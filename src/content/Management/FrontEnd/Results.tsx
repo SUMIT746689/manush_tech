@@ -7,47 +7,53 @@ import { FC, useEffect, useState } from 'react';
 import { ResultProps } from '@/models/front_end';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
+import axios from 'axios';
 
-// @ts-ignore
+
 const Results = ({ data, reFetchData }) => {
+
   console.log("data__", data);
+
   const { t }: { t: any } = useTranslation();
-  const [header_image, setHeader_image] = useState(null)
-  const [carousel_image, setCarousel_image] = useState(null)
-  const [chairman_photo, setChairman_photo] = useState(null)
-  const [principal_photo, setPrincipal_photo] = useState(null)
 
-  useEffect(() => {
-    console.log("carousel_image__", typeof (carousel_image), carousel_image);
+  // const [header_image, setHeader_image] = useState(null)
+  // const [carousel_image, setCarousel_image] = useState(null)
+  // const [chairman_photo, setChairman_photo] = useState(null)
+  // const [principal_photo, setPrincipal_photo] = useState(null)
 
+  // useEffect(() => {
+  //   console.log("carousel_image__", typeof (carousel_image), carousel_image);
+
+  //   let cnt = []
+  //   for (const i in carousel_image) {
+  //     cnt.push(carousel_image[i])
+  //   }
+  //   console.log(cnt);
+  // }, [carousel_image])
+
+
+  const getValue = (carousel_image) => {
     let cnt = []
     for (const i in carousel_image) {
       cnt.push(carousel_image[i])
     }
-    console.log(cnt);
-  }, [carousel_image])
-
-
-  const getValue = () => {
-    let cnt = []
-    for (const i in carousel_image) {
-      cnt.push(carousel_image[i])
-    }
-    return cnt.length > 0 ? (cnt.map(j => j.name).join(', ')) : false
+    return cnt.map(j => j.name).join(', ')
   }
   return (
     <Formik
+      enableReinitialize
+
       initialValues={{
-        header_image: data ? data?.header_image : '',
-        carousel_image: data ? data?.carousel_image : '',
+        header_image: data?.header_image || undefined,
+        carousel_image: undefined,
 
-        school_history: data ? data?.school_history : '',
+        history_description: data?.history_description || '',
 
-        chairman_photo: data ? data?.chairman_photo : '',
-        chairman_speech: data ? data?.chairman_speech : '',
+        chairman_photo: data?.chairman_photo || '',
+        chairman_speech: data?.chairman_speech || '',
 
-        principal_photo: data ? data?.principal_photo : '',
-        principal_speech: data ? data?.principal_speech : '',
+        principal_photo: data?.principal_photo || '',
+        principal_speech: data?.principal_speech || '',
 
         submit: null
       }}
@@ -70,6 +76,53 @@ const Results = ({ data, reFetchData }) => {
             reFetchData();
           };
 
+          // console.log("incomming _values", _values);
+
+          // let cnt = [];
+          // for (const j in _values['carousel_image']) {
+          //   console.log({ j })
+          //   if (typeof (_values['carousel_image'][j]) == 'object') {
+          //     cnt.push(_values['carousel_image'][j])
+          //   }
+
+          // }
+          // console.log("cnt__", cnt);
+
+          // _values['carousel_image'] = cnt
+
+
+          console.log("_values", _values);
+
+
+          const formData = new FormData();
+
+          for (let i in _values) {
+            if (i == 'carousel_image') {
+              const temp = _values[i]
+              let nameList: any = []
+              for (const j in temp) {
+                if (typeof (temp[j]) == 'object') {
+                  nameList.push({ name: temp[j].name })
+                  formData.append('carousel_image', temp[j])
+                }
+              }
+              if (nameList.length) {
+                formData.append(`carousel_image_name_list`, nameList);
+              }
+            }
+            else {
+              formData.append(`${i}`, _values[i]);
+            }
+          }
+
+
+          axios.put('/api/front_end', formData)
+            .then(res => {
+              console.log(res);
+            }).catch(err => {
+              console.log(err);
+
+            })
 
         } catch (err) {
           console.error(err);
@@ -91,7 +144,7 @@ const Results = ({ data, reFetchData }) => {
         values,
         setFieldValue
       }) => {
-        console.log("values__", values);
+        //  console.log("values__", values);
 
         return (
           <>
@@ -117,9 +170,9 @@ const Results = ({ data, reFetchData }) => {
                       htmlFor="header_image"
                       label="select Header image"
                       name="header_image"
-                      value={header_image?.name || ''}
-                      handleChangeFile={(e) => { setHeader_image(e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setHeader_image(undefined) }}
+                      value={values?.header_image?.name || values?.header_image || ''}
+                      handleChangeFile={(e) => { setFieldValue('header_image', e.target.files[0]) }}
+                      handleRemoveFile={(e) => { setFieldValue('header_image', undefined) }}
                     />
 
                   </Grid>
@@ -145,10 +198,14 @@ const Results = ({ data, reFetchData }) => {
                       label="select Carousel Image"
                       name="carousel_image"
                       multiple={true}
-                      value={getValue() || ''}
+                      value={values?.carousel_image ? getValue(values?.carousel_image) : ''}
                       // carousel_image?.map(j=>j?.name)?.join(', ') ||
-                      handleChangeFile={(e) => { setCarousel_image(e.target.files) }}
-                      handleRemoveFile={(e) => { setCarousel_image(undefined) }}
+                      handleChangeFile={(e) => {
+
+
+                        setFieldValue('carousel_image', e.target.files)
+                      }}
+                      handleRemoveFile={(e) => { setFieldValue('carousel_image', undefined) }}
                     />
 
                   </Grid>
@@ -158,15 +215,15 @@ const Results = ({ data, reFetchData }) => {
                 <Grid container item borderRadius='10px' marginBottom='10px'>
                   <TextField
                     id="outlined-basic"
-                    label="School history"
-                    error={Boolean(touched?.school_history && errors?.school_history)}
+                    label="History Description"
+                    error={Boolean(touched?.history_description && errors?.history_description)}
                     fullWidth
-                    helperText={touched?.school_history && errors?.school_history}
-                    name="school_history"
-                    placeholder={t(`school history here...`)}
+                    helperText={touched?.history_description && errors?.history_description}
+                    name="history_description"
+                    placeholder={t(`History Description here...`)}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.school_history}
+                    value={values?.history_description}
                     variant="outlined"
                     minRows={4}
                     maxRows={5}
@@ -181,7 +238,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Chairman photo'
-                      src={`/${data?.header_image}`}
+                      src={`/${data?.chairman_photo}`}
                       loading='lazy'
                     />
 
@@ -193,9 +250,9 @@ const Results = ({ data, reFetchData }) => {
                       htmlFor="chairman_photo"
                       label="select chairman photo"
                       name="chairman_photo"
-                      value={chairman_photo?.name || ''}
-                      handleChangeFile={(e) => { setChairman_photo(e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setChairman_photo(undefined) }}
+                      value={values?.chairman_photo?.name || values?.chairman_photo || ''}
+                      handleChangeFile={(e) => { setFieldValue('chairman_photo', e.target.files[0]) }}
+                      handleRemoveFile={(e) => { setFieldValue('chairman_photo', undefined) }}
                     />
 
                   </Grid>
@@ -227,7 +284,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Principal photo'
-                      src={`/${data?.header_image}`}
+                      src={`/${data?.principal_photo}`}
                       loading='lazy'
                     />
 
@@ -238,10 +295,10 @@ const Results = ({ data, reFetchData }) => {
                     <FileUploadFieldWrapper
                       htmlFor="principal photo"
                       label="select principal photo"
-                      name="chairman_photo"
-                      value={principal_photo?.name || ''}
-                      handleChangeFile={(e) => { setPrincipal_photo(e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setPrincipal_photo(undefined) }}
+                      name="principal_photo"
+                      value={values?.principal_photo?.name || values?.principal_photo || ''}
+                      handleChangeFile={(e) => { setFieldValue('principal_photo', e.target.files[0]) }}
+                      handleRemoveFile={(e) => { setFieldValue('principal_photo', undefined) }}
                     />
 
                   </Grid>
@@ -272,13 +329,11 @@ const Results = ({ data, reFetchData }) => {
                   p: 3
                 }}
               >
-                <Button color="secondary" onClick={() => { }}>
-                  {t('Cancel')}
-                </Button>
+
                 <Button
                   type="submit"
                   startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
-                  //@ts-ignore
+
                   disabled={Boolean(errors.submit) || isSubmitting}
                   variant="contained"
                 >

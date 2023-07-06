@@ -1,6 +1,11 @@
 import get from 'controllers/front_end/get';
 import put from 'controllers/front_end/put';
 
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
 const index = async (req, res) => {
   try {
     const { method } = req;
@@ -9,11 +14,12 @@ const index = async (req, res) => {
       case 'GET':
         get(req, res);
         break;
-      case 'POST':
+      case 'PUT':
+        console.log('hitted');
         put(req, res);
         break;
       default:
-        res.setHeader('Allow', ['GET', 'POST']);
+        res.setHeader('Allow', ['GET', 'PUT']);
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {
@@ -22,4 +28,4 @@ const index = async (req, res) => {
   }
 };
 
-export default  index;
+export default index;

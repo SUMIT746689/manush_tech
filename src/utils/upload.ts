@@ -38,11 +38,11 @@ export const imageFolder = async () => {
 }
 export const certificateTemplateFolder = async (foldername: string) => {
     try {
-        // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/${foldername}`));
+        await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        // await fs.readdir(path.join(process.cwd(), `/${foldername}`));
     } catch (error) {
-        // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/${foldername}`));
+        await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        // await fs.mkdir(path.join(process.cwd(), `/${foldername}`));
     }
 }
 
@@ -86,7 +86,7 @@ export const validateField = async (req) => {
 
 }
 
-export const fileUpload = async ({ req, filterFiles, uploadFolderName }) => {
+export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFileName = true }) => {
     let error = null;
 
     const options: formidable.Options = {};
@@ -94,7 +94,7 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName }) => {
     options.multiple = true;
     // options.maxFieldsSize = 1 * 1024 * 1024;
     options.keepExtensions = true;
-    options.filename = (name, ext, path, form) => Date.now().toString() + '_' + path.originalFilename;
+    options.filename = (name, ext, path, form) => uniqueFileName ? Date.now().toString() + '_' + path.originalFilename : path.originalFilename;
     options['filter'] = function ({ name, mimetype }) {
 
         for (const [key, value] of Object.entries(filterFiles)) {
@@ -110,15 +110,23 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName }) => {
 
     const form = await formidable(options);
 
+
     const [files, fields] = await new Promise((resolve) => {
+
         form.parse(req, (err, fields, files) => {
             if (err) {
                 error = err;
                 resolve([{}, {}]);
             }
             else {
+                
+                console.log("fields__",typeof(fields.carousel_image_name_list), fields.carousel_image_name_list);
+
                 const convertJsonfile = JSON.stringify(files);
+                console.log("convertJsonfile__",typeof(JSON.stringify(fields)),JSON.stringify(fields));
+                
                 const convertObjectfile = JSON.parse(convertJsonfile);
+                console.log("convertJsonfile__",typeof(convertObjectfile),convertObjectfile);
                 resolve([convertObjectfile, fields]);
             }
         });

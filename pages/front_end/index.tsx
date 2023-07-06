@@ -12,18 +12,18 @@ import { Data } from '@/models/front_end';
 const Packages = () => {
 
   const { data, reFetchData }: { data: Data, reFetchData: Function } = useClientFetch('/api/front_end');
-  
+
   return (
     <>
 
       <Head>
         <title>Frontend - Management</title>
       </Head>
-     
-        <PageTitleWrapper>
-          <PageHeader title={'Frontend - Management'} />
-        </PageTitleWrapper>
-    
+
+      <PageTitleWrapper>
+        <PageHeader title={'Frontend - Management'} />
+      </PageTitleWrapper>
+
 
 
       <Grid
@@ -40,6 +40,8 @@ const Packages = () => {
             reFetchData={reFetchData}
 
           />
+
+
         </Grid>
 
       </Grid>

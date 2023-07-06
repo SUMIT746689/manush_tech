@@ -5,7 +5,7 @@ import { Authenticated } from 'src/components/Authenticated';
 
 import DashboardReportsContent from 'src/content/DashboardPages/reports';
 import { SSRHTTPClient } from 'repositories/base';
-import { useEffect } from 'react';
+import prisma from '@/lib/prisma_client';
 
 export async function getServerSideProps(context: any) {
 
@@ -14,6 +14,9 @@ export async function getServerSideProps(context: any) {
     const client = SSRHTTPClient(context)
     const res = await client.get(`${process.env.NEXT_PUBLIC_BASE_API}/api/dashboard`)
     blockCount = res.data;
+    console.log({cookee: context.req.headers.cookie})
+    const cookie = context.req.headers.cookie || ''  ; 
+    const data = await prisma.student.findFirst()
     
   } catch (err) {
     console.log(err)

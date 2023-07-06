@@ -1,9 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-// @ts-ignore
-import bcrypt from 'bcrypt';
+import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
 
 const index = async (req, res) => {
   try {
@@ -12,8 +8,7 @@ const index = async (req, res) => {
     const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
     if (!refresh_token) throw new Error('invalid user');
-    console.log({ refresh_token });
-
+  
     const userInfo = await prisma.user.findFirst({
       where: { id: refresh_token.id },
       include: {
@@ -50,6 +45,11 @@ const index = async (req, res) => {
             })
           };
         }
+
+        // if (userInfo.role.title === 'STUDENT') {
+        //   totalCount['class'] = await prisma.student.findFirst
+        // }
+
         console.log({ totalCount });
         res.status(200).json({
           ...totalCount

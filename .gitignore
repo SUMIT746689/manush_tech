@@ -20,5 +20,5 @@ yarn-error.log*
 /public/images
 /public/files
 /public/certificate_templates
-certificate_templates
+/certificate_templates
 /public/certificate_images

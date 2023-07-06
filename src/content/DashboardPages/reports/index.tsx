@@ -1,6 +1,7 @@
 import PageHeader from 'src/content/Dashboards/Reports/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 
 import { Button, Card, Grid } from '@mui/material';
 
@@ -77,6 +78,7 @@ function DashboardReportsContent({ blockCount = null }) {
       })
       .catch(err => showNotification(`${err?.response?.data?.message}`, 'error'))
   }
+
   return (
     <>
       <PageTitleWrapper>
@@ -222,6 +224,16 @@ function DashboardReportsContent({ blockCount = null }) {
           <Block13 />
         </Grid>*/}
       </Grid>
+      {
+        blockCount.role === "student" && 
+        <Grid>
+          <Card>Exam</Card>
+          <Card>Attendance</Card>
+          <Card>Routine</Card>
+          <Card>Fees Collection</Card>
+        </Grid>
+
+      }
       <Footer />
     </>
   );

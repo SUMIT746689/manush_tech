@@ -15,7 +15,7 @@ const index = async (req, res) => {
         role: true
       }
     });
-    console.log({ userInfo });
+  
     const { method } = req;
 
     switch (method) {
@@ -50,7 +50,6 @@ const index = async (req, res) => {
         //   totalCount['class'] = await prisma.student.findFirst
         // }
 
-        console.log({ totalCount });
         res.status(200).json({
           ...totalCount
         });

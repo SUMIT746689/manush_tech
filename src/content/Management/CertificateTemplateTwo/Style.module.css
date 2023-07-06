@@ -1,0 +1,31 @@
+.containerForTwo {
+  background-image: url('https://www.chrisbrosky.com/images/harry-dunne-badge.png');
+  /* background-size: cover; */
+  background-size: auto 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  height: 45%;
+  width: 55%;
+  
+  position: relative;
+  text-align: center;
+  /* background-image: url('https://www.chrisbrosky.com/images/harry-dunne-badge.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: auto 70%;
+  opacity: 0.5; */
+}
+.dd{
+
+  position: relative;
+  text-align: center;
+}
+
+.centered {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  font-size: larger;
+  /* transform: translate(-50%, -50%); */
+}

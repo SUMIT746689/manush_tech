@@ -1,0 +1,751 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int                 @id @default(autoincrement())
+  username     String
+  password     String
+  /// 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
+  user_role_id Int
+  role_id      Int?
+  is_enabled   Boolean             @default(true)
+  created_at   DateTime            @default(now())
+  updated_at   DateTime            @updatedAt
+  school_id    Int?
+  teacher      Teacher?
+  school       School?             @relation("AdminUserSchool", fields: [school_id], references: [id])
+  user_role    Role                @relation("userRoleWithRole", fields: [user_role_id], references: [id])
+  role         Role?               @relation(fields: [role_id], references: [id])
+  permissions  Permission[]        @relation("PermissionToUser")
+  student      StudentInformation?
+
+  // admin_school School? @relation(name: "AdminUserSchool")
+  SentSmsDetail      SentSmsDetail[]
+  EmployeeAttendance EmployeeAttendance[]
+  StudentFee         StudentFee[]
+
+  @@map("users")
+}
+
+model School {
+  id       Int     @id @default(autoincrement())
+  name     String
+  address  String
+  phone    String
+  email    String
+  domain   String? @unique
+  /// school should not be created without an existing user
+  // admin_id Int     @unique
+  currency String?
+
+  // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
+  admins              User[]                @relation("AdminUserSchool")
+  teachers            Teacher[]
+  classes             Class[]
+  student_list        StudentInformation[]
+  rooms               Room[]
+  periods             Period[]
+  fees                Fee[]
+  exams               Exam[]
+  holidays            Holiday[]
+  academic_years      AcademicYear[]
+  attendances         Attendance[]
+  subscription        Subscription[]
+  websiteui           WebsiteUi[]
+  RequestPackage      RequestPackage[]
+  SmsGateway          SmsGateway[]
+  SmsTemplate         SmsTemplate[]
+  SentSms             SentSms[]
+  CertificateTemplate CertificateTemplate[]
+  Transaction         Transaction[]
+  GradingSystem       GradingSystem[]
+
+  // routines Routine[]
+  @@map("schools")
+}
+
+model Permission {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value String
+  group String
+  users User[] @relation("PermissionToUser")
+  roles Role[] @relation("RolesToPermissions")
+
+  @@map("permissions")
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  title       String
+  permissions Permission[] @relation("RolesToPermissions")
+  User        User[]
+  user_role   User[]       @relation("userRoleWithRole")
+}
+
+model Department {
+  id        Int    @id @default(autoincrement())
+  title     String
+  school_id Int
+
+  teachers Teacher[]
+
+  @@map("departments")
+}
+
+model Teacher {
+  id                Int      @id @default(autoincrement())
+  first_name        String
+  middle_name       String?
+  last_name         String?
+  national_id       String
+  phone             String?
+  email             String?
+  gender            Gender
+  blood_group       String?  @db.VarChar(20)
+  religion          String?
+  date_of_birth     DateTime @db.Date
+  present_address   String
+  permanent_address String
+  joining_date      DateTime @db.Date
+  resume            String
+  photo             String?
+
+  department_id Int
+  user_id       Int @unique
+  school_id     Int
+
+  my_class   Section[]  @relation("class_teacher")
+  user       User       @relation(fields: [user_id], references: [id])
+  classes    Section[]  @relation("SectionToTeacher")
+  periods    Period[]
+  school     School     @relation(fields: [school_id], references: [id])
+  department Department @relation(fields: [department_id], references: [id])
+
+  @@map("teachers")
+}
+
+model Class {
+  id          Int     @id @default(autoincrement())
+  name        String
+  code        String
+  has_section Boolean @default(false)
+  school_id   Int
+
+  sections Section[]
+  subjects Subject[]
+  school   School    @relation(fields: [school_id], references: [id])
+  fees     Fee[]
+  Group    Group[]
+
+  @@map("classes")
+}
+
+model Section {
+  id               Int          @id @default(autoincrement())
+  name             String?      @db.VarChar(40)
+  class_id         Int
+  class_teacher_id Int?
+  is_class         Boolean      @default(true)
+  class            Class        @relation(fields: [class_id], references: [id])
+  class_teacher    Teacher?     @relation("class_teacher", fields: [class_teacher_id], references: [id])
+  students         Student[]
+  teachers         Teacher[]    @relation("SectionToTeacher")
+  periods          Period[]
+  attendaces       Attendance[]
+  exams            Exam[]
+  groups           Group[]
+
+  @@map("sections")
+}
+
+model StudentInformation {
+  id                        Int             @id @default(autoincrement())
+  user_id                   Int             @unique
+  first_name                String
+  middle_name               String?
+  last_name                 String?
+  school_id                 Int
+  admission_no              String
+  admission_date            DateTime
+  admission_status          AdmissionStatus @default(waiting)
+  date_of_birth             DateTime        @db.Date
+  gender                    Gender
+  blood_group               String?         @db.VarChar(20)
+  religion                  String?
+  phone                     String?
+  email                     String?
+  national_id               String?
+  father_name               String?
+  father_phone              String?
+  father_profession         String?
+  father_photo              String?
+  mother_name               String?
+  mother_phone              String?
+  mother_profession         String?
+  mother_photo              String?
+  student_permanent_address String?
+  previous_school           String?
+
+  user   User   @relation(fields: [user_id], references: [id])
+  school School @relation(fields: [school_id], references: [id])
+
+  variance Student[]
+
+  @@map("student_informations")
+}
+
+model Student {
+  id                      Int     @id @default(autoincrement())
+  student_information_id  Int
+  section_id              Int
+  group_id                Int?
+  academic_year_id        Int
+  class_roll_no           String
+  class_registration_no   String
+  discount                Float
+  student_photo           String?
+  guardian_name           String?
+  guardian_phone          String?
+  guardian_profession     String?
+  guardian_photo          String?
+  relation_with_guardian  String?
+  student_present_address String?
+
+  academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
+  student_info  StudentInformation @relation(fields: [student_information_id], references: [id])
+  section       Section            @relation(fields: [section_id], references: [id])
+  group         Group?             @relation(fields: [group_id], references: [id])
+
+  fees        StudentFee[]
+  attendances Attendance[]
+  results     StudentResult[]
+
+  @@map("students")
+}
+
+enum AdmissionStatus {
+  waiting
+  approved
+  declined
+}
+
+enum Gender {
+  male
+  female
+}
+
+/// StudentStatus holds student current status also history. Current status like payment info, results etc,
+/// duplicate by commonly section id
+// model StudentStatus {
+//   id         Int @id @default(autoincrement())
+//   student_id Int
+//   section_id Int
+//   session_id Int
+//
+//   student Student @relation(fields: [student_id], references: [id])
+//   section Section @relation(fields: [section_id], references: [id])
+//   session Session @relation(fields: [session_id], references: [id])
+//
+//   @@map("student_statuses")
+// }
+
+model Subject {
+  id       Int    @id @default(autoincrement())
+  name     String
+  class_id Int
+  class    Class  @relation(fields: [class_id], references: [id])
+
+  exam_details ExamDetails[]
+
+  @@map("subjects")
+}
+
+model Room {
+  id        Int    @id @default(autoincrement())
+  name      String
+  school_id Int
+
+  periods Period[]
+  school  School   @relation(fields: [school_id], references: [id])
+
+  @@map("rooms")
+}
+
+model Period {
+  id         Int      @id @default(autoincrement())
+  room_id    Int
+  day        weekdays
+  start_time DateTime @db.Time()
+  end_time   DateTime @db.Time()
+  teacher_id Int?
+  section_id Int?
+  school_id  Int
+
+  room    Room     @relation(fields: [room_id], references: [id])
+  teacher Teacher? @relation(fields: [teacher_id], references: [id])
+  section Section? @relation(fields: [section_id], references: [id])
+  school  School   @relation(fields: [school_id], references: [id])
+
+  // routine Routine?
+  @@map("periods")
+}
+
+enum weekdays {
+  Saturday
+  Sunday
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+}
+
+model Group {
+  id       Int    @id @default(autoincrement())
+  title    String
+  class_id Int
+
+  class    Class     @relation(fields: [class_id], references: [id])
+  Section  Section[]
+  students Student[]
+}
+
+// model Routine {
+//   id         Int  @id @default(autoincrement())
+//   period_id  Int? @unique
+//   teacher_id Int
+//   section_id Int
+//   school_id  Int
+//
+//   period  Period? @relation(fields: [period_id], references: [id])
+//   teacher Teacher @relation(fields: [teacher_id], references: [id])
+//   section Section @relation(fields: [section_id], references: [id])
+//   school  School  @relation(fields: [school_id], references: [id])
+//
+//   @@map("routines")
+// }
+
+// model Session {
+//   id    Int    @id @default(autoincrement())
+//   title String @db.VarChar(100)
+//
+//   fees             Fee[]
+//   student_statuses StudentStatus[]
+//
+//   @@map("sessions")
+// }
+
+model Fee {
+  id        Int      @id @default(autoincrement())
+  title     String
+  for       String?
+  amount    Float
+  last_date DateTime
+  late_fee  Float?
+
+  academic_year_id Int
+  class_id         Int
+  school_id        Int
+
+  academic_year AcademicYear @relation(fields: [academic_year_id], references: [id])
+  class         Class        @relation(fields: [class_id], references: [id])
+  school        School       @relation(fields: [school_id], references: [id])
+  student_fees  StudentFee[]
+
+  @@map("fees")
+}
+
+model StudentFee {
+  id               Int           @id @default(autoincrement())
+  student_id       Int
+  fee_id           Int
+  collected_amount Float
+  payment_method   PaymentMethod
+  collected_by     Int?
+  created_at       DateTime      @default(now())
+
+  student           Student @relation(fields: [student_id], references: [id])
+  fee               Fee     @relation(fields: [fee_id], references: [id])
+  collected_by_user User?    @relation(fields: [collected_by], references: [id])
+
+  @@map("student_fees")
+}
+
+enum PaymentMethod {
+  cash
+  online
+  pending
+}
+
+model Holiday {
+  id        Int      @id @default(autoincrement())
+  title     String
+  date      DateTime @db.Date
+  school_id Int
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("holidays")
+}
+
+model AcademicYear {
+  id        Int    @id @default(autoincrement())
+  title     String
+  school_id Int
+
+  school School @relation(fields: [school_id], references: [id])
+
+  exams         Exam[]
+  students      Student[]
+  fees          Fee[]
+  GradingSystem GradingSystem[]
+
+  @@map("academic_years")
+}
+
+model Exam {
+  id               Int    @id @default(autoincrement())
+  title            String
+  // class_id         Int
+  section_id       Int
+  academic_year_id Int
+  school_id        Int
+  final_percent    Int?
+
+  // class         Class        @relation(fields: [class_id], references: [id])
+  section       Section      @relation(fields: [section_id], references: [id])
+  academic_year AcademicYear @relation(fields: [academic_year_id], references: [id])
+  school        School       @relation(fields: [school_id], references: [id])
+
+  exam_details    ExamDetails[]
+  student_results StudentResult[]
+  Attendance      Attendance[]
+
+  @@map("exams")
+}
+
+model ExamDetails {
+  id            Int   @id @default(autoincrement())
+  exam_id       Int
+  subject_id    Int
+  subject_total Float
+
+  exam    Exam    @relation(fields: [exam_id], references: [id])
+  subject Subject @relation(fields: [subject_id], references: [id])
+
+  participants StudentResultDetails[]
+
+  @@map("exam_details")
+}
+
+model Attendance {
+  id         Int              @id @default(autoincrement())
+  student_id Int
+  date       DateTime         @db.Date
+  status     AttendenceStatus
+  remark     String?
+  section_id Int
+  school_id  Int
+  exam_id    Int?
+
+  student Student @relation(fields: [student_id], references: [id])
+  section Section @relation(fields: [section_id], references: [id])
+  school  School  @relation(fields: [school_id], references: [id])
+  exam    Exam?   @relation(fields: [exam_id], references: [id])
+
+  @@map("attendances")
+}
+
+enum AttendenceStatus {
+  present
+  absent
+  late
+  bunk
+  holiday
+}
+
+model EmployeeAttendance {
+  id        Int                      @id @default(autoincrement())
+  date      DateTime                 @db.Date
+  status    EmployeeAttendenceStatus
+  remark    String?
+  school_id Int
+  user_id   Int
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("employee_attendances")
+}
+
+enum EmployeeAttendenceStatus {
+  present
+  absent
+  late
+  half_holiday
+  holiday
+}
+
+model StudentResult {
+  id                   Int    @id @default(autoincrement())
+  student_id           Int
+  exam_id              Int
+  total_marks_obtained Float
+  calculated_grade     String
+  calculated_point     Float
+
+  student Student @relation(fields: [student_id], references: [id])
+  exam    Exam    @relation(fields: [exam_id], references: [id])
+
+  result_details StudentResultDetails[]
+
+  @@map("student_results")
+}
+
+model StudentResultDetails {
+  student_result_id Int
+  exam_details_id   Int
+  mark_obtained     Float
+  grade_id          Int
+
+  result       StudentResult @relation(fields: [student_result_id], references: [id])
+  exam_details ExamDetails   @relation(fields: [exam_details_id], references: [id])
+  grade        GradingSystem @relation(fields: [grade_id], references: [id])
+
+  @@id([student_result_id, exam_details_id])
+  @@map("student_result_details")
+}
+
+model Package {
+  id            Int    @id @default(autoincrement())
+  title         String
+  price         Float
+  duration      Int
+  student_count Int
+
+  subscription   Subscription[]
+  RequestPackage RequestPackage[]
+
+  @@map("packages")
+}
+
+model RequestPackage {
+  id             Int                  @id @default(autoincrement())
+  document_photo String
+  school_id      Int
+  package_id     Int
+  status         RequestPakcageStatus
+
+  school  School  @relation(fields: [school_id], references: [id])
+  package Package @relation(fields: [package_id], references: [id])
+
+  @@map("request_packages")
+}
+
+enum RequestPakcageStatus {
+  pending
+  approved
+  declined
+}
+
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  school_id  Int
+  package_id Int
+  start_date DateTime @db.Date
+  end_date   DateTime @db.Date
+  is_active  Boolean
+
+  school  School  @relation(fields: [school_id], references: [id])
+  package Package @relation(fields: [package_id], references: [id])
+
+  @@map("subscriptions")
+}
+
+model WebsiteUi {
+  id                  Int    @id @default(autoincrement())
+  header_image        String
+  carousel_image      Json?
+  school_history      String?
+  school_id           Int
+  history_photo       String
+  history_description String
+  chairman_photo      String
+  chairman_speech     String
+  principal_photo     String
+  principal_speech    String
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("website_uis")
+}
+
+model SmsTemplate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  body       String
+  school_id  Int
+  created_at DateTime @default(now())
+
+  school  School    @relation(fields: [school_id], references: [id])
+  SentSms SentSms[]
+
+  @@map("sms_templates")
+}
+
+model SmsGateway {
+  id        Int     @id @default(autoincrement())
+  title     String
+  details   Json
+  is_active Boolean
+  school_id Int
+
+  school  School    @relation(fields: [school_id], references: [id])
+  SentSms SentSms[]
+
+  @@map("sms_gateway")
+}
+
+model SentSms {
+  id              Int            @id @default(autoincrement())
+  name            String
+  recipient_type  RecipientType?
+  recipient_count Int?
+  sms_template_id Int?
+  sms_gateway_id  Int
+  school_id       Int
+  custom_body     String?
+  created_at      DateTime       @default(now())
+
+  school        School          @relation(fields: [school_id], references: [id])
+  smsTemplate   SmsTemplate?    @relation(fields: [sms_template_id], references: [id])
+  smsGateway    SmsGateway      @relation(fields: [sms_gateway_id], references: [id])
+  sentSmsDetail SentSmsDetail[]
+
+  @@map("sent_sms")
+}
+
+enum RecipientType {
+  group
+  class
+  individual
+}
+
+model SentSmsDetail {
+  id          Int           @id @default(autoincrement())
+  sent_sms_id Int
+  name        String
+  phone       String
+  user_id     Int
+  status      SentSmsStatus
+  created_at  DateTime      @default(now())
+
+  sentSms SentSms @relation(fields: [sent_sms_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+
+  @@map("sent_sms_details")
+}
+
+enum SentSmsStatus {
+  pending
+  success
+  failed
+}
+
+model CertificateTemplate {
+  id               Int         @id @default(autoincrement())
+  name             String
+  user_type        UserType
+  page_layout      PageLayouts
+  student_qr_code  String?
+  employee_qr_code String?
+  photo_style      PhotoStyle
+  photo_size       Float
+  top_space        Float
+  bottom_space     Float
+  right_space      Float
+  left_space       Float
+  signature_url    String
+  logo_url         String
+  background_url   String
+  content          Json
+  school_id        Int
+  created_at       DateTime    @default(now())
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("certificate_templates")
+}
+
+enum UserType {
+  student
+  employee
+}
+
+enum PageLayouts {
+  a4_potrait
+  a4_landscape
+}
+
+enum PhotoStyle {
+  circular
+  rounded
+  square
+}
+
+model GradingSystem {
+  id               Int     @id @default(autoincrement())
+  lower_mark       Float
+  upper_mark       Float
+  point            Float?
+  grade            String?
+  school_id        Int
+  academic_year_id Int
+
+  school               School                 @relation(fields: [school_id], references: [id])
+  academic_year        AcademicYear           @relation(fields: [academic_year_id], references: [id])
+  StudentResultDetails StudentResultDetails[]
+
+  @@map("grade_systems")
+}
+
+model Voucher {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  amount        Float
+  reference     String
+  type          TransactionType
+  resource_id   Int
+  resource_type String
+  created_at    DateTime        @default(now())
+
+  Transaction Transaction[]
+
+  @@map("vouchers")
+}
+
+enum TransactionType {
+  debit
+  credit
+}
+
+model Transaction {
+  id             Int      @id @default(autoincrement())
+  amount         Float
+  payment_method String
+  voucher_id     Int
+  school_id      Int
+  created_at     DateTime @default(now())
+
+  voucher Voucher @relation(fields: [voucher_id], references: [id])
+  school  School  @relation(fields: [school_id], references: [id])
+
+  @@map("transactions")
+}

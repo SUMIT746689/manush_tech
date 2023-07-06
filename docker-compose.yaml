@@ -1,0 +1,9 @@
+version: '3'
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+    # todo: need to persist files
+    #map ports
+    #tell to use system network, if I use system network then should I need to map?
+    network_mode: host

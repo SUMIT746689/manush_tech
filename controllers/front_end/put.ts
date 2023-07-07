@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
-import fs from 'fs/promises';
 import formidable from 'formidable';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 

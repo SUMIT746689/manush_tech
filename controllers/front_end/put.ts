@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import formidable from 'formidable';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma_client';
 
 const saveImage = (req, saveLocally) => {
     const options: formidable.Options = {};
@@ -30,13 +28,6 @@ const saveImage = (req, saveLocally) => {
 };
 async function put(req, res, refresh_token) {
     try {
-        console.log('!!!!!!!!! hitted');
-        // try {
-        //     await fs.readdir(path.join(process.cwd() + '/public', '/frontendPhoto'));
-        // } catch (error) {
-        //     await fs.mkdir(path.join(process.cwd() + '/public', '/frontendPhoto'));
-        // }
-        // const { fields, files }: any = await saveImage(req, true);
 
 
         const uploadFolderName = "frontendPhoto";
@@ -53,6 +44,7 @@ async function put(req, res, refresh_token) {
         }
 
         const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
+        console.log({error})
         // const {
         //     header_image,
         //     carousel_image,
@@ -65,7 +57,7 @@ async function put(req, res, refresh_token) {
         // } = req.body;
         console.log({ fields, files });
 
-        console.log("aaaaaaaaaaaaa__", typeof(fields.carousel_image_name_list),fields.carousel_image_name_list);
+        console.log("aaaaaaaaaaaaa__", typeof (fields.carousel_image_name_list), fields.carousel_image_name_list);
 
         // const websiteUiId = await prisma.websiteUi.findFirst({
         //     where: {

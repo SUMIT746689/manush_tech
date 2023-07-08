@@ -107,7 +107,11 @@ const Results = ({ data, reFetchData }) => {
                 }
               }
               if (nameList.length) {
-                formData.append(`carousel_image_name_list`, nameList);
+                nameList.forEach(element => {
+                  console.log({element})
+                  formData.append(`carousel_image_name_list[]`, element.name);
+                  // formData.append(`carousel_image_name_list[]`, nameList);
+                });
               }
             }
             else {

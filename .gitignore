@@ -22,3 +22,4 @@ yarn-error.log*
 /public/certificate_templates
 /certificate_templates
 /public/certificate_images
+/frontendPhoto

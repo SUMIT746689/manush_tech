@@ -7,6 +7,7 @@ import DashboardReportsContent from 'src/content/DashboardPages/reports';
 import { SSRHTTPClient } from 'repositories/base';
 import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 
 export async function getServerSideProps(context: any) {
 
@@ -39,12 +40,12 @@ export async function getServerSideProps(context: any) {
     }
 
     if (refresh_token.role.title === 'ADMIN') {
-      totalCount['students'] = {
+      blockCount['students'] = {
         count: await prisma.student.count({
           where: { student_info: { school_id: refresh_token?.school_id } }
         })
       };
-      totalCount['teachers'] = {
+      blockCount['teachers'] = {
         count: await prisma.teacher.count({
           where: { school_id: refresh_token?.school_id }
         })
@@ -53,10 +54,32 @@ export async function getServerSideProps(context: any) {
 
     if (refresh_token.role.title === 'STUDENT') {
       // blockCount['class'] = await prisma.student.F({
-        // where: {
-          // refresh_token.id
-        // }
+      // where: {
+      // refresh_token.id
+      // }
       // })
+      blockCount['student'] = await prisma.student.findFirst({
+        where: {
+          student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id }
+        },
+        select: {
+          class_roll_no: true,
+          section: {
+            select: {
+              name: true,
+              class: true,
+            }
+          },
+          student_info: {
+            select: {
+              first_name: true,
+              middle_name: true,
+              last_name: true,
+            }
+          }
+        }
+
+      });
       blockCount['role'] = 'student';
 
     }
@@ -76,8 +99,12 @@ function DashboardReports({ blockCount }) {
       <Head>
         <title>Dashboard</title>
       </Head>
-      <DashboardReportsContent blockCount={blockCount} />
-     
+      {
+        blockCount.role === "student" ? <StudentDashboardReportsContent blockCount={blockCount} />
+        :
+        <DashboardReportsContent blockCount={blockCount} />
+      }
+
     </>
   );
 }

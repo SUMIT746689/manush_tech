@@ -2,7 +2,7 @@ import PageHeader from 'src/content/Dashboards/Reports/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
-import { Box, Button, Card, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 import Block1 from 'src/content/Blocks/Statistics/Block3';
 import Block2 from 'src/content/Blocks/ListsLarge/Block8';
@@ -32,76 +32,69 @@ import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 
-function DashboardReportsContent({ blockCount = null }) {
+function StudentDashboardReportsContent({ blockCount = null }) {
   const [holidays, setHolidays] = useState([]);
   const [dbBtN, setDbBtN] = useState(false)
   const { user } = useAuth();
   const { showNotification } = useNotistick()
 
-  useEffect(() => {
-    // @ts-ignore
-    axios
-      .get('/api/holidays')
-      .then((res) => {
-        // @ts-ignore
-        if (user?.role?.title === "SUPER_ADMIN") {
-          setHolidays(
-            res?.data?.data.map((i) => {
-              return {
-                title: `${i?.school?.name} subscription ending`,
-                date: dayjs(i.end_date).format('YYYY-MM-DD'),
-              };
-            })
-          )
-        } else {
-          setHolidays(
-            res?.data?.data.map((i) => {
-              return {
-                title: i.title,
-                date: dayjs(i.date).format('YYYY-MM-DD')
-              };
-            })
-          )
-        }
-        ;
-      })
-      .catch((err) => console.log(err));
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   axios
+  //     .get('/api/holidays')
+  //     .then((res) => {
+  //       // @ts-ignore
+  //       if (user?.role?.title === "SUPER_ADMIN") {
+  //         setHolidays(
+  //           res?.data?.data.map((i) => {
+  //             return {
+  //               title: `${i?.school?.name} subscription ending`,
+  //               date: dayjs(i.end_date).format('YYYY-MM-DD'),
+  //             };
+  //           })
+  //         )
+  //       } else {
+  //         setHolidays(
+  //           res?.data?.data.map((i) => {
+  //             return {
+  //               title: i.title,
+  //               date: dayjs(i.date).format('YYYY-MM-DD')
+  //             };
+  //           })
+  //         )
+  //       }
+  //       ;
+  //     })
+  //     .catch((err) => console.log(err));
 
-  }, []);
+  // }, []);
 
 
-  const handleDBbackup = () => {
-    axios.post('/api/db_backup')
-      .then(res => {
-        showNotification(`${res?.data?.message}`)
-        setDbBtN(true)
-      })
-      .catch(err => showNotification(`${err?.response?.data?.message}`, 'error'))
-  }
+  // const handleDBbackup = () => {
+  //   axios.post('/api/db_backup')
+  //     .then(res => {
+  //       showNotification(`${res?.data?.message}`)
+  //       setDbBtN(true)
+  //     })
+  //     .catch(err => showNotification(`${err?.response?.data?.message}`, 'error'))
+  // }
 
   return (
     <>
-      <PageTitleWrapper>
-
-        <Grid container justifyContent='space-between'>
-          <Grid item>
-
-
-            {blockCount.role === "student" ?
-              <StudentHeader blockCount={blockCount} />
-              :
-              <PageHeader />
-
-            }
+      <Card sx={{ m: 4, borderRadius: 0.5 }}>
+        <Grid container  justifyContent='space-between' sx={{ backgroundColor: 'green' }}>
+          <Grid item p={2}>
+            <StudentHeader blockCount={blockCount} />
           </Grid>
-          <Grid item>
-            <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
-              Database backup
-            </Button>
+          <Grid position="relative" sx={{backgroundColor:'yellow'}} >
+            {/* <Grid position="absolute"> */}
+            <Image layout="fill" objectFit='cover' className='rounded-full' src={'school_classroom.svg'} alt="classroom" />
+            {/* </Grid> */}
+            {/* <Image className='absolute top-0' width={70} height={50} src={'curve_circle.svg'} alt="classroom" /> */}
           </Grid>
-
         </Grid>
-      </PageTitleWrapper>
+      </Card>
+
       <Grid
         sx={{
           px: 4
@@ -115,6 +108,7 @@ function DashboardReportsContent({ blockCount = null }) {
         <Grid item xs={12}>
           <Block1 blockCount={blockCount} />
         </Grid>
+
         <Grid
           xs={12}
           md={11}
@@ -123,72 +117,54 @@ function DashboardReportsContent({ blockCount = null }) {
             pt: 2,
           }}
         >
-          {/* <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="stretch"
-            spacing={4}
-          >
-            <Grid item xs={12}>
-              <Block2 />
+
+
+          <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+            {/* quick */}
+            <Grid display="grid" gridTemplateColumns={'1fr 1fr'} justifyContent="center" gap={2} p={2} mx='auto' maxWidth={500} >
+              <QuickLinkCards src="exam.svg" name="Exam" />
+              <QuickLinkCards src="attendance.svg" name="Attendance" />
+              <QuickLinkCards src="routine.svg" name="Routine" />
+              <QuickLinkCards src="fees_collection.svg" name="Fees Collection" />
             </Grid>
-            <Grid item xs={12}>
-              <Block4 />
-            </Grid>
-          </Grid> */}
-          {/* </Grid>
-          <Grid item md={5} xs={12}>
-          <Block3 /> */}
 
-          {/* <Demo /> */}
-          {
-            blockCount.role === "student" ?
-              <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
-                {/* quick */}
-                <Grid display="grid" gridTemplateColumns={'1fr 1fr'} justifyContent="center" gap={2} p={2} mx='auto' maxWidth={500} >
-                  <QuickLinkCards src="exam.svg" name="Exam" />
-                  <QuickLinkCards src="attendance.svg" name="Attendance" />
-                  <QuickLinkCards src="routine.svg" name="Routine" />
-                  <QuickLinkCards src="fees_collection.svg" name="Fees Collection" />
-                </Grid>
+            {/* calander */}
+            <Calander holidays={holidays} />
+          </Grid>
+        </Grid>
+      </Grid>
 
-                {/* calander */}
-                <Calander holidays={holidays} />
-              </Grid>
-              :
-              <Calander holidays={holidays} />
-          }
-
-        </Grid>
-      
-        {/* <Grid item xs={12}>
-          <Block5 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block6 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block7 />
-        </Grid>
-        <Grid item md={5} xs={12}>
-          <Block8 />
-        </Grid>
-        <Grid item md={7} xs={12}>
-          <Block9 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block10 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block11 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block12 />
-        </Grid>
-        <Grid item md={6} xs={12}>
-          <Block13 />
-        </Grid>*/}
+      {/* notice */}
+      <Grid padding={4}>
+        <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Dessert (100g serving)</TableCell>
+                <TableCell align="right">Calories</TableCell>
+                <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* {rows.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.calories}</TableCell>
+                <TableCell align="right">{row.fat}</TableCell>
+                <TableCell align="right">{row.carbs}</TableCell>
+                <TableCell align="right">{row.protein}</TableCell>
+              </TableRow>
+            ))} */}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Grid>
 
       <Footer />
@@ -215,7 +191,6 @@ const Calander = ({ holidays }) => {
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
-          // right: 'dayGridMonth,timeGridWeek,timeGridDay'
           right: 'dayGridMonth'
         }}
         initialView="dayGridMonth"
@@ -225,33 +200,7 @@ const Calander = ({ holidays }) => {
         dayMaxEvents={true}
         eventMaxStack={4}
         progressiveEventRendering={true}
-        // weekends={false}
-
-        // hiddenDays={[5]}
-
-        // events={[
-        //   { title: 'event 1', date: '2023-03-07' },
-        //   { title: 'event 2', date: '2023-03-02' }
-        // ]}
         events={holidays}
-
-      // events={[
-      //   {
-      //     title: 'class-5 Exam',
-      //     start: '2023-03-02',
-      //     end: '2023-03-07'
-      //   },
-      //   {
-      //     title: 'class-6 Exam',
-      //     start: '2023-03-02',
-      //     end: '2023-03-07'
-      //   },
-      //   {
-      //     title: 'class-7 Exam',
-      //     start: '2023-03-14',
-      //     end: '2023-03-21'
-      //   },
-      // ]}
       />
 
       {/* <DemoApp /> */}
@@ -263,17 +212,16 @@ const StudentHeader = ({ blockCount }) => {
 
   const { t }: { t: any } = useTranslation();
 
-
-  console.log({ blockCount });
   const { student } = blockCount;
   const name = [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' ');
+
   return (
     <Box
       display="flex"
       alignItems={{ xs: 'stretch', md: 'center' }}
       flexDirection={{ xs: 'column', md: 'row' }}
       justifyContent="space-between"
-      sx={{backgroundColor:'red'}}
+      sx={{ backgroundColor: 'red' }}
     >
       <Box display="flex" alignItems="center">
         {/* <AvatarPageTitle variant="rounded">
@@ -318,4 +266,4 @@ const QuickLinkCards = ({ src, name }) => {
 }
 
 
-export default DashboardReportsContent;
+export default StudentDashboardReportsContent;

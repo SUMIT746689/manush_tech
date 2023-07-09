@@ -2,7 +2,7 @@ import PageHeader from 'src/content/Dashboards/Reports/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
-import { Button, Card, Grid } from '@mui/material';
+import { Box, Button, Card, Grid, Typography } from '@mui/material';
 
 import Block1 from 'src/content/Blocks/Statistics/Block3';
 import Block2 from 'src/content/Blocks/ListsLarge/Block8';
@@ -29,6 +29,8 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
+import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
 
 function DashboardReportsContent({ blockCount = null }) {
   const [holidays, setHolidays] = useState([]);
@@ -65,7 +67,6 @@ function DashboardReportsContent({ blockCount = null }) {
       })
       .catch((err) => console.log(err));
 
-
   }, []);
 
 
@@ -77,13 +78,21 @@ function DashboardReportsContent({ blockCount = null }) {
       })
       .catch(err => showNotification(`${err?.response?.data?.message}`, 'error'))
   }
+
   return (
     <>
       <PageTitleWrapper>
 
         <Grid container justifyContent='space-between'>
           <Grid item>
-            <PageHeader />
+
+
+            {blockCount.role === "student" ?
+              <StudentHeader blockCount={blockCount} />
+              :
+              <PageHeader />
+
+            }
           </Grid>
           <Grid item>
             <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
@@ -133,67 +142,26 @@ function DashboardReportsContent({ blockCount = null }) {
           <Block3 /> */}
 
           {/* <Demo /> */}
-          <Card sx={{ p: 0.5, borderRadius: 0.5 }}>
-            <Grid
-              item
-              md={12}
-              direction="row"
-              //  justifyContent="flex-end"
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                height: '20%'
-              }}
-            >
-              <FullCalendar
-                // plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                plugins={[dayGridPlugin]}
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  // right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                  right: 'dayGridMonth'
-                }}
-                initialView="dayGridMonth"
-                editable={true}
-                selectable={true}
-                selectMirror={true}
-                dayMaxEvents={true}
-                eventMaxStack={4}
-                progressiveEventRendering={true}
-                // weekends={false}
+          {
+            blockCount.role === "student" ?
+              <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+                {/* quick */}
+                <Grid display="grid" gridTemplateColumns={'1fr 1fr'} justifyContent="center" gap={2} p={2} mx='auto' maxWidth={500} >
+                  <QuickLinkCards src="exam.svg" name="Exam" />
+                  <QuickLinkCards src="attendance.svg" name="Attendance" />
+                  <QuickLinkCards src="routine.svg" name="Routine" />
+                  <QuickLinkCards src="fees_collection.svg" name="Fees Collection" />
+                </Grid>
 
-                // hiddenDays={[5]}
+                {/* calander */}
+                <Calander holidays={holidays} />
+              </Grid>
+              :
+              <Calander holidays={holidays} />
+          }
 
-                // events={[
-                //   { title: 'event 1', date: '2023-03-07' },
-                //   { title: 'event 2', date: '2023-03-02' }
-                // ]}
-                events={holidays}
-
-              // events={[
-              //   {
-              //     title: 'class-5 Exam',
-              //     start: '2023-03-02',
-              //     end: '2023-03-07'
-              //   },
-              //   {
-              //     title: 'class-6 Exam',
-              //     start: '2023-03-02',
-              //     end: '2023-03-07'
-              //   },
-              //   {
-              //     title: 'class-7 Exam',
-              //     start: '2023-03-14',
-              //     end: '2023-03-21'
-              //   },
-              // ]}
-              />
-
-              {/* <DemoApp /> */}
-            </Grid>
-          </Card>
         </Grid>
+      
         {/* <Grid item xs={12}>
           <Block5 />
         </Grid>
@@ -222,9 +190,132 @@ function DashboardReportsContent({ blockCount = null }) {
           <Block13 />
         </Grid>*/}
       </Grid>
+
       <Footer />
     </>
   );
 }
+
+const Calander = ({ holidays }) => {
+  return <Card sx={{ p: 0.5, borderRadius: 0.5 }}>
+    <Grid
+      item
+      md={12}
+      direction="row"
+      //  justifyContent="flex-end"
+      justifyContent="center"
+      alignItems="center"
+      sx={{
+        height: '20%'
+      }}
+    >
+      <FullCalendar
+        // plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        plugins={[dayGridPlugin]}
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          // right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          right: 'dayGridMonth'
+        }}
+        initialView="dayGridMonth"
+        editable={true}
+        selectable={true}
+        selectMirror={true}
+        dayMaxEvents={true}
+        eventMaxStack={4}
+        progressiveEventRendering={true}
+        // weekends={false}
+
+        // hiddenDays={[5]}
+
+        // events={[
+        //   { title: 'event 1', date: '2023-03-07' },
+        //   { title: 'event 2', date: '2023-03-02' }
+        // ]}
+        events={holidays}
+
+      // events={[
+      //   {
+      //     title: 'class-5 Exam',
+      //     start: '2023-03-02',
+      //     end: '2023-03-07'
+      //   },
+      //   {
+      //     title: 'class-6 Exam',
+      //     start: '2023-03-02',
+      //     end: '2023-03-07'
+      //   },
+      //   {
+      //     title: 'class-7 Exam',
+      //     start: '2023-03-14',
+      //     end: '2023-03-21'
+      //   },
+      // ]}
+      />
+
+      {/* <DemoApp /> */}
+    </Grid>
+  </Card>
+}
+
+const StudentHeader = ({ blockCount }) => {
+
+  const { t }: { t: any } = useTranslation();
+
+
+  console.log({ blockCount });
+  const { student } = blockCount;
+  const name = [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' ');
+  return (
+    <Box
+      display="flex"
+      alignItems={{ xs: 'stretch', md: 'center' }}
+      flexDirection={{ xs: 'column', md: 'row' }}
+      justifyContent="space-between"
+      sx={{backgroundColor:'red'}}
+    >
+      <Box display="flex" alignItems="center">
+        {/* <AvatarPageTitle variant="rounded">
+          <AddAlertTwoToneIcon fontSize="large" />
+        </AvatarPageTitle> */}
+        <Box>
+          <Typography variant="h3" component="h3" gutterBottom>
+            {t(`Welcome, ${name}`)}
+          </Typography>
+
+
+          <Grid className=' grid grid-cols-2 bg-sky-600'>
+            <Typography variant="h5" component="h5" gutterBottom>
+              {t(`Roll: ${student.class_roll_no}`)}
+            </Typography>
+
+            <Typography variant="h5" component="h5" gutterBottom>
+              {t(`Class: ${student.section.class.name}`)}
+            </Typography>
+
+            <Typography variant="h5" component="h5" gutterBottom>
+              {t(`Section: ${student.section.name}`)}
+            </Typography>
+
+          </Grid>
+        </Box>
+      </Box>
+
+    </Box>
+  )
+}
+const QuickLinkCards = ({ src, name }) => {
+
+  return (
+    <Card
+      sx={{ p: 2, fontWeight: 700, borderRadius: 0.5, textAlign: 'center', px: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}
+    >
+      <Image src={src} alt="exam" width={40} height={40} />
+      {name}
+    </Card>
+  )
+}
+
 
 export default DashboardReportsContent;

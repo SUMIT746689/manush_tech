@@ -49,6 +49,7 @@ import JoinFullSharpIcon from '@mui/icons-material/JoinFullSharp';
 import AccountBalanceWalletSharpIcon from '@mui/icons-material/AccountBalanceWalletSharp';
 import BorderBottomSharpIcon from '@mui/icons-material/BorderBottomSharp';
 import GradeIcon from '@mui/icons-material/Grade';
+import WifiTetheringErrorIcon from '@mui/icons-material/WifiTetheringError';
 export interface MenuItem {
   link?: string;
   icon?: ReactNode;
@@ -350,6 +351,14 @@ const menuItems: MenuItems[] = [
         icon: CameraFrontIcon,
         link: '/front_end',
       },
+      
+      {
+        name: 'Notice',
+        icon: WifiTetheringErrorIcon,
+        link: '/front_end/notice',
+      },
+
+
       {
         name: 'Certificate',
         icon: WorkspacePremiumIcon,

@@ -2,7 +2,7 @@ import PageHeader from 'src/content/Dashboards/Reports/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
-import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Card, Checkbox, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 import Block1 from 'src/content/Blocks/Statistics/Block3';
 import Block2 from 'src/content/Blocks/ListsLarge/Block8';
@@ -36,7 +36,8 @@ function StudentDashboardReportsContent({ blockCount = null }) {
   const [holidays, setHolidays] = useState([]);
   const [dbBtN, setDbBtN] = useState(false)
   const { user } = useAuth();
-  const { showNotification } = useNotistick()
+  const { showNotification } = useNotistick();
+  const { t }: { t: any } = useTranslation();
 
   // useEffect(() => {
   //   // @ts-ignore
@@ -82,15 +83,15 @@ function StudentDashboardReportsContent({ blockCount = null }) {
   return (
     <>
       <Card sx={{ m: 4, borderRadius: 0.5 }}>
-        <Grid container  justifyContent='space-between' sx={{ backgroundColor: 'green' }}>
-          <Grid item p={2}>
+        <Grid container justifyContent='space-between' >
+          <Grid item xs={8} p={2}>
             <StudentHeader blockCount={blockCount} />
           </Grid>
-          <Grid position="relative" sx={{backgroundColor:'yellow'}} >
+          <Grid item xs={4} position="relative" >
             {/* <Grid position="absolute"> */}
-            <Image layout="fill" objectFit='cover' className='rounded-full' src={'school_classroom.svg'} alt="classroom" />
+            <Image width={50} height={50} className=' absolute object-cover h-full w-full content-center ' src={'school_classroom.svg'} alt="classroom" />
             {/* </Grid> */}
-            {/* <Image className='absolute top-0' width={70} height={50} src={'curve_circle.svg'} alt="classroom" /> */}
+            {/* <Image width={60} height={60} className=' absolute object-contain h-full w-full  ' src={'curve_circle.svg'} alt="classroom" /> */}
           </Grid>
         </Grid>
       </Card>
@@ -135,16 +136,26 @@ function StudentDashboardReportsContent({ blockCount = null }) {
       </Grid>
 
       {/* notice */}
-      <Grid padding={4}>
+
+      <Typography variant="h3" component="h3" pl={4} gutterBottom>
+        {t('Notice')}
+      </Typography>
+
+      <Grid paddingX={4}>
         <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Dessert (100g serving)</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={false}
+                    indeterminate={false}
+                  // onChange={}
+                  />
+                </TableCell>
+                <TableCell align="right">Date</TableCell>
+                <TableCell align="right">Title</TableCell>
+                <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -217,39 +228,37 @@ const StudentHeader = ({ blockCount }) => {
 
   return (
     <Box
-      display="flex"
-      alignItems={{ xs: 'stretch', md: 'center' }}
-      flexDirection={{ xs: 'column', md: 'row' }}
-      justifyContent="space-between"
-      sx={{ backgroundColor: 'red' }}
+      display="grid"
+      // alignItems={{ xs: 'stretch', md: 'center' }}
+      // flexDirection={{ xs: 'column', md: 'row' }}
+      // justifyContent="space-between"
+      // backgroundColor={"red"}
+      width="full"
+      
     >
-      <Box display="flex" alignItems="center">
-        {/* <AvatarPageTitle variant="rounded">
+
+      {/* <AvatarPageTitle variant="rounded">
           <AddAlertTwoToneIcon fontSize="large" />
         </AvatarPageTitle> */}
-        <Box>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t(`Welcome, ${name}`)}
-          </Typography>
+      <Typography variant="h3" component="h3" gutterBottom>
+        {t(`Welcome, ${name}`)}
+      </Typography>
 
 
-          <Grid className=' grid grid-cols-2 bg-sky-600'>
-            <Typography variant="h5" component="h5" gutterBottom>
-              {t(`Roll: ${student.class_roll_no}`)}
-            </Typography>
+      <Grid className=' grid item grid-cols-2'>
+        <Typography variant="h5" component="h5" gutterBottom>
+          {t(`Roll: ${student.class_roll_no}`)}
+        </Typography>
 
-            <Typography variant="h5" component="h5" gutterBottom>
-              {t(`Class: ${student.section.class.name}`)}
-            </Typography>
+        <Typography variant="h5" component="h5" gutterBottom>
+          {t(`Class: ${student.section.class.name}`)}
+        </Typography>
 
-            <Typography variant="h5" component="h5" gutterBottom>
-              {t(`Section: ${student.section.name}`)}
-            </Typography>
+        <Typography variant="h5" component="h5" gutterBottom>
+          {t(`Section: ${student.section.name}`)}
+        </Typography>
 
-          </Grid>
-        </Box>
-      </Box>
-
+      </Grid>
     </Box>
   )
 }

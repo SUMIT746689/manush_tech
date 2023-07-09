@@ -15,6 +15,7 @@ const Results = ({ data, reFetchData }) => {
   console.log("data__", data);
 
   const { t }: { t: any } = useTranslation();
+  const [notice, setNotice] = useState(['']);
 
   // const [header_image, setHeader_image] = useState(null)
   // const [carousel_image, setCarousel_image] = useState(null)
@@ -30,7 +31,11 @@ const Results = ({ data, reFetchData }) => {
   //   }
   //   console.log(cnt);
   // }, [carousel_image])
-
+  useEffect(() => {
+    if (data) {
+      setNotice(data?.latest_news)
+    }
+  }, [data])
 
   const getValue = (carousel_image) => {
     let cnt = []
@@ -44,21 +49,21 @@ const Results = ({ data, reFetchData }) => {
       enableReinitialize
 
       initialValues={{
-        header_image: data?.header_image || undefined,
+        header_image: data ? data?.header_image?.replace(/\\/g, '/') : undefined,
         carousel_image: undefined,
 
-        history_photo: data?.history_photo || '',
+        history_photo: data?.history_photo.replace(/\\/g, '/') || '',
         school_history: data?.school_history || '',
 
-        chairman_photo: data?.chairman_photo || '',
+        chairman_photo: data?.chairman_photo?.replace(/\\/g, '/') || '',
         chairman_speech: data?.chairman_speech || '',
 
-        principal_photo: data?.principal_photo || '',
+        principal_photo: data?.principal_photo?.replace(/\\/g, '/') || '',
         principal_speech: data?.principal_speech || '',
 
-        latest_news: undefined,
+        latest_news: notice,
 
-        submit: null
+        submit: data?.latest_news || null
       }}
       // validationSchema={Yup.object().shape({
       //   title: Yup.string().max(255).required(t('The title field is required')),
@@ -118,7 +123,15 @@ const Results = ({ data, reFetchData }) => {
               // }
             }
             else {
-              formData.append(`${i}`, _values[i]);
+              if (i == 'latest_news') {
+                notice.forEach(element => {
+                  console.log({ element })
+                  formData.append(`latest_news[]`, element);
+                });
+              } else {
+                formData.append(`${i}`, _values[i]);
+              }
+
             }
           }
 
@@ -126,6 +139,7 @@ const Results = ({ data, reFetchData }) => {
           axios.put('/api/front_end', formData)
             .then(res => {
               console.log(res);
+              reFetchData();
             }).catch(err => {
               console.log(err);
 
@@ -162,7 +176,7 @@ const Results = ({ data, reFetchData }) => {
                 {/* header_image */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
                   <Grid item>
-                    <Image src={`/${data?.header_image}`}
+                    <Image src={`/${data?.header_image.replace(/\\/g, '/')}`}
                       height={200}
                       width={200}
                       alt='Header Image'
@@ -186,16 +200,28 @@ const Results = ({ data, reFetchData }) => {
                 </Grid>
                 {/* carousel_image */}
                 <Grid container gap={1} justifyContent='center' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
-                  <Grid item>
-                    <Image
-                      src={`/${data?.header_image}`}
-                      height={200}
-                      width={200}
-                      alt='Carousel Image'
-                      loading='lazy'
-                    />
 
-                  </Grid>
+                  {
+                    data &&
+                    <>
+                      {
+                        data?.carousel_image?.map(i => <Grid item >
+                          <Image
+                            src={`/${i.path.replace(/\\/g, '/')}`}
+                            height={120}
+                            width={120}
+                            alt='Carousel Image'
+                            loading='lazy'
+
+                          />
+
+                        </Grid>)
+                      }
+
+                    </>
+                  }
+
+
 
                   <Grid container justifyContent='center' sx={{
                     pt: '25px'
@@ -208,6 +234,7 @@ const Results = ({ data, reFetchData }) => {
                       value={values?.carousel_image ? getValue(values?.carousel_image) : ''}
                       // carousel_image?.map(j=>j?.name)?.join(', ') ||
                       handleChangeFile={(e) => {
+
 
 
                         setFieldValue('carousel_image', e.target.files)
@@ -245,7 +272,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='History photo'
-                      src={`/${data?.history_photo}`}
+                      src={`/${data?.history_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -271,7 +298,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Chairman photo'
-                      src={`/${data?.chairman_photo}`}
+                      src={`/${data?.chairman_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -317,7 +344,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Principal photo'
-                      src={`/${data?.principal_photo}`}
+                      src={`/${data?.principal_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -354,6 +381,44 @@ const Results = ({ data, reFetchData }) => {
                     maxRows={5}
                     multiline
                   />
+                </Grid>
+                <Grid item borderRadius='10px' marginBottom='10px'>
+
+                  {notice.map((field, index) => (
+                    <Grid container gap={2}>
+                      <Grid >
+                        <TextField
+                          key={index}
+                          value={field}
+                          onChange={(e) => {
+                            const updatedFields = [...notice];
+                            updatedFields[index] = e.target.value;
+                            setNotice(updatedFields);
+                          }}
+                          label="Input Field"
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      </Grid>
+                      <Grid >
+                        <Button variant="contained" sx={{
+                          marginTop: '18px'
+                        }} onClick={() => {
+                          const temp = [...notice]
+                          temp.splice(index, 1)
+                          setNotice(temp)
+                        }}>
+                          remove
+                        </Button>
+                      </Grid>
+
+
+                    </Grid>
+                  ))}
+                  <Button variant="contained" onClick={() => setNotice([...notice, ''])}>
+                    Add notice
+                  </Button>
+
                 </Grid>
               </Grid>
 

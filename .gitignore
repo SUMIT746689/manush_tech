@@ -17,10 +17,9 @@ yarn-error.log*
 # Next.js
 /.next
 .vscode
-files
 /public/images
 /public/files
 /public/certificate_templates
 /certificate_templates
 /public/certificate_images
-/frontendPhoto
+/public/frontendPhoto

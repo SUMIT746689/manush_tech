@@ -139,21 +139,15 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
     let error = null;
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/files`));
+        await fs.readdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/files`));
-    }
-    try {
-        // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/files`, `${uploadFolderName}`));
-    } catch (error) {
-        // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/files`, `${uploadFolderName}`));
+        await fs.mkdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
     }
 
 
-    const uploadDir = path.join(process.cwd() + "/files", `${uploadFolderName}`);
+    const uploadDir = path.join(process.cwd() + "/public", `${uploadFolderName}`);
+console.log("uploadDir__",uploadDir);
 
     const customOptions = {
         keepExtensions: true,

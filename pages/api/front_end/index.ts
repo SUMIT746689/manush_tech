@@ -15,7 +15,6 @@ const index = async (req, res) => {
         get(req, res);
         break;
       case 'PUT':
-        console.log('hitted');
         put(req, res);
         break;
       default:

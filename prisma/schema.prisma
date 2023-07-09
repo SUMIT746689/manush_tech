@@ -580,6 +580,7 @@ model WebsiteUi {
   chairman_speech     String
   principal_photo     String
   principal_speech    String
+  latest_news         Json
 
   school School @relation(fields: [school_id], references: [id])
 

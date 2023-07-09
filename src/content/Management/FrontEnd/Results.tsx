@@ -47,13 +47,16 @@ const Results = ({ data, reFetchData }) => {
         header_image: data?.header_image || undefined,
         carousel_image: undefined,
 
-        history_description: data?.history_description || '',
+        history_photo: data?.history_photo || '',
+        school_history: data?.school_history || '',
 
         chairman_photo: data?.chairman_photo || '',
         chairman_speech: data?.chairman_speech || '',
 
         principal_photo: data?.principal_photo || '',
         principal_speech: data?.principal_speech || '',
+
+        latest_news: undefined,
 
         submit: null
       }}
@@ -106,13 +109,13 @@ const Results = ({ data, reFetchData }) => {
                   formData.append('carousel_image', temp[j])
                 }
               }
-              if (nameList.length) {
-                nameList.forEach(element => {
-                  console.log({element})
-                  formData.append(`carousel_image_name_list[]`, element.name);
-                  // formData.append(`carousel_image_name_list[]`, nameList);
-                });
-              }
+              // if (nameList.length) {
+              //   nameList.forEach(element => {
+              //     console.log({element})
+              //     formData.append(`carousel_image_name_list[]`, element.name);
+              //     // formData.append(`carousel_image_name_list[]`, nameList);
+              //   });
+              // }
             }
             else {
               formData.append(`${i}`, _values[i]);
@@ -219,15 +222,15 @@ const Results = ({ data, reFetchData }) => {
                 <Grid container item borderRadius='10px' marginBottom='10px'>
                   <TextField
                     id="outlined-basic"
-                    label="History Description"
-                    error={Boolean(touched?.history_description && errors?.history_description)}
+                    label="School history"
+                    error={Boolean(touched?.school_history && errors?.school_history)}
                     fullWidth
-                    helperText={touched?.history_description && errors?.history_description}
-                    name="history_description"
+                    helperText={touched?.school_history && errors?.school_history}
+                    name="school_history"
                     placeholder={t(`History Description here...`)}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.history_description}
+                    value={values?.school_history}
                     variant="outlined"
                     minRows={4}
                     maxRows={5}
@@ -235,6 +238,32 @@ const Results = ({ data, reFetchData }) => {
                   />
                 </Grid>
 
+                {/* history_photo */}
+                <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
+                  <Grid item>
+                    <Image
+                      height={200}
+                      width={200}
+                      alt='History photo'
+                      src={`/${data?.history_photo}`}
+                      loading='lazy'
+                    />
+
+                  </Grid>
+                  <Grid item sx={{
+                    pt: '25px'
+                  }}>
+                    <FileUploadFieldWrapper
+                      htmlFor="history_photo"
+                      label="select History photo"
+                      name="history_photo"
+                      value={values?.history_photo?.name || values?.history_photo || ''}
+                      handleChangeFile={(e) => { setFieldValue('history_photo', e.target.files[0]) }}
+                      handleRemoveFile={(e) => { setFieldValue('history_photo', undefined) }}
+                    />
+
+                  </Grid>
+                </Grid>
                 {/* chairman_photo */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
                   <Grid item>

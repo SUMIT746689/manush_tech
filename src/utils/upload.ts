@@ -137,8 +137,23 @@ export const validateField = async (req) => {
 export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFileName = true }) => {
 
     let error = null;
+    try {
+        // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.readdir(path.join(process.cwd(), `/files`));
+    } catch (error) {
+        // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.mkdir(path.join(process.cwd(), `/files`));
+    }
+    try {
+        // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.readdir(path.join(process.cwd(), `/files`, `${uploadFolderName}`));
+    } catch (error) {
+        // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.mkdir(path.join(process.cwd(), `/files`, `${uploadFolderName}`));
+    }
 
-    const uploadDir = path.join(process.cwd(), `${uploadFolderName}`);
+
+    const uploadDir = path.join(process.cwd() + "/files", `${uploadFolderName}`);
 
     const customOptions = {
         keepExtensions: true,
@@ -165,24 +180,12 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
 
     const form = new formidable.IncomingForm(customOptions)
 
-    // const fls = [];
-    // const flds = [];
-
-    form
-        //     .on('field', function (field, value) {
-        //         // console.log(field, value);
-        //         flds.push([field, value]);
-        //     })
-        .on('file', function (field, file) {
-            const filename = path.join(process.cwd(), uploadFolderName, Date.now().toString() + '_' + file.originalFilename);
-            // console.log({ field, file });
-            fs.rename(file.filepath, filename)
-            // fls.push([field, file]);
-        })
-    // .on('end', function () {
-    //     console.log({ fls, flds });
-    //     console.log('-> upload done');
-    // });
+    // form.on('file', function (field, file) {
+    //         const filename = path.join(process.cwd(),"files", uploadFolderName, Date.now().toString() + '_' + file.originalFilename);
+    //         // console.log({ field, file });
+    //         fs.rename(file.filepath, filename)
+    //         // fls.push([field, file]);
+    //     })
 
     // @ts-ignore
     const [files, fields] = await new Promise((resolve) => {
@@ -193,16 +196,23 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
                 resolve([{}, {}]);
             }
             else {
-                console.log("fields__", typeof (fields.carousel_image_name_list), fields.carousel_image_name_list);
-
                 const convertJsonfile = JSON.stringify(files);
-                console.log("convertJsonfile__", typeof (JSON.stringify(fields)), JSON.stringify(fields));
-
                 const convertObjectfile = JSON.parse(convertJsonfile);
-                console.log("convertJsonfile__", typeof (convertObjectfile), convertObjectfile);
                 resolve([convertObjectfile, fields]);
             }
         });
     });
     return { files, fields, error };
+}
+
+export const fileRename = async (file, newFilePath) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await fs.rename(file.filepath, newFilePath)
+            resolve('File renamed !')
+        } catch (err) {
+            reject('File rename failed!')
+        }
+    })
+
 }

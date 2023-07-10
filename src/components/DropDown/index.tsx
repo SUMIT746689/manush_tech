@@ -39,7 +39,8 @@ export function DynamicDropDownSelectWrapper({ value, name, label, handleChange,
           [`& fieldset`]: {
             borderRadius: 0.6,
           }
-        }}>
+        }}
+        >
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select
           labelId="demo-simple-select-label"

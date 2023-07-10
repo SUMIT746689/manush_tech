@@ -11,7 +11,29 @@ import {
 } from '@mui/material';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useReactToPrint } from 'react-to-print';
-import { useRef } from 'react';
+import { forwardRef, useRef } from 'react';
+
+
+export const BasicPdfExport = forwardRef((props,ref:any) => {
+ 
+  const handlePrint = useReactToPrint({
+    content: () => ref.current
+  });
+
+  return (
+    <>
+      <Grid
+        onClick={handlePrint}
+        sx={{ ':hover': { cursor: 'pointer', scale: 1 } }}
+      >
+        <Tooltip title={'Export Pdf'} arrow>
+          <PictureAsPdfIcon sx={{ fontSize: '35px' }} />
+        </Tooltip>
+      </Grid>
+    </>
+  );
+})
+
 
 export const PdfExport = ({ title, exportData,tableFooter = <></> }) => {
   const componentRef = useRef();

@@ -20,3 +20,23 @@ export const ButtonWrapper = ({ handleClick, disabled = false, children }) => {
     </Grid>
   )
 }
+
+export const DisableButtonWrapper = ({ children }) => {
+
+  return (
+    <Grid container sx={{ pb: 1, justifyContent: 'center' }}>
+      <Button variant="contained" size="small" disabled={true}
+        sx={{
+          borderRadius: 0.5,
+          height: 36,
+          width: '100%',
+          ":disabled": {
+            backgroundColor: 'lightgray'
+          }
+        }}
+      >
+        {children}
+      </Button>
+    </Grid>
+  )
+}

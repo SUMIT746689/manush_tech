@@ -7,7 +7,7 @@ export const AutoCompleteWrapper = ({ options, value, handleChange, label, place
     <Grid item pb={1}>
       <Autocomplete
         fullWidth
-       size='medium'
+        size='small'
         sx={customBorder}
         id="tags-outlined"
         options={options}

@@ -10,6 +10,10 @@ import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { BasicPdfExport } from '@/components/Export/Pdf';
 const Results = () => {
   const { t }: { t: any } = useTranslation();
   const [routine, setRoutine] = useState(null);
@@ -114,7 +118,7 @@ const Results = () => {
             }
             index++;
           }
-         
+
 
           timeSlot.sort((a, b) => {
             if (a.start_time > b.start_time && a.end_time > b.end_time) return 1;
@@ -144,110 +148,58 @@ const Results = () => {
   }
   return (
     <>
-      <Card
-        sx={{
-          p: 1,
-          mb: 3
-        }}
-      >
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Box p={1}>
-              <Autocomplete
-                sx={{
-                  m: 0
-                }}
-                limitTags={2}
-                options={classes?.map(i => { return { label: i.name, id: i.id, has_section: i.has_section } })}
-                value={selectedClass}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    variant="outlined"
-                    label={t('Select class')}
-                    placeholder={t('Select class...')}
-                  />
-                )}
-                onChange={handleClassSelect}
-              />
-            </Box>
-          </Grid>
+      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
+        <Grid>
+          <AutoCompleteWrapper value={selectedClass} label='Select Class' placeholder='Select class...' handleChange={handleClassSelect} options={classes?.map(i => ({ label: i.name, value: i.id, id: i.id, has_section: i.has_section }))} />
+        </Grid>
+        <Grid>
           {
-            selectedClass && selectedClass.has_section && (<Grid item xs={12} sm={6} md={4}>
-              <Box p={1}>
-                <Autocomplete
-                  sx={{
-                    m: 0
-                  }}
-                  limitTags={2}
-                  options={sections}
-                  value={selectedSection}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      variant="outlined"
-                      label={t('Select section')}
-                      placeholder={t('Select section...')}
-                    />
-                  )}
-                  onChange={handleSectionSelect}
-                />
-              </Box>
-            </Grid>)
+            selectedClass && selectedClass.has_section
+            &&
+            <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
           }
-
+        </Grid>
+        <Grid>
           {
-            selectedSection && <Grid item xs={2} sm={4} md={3} >
-              <Box p={1}>
-                <Button variant="contained"
-                  size="medium" onClick={handleRoutineGenerate}>Find</Button>
-              </Box>
-            </Grid>
+            selectedSection ? <ButtonWrapper handleClick={handleRoutineGenerate} >Find</ButtonWrapper>
+              :
+              <DisableButtonWrapper >Find</DisableButtonWrapper>
           }
-          {
-            routine && <Grid item xs={12} sm={6} md={4}>
-              <Box p={1}>
-                <ReactToPrint
-                  content={() => routineRef.current}
-                  trigger={() => (
-                    <Button size='large'
-                    startIcon={<LocalPrintshopIcon/>}
-                    fullWidth variant="contained">
-                      print
-                    </Button>
-                  )}
-                />
-              </Box>
-            </Grid>
-          }
-
+        </Grid>
+        <Grid item className='w-full'>
+          {routine && <BasicPdfExport ref={routineRef} />}
         </Grid>
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 445px) !important' }}>
+      <Card sx={{ minHeight: '85%' }} >
 
         <Divider />
 
         <>
           {
-            routine && <TableContainer sx={{ p: 1 }} >
-              <Table ref={routineRef}>
+            routine ? <TableContainer sx={{ p: 1 }} ref={routineRef} >
+              <Table>
                 <TableHead sx={{
-                  border: '1px solid black',
+                  border: '1px solid darkgrey',
                   borderCollapse: 'collapse'
                 }}>
                   <TableRow>
                     <TableCell sx={{
-                      border: '1px solid black',
-                      borderCollapse: 'collapse'
+                      border: '1px solid darkgrey',
+                      borderCollapse: 'collapse',
+                      fontSize: '11px',
+                      px: 1,
+                      py: 0.5
                     }}>
+                      Weeks
                     </TableCell>
                     {
                       slotHeader.map(i => <TableCell key={i} sx={{
-                        border: '1px solid black',
-                        borderCollapse: 'collapse'
+                        border: '1px solid darkgrey',
+                        borderCollapse: 'collapse',
+                        fontSize: '11px',
+                        p: 0.5,
+                        textAlign: 'center'
                       }}>{t(`${i?.actualStart_time} - ${i?.actualEnd_time}`)}</TableCell>)
                     }
                   </TableRow>
@@ -262,10 +214,12 @@ const Results = () => {
 
                       >
                         <TableCell sx={{
-                          border: '1px solid black',
-                          borderCollapse: 'collapse'
+                          border: '1px solid darkgrey',
+                          borderCollapse: 'collapse',
+                          px: 1,
+                          py: 0.5
                         }}>
-                          <Typography >
+                          <Typography sx={{ fontSize: '11px' }} >
                             {i?.day}
                           </Typography>
                         </TableCell>
@@ -278,13 +232,14 @@ const Results = () => {
 
                             if (slot) {
                               return <TableCell key={index} sx={{
-                                border: '1px solid black',
+                                border: '1px solid darkgrey',
                                 borderCollapse: 'collapse',
                                 minHeight: '20px',
-                                minWidth: '20px'
+                                minWidth: '20px',
+                                p: 0.5
                               }}>
-                                <Typography noWrap variant="h5" className=' text-center'>
-                                  <td className=' text-center'>
+                                <Typography noWrap variant="h5" sx={{ fontSize: '11px' }}>
+                                  <div className=' text-center'>
                                     {slot.start_time}-
                                     {slot.end_time}
 
@@ -293,13 +248,13 @@ const Results = () => {
                                     {slot?.teacher} <br />
                                     {selectedClass?.has_section ? slot?.section : '(no section)'}<br />
                                     {slot?.class}
-                                  </td>
+                                  </div>
 
                                 </Typography>
                               </TableCell>
                             } else {
                               return <TableCell key={index} sx={{
-                                border: '1px solid black',
+                                border: '1px solid darkgrey',
                                 borderCollapse: 'collapse',
                                 minHeight: '20px',
                                 minWidth: '20px'
@@ -316,6 +271,23 @@ const Results = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+              :
+              <Typography
+                sx={{
+                  py: 10,
+                  px: 4,
+                  height: ''
+                }}
+                variant="h3"
+                fontWeight="normal"
+                color="text.secondary"
+                align="center"
+              >
+                {t(
+                  "We couldn't find any result matching your search criteria"
+                )}
+              </Typography>
+
           }
 
 

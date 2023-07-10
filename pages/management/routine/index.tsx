@@ -27,12 +27,13 @@ function Routine() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 4,minHeight: 'calc(100vh - 304px) !important' }}
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
         spacing={3}
+       
       >
         <Grid item xs={12}>
           <Results />

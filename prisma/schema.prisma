@@ -29,6 +29,7 @@ model User {
   SentSmsDetail      SentSmsDetail[]
   EmployeeAttendance EmployeeAttendance[]
   StudentFee         StudentFee[]
+  Leave              Leave[]
 
   @@map("users")
 }
@@ -764,4 +765,21 @@ model Notice {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("notices")
+}
+
+model Leave {
+  id          Int         @id @default(autoincrement())
+  user_id     Int
+  form_date   DateTime
+  to_date     DateTime
+  created_at  DateTime    @default(now())
+  status      LeaveStatus
+  description String?
+  user        User        @relation(fields: [user_id], references: [id])
+}
+
+enum LeaveStatus {
+  pending
+  approved
+  declined
 }

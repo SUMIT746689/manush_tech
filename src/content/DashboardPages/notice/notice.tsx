@@ -30,7 +30,7 @@ const Notice = ({ blockCount }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {blockCount.notices.map((row) => (
+              {blockCount?.notices?.map((row) => (
                 <TableRow
                   key={row.name}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

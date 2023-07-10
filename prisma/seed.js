@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function seed() {
   const hash = await bcrypt.hash('a', Number(process.env.SALTROUNDS));
 
-  
+
 
   // const superadmin = await prisma.user.create({
   //   data: {
@@ -31,8 +31,8 @@ async function seed() {
   });
 
   const createSuperAdminRole = await prisma.role.create({
-    data:{
-      title:"SUPER_ADMIN",
+    data: {
+      title: "SUPER_ADMIN",
       permissions: {
         connect: [
           { id: createAdminPermission.id },
@@ -55,7 +55,7 @@ async function seed() {
     }
   });
 
-await prisma.permission.createMany({
+  await prisma.permission.createMany({
     data: [
       { name: 'create academic years', value: 'create_academic_yaers', group: 'academic_years' },
       { name: 'create student', value: 'create_student', group: 'student' },
@@ -94,213 +94,222 @@ await prisma.permission.createMany({
       { name: 'create report', value: 'create_report', group: 'report' },
       { name: 'create bulk sms & email', value: 'create_bulk_sms_&_email', group: 'bulk_sms_&_email' },
     ]
-});
+  });
 
-const permissions = await prisma.permission.findMany({
-  where: {
-    NOT: [
-      {
-        value: 'create_admin'
-      },
-      {
-        value: 'create_school'
-      },
-      {
-        value: 'list_package'
-      },
-      {
-        value: 'list_pending_packages'
+  const permissions = await prisma.permission.findMany({
+    where: {
+      NOT: [
+        {
+          value: 'create_admin'
+        },
+        {
+          value: 'create_school'
+        },
+        {
+          value: 'list_package'
+        },
+        {
+          value: 'list_pending_packages'
+        }
+      ]
+    }
+  });
+
+
+  // Dummy Things create
+  const hashPassword = await bcrypt.hash('admin', Number(process.env.SALTROUNDS));
+
+  const createAdminRole = await prisma.role.create({
+    data: {
+      title: "ADMIN",
+      permissions: {
+        connect: permissions.map((permission) => ({
+          id: permission.id
+        }))
       }
+    }
+  })
+
+  const admin = await prisma.user.create({
+    data:
+    {
+      username: 'admin',
+      password: hashPassword,
+      user_role_id: createAdminRole.id,
+      role_id: createAdminRole.id
+    }
+  });
+
+  const school = await prisma.school.create({
+    data: {
+      name: 'My School and College',
+      phone: '01773456789',
+      email: 'admin@email.com',
+      address: 'Gulshan-1,Dhake',
+      currency: 'BDT',
+      admins: { connect: { id: admin.id } }
+    }
+  });
+
+  const createPackage = await prisma.package.create({
+    data: {
+      title: 'Monthly',
+      price: 1000,
+      duration: 30,
+      student_count: 10
+    }
+  });
+
+  const end_date = new Date(Date.now());
+  end_date.setDate(end_date.getDate() + createPackage.duration);
+
+  await prisma.subscription.create({
+    data: {
+      school_id: school.id,
+      package_id: createPackage.id,
+      start_date: new Date(Date.now()),
+      end_date,
+      is_active: true
+    }
+  });
+
+  const createDepartment = await prisma.department.create({
+    data: {
+      title: 'Science',
+      school_id: school.id
+    }
+  });
+
+  const createTeacherRole = await prisma.role.create({
+    data: {
+      title: "TEACHER",
+      permissions: {
+        connect: [
+          { id: permissions.find(i => i.value == 'create_exam').id },
+          { id: permissions.find(i => i.value == 'create_result').id },
+          { id: permissions.find(i => i.value == 'create_attendence').id },
+        ]
+      }
+    }
+  })
+
+  await prisma.teacher.create({
+    data: {
+      first_name: 'Sume',
+      national_id: '653216532123',
+      gender: 'female',
+      date_of_birth: new Date('1/1/1996'),
+      permanent_address: 'Khilgaon, Dhaka-1219',
+      present_address: 'Khilgaon, Dhaka-1219',
+      joining_date: new Date(),
+      resume: '',
+      school: { connect: { id: school.id } },
+      department: { connect: { id: createDepartment.id } },
+      user: {
+        create: {
+          username: 'Sume',
+          password: hashPassword,
+          user_role_id: createTeacherRole.id,
+          role_id: createTeacherRole.id,
+          school_id: school.id
+        }
+      }
+    }
+  });
+
+  const createAcademicYear = await prisma.academicYear.create({
+    data: {
+      title: '2023',
+      school_id: school.id
+    }
+  });
+
+  const createClass = await prisma.class.create({
+    data: {
+      name: 'Nine',
+      code: '901',
+      school_id: school.id,
+      has_section: true
+    }
+  });
+
+  const createSection = await prisma.section.create({
+    data: {
+      name: 'A',
+      class_id: createClass.id,
+    }
+  });
+
+  await prisma.group.create({
+    data: {
+      title: 'Science',
+      class_id: createClass.id
+    }
+  });
+
+  const createStudentRole = await prisma.role.create({
+    data: {
+      title: "STUDENT",
+    }
+  })
+
+  const studentInformation = await prisma.studentInformation.create({
+    // @ts-ignore
+    data: {
+      first_name: 'Mehedi',
+      admission_no: '874965132',
+      admission_date: new Date(Date.now()),
+      admission_status: 'waiting',
+      date_of_birth: new Date('10/10/2010'),
+      gender: 'male',
+      phone: '01650324165',
+      email: 'students@email.com',
+      national_id: '89657410685412',
+
+      school: {
+        connect: { id: school.id }
+      },
+      user: {
+        create: {
+          username: 'Mehedi',
+          password: hashPassword,
+          user_role_id: createStudentRole.id,
+          role_id: createStudentRole.id,
+          school_id: school.id
+        }
+      }
+    }
+  });
+
+  await prisma.student.create({
+    data: {
+      class_roll_no: '01',
+      class_registration_no: '654312',
+      discount: parseFloat(0),
+      section: {
+        connect: { id: createSection.id }
+      },
+      academic_year: {
+        connect: { id: createAcademicYear.id }
+      },
+      student_info: {
+        connect: { id: studentInformation.id }
+      }
+    }
+  });
+
+
+  // role
+  // 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
+  await prisma.role.createMany({
+    data: [
+      { title: "GURDIAN" },
+      { title: "STAFF" },
+      { title: "ACCOUNTANT" },
+      { title: "LIBRARIAN" },
+      { title: "RECEPTIONIST" }
     ]
-  }
-});
-
-
-// Dummy Things create
-const hashPassword = await bcrypt.hash('admin', Number(process.env.SALTROUNDS));
-
-const createAdminRole = await prisma.role.create({
-  data:{
-    title:"ADMIN",
-    permissions:{
-      connect :permissions.map((permission) => ({
-        id: permission.id
-      }))
-    }
-  }
-})
-
-const admin = await prisma.user.create({
-  data: 
-  {
-    username: 'admin',
-    password:hashPassword,
-    user_role_id: createAdminRole.id,
-    role_id: createAdminRole.id
-}});
-
-const school = await prisma.school.create({
-  data:{ 
-  name:'My School and College',
-  phone: '01773456789',
-  email: 'admin@email.com',
-  address: 'Gulshan-1,Dhake',
-  currency: 'BDT',
-  admins: { connect: {id: admin.id} }
-}});
-
-const createPackage = await prisma.package.create({
-  data: {
-    title: 'Monthly',
-    price: 1000,
-    duration: 30,
-    student_count: 10
-  }
-});
-
-const end_date = new Date(Date.now());
-end_date.setDate(end_date.getDate() + createPackage.duration);
-
-await prisma.subscription.create({
-  data: {
-    school_id: school.id,
-    package_id: createPackage.id,
-    start_date: new Date(Date.now()),
-    end_date,
-    is_active: true
-  }
-});
-
-const createDepartment = await prisma.department.create({
-  data:{
-    title: 'Science',
-    school_id: school.id
-  }
-});
-
-const createTeacherRole = await prisma.role.create({
-  data:{
-    title:"TEACHER",
-  }
-})
-
-await prisma.teacher.create({
-  data: {
-    first_name: 'Sume',
-    national_id: '653216532123',
-    gender: 'female',
-    date_of_birth: new Date( '1/1/1996'),
-    permanent_address: 'Khilgaon, Dhaka-1219',
-    present_address: 'Khilgaon, Dhaka-1219',
-    joining_date: new Date(),
-    resume: '',
-    school: { connect: { id:school.id } },
-    department: { connect: { id: createDepartment.id } },
-    user: {
-      create: {
-        username: 'Sume',
-        password: hashPassword,
-        user_role_id: createTeacherRole.id,
-        role_id: createTeacherRole.id,
-        school_id:school.id 
-      }
-    }
-  }
-});
-
-const createAcademicYear = await prisma.academicYear.create({
-  data: {
-    title:'2023',
-    school_id: school.id
-  }
-});
-
-const createClass = await prisma.class.create({
-  data: {
-    name: 'Nine',
-    code: '901',
-    school_id: school.id,
-    has_section: true
-  }
-});
-
-const createSection = await prisma.section.create({
-  data: {
-    name: 'A',
-    class_id: createClass.id,
-  }
-});
-
-await prisma.group.create({
-  data: {
-    title: 'Science',
-    class_id: createClass.id
-  }
-});
-
-const createStudentRole = await prisma.role.create({
-  data:{
-    title:"STUDENT",
-  }
-})
-
-const studentInformation = await prisma.studentInformation.create({
-  // @ts-ignore
-  data: {
-    first_name: 'Mehedi',
-    admission_no: '874965132',
-    admission_date: new Date(Date.now()),
-    admission_status: 'waiting',
-    date_of_birth: new Date( '10/10/2010'),
-    gender: 'male',
-    phone: '01650324165',
-    email: 'students@email.com',
-    national_id: '89657410685412',
-    
-    school: {
-      connect: { id: school.id }
-    },
-    user: {
-      create: {
-        username: 'Mehedi',
-        password: hashPassword,
-        user_role_id : createStudentRole.id,
-        role_id : createStudentRole.id,
-        school_id: school.id
-      }
-    }
-  }
-});
-
-await prisma.student.create({
-  data: {
-    class_roll_no: '01',
-    class_registration_no: '654312',
-    discount: parseFloat(0),
-    section: {
-      connect: { id: createSection.id }
-    },
-    academic_year: {
-      connect: { id: createAcademicYear.id }
-    },
-    student_info: {
-      connect: { id: studentInformation.id }
-    }
-  }
-});
-
-
-// role
-// 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
-await prisma.role.createMany({
-  data:[
-    {title:"GURDIAN"},
-    {title:"STAFF"},
-    {title:"ACCOUNTANT"},
-    {title:"LIBRARIAN"},
-    {title:"RECEPTIONIST"}
-  ]
-})
+  })
 }
 
 

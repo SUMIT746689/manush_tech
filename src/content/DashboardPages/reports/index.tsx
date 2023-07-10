@@ -18,57 +18,52 @@ import Block2 from 'src/content/Blocks/ListsLarge/Block8';
 // import Block12 from 'src/content/Dashboards/Reports/Block12';
 // import Block13 from 'src/content/Dashboards/Reports/Block13';
 // import Demo from '../calender/demo';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 // import timeGridPlugin from '@fullcalendar/timegrid';
 // import interactionPlugin from '@fullcalendar/interaction';
 // import DemoApp from '../calender/FullCalender/Demo';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
-import Image from 'next/image';
-import { useTranslation } from 'next-i18next';
 import Calander from '../calender/calander';
 
 function DashboardReportsContent({ blockCount = null }) {
-  const [holidays, setHolidays] = useState([]);
+  // const [holidays, setHolidays] = useState([]);
   const [dbBtN, setDbBtN] = useState(false)
   const { user } = useAuth();
   const { showNotification } = useNotistick()
 
-  useEffect(() => {
-    // @ts-ignore
-    axios
-      .get('/api/holidays')
-      .then((res) => {
-        // @ts-ignore
-        if (user?.role?.title === "SUPER_ADMIN") {
-          setHolidays(
-            res?.data?.data.map((i) => {
-              return {
-                title: `${i?.school?.name} subscription ending`,
-                date: dayjs(i.end_date).format('YYYY-MM-DD'),
-              };
-            })
-          )
-        } else {
-          setHolidays(
-            res?.data?.data.map((i) => {
-              return {
-                title: i.title,
-                date: dayjs(i.date).format('YYYY-MM-DD')
-              };
-            })
-          )
-        }
-        ;
-      })
-      .catch((err) => console.log(err));
+  // useEffect(() => {
+  //   // @ts-ignore
+  //   axios
+  //     .get('/api/holidays')
+  //     .then((res) => {
+  //       // @ts-ignore
+  //       if (user?.role?.title === "SUPER_ADMIN") {
+  //         setHolidays(
+  //           res?.data?.data.map((i) => {
+  //             return {
+  //               title: `${i?.school?.name} subscription ending`,
+  //               date: dayjs(i.end_date).format('YYYY-MM-DD'),
+  //             };
+  //           })
+  //         )
+  //       } else {
+  //         setHolidays(
+  //           res?.data?.data.map((i) => {
+  //             return {
+  //               title: i.title,
+  //               date: dayjs(i.date).format('YYYY-MM-DD')
+  //             };
+  //           })
+  //         )
+  //       }
+  //       ;
+  //     })
+  //     .catch((err) => console.log(err));
 
-  }, []);
+  // }, []);
 
 
   const handleDBbackup = () => {
@@ -136,7 +131,7 @@ function DashboardReportsContent({ blockCount = null }) {
           <Block3 /> */}
 
           {/* <Demo /> */}
-          <Calander holidays={holidays} />
+          <Calander holidays={blockCount.holidays} />
 
 
         </Grid>

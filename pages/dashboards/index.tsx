@@ -9,10 +9,11 @@ import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
+import dayjs from 'dayjs';
 
 export async function getServerSideProps(context: any) {
 
-  let blockCount: object = {};
+  let blockCount: any = { holidays: [] };
   try {
     // const client = SSRHTTPClient(context)
     // const res = await client.get(`${process.env.NEXT_PUBLIC_BASE_API}/api/dashboard`)
@@ -38,9 +39,10 @@ export async function getServerSideProps(context: any) {
           }
         })
       };
+
     }
 
-    if (refresh_token.role.title === 'ADMIN') {
+    else if (refresh_token.role.title === 'ADMIN') {
       blockCount['students'] = {
         count: await prisma.student.count({
           where: { student_info: { school_id: refresh_token?.school_id } }
@@ -53,7 +55,7 @@ export async function getServerSideProps(context: any) {
       };
     }
 
-    if (refresh_token.role.title === 'TEACHER') {
+    else if (refresh_token.role.title === 'TEACHER') {
       blockCount['role'] = 'teacher';
       blockCount['teacher'] = await prisma.teacher.findFirst({
         where: { user_id: refresh_token.id },
@@ -71,7 +73,7 @@ export async function getServerSideProps(context: any) {
       blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
     }
 
-    if (refresh_token.role.title === 'STUDENT') {
+    else if (refresh_token.role.title === 'STUDENT') {
       // blockCount['class'] = await prisma.student.F({
       // where: {
       // refresh_token.id
@@ -103,12 +105,45 @@ export async function getServerSideProps(context: any) {
       blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
     }
 
+    if (refresh_token.role.title === 'SUPER_ADMIN') {
+      const resSubscription = await prisma.subscription.findMany({
+        where: {
+          is_active: true
+        },
+        select: {
+          school: {
+            select: {
+              name: true
+            }
+          },
+          end_date: true
+        }
+      });
+
+      blockCount.holidays = resSubscription.map(sub => ({
+        title: `${sub?.school?.name} subscription ending`,
+        date: dayjs(sub.end_date).format('YYYY-MM-DD'),
+      }))
+    }
+    else {
+      const resHolidays = await prisma.holiday.findMany({
+        where: { school_id: refresh_token.school_id }
+      });
+
+      blockCount.holidays = resHolidays.map(holiday => ({
+        title: holiday.title,
+        date: dayjs(holiday.date).format('YYYY-MM-DD')
+      }))
+    }
+
+    console.log({blockCount});
+
   } catch (err) {
     console.log(err)
   }
   const stringify = JSON.stringify(blockCount);
   const parseJson = JSON.parse(stringify);
-  console.log({parseJson})
+  console.log({ parseJson })
   return {
     props: { blockCount: parseJson },
   }

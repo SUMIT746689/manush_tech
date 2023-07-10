@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="256" height="256">
+	<g data-name="73 exam" fill="#000000" class="color000 svgShape">
+		<path fill="#55ace3" d="M22,3V17.35a1,1,0,0,1-.67.94,5,5,0,0,0-2,8A1,1,0,0,1,18.54,28H6a1,1,0,0,1-1-1V3A1,1,0,0,1,6,2H21A1,1,0,0,1,22,3Z" class="color55ace3 svgShape"></path>
+		<path d="M18 9H14a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2zM18 13H14a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2zM18 21H14a1 1 0 0 1 0-2h4a1 1 0 0 1 0 2zM17 25H14a1 1 0 0 1 0-2h3a1 1 0 0 1 0 2zM11 17H6a1 1 0 0 1 0-2h5a1 1 0 0 1 0 2z" opacity=".1" fill="#000000" class="color000 svgShape"></path>
+		<circle cx="14" cy="16" r="1" opacity=".1" fill="#000000" class="color000 svgShape"></circle>
+		<circle cx="18" cy="16" r="1" opacity=".1" fill="#000000" class="color000 svgShape"></circle>
+		<g opacity=".1" fill="#000000" class="color000 svgShape">
+			<rect width="7" height="6" x="5" y="7" rx="1" fill="#000000" class="color000 svgShape"></rect>
+			<rect width="7" height="6" x="5" y="19" rx="1" fill="#000000" class="color000 svgShape"></rect>
+		</g>
+		<rect width="7" height="6" x="5" y="6" fill="#ffc10e" rx="1" class="colorffc10e svgShape"></rect>
+		<rect width="7" height="6" x="5" y="18" fill="#ffc10e" rx="1" class="colorffc10e svgShape"></rect>
+		<path fill="#ffc10e" d="M23,16a6.72,6.72,0,0,0-2.33.41A7,7,0,1,0,23,16Zm2,2a5.84,5.84,0,0,0-2,.35,6,6,0,0,0-2.7,9.36,5.12,5.12,0,0,1-.76-.71A6,6,0,0,1,22,17.35,5.84,5.84,0,0,1,24,17a6,6,0,0,1,4.71,2.29A5.94,5.94,0,0,0,25,18Z" class="colorffc10e svgShape"></path>
+		<path d="M25,27a1,1,0,0,1-.71-.29l-2-2A1,1,0,0,1,22,24V21a1,1,0,0,1,2,0v2.59l1.71,1.7a1,1,0,0,1,0,1.42A1,1,0,0,1,25,27Z" opacity=".1" fill="#000000" class="color000 svgShape"></path>
+		<path fill="#1565c0" d="M25,26a1,1,0,0,1-.71-.29l-2-2A1,1,0,0,1,22,23V20a1,1,0,0,1,2,0v2.59l1.71,1.7a1,1,0,0,1,0,1.42A1,1,0,0,1,25,26Z" class="color1565c0 svgShape"></path>
+		<path fill="#1a5083" d="M11,6H6A1,1,0,0,0,5,7v4a1,1,0,0,0,1,1h5a1,1,0,0,0,1-1V7A1,1,0,0,0,11,6Zm-1,4H7V8h3Zm3-3a1,1,0,0,1,1-1h4a1,1,0,0,1,0,2H14A1,1,0,0,1,13,7Zm0,4a1,1,0,0,1,1-1h4a1,1,0,0,1,0,2H14A1,1,0,0,1,13,11Zm-2,7H6a1,1,0,0,0-1,1v4a1,1,0,0,0,1,1h5a1,1,0,0,0,1-1V19A1,1,0,0,0,11,18Zm-1,4H7V20h3Zm13-6a6.63,6.63,0,0,0-1,.08V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V27a1,1,0,0,0,1,1H18.11A7,7,0,1,0,23,16ZM4,4H20V16.69A6.69,6.69,0,0,0,18.09,18L18,18H14a1,1,0,0,0,0,2h2.69a6.74,6.74,0,0,0-.61,2H14a1,1,0,0,0,0,2h2.08a6.74,6.74,0,0,0,.61,2H4ZM23,28a5,5,0,1,1,5-5A5,5,0,0,1,23,28Zm2.71-3.71a1,1,0,0,1,0,1.42,1,1,0,0,1-1.42,0l-2-2A1,1,0,0,1,22,23V20a1,1,0,0,1,2,0v2.59ZM12,15a1,1,0,0,1-1,1H6a1,1,0,0,1,0-2h5A1,1,0,0,1,12,15Zm1,0a1,1,0,1,1,1,1A1,1,0,0,1,13,15Zm6,0a1,1,0,1,1-1-1A1,1,0,0,1,19,15Z" class="color1a5083 svgShape"></path>
+	</g>
+</svg>

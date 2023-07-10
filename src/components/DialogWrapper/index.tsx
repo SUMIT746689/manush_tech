@@ -103,7 +103,7 @@ export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, 
       disabled={Boolean(errors.submit) || isSubmitting}
       variant="contained"
     >
-      {t(`${editData ? 'Edit' : 'Add'} ${title}`)}
+      {t(`${editData ? 'Update' : 'Create'} ${title}`)}
     </Button>
   </DialogActions>
   )

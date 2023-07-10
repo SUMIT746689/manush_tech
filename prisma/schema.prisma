@@ -66,6 +66,7 @@ model School {
   CertificateTemplate CertificateTemplate[]
   Transaction         Transaction[]
   GradingSystem       GradingSystem[]
+  Notice              Notice[]
 
   // routines Routine[]
   @@map("schools")
@@ -750,4 +751,17 @@ model Transaction {
   school  School  @relation(fields: [school_id], references: [id])
 
   @@map("transactions")
+}
+
+model Notice {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description Json
+  photo_url   String
+  school_id   Int
+  created_at  DateTime @default(now())
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("notices")
 }

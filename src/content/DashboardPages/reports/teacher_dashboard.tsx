@@ -63,22 +63,22 @@ function StudentDashboardReportsContent({ blockCount = null }) {
   //     })
   //     .catch(err => showNotification(`${err?.response?.data?.message}`, 'error'))
   // }
-
-  const { student } = blockCount;
-  const name = [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' ');
-  const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class.name], ['Section', student.section.name]]
+  const { teacher } = blockCount;
+  const name = [teacher.first_name, teacher.middle_name, teacher.last_name].join(' ');
+  const extraInfo = [['department',teacher.department.title]];
   const quickLinks = [
     { name: 'Exam', src: "exam.svg", href: "/management/exam" },
-    { name: 'Attendance', src: "attendance.svg", href: "/management/exam" },
+    { name: 'Class Attendance', src: "attendance.svg", href: "/management/exam" },
     { name: 'Routine', src: "routine.svg", href: "/management/exam" },
-    { name: 'Fees Collection', src: "fees_collection.svg", href: "/management/exam" }
+    { name: 'Exam Attendance', src: "exam_attendance.svg", href: "/management/exam" }
   ]
+
   return (
     <>
       <Card sx={{ m: 4, borderRadius: 0.5 }}>
         <Grid container justifyContent='space-between' >
           <Grid item xs={8} p={2}>
-            <Head name={name} extraInfo={extraInfo} />
+            <Head name={name} extraInfo={extraInfo}/>
           </Grid>
           <Grid item xs={4} position="relative" >
             {/* <Grid position="absolute"> */}
@@ -91,8 +91,7 @@ function StudentDashboardReportsContent({ blockCount = null }) {
 
       <Grid
         sx={{
-          px: 4,
-          pt: 2
+          px: 4
         }}
         container
         direction="row"
@@ -100,10 +99,20 @@ function StudentDashboardReportsContent({ blockCount = null }) {
         alignItems='center'
         spacing={4}
       >
-        <Grid xs={12} md={11} sx={{ pl: 4, pt: 2 }} >
-          <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+        <Grid item xs={12}>
+          <Block1 blockCount={blockCount} />
+        </Grid>
 
-            {/* quick link cards */}
+        <Grid
+          xs={12}
+          md={11}
+          sx={{
+            pl: 4,
+            pt: 2,
+          }}
+        >
+          <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+            {/* quick links */}
             <QuickLinkCards quickLinks={quickLinks} />
 
             {/* calander */}
@@ -118,10 +127,6 @@ function StudentDashboardReportsContent({ blockCount = null }) {
     </>
   );
 }
-
-
-
-
 
 
 export default StudentDashboardReportsContent;

@@ -8,6 +8,7 @@ import { SSRHTTPClient } from 'repositories/base';
 import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
+import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 
 export async function getServerSideProps(context: any) {
 
@@ -52,12 +53,31 @@ export async function getServerSideProps(context: any) {
       };
     }
 
+    if (refresh_token.role.title === 'TEACHER') {
+      blockCount['role'] = 'teacher';
+      blockCount['teacher'] = await prisma.teacher.findFirst({
+        where: { user_id: refresh_token.id },
+        select: {
+          first_name: true,
+          middle_name: true,
+          last_name: true,
+          department: {
+            select: {
+              title: true
+            }
+          }
+        }
+      })
+      blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
+    }
+
     if (refresh_token.role.title === 'STUDENT') {
       // blockCount['class'] = await prisma.student.F({
       // where: {
       // refresh_token.id
       // }
       // })
+      blockCount['role'] = 'student';
       blockCount['student'] = await prisma.student.findFirst({
         where: {
           student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id }
@@ -80,33 +100,47 @@ export async function getServerSideProps(context: any) {
         }
 
       });
-      blockCount['role'] = 'student';
-
+      blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
     }
-
 
   } catch (err) {
     console.log(err)
   }
+  const stringify = JSON.stringify(blockCount);
+  const parseJson = JSON.parse(stringify);
+  console.log({parseJson})
   return {
-    props: { blockCount },
+    props: { blockCount: parseJson },
   }
 }
 
 function DashboardReports({ blockCount }) {
-  return (
-    <>
-      <Head>
-        <title>Dashboard</title>
-      </Head>
-      {
-        blockCount.role === "student" ? <StudentDashboardReportsContent blockCount={blockCount} />
-        :
-        <DashboardReportsContent blockCount={blockCount} />
-      }
 
-    </>
-  );
+  switch (blockCount?.role) {
+    case 'teacher':
+      return (
+        <>
+          <Head> <title>Teacher Dashboard</title> </Head>
+          <TeacherDashboardReportsContent blockCount={blockCount} />
+        </>
+      )
+
+    case 'student':
+      return (
+        <>
+          <Head><title>Student Dashboard</title></Head>
+          <StudentDashboardReportsContent blockCount={blockCount} />
+        </>
+      )
+
+    default:
+      return (
+        <>
+          <Head><title>Dashboard</title></Head>
+          <DashboardReportsContent blockCount={blockCount} />
+        </>
+      )
+  }
 }
 
 DashboardReports.getLayout = (page) => (

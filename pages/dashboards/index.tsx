@@ -9,10 +9,11 @@ import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
+import dayjs from 'dayjs';
 
 export async function getServerSideProps(context: any) {
 
-  let blockCount: object = {};
+  let blockCount: any = { holidays: [] };
   try {
     // const client = SSRHTTPClient(context)
     // const res = await client.get(`${process.env.NEXT_PUBLIC_BASE_API}/api/dashboard`)
@@ -27,80 +28,113 @@ export async function getServerSideProps(context: any) {
 
     console.log({ cookie: cookie });
 
-    if (refresh_token.role.title === 'SUPER_ADMIN') {
-      blockCount['schools'] = { count: await prisma.school.count() };
-      blockCount['admins'] = {
-        count: await prisma.user.count({
-          where: {
-            role: {
-              title: 'ADMIN'
-            }
-          }
-        })
-      };
-    }
-
-    if (refresh_token.role.title === 'ADMIN') {
-      blockCount['students'] = {
-        count: await prisma.student.count({
-          where: { student_info: { school_id: refresh_token?.school_id } }
-        })
-      };
-      blockCount['teachers'] = {
-        count: await prisma.teacher.count({
-          where: { school_id: refresh_token?.school_id }
-        })
-      };
-    }
-
-    if (refresh_token.role.title === 'TEACHER') {
-      blockCount['role'] = 'teacher';
-      blockCount['teacher'] = await prisma.teacher.findFirst({
-        where: { user_id: refresh_token.id },
-        select: {
-          first_name: true,
-          middle_name: true,
-          last_name: true,
-          department: {
-            select: {
-              title: true
-            }
-          }
-        }
-      })
-      blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
-    }
-
-    if (refresh_token.role.title === 'STUDENT') {
-      // blockCount['class'] = await prisma.student.F({
-      // where: {
-      // refresh_token.id
-      // }
-      // })
-      blockCount['role'] = 'student';
-      blockCount['student'] = await prisma.student.findFirst({
-        where: {
-          student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id }
-        },
-        select: {
-          class_roll_no: true,
-          section: {
-            select: {
-              name: true,
-              class: true,
-            }
-          },
-          student_info: {
-            select: {
-              first_name: true,
-              middle_name: true,
-              last_name: true,
-            }
-          }
-        }
-
+    const updateHolidays = async () => {
+      const resHolidays = await prisma.holiday.findMany({
+        where: { school_id: refresh_token.school_id }
       });
-      blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } })
+
+      blockCount.holidays = resHolidays.map(holiday => ({
+        title: holiday.title,
+        date: dayjs(holiday.date).format('YYYY-MM-DD')
+      }))
+    }
+
+    switch (refresh_token.role.title) {
+      case 'SUPER_ADMIN':
+        blockCount['schools'] = { count: await prisma.school.count() };
+        blockCount['admins'] = {
+          count: await prisma.user.count({
+            where: {
+              role: {
+                title: 'ADMIN'
+              }
+            }
+          })
+        };
+
+        const resSubscription = await prisma.subscription.findMany({
+          where: {
+            is_active: true
+          },
+          select: {
+            school: {
+              select: {
+                name: true
+              }
+            },
+            end_date: true
+          }
+        });
+
+        blockCount.holidays = resSubscription.map(sub => ({
+          title: `${sub?.school?.name} subscription ending`,
+          date: dayjs(sub.end_date).format('YYYY-MM-DD'),
+        }));
+        break;
+
+      case 'ADMIN':
+        blockCount['students'] = {
+          count: await prisma.student.count({
+            where: { student_info: { school_id: refresh_token?.school_id } }
+          })
+        };
+        blockCount['teachers'] = {
+          count: await prisma.teacher.count({
+            where: { school_id: refresh_token?.school_id }
+          })
+        };
+        await updateHolidays();
+        break;
+
+      case 'TEACHER':
+        blockCount['role'] = 'teacher';
+        blockCount['teacher'] = await prisma.teacher.findFirst({
+          where: { user_id: refresh_token.id },
+          select: {
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            department: {
+              select: {
+                title: true
+              }
+            }
+          }
+        })
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        await updateHolidays();
+        break;
+
+      case 'STUDENT':
+        blockCount['role'] = 'student';
+        blockCount['student'] = await prisma.student.findFirst({
+          where: {
+            student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id }
+          },
+          select: {
+            class_roll_no: true,
+            section: {
+              select: {
+                name: true,
+                class: true,
+              }
+            },
+            student_info: {
+              select: {
+                first_name: true,
+                middle_name: true,
+                last_name: true,
+              }
+            }
+          }
+
+        });
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        await updateHolidays();
+        break;
+
+      default:
+
     }
 
   } catch (err) {
@@ -108,7 +142,7 @@ export async function getServerSideProps(context: any) {
   }
   const stringify = JSON.stringify(blockCount);
   const parseJson = JSON.parse(stringify);
-  console.log({parseJson})
+
   return {
     props: { blockCount: parseJson },
   }

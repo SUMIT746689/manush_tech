@@ -43,6 +43,7 @@ model School {
   /// school should not be created without an existing user
   // admin_id Int     @unique
   currency String?
+  // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
   admins              User[]                @relation("AdminUserSchool")
@@ -373,7 +374,7 @@ model StudentFee {
 
   student           Student @relation(fields: [student_id], references: [id])
   fee               Fee     @relation(fields: [fee_id], references: [id])
-  collected_by_user User?    @relation(fields: [collected_by], references: [id])
+  collected_by_user User?   @relation(fields: [collected_by], references: [id])
 
   @@map("student_fees")
 }
@@ -569,7 +570,7 @@ model Subscription {
 }
 
 model WebsiteUi {
-  id                  Int    @id @default(autoincrement())
+  id                  Int     @id @default(autoincrement())
   header_image        String
   carousel_image      Json?
   school_history      String?

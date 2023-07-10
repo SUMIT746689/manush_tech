@@ -165,8 +165,6 @@ const Results = ({ data, reFetchData }) => {
         values,
         setFieldValue
       }) => {
-        //  console.log("values__", values);
-
         return (
           <>
             <form onSubmit={handleSubmit}>

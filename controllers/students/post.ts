@@ -208,7 +208,7 @@ const postHandle = async (req, res, authenticate_user) => {
           student_id: student?.id,
           fee_id: i.id,
           collected_amount: 0,
-          payment_method: 'pending', 
+          payment_method: 'pending',
         });
       }
       console.log("StudentFeeContainer__", StudentFeeContainer);
@@ -236,19 +236,26 @@ const postHandle = async (req, res, authenticate_user) => {
       // request.end();
 
     })
-    // const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${fields?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${fields.first_name}, Your username: ${fields.username} and password: ${fields.password}`)}`)
-    // // const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${fields?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(fields?.phone)}`)
 
-    // if (sms_res.data == 1015) {
-    //   res.status(200).json({ success: 'student created successfully but sms sending failed' });
-    // }
-    // else if (sms_res.data.startsWith('SMS SUBMITTED')) {
-    //   res.status(200).json({ success: 'student created successfully' });
-    // }
-    // else {
-    //   res.status(200).json({ success: 'student created successfully but sms sending failed' });
-    // }
-    res.status(200).json({ success: 'student created successfully but sms sending failed' });
+    const sms_res_gatewayinfo = await prisma.smsGateway.findFirst({
+      where: {
+        school_id: authenticate_user?.school_id,
+        is_active: true
+      }
+    })
+
+    const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.title}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${fields?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${fields.first_name}, Your username: ${fields.username} and password: ${fields.password}`)}`)
+    
+    if (sms_res.data == 1015) {
+      res.status(200).json({ success: 'student created successfully but sms sending failed' });
+    }
+    else if (sms_res.data.startsWith('SMS SUBMITTED')) {
+      res.status(200).json({ success: 'student created successfully' });
+    }
+    else {
+      res.status(200).json({ success: 'student created successfully but sms sending failed' });
+    }
+    // res.status(200).json({ success: 'student created successfully but sms sending failed' });
   } catch (error) {
     console.log(error);
     res.status(404).json({ error: error.message });

@@ -6,16 +6,22 @@ const prisma = new PrismaClient();
 
 async function post(req, res, refresh_token) {
   try {
-    const { title,details } = req.body;
+    const { title, details, id } = req.body;
 
-    if (!refresh_token.school_id) throw new Error("invalid user")
     if (!title || !details) throw new Error("provide valid data")
+    const query = {
+      title: title,
+      details: details,
+    };
 
-    const response = await prisma.smsGateway.create({
-      data: {
-        title: title,
-        details: details,
-        is_active: false,
+    const response = await prisma.smsGateway.upsert({
+      where: {
+        id: id
+      },
+      update: query,
+      create: {
+        ...query,
+        is_active: true,
         school_id: Number(refresh_token.school_id)
       }
     })

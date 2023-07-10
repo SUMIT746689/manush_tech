@@ -770,7 +770,7 @@ model Notice {
 model Leave {
   id          Int         @id @default(autoincrement())
   user_id     Int
-  form_date   DateTime
+  from_date   DateTime
   to_date     DateTime
   created_at  DateTime    @default(now())
   status      LeaveStatus

@@ -86,11 +86,11 @@ function PageHeader({ editData, setEditData, reFetchData }) {
   return (
     <>
       {/* page head title and create button ui */}
-      <PageHeaderTitleWrapper name="notice" handleCreateClassOpen={handleCreateClassOpen} />
+      <PageHeaderTitleWrapper name="certificate template" handleCreateClassOpen={handleCreateClassOpen} />
 
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -99,9 +99,21 @@ function PageHeader({ editData, setEditData, reFetchData }) {
 
         <Formik
           initialValues={{
-            title: undefined,
-            description: undefined,
-            photo: '',
+            name: editData?.name || undefined,
+            user_type: editData?.user_type || undefined,
+            page_layout: editData?.page_layout || undefined,
+            student_qr_code: editData?.user_type === "student" ? editData.student_qr_code : undefined,
+            employee_qr_code: editData?.user_type === "employee" ? editData.employee_qr_code : undefined,
+            photo_style: editData?.photo_style || undefined,
+            photo_size: editData?.photo_size || undefined,
+            top_space: editData?.top_space || undefined,
+            bottom_space: editData?.bottom_space || undefined,
+            right_space: editData?.right_space || undefined,
+            left_space: editData?.left_space || undefined,
+            content: editData?.content || '',
+            logo: '',
+            signature: '',
+            background_image: '',
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -128,54 +140,240 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                     p: 3
                   }}
                 >
-                  <Grid container gap={1} >
-                    {/* <Grid container display="grid" sx={{ gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 1 }} > */}
+                  <Grid container >
+                    <Grid container display="grid" sx={{ gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 1 }} >
                       <TextFieldWrapper
-                        label="Title"
-                        name="title"
-                        value={values.title}
-                        touched={touched.title}
-                        errors={errors.title}
+                        label="Certificate Name"
+                        name="name"
+                        value={values.name}
+                        touched={touched.name}
+                        errors={errors.name}
                         handleChange={handleChange}
                         handleBlur={handleBlur}
+                        required={true}
                       />
 
-                      <RichTextEditorWrapper
-                        value={values.description}
-                        handleChange={(newValue, editor) => {
-                          setFieldValue('description', newValue);
-                          // setText(editor.getContent({ format: 'text' }));
-                          editor.getContent({ format: 'text' });
+                      <DropDownSelectWrapper
+                        label="User Type"
+                        name="user_type"
+                        value={values.user_type}
+                        menuItems={['student', 'employee']}
+                        handleChange={({ target }) => {
+                          const { name, value } = target;
+                          setFieldValue(name, value);
+                          handleDynamicContent(value);
                         }}
+                        required={true}
                       />
 
-                      <Grid sx={{ gap: 1 }}>
+                      <DynamicDropDownSelectWrapper
+                        label="Page Layout"
+                        name={"page_layout"}
+                        value={values.page_layout}
+                        menuItems={[{ title: 'a4-potrait', value: 'a4_potrait' }, { title: 'a4-landscape', value: 'a4_landscape' }]}
+                        handleChange={handleChange}
+                        required={true}
+                      />
 
-                        <FileUploadFieldWrapper
-                          htmlFor="photo"
-                          label="Photo Image"
-                          name="photo"
-                          value={values.photo?.name || ''}
+                      {values.user_type === "student" && <DropDownSelectWrapper
+                        label="Student QR Code "
+                        name="student_qr_code"
+                        value={values.student_qr_code}
+                        menuItems={['name', 'date_of_birth', 'registration_no', 'roll']}
+                        // touched={touched.name}
+                        // errors={errors.name}
+                        handleChange={handleChange}
+                        // handleBlur={handleBlur}
+                        required={true}
+                      />
+                      }
 
-                          handleChangeFile={(e) => { setFieldValue("photo", e.target.files[0]) }}
-                          handleRemoveFile={() => { setFieldValue("photo", undefined) }}
-                        />
+                      {values.user_type === "employee" && <DropDownSelectWrapper
+                        label="Employee QR Code "
+                        name="employee_qr_code"
+                        value={values.employee_qr_code}
+                        menuItems={['name', 'date_of_birth', 'registration_no', 'roll']}
 
-                        {editData?.background_url
-                          &&
-                          <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
-                            {/* <Image src={editData?.background_url} width={100} height={100} alt="logo" /> */}
-                            <img src={editData?.background_url} className=" h-fit w-20" />
-                          </Avatar>
-                        }
-                      {/* </Grid> */}
+                        // touched={touched.name}
+                        // errors={errors.name}
+                        handleChange={handleChange}
+                        // handleBlur={handleBlur}
+                        required={true}
+                      />
+                      }
+
+                      <DropDownSelectWrapper
+                        label="User Photo Style"
+                        name="photo_style"
+                        value={values.photo_style}
+                        menuItems={['circular', 'rounded', 'square']}
+
+                        // touched={touched.name}
+                        // errors={errors.name}
+                        handleChange={handleChange}
+                        // handleBlur={handleBlur}
+                        required={true}
+                      />
+
+                      <TextFieldWrapper
+                        label="User Photo Size (PX) "
+                        name="photo_size"
+                        value={values.photo_size}
+                        touched={touched.photo_size}
+                        errors={errors.photo_size}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                        type="number"
+                      />
+
+                      <TextFieldWrapper
+                        label="top space (PX)"
+                        name="top_space"
+                        value={values.top_space}
+                        touched={touched.top_space}
+                        errors={errors.top_space}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                        type="number"
+                      />
+
+                      <TextFieldWrapper
+                        label="bottom space (PX)"
+                        name="bottom_space"
+                        value={values.bottom_space}
+                        touched={touched.bottom_space}
+                        errors={errors.bottom_space}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                        type="number"
+                      />
+
+                      <TextFieldWrapper
+                        label="right space (PX)"
+                        name="right_space"
+                        value={values.right_space}
+                        touched={touched.right_space}
+                        errors={errors.right_space}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                        type="number"
+                      />
+
+                      <TextFieldWrapper
+                        label="left space (PX)"
+                        name="left_space"
+                        value={values.left_space}
+                        touched={touched.left_space}
+                        errors={errors.left_space}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                        type="number"
+                      />
+                    </Grid>
+
+                    <Grid sx={{ gap: 1 }}>
+
+                      {/* <TextFieldWrapper
+                        label="Logo Image"
+                        name="logo"
+                        value={undefined}
+                        touched={touched.logo}
+                        errors={errors.logo}
+                        handleChange={(e) => { setFieldValue("logo", e.target.files[0]) }}
+                        handleBlur={handleBlur}
+                        required={editData?.logo_url ? false : true}
+                        type="file"
+                      /> */}
+                      <FileUploadFieldWrapper
+                        htmlFor="logo"
+                        label="Logo Image"
+                        name="logo"
+                        value={values.logo?.name || ''}
+
+                        handleChangeFile={(e) => { setFieldValue("logo", e.target.files[0]) }}
+                        handleRemoveFile={() => { setFieldValue("logo", undefined) }}
+                      />
+                      {editData?.logo_url
+                        &&
+                        <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
+                          {/* <Image src={editData?.logo_url} width={100} height={100} alt="logo" /> */}
+                          <img src={editData?.logo_url} className=" h-fit w-20" alt='logo' />
+                        </Avatar>
+                      }
+
+                      <FileUploadFieldWrapper
+                        htmlFor="signature"
+                        label="Signature Image"
+                        name="signature"
+                        value={values.signature?.name || ''}
+                        handleChangeFile={(e) => { setFieldValue("signature", e.target.files[0]) }}
+                        handleRemoveFile={(e) => { setFieldValue("signature", undefined) }}
+                      />
+
+                      {editData?.signature_url
+                        &&
+                        <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
+                          {/* <Image src={editData?.signature_url} width={100} height={100} alt="logo" /> */}
+                          <img src={editData?.signature_url} className=" h-fit w-20" alt="signature" />
+                        </Avatar>
+                      }
+
+                      <FileUploadFieldWrapper
+                        htmlFor="background_image"
+                        label="Background Image"
+                        name="background_image"
+                        value={values.background_image?.name || ''}
+                        // touched={touched.background_image}
+                        // errors={errors.background_image}
+                        handleChangeFile={(e) => { setFieldValue("background_image", e.target.files[0]) }}
+                        handleRemoveFile={(e) => { setFieldValue("background_image", undefined) }}
+
+                      // handleBlur={handleBlur}
+                      // required={editData?.background_url ? false : true}
+                      // type="file"
+                      />
+                      {editData?.background_url
+                        &&
+                        <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
+                          {/* <Image src={editData?.background_url} width={100} height={100} alt="logo" /> */}
+                          <img src={editData?.background_url} className=" h-fit w-20" />
+                        </Avatar>
+                      }
+                    </Grid>
+
+                    {/* <TextAreaWrapper
+                      name="content"
+                      value={values.content}
+                      touched={touched.content}
+                      errors={errors.content}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
+                      required={true}
+                    /> */}
+
+                    <RichTextEditorWrapper
+                      value={values.content}
+                      handleChange={(newValue, editor) => {
+                        setFieldValue('content', newValue);
+                        // setText(editor.getContent({ format: 'text' }));
+                        editor.getContent({ format: 'text' });
+                      }}
+                    />
+                    <Grid display="flex" flexWrap="wrap" gap={1} mt={1} >
+                      {dynamicContent?.map((content, index) => <Button key={index} variant="contained" sx={{ borderRadius: 0.4, fontSize: 12, fontWeight: 400, py: 0.4, px: 1 }} onClick={() => { setFieldValue('content', values.content + content) }} >{content}</Button>)}
+
                     </Grid>
                   </Grid>
                 </DialogContent>
 
                 {/* handle cancel dilog / close / submit dialog click cancel or add button */}
                 <DialogActionWrapper
-                  title="Nsotice"
+                  title="Certificate Template"
                   handleCreateClassClose={handleCreateClassClose}
                   errors={errors}
                   editData={editData}

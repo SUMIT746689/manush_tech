@@ -39,11 +39,19 @@ export const imageFolder = async () => {
 export const certificateTemplateFolder = async (foldername: string) => {
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/${foldername}`));
+        await fs.readdir(path.join(process.cwd(), `/files`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/${foldername}`));
+        await fs.mkdir(path.join(process.cwd(), `/files`));
     }
+    try {
+        // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.readdir(path.join(process.cwd(), `/files`, `${foldername}`));
+    } catch (error) {
+        // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
+        await fs.mkdir(path.join(process.cwd(), `/files`, `${foldername}`));
+    }
+
 }
 
 export const validateField = async (req) => {

@@ -1,7 +1,7 @@
 import { Authenticated } from '@/components/Authenticated';
 import Footer from '@/components/Footer';
-import PageHeader from '@/content/Certificate/CertificateTemplate/PageHeader';
-import Results from '@/content/Certificate/CertificateTemplate/Results';
+import PageHeader from '@/content/FrontEnd/Notice/PageHeader';
+import Results from '@/content/FrontEnd/Notice/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Grid } from '@mui/material';
@@ -10,14 +10,14 @@ import PageBodyWrapper from '@/components/PageBodyWrapper';
 import { useState } from 'react';
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 
-const EmailTemplates = () => {
+const Notice = () => {
   const [editData, setEditData] = useState();
-  const { data: emailTemplates, reFetchData } = useClientFetch('/api/certificate_templates');
-  
+  const { data: notices, reFetchData } = useClientFetch('/api/notices');
+
   return (
     <>
       <Head>
-        <title>Certificate Template</title>
+        <title>Notice</title>
       </Head>
       <PageBodyWrapper>
         <Grid
@@ -35,7 +35,7 @@ const EmailTemplates = () => {
           </PageTitleWrapper>
 
           <Results
-            sessions={emailTemplates?.data || []}
+            sessions={notices?.data || []}
             setEditData={setEditData}
           />
         </Grid>
@@ -45,10 +45,10 @@ const EmailTemplates = () => {
   );
 };
 
-EmailTemplates.getLayout = (page) => (
+Notice.getLayout = (page) => (
   <Authenticated>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );
 
-export default EmailTemplates;
+export default Notice;

@@ -65,6 +65,7 @@ model School {
   CertificateTemplate CertificateTemplate[]
   Transaction         Transaction[]
   GradingSystem       GradingSystem[]
+  Notice              Notice[]
 
   // routines Routine[]
   @@map("schools")
@@ -373,7 +374,7 @@ model StudentFee {
 
   student           Student @relation(fields: [student_id], references: [id])
   fee               Fee     @relation(fields: [fee_id], references: [id])
-  collected_by_user User?    @relation(fields: [collected_by], references: [id])
+  collected_by_user User?   @relation(fields: [collected_by], references: [id])
 
   @@map("student_fees")
 }
@@ -569,7 +570,7 @@ model Subscription {
 }
 
 model WebsiteUi {
-  id                  Int    @id @default(autoincrement())
+  id                  Int     @id @default(autoincrement())
   header_image        String
   carousel_image      Json?
   school_history      String?
@@ -749,4 +750,17 @@ model Transaction {
   school  School  @relation(fields: [school_id], references: [id])
 
   @@map("transactions")
+}
+
+model Notice {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description Json
+  photo_url   String
+  school_id   Int
+  created_at  DateTime @default(now())
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("notices")
 }

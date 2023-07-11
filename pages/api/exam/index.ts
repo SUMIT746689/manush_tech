@@ -51,7 +51,8 @@ const index = async (req, res) => {
                         exam_details: {
                             select: {
                                 subject: true,
-                                subject_total: true
+                                subject_total: true,
+                                exam_date: true
                             }
                         }
                     }
@@ -68,16 +69,16 @@ const index = async (req, res) => {
                         "academic_year_id": 1,
                         "school_id": 1,
                         "subject_id_list": [
-                           {id:1,mark:23.54} ,
-                           {id:2,mark:24.54} ,
-                           {id:3,mark:23.54} ,
+                           {id:1,mark:23.54,exam_date} ,
+                           {id:2,mark:24.54,exam_date} ,
+                           {id:3,mark:23.54,exam_date} ,
                         ],
                         "final_percent": 20
                     } 
                     */
 
 
-                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.school_id || !req.body.subject_id_list || !req.body.exam_date) {
+                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.school_id || !req.body.subject_id_list) {
                     return res.status(400).send({ message: "parameter missing" })
                 }
                 const { title, section_id, academic_year_id, school_id, subject_id_list, class_id, final_percent, exam_date } = req.body;
@@ -110,7 +111,6 @@ const index = async (req, res) => {
                         school: {
                             connect: { id: parseInt(school_id) }
                         },
-                        exam_date: new Date(exam_date),
                         final_percent: final_percent ? parseInt(final_percent) : null
                     }
                 })
@@ -125,7 +125,8 @@ const index = async (req, res) => {
                                 connect: { id: parseInt(i.id) },
 
                             },
-                            subject_total: parseFloat(i.mark)
+                            subject_total: parseFloat(i.mark),
+                            exam_date: new Date(i.exam_date)
                             // ...query
                         }
                     })
@@ -160,7 +161,12 @@ const index = async (req, res) => {
                         })
                         let subject_id_list = [];
                         for (let i of req.body.subject_id_list) {
-                            subject_id_list.push({ exam_id: parseInt(req.body.exam_id), subject_id: parseInt(i.id), subject_total: parseFloat(i.mark) })
+                            subject_id_list.push({
+                                exam_id: parseInt(req.body.exam_id),
+                                subject_id: parseInt(i.id),
+                                subject_total: parseFloat(i.mark),
+                                exam_date: new Date(i.exam_date)
+                            })
                         }
                         await prisma.examDetails.createMany({
                             data: subject_id_list
@@ -210,7 +216,7 @@ const handleUpdate = async (req, res) => {
         if (req.body.exam_date) {
             updateQuery['exam_date'] = new Date(req.body.exam_date)
         }
-        console.log("req.body__",req.body, "updateQuery__", updateQuery);
+        console.log("req.body__", req.body, "updateQuery__", updateQuery);
         const temp = await prisma.exam.update({
             where: {
                 id: parseInt(req.body.exam_id)

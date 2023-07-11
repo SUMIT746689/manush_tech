@@ -85,6 +85,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
         for (const j of subjectList) {
           if (j.id == i.subject?.id) {
             j.mark = i.subject_total
+            j.exam_date = i.exam_date
             temp.push(j);
             break;
           }
@@ -133,7 +134,8 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             return {
               label: i.name,
               id: i.id,
-              mark: 100
+              mark: 100,
+              exam_date: null
             };
           })
         );
@@ -230,7 +232,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             class_id: editExam ? editExam?.section?.class?.id : undefined,
             section_id: editExam ? editExam?.editExam?.section?.id : undefined,
             subject_id_list: editExam ? subject : [],
-            exam_date: editExam ? new Date(editExam?.exam_date) : null,
             final_percent: editExam ? editExam?.final_percent : 0,
             submit: null
           }}
@@ -240,7 +241,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
               .required(t('Exam title field is required')),
             class_id: Yup.number().min(1).required(t('The class field is required')),
             section_id: Yup.number().min(1).required(t('The section field is required')),
-            exam_date: Yup.date().required(t('The Exam Date field is required')),
             subject_id_list: Yup.array().required(t('Subject is required')),
           })}
 
@@ -259,7 +259,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
 
               let subject_id_list = [];
               for (const i of subject) {
-                subject_id_list.push({ id: i.id, mark: parseFloat(i.mark) });
+                subject_id_list.push({ id: i.id, mark: parseFloat(i.mark),exam_date: i.exam_date });
               }
               let query = {};
               if (editExam) {
@@ -268,7 +268,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                   section_id: _values.section_id || editExam?.section_id,
                   title: _values.title,
                   class_id: _values.class_id || editExam?.section?.class?.id,
-                  exam_date: _values.exam_date,
                   school_id: user.school_id,
                   academic_year_id: academicYear?.id,
                   subject_id_list: subject_id_list,
@@ -281,7 +280,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                   title: _values.title,
                   class_id: _values.class_id,
                   school_id: user.school_id,
-                  exam_date: _values.exam_date,
                   academic_year_id: academicYear?.id,
                   subject_id_list: subject_id_list,
                   final_percent: checked ? _values?.final_percent : 0
@@ -591,41 +589,67 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                               }}
                             />
 
-                            <Grid
-                              sx={{
-                                mb: `${theme.spacing(3)}`,
-                                gap: 3,
-                                marginTop: '10px'
-                              }}
-                              item
-                              xs={12}
-                              sm={8}
-                              md={9}
+                            <Grid                            
+                              item                            
                               justifyContent="flex-end"
                               textAlign={{ sm: 'right', md: 'left' }}
                             >
                               {
                                 subject?.map((option, index) => (
-                                  <TextField
-                                    sx={{
-                                      m: '5px', '& fieldset': {
-                                        borderRadius: '3px'
-                                      }
-                                    }}
-                                    key={option.label}
-                                    variant="outlined"
-                                    label={`Input ${option.label} mark`}
-                                    value={option.mark}
-                                    type="number"
+                                  <Grid container sx={{
+                                    display:'grid',
+                                    gridTemplateColumns:'150px 250px',
+                                    marginTop: '12px'
+                                  }}  gap={1}>
+                                    <Grid item>
+                                      <TextField
+                                        sx={{
+                                          '& fieldset': {
+                                            borderRadius: '3px'
+                                          }
+                                        }}
+                                        key={option.label}
+                                        variant="outlined"
+                                        label={`Input ${option.label} mark`}
+                                        value={option.mark}
+                                        type="number"
+                                        required
+                                        onChange={(e) => {
+                                          const temp = [...subject];
+                                          temp[index].mark = e.target.value;
+                                          console.log(temp);
+                                          setSubject(temp);
+                                          setFieldValue('subject_id_list', temp);
+                                        }}
+                                      />
+                                    </Grid>
+                                    <Grid item>
+                                      <DateTimePicker
+                                        label="Exam Date"
+                                        value={option.exam_date}
+                                        onChange={(n: any) => {
+                                          const temp = [...subject];
+                                          temp[index].exam_date = n;
+                                          console.log(temp);
+                                          setSubject(temp);
+                                          setFieldValue('subject_id_list', temp);
+                                        }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            required
+                                            size="small"
+                                            sx={{
+                                              '& fieldset': {
+                                                borderRadius: '3px'
+                                              }
+                                            }}
+                                            {...params}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                  </Grid>
 
-                                    onChange={(e) => {
-                                      const temp = [...subject];
-                                      temp[index].mark = e.target.value;
-                                      console.log(temp);
-                                      setSubject(temp);
-                                      setFieldValue('subject_id_list', temp);
-                                    }}
-                                  />
                                 ))
                               }
                             </Grid>
@@ -633,79 +657,10 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         </>
 
                       )}
-                    {/* Exam date */}
-                    {
-                      subject.length > 0 &&
-                      <>
-                        <Grid
-                          item
-                          xs={12}
-                          sm={4}
-                          md={3}
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
-                        >
-                          <Box
-                            pr={3}
-                            sx={{
-                              pt: `${theme.spacing(2)}`,
-                              pb: { xs: 1, md: 0 }
-                            }}
-                            alignSelf="center"
-                          >
-                            <b>{t('Select Exam date')}:</b>
-                          </Box>
-                        </Grid>
-                        <Grid
-                          sx={{
-                            mb: `${theme.spacing(3)}`
-                          }}
-                          item
-                          xs={12}
-                          sm={8}
-                          md={9}
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
 
-                        >
-                          {/* <DatePickerWrapper
-                            label={'Exam Date'}
-                            date={values.exam_date}
-                            handleChange={(e) => setFieldValue('exam_date', e)}
-                          /> */}
-
-
-                          <DateTimePicker
-                            label="Exam Date"
-                            value={values.exam_date}
-                            onChange={(n: any) => {
-                              console.log('n_______', n);
-
-                              setFieldValue('exam_date', n)
-                            }}
-                            renderInput={(params) => (
-                              <TextField
-                                required
-                                fullWidth
-                                size="small"
-                                sx={{
-                                  '& fieldset': {
-                                    borderRadius: '3px'
-                                  }
-                                }}
-                                {...params}
-                              />
-                            )}
-                          />
-
-
-
-                        </Grid>
-                      </>
-                    }
                     {/* Is add mark to final */}
                     {
-                      values.exam_date &&
+                      subject.length > 0 &&
                       <>
                         <Grid
                           item

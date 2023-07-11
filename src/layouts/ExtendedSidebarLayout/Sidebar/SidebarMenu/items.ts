@@ -204,9 +204,23 @@ const menuItems: MenuItems[] = [
       },
       {
         name: 'Routine',
-        link: '/management/routine',
-        icon: CalendarTodayIcon
-      },
+        icon: CalendarTodayIcon,
+        items: [
+          {
+            name: 'Class',
+            link: '/management/routine/class',
+            icon: AccessibilityIcon
+          },
+          {
+            name: 'Exam',
+            link: '/management/routine/exam',
+            icon: AccessibilityIcon
+          },
+
+        ]
+      }
+      ,
+
       {
         name: 'Reports',
         icon: AssessmentIcon,
@@ -351,7 +365,7 @@ const menuItems: MenuItems[] = [
         icon: CameraFrontIcon,
         link: '/front_end',
       },
-      
+
       {
         name: 'Notice',
         icon: WifiTetheringErrorIcon,

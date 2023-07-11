@@ -414,12 +414,11 @@ model AcademicYear {
 }
 
 model Exam {
-  id               Int      @id @default(autoincrement())
+  id               Int    @id @default(autoincrement())
   title            String
   section_id       Int
   academic_year_id Int
   school_id        Int
-  exam_date        DateTime @db.DateTime()
   final_percent    Int?
 
   // class         Class        @relation(fields: [class_id], references: [id])
@@ -435,10 +434,11 @@ model Exam {
 }
 
 model ExamDetails {
-  id            Int   @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   exam_id       Int
   subject_id    Int
   subject_total Float
+  exam_date     DateTime @db.DateTime()
 
   exam    Exam    @relation(fields: [exam_id], references: [id])
   subject Subject @relation(fields: [subject_id], references: [id])

@@ -1,6 +1,6 @@
 import { FC, ChangeEvent, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Divider, TableCell, TableRow, Grid, Checkbox } from '@mui/material';
+import { Card, Divider, TableCell, TableRow, Grid, Checkbox, Tooltip, IconButton, Modal } from '@mui/material';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import { TableContainerWrapper, TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
@@ -8,21 +8,21 @@ import dayjs from 'dayjs';
 import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { fetchData } from '@/utils/post';
-import { GenerateCertificateExport } from '@/components/Export/certificate';
+import { GenerateCertificate, GenerateCertificateExport } from '@/components/Export/certificate';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import CsvExport from '@/components/Export/Csv';
-
+import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
+import PreviewIcon from '@mui/icons-material/Preview';
+import DownloadIcon from '@mui/icons-material/Download';
 
 interface ResultsProps {
-  // sent_sms: Project[];
-  classes: any;
+  student: any;
   templates: any;
 }
 
 interface Filters {
   status?: ProjectStatus;
 }
-
 
 const applyFilters = (
   sessions: Project[],
@@ -72,7 +72,7 @@ const applyPagination = (
   return sent_sms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ classes, templates }) => {
+const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -88,12 +88,11 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<number>();
   const [students, setStudents] = useState<any>([]);
   const [printDate, setPrintDate] = useState<any>(dayjs(Date.now()));
+  const [showTemplate, setShowTemplate] = useState<boolean>(false);
 
 
-  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    event.persist();
-    setQuery(event.target.value);
-  };
+
+
 
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
@@ -124,7 +123,7 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredschools = applyFilters(students, query, filters);
+  const filteredschools = applyFilters(templates, query, filters);
   const paginatedFees = applyPagination(filteredschools, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
   const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < paginatedFees.length;
@@ -141,11 +140,9 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
   }
 
   const handleSectionChange = (e) => setSelectedSection(e.target.value);
+
   const handleSearchClick = async () => {
-    let url = `/api/student?class_id=${selectedClass}`;
-    if (selectedSection > 0) url += `&section_id=${selectedSection}`;
-    const [err, resstudents] = await fetchData(url, 'get', {});
-    setStudents(() => err ? [] : resstudents)
+
   }
 
   const handleTemplateChange = (e) => {
@@ -171,25 +168,39 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
 
   return (
     <>
+
+      <Modal open={showTemplate} onClose={() => setShowTemplate(false)}
+        ria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description" 
+        >
+        <div>aaa</div>
+      </Modal>
+
+
       <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
         <Grid>
-          <DynamicDropDownSelectWrapper value={selectedClass} label='Select Class' name='' handleChange={handleClassChange} menuItems={classes?.map(cls => ({ title: cls.name, value: cls.id }))} />
+          <UncontrolledTextFieldWrapper label="Name" value={student.student_info?.first_name + (student.student_info?.middle_name || " ") + (student.student_info?.last_name || " ")} />
+        </Grid>
+        <Grid>
+          <UncontrolledTextFieldWrapper label="Class" value={student.section?.class?.name} />
+          {/* <DynamicDropDownSelectWrapper value={selectedClass} label='Select Class' name='' handleChange={handleClassChange} menuItems={classes?.map(cls => ({ title: cls.name, value: cls.id }))} /> */}
         </Grid>
         <Grid >
-          <DynamicDropDownSelectWrapper value={selectedSection} label='Select Section' name='' handleChange={handleSectionChange} menuItems={sections} />
+          <UncontrolledTextFieldWrapper label="Section" value={student.section.class.has_section ? student.section?.name : ''} />
+          {/* <DynamicDropDownSelectWrapper value={selectedSection} label='Select Section' name='' handleChange={handleSectionChange} menuItems={sections} /> */}
         </Grid>
-        <Grid >
+        {/* <Grid >
           <DynamicDropDownSelectWrapper value={selectedTemplate} label='Select Template' name='' handleChange={handleTemplateChange} menuItems={templates.map(tmplt => ({ title: tmplt.name, value: tmplt.id }))} />
         </Grid>
         <Grid item container justifyContent={"flex-end"} >
-          <ButtonWrapper disabled={!selectedClass || !selectedTemplate || !(selectedSection >= 0)} handleClick={handleSearchClick}>Search</ButtonWrapper>
-        </Grid>
+          <ButtonWrapper disabled={!selectedTemplate } handleClick={handleSearchClick}>Search</ButtonWrapper>
+        </Grid> */}
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 350px)' }}>
 
         <TableHeadWrapper
-          title="students"
+          title="templates"
           total={paginatedFees.length}
           count={filteredschools.length}
           page={page}
@@ -202,7 +213,6 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
               {selectedBulkActions && (
                 selectedItems.length > 0 && selectedTemplate && (
                   <>
-                    <GenerateCertificateExport publicationDate={printDate} datas={students.filter(std => selectedItems.includes(std.id))} template={templates.find(tmp => selectedTemplate === tmp.id)} />
                     <CsvExport exportData={export_data()} />
                   </>
                 )
@@ -223,35 +233,34 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
               <TableContainerWrapper
                 tableHead={
                   <TableRow>
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={selectedAllschools}
                         indeterminate={selectedSomeschools}
                         onChange={handleSelectAllschools}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{t('ID')}</TableCell>
-                    <TableCell>{t('Student Name')}</TableCell>
-                    <TableCell>{t('Category')}</TableCell>
-                    <TableCell>{t('Registration No')}</TableCell>
-                    <TableCell>{t('Roll No')}</TableCell>
-                    <TableCell>{t('Mobile No')}</TableCell>
+                    <TableCell>{t('Name')}</TableCell>
+                    <TableCell>{t('Background Image')}</TableCell>
+                    <TableCell>{t('Actions')}</TableCell>
+
                   </TableRow>
                 }
 
                 tableBody={
                   <>
-                    {paginatedFees.map((student) => {
+                    {paginatedFees.map((template) => {
                       const isschoolselected = selectedItems.includes(
-                        student.id
+                        template.id
                       );
                       return (
                         <TableRow
                           hover
-                          key={student.id}
+                          key={template.id}
                           selected={isschoolselected}
                         >
-                          <TableCell padding="checkbox">
+                          {/* <TableCell padding="checkbox">
                             <Checkbox
                               checked={isschoolselected}
                               onChange={(event) =>
@@ -259,24 +268,35 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
                               }
                               value={isschoolselected}
                             />
+                          </TableCell> */}
+                          <TableCell sx={{ py: 1 }}>
+                            {template.id}
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
-                            {student.id}
+                            {template.name}
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
-                            {student.student_info?.first_name + (student.student_info?.middle_name || " ") + (student.student_info?.last_name || " ")}
+                            {<img src={template.background_url} className=' h-10' alt='background_image' />}
                           </TableCell>
-                          <TableCell sx={{ py: 1 }}>
-                            Student
-                          </TableCell>
-                          <TableCell sx={{ py: 1 }}>
-                            {student.class_registration_no}
-                          </TableCell >
-                          <TableCell sx={{ py: 1 }}>
-                            {student.class_roll_no}
-                          </TableCell>
-                          <TableCell sx={{ py: 1 }}>
-                            {student.phone}
+                          <TableCell>
+                            <Tooltip title={t('Show')} arrow>
+                              <IconButton
+                                onClick={() => { }
+                                  // handleConfirmDelete(fee.id)
+                                }
+                                color="primary"
+                              >
+                                <GenerateCertificate _for='student' publicationDate={printDate} datas={[student]} template={template} />
+                              </IconButton>
+                            </Tooltip>
+                            {/* <Tooltip title={t('Download')} arrow>
+                                <IconButton
+                                  onClick={() =>{}}
+                                  color="primary"
+                                > */}
+                            <GenerateCertificateExport _for='student' publicationDate={printDate} datas={[student]} template={template} />
+                            {/* </IconButton>
+                              </Tooltip> */}
                           </TableCell>
                         </TableRow>
                       );
@@ -293,13 +313,4 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
   );
 };
 
-
-Results.propTypes = {
-  classes: PropTypes.array.isRequired
-};
-
-Results.defaultProps = {
-  classes: []
-};
-
-export default Results;
+export default StudentResults;

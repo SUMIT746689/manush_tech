@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import fs from 'fs/promises';
 import formidable from 'formidable';
 import axios from 'axios';
+import prisma from '@/lib/prisma_client';
 
-const prisma = new PrismaClient();
 
 const saveImage = (req, saveLocally) => {
   const options: formidable.Options = {};

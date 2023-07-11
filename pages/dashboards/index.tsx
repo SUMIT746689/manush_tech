@@ -24,6 +24,7 @@ export async function getServerSideProps(context: any) {
     const refresh_token: any = refresh_token_varify(cookie);
 
     // if (refresh_token) return {hasError: true}
+    if (!refresh_token) return blockCount;
     console.log({ refresh_token })
 
     console.log({ cookie: cookie });

@@ -29,6 +29,30 @@ export const TextFieldWrapper = ({ label, name, value, type = "string", touched,
   );
 };
 
+export const UncontrolledTextFieldWrapper = ({ label, value, type = "string", disabled = false }) => {
+  return (
+    <Grid item container pb={1}>
+      <TextField
+        size='small'
+        sx={{
+          [`& fieldset`]: {
+            borderRadius: 0.6,
+          }
+        }}
+        id="outlined-basic"
+        label={label}
+        variant="outlined"
+        type={type}
+       
+        fullWidth
+        placeholder={`${name} here...`}
+        value={value}
+        disabled={disabled}
+      />
+    </Grid>
+  );
+};
+
 export const DisableTextWrapper = ({ label, touched, errors, value }) => {
   return (
     <Grid item container pb={1}>

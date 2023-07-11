@@ -247,9 +247,14 @@ async function seed() {
     }
   });
 
+  const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
+
   const createStudentRole = await prisma.role.create({
     data: {
       title: "STUDENT",
+      permissions: {
+        connect: { id: createPermissionForStudentRole.id }
+      }
     }
   })
 

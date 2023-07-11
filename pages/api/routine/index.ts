@@ -1,12 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma_client";
 
 const index = async (req, res) => {
     try {
         const { method } = req;
-        console.log("req body__", req.body);
 
         switch (method) {
             case 'GET':

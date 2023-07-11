@@ -15,8 +15,18 @@ import type { Project } from 'src/models/project';
 // import { schoolsApi } from 'src/mocks/schools';
 import Results from 'src/content/Management/Routine/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
+import { useAuth } from '@/hooks/useAuth';
+import StudentResults from '@/content/Management/Routine/StudentResult';
 function Routine() {
- 
+
+  const { user }:any = useAuth();
+
+  // const permissions = user?.permissions ? user.permissions : null;
+  // const filter =permissions ? permissions.filter((permission: any) => permission?.group === 'routine') : null;
+  // console.log({ user });
+  // console.log({ filter });
+  // const haveCreatePermission = filter.find((permission: any) => permission.value === 'create_routine')
+
   return (
     <>
       <Head>
@@ -27,16 +37,21 @@ function Routine() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4,minHeight: 'calc(100vh - 304px) !important' }}
+        sx={{ px: 4, minHeight: 'calc(100vh - 304px) !important' }}
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
         spacing={3}
-       
+
       >
         <Grid item xs={12}>
-          <Results />
+
+          {user?.role?.title === 'STUDENT' ?
+            <StudentResults />
+            :
+            <Results />
+          }
         </Grid>
       </Grid>
       <Footer />

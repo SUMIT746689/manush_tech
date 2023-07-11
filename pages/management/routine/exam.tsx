@@ -33,7 +33,7 @@ function Routine() {
         <title>Routine</title>
       </Head>
       <PageTitleWrapper>
-        <PageHeader />
+        <PageHeader title={'Exam routine'} />
       </PageTitleWrapper>
 
       <Grid

@@ -15,17 +15,20 @@ import type { Project } from 'src/models/project';
 // import { schoolsApi } from 'src/mocks/schools';
 import Results from 'src/content/Management/Holidays/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
-import { DataSaverOnRounded } from '@mui/icons-material';
+import { useAuth } from '@/hooks/useAuth';
+
 function Managementschools() {
   // const isMountedRef = useRefMounted();
   const [datas, setDatas] = useState<Project[]>([]);
   const [editData, setEditData] = useState<Project>(null);
-
-  const { data,reFetchData, error } = useClientFetch('/api/holidays');
+  const auth = useAuth();
+  const { data, reFetchData, error } = useClientFetch('/api/holidays');
 
   useEffect(() => {
     if (data?.success) setDatas(data.data);
   }, [data, error]);
+
+  const create_holiday = auth?.user?.permissions.find(i => i?.value == 'create_holiday')
 
   return (
     <>
@@ -34,11 +37,18 @@ function Managementschools() {
       </Head>
       <PageTitleWrapper>
         {/* @ts-ignore */}
+
+
         <PageHeader
+          contentPermission={{
+            create_holiday
+          }}
           editData={editData}
           seteditData={setEditData}
           reFetchData={reFetchData}
         />
+
+
       </PageTitleWrapper>
 
       <Grid

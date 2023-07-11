@@ -39,7 +39,7 @@ const StudentResults = () => {
 
   const handleRoutineGenerate = () => {
 
-    axios.get(`/api/routine/student?user_id=${user?.id}`)
+    axios.get(`/api/routine/student`)
       .then(res => {
         let routine = [];
         let index = 0;

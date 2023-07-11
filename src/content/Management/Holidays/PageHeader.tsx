@@ -21,11 +21,14 @@ import axios from 'axios';
 import { MobileDatePicker } from '@mui/lab';
 import useNotistick from '@/hooks/useNotistick';
 
-function PageHeader({ editData, seteditData, reFetchData }) {
+function PageHeader({contentPermission, editData, seteditData, reFetchData }) {
+  console.log(contentPermission);
+  
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
   const theme = useTheme();
+
 
   useEffect(() => {
     if (editData) handleCreateClassOpen();
@@ -44,6 +47,8 @@ function PageHeader({ editData, seteditData, reFetchData }) {
     seteditData(null);
     setOpen(false);
   };
+
+
   return (
     <>
       <Grid container justifyContent="space-between" alignItems="center">
@@ -57,7 +62,8 @@ function PageHeader({ editData, seteditData, reFetchData }) {
             )}
           </Typography>
         </Grid>
-        <Grid item>
+        {
+          contentPermission?.create_holiday && <Grid item>
           <Button
             sx={{
               mt: { xs: 2, sm: 0 }
@@ -69,6 +75,8 @@ function PageHeader({ editData, seteditData, reFetchData }) {
             {t('Create Holidays ')}
           </Button>
         </Grid>
+        }
+        
       </Grid>
       <Dialog
         fullWidth

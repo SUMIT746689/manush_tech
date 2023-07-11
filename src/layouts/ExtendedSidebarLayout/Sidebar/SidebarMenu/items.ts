@@ -371,6 +371,11 @@ const menuItems: MenuItems[] = [
         icon: WifiTetheringErrorIcon,
         link: '/front_end/notice',
       },
+      {
+        name: 'Leave Application',
+        icon: WifiTetheringErrorIcon,
+        link: '/management/leave',
+      },
 
 
       {

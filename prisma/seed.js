@@ -93,6 +93,8 @@ async function seed() {
       { name: 'create grade', value: 'create_grade', group: 'grade' },
       { name: 'create report', value: 'create_report', group: 'report' },
       { name: 'create bulk sms & email', value: 'create_bulk_sms_&_email', group: 'bulk_sms_&_email' },
+      { name: 'create leave', value: 'create_leave', group: 'leave' },
+      { name: 'view holiday', value: 'view_holiday', group: 'holiday' },
     ]
   });
 
@@ -188,6 +190,8 @@ async function seed() {
           { id: permissions.find(i => i.value == 'create_exam').id },
           { id: permissions.find(i => i.value == 'create_result').id },
           { id: permissions.find(i => i.value == 'create_attendence').id },
+          { id: permissions.find(i => i.value == 'create_leave').id },
+          { id: permissions.find(i => i.value == 'view_holiday').id },
         ]
       }
     }

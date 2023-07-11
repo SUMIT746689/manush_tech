@@ -28,7 +28,7 @@ function Managementschools() {
     if (data?.success) setDatas(data.data);
   }, [data, error]);
   // @ts-ignore
-  const create_holiday = auth?.user?.permissions.find(i => i?.value == 'create_holiday')
+  const create_holiday = auth?.user?.permissions?.find(i => i?.value == 'create_holiday')
 
   return (
     <>

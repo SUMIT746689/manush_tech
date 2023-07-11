@@ -24,6 +24,7 @@ import axios from 'axios';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
+import { DateTimePicker } from '@mui/lab';
 
 function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   const { t }: { t: any } = useTranslation();
@@ -39,6 +40,8 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   const [checked, setChecked] = useState(false);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classList, setClassList] = useState([]);
+
+
 
 
   useEffect(() => {
@@ -130,7 +133,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             return {
               label: i.name,
               id: i.id,
-              mark: 0
+              mark: 100
             };
           })
         );
@@ -176,7 +179,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   };
 
   const handleErrorSnackbar = (err) => {
-    showNotification(err?.response?.data?.message,'error')
+    showNotification(err?.response?.data?.message, 'error')
   }
   return (
     <>
@@ -227,7 +230,8 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             class_id: editExam ? editExam?.section?.class?.id : undefined,
             section_id: editExam ? editExam?.editExam?.section?.id : undefined,
             subject_id_list: editExam ? subject : [],
-            final_percent: editExam ? editExam?.final_percent : null,
+            exam_date: editExam ? new Date(editExam?.exam_date) : null,
+            final_percent: editExam ? editExam?.final_percent : 0,
             submit: null
           }}
           validationSchema={editExam ? null : Yup.object().shape({
@@ -236,7 +240,8 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
               .required(t('Exam title field is required')),
             class_id: Yup.number().min(1).required(t('The class field is required')),
             section_id: Yup.number().min(1).required(t('The section field is required')),
-            subject_id_list: Yup.array().required(t('Subject is required'))
+            exam_date: Yup.date().required(t('The Exam Date field is required')),
+            subject_id_list: Yup.array().required(t('Subject is required')),
           })}
 
           onSubmit={async (
@@ -263,9 +268,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                   section_id: _values.section_id || editExam?.section_id,
                   title: _values.title,
                   class_id: _values.class_id || editExam?.section?.class?.id,
+                  exam_date: _values.exam_date,
                   school_id: user.school_id,
                   academic_year_id: academicYear?.id,
                   subject_id_list: subject_id_list,
+                  // final_percent: checked ? _values.final_percent || editExam?.final_percent : null,
                   final_percent: checked ? _values.final_percent || editExam?.final_percent : 0,
                 };
               } else {
@@ -274,14 +281,13 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                   title: _values.title,
                   class_id: _values.class_id,
                   school_id: user.school_id,
+                  exam_date: _values.exam_date,
                   academic_year_id: academicYear?.id,
                   subject_id_list: subject_id_list,
-                  final_percent: _values?.final_percent || null
+                  final_percent: checked ? _values?.final_percent : 0
                 };
-                if (_values.final_percent) {
-                  query["final_percent"] = _values.final_percent
-                }
               }
+              console.log("query__", query);
 
               if (editExam) {
                 axios
@@ -308,7 +314,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
               }
             } catch (err) {
               console.error(err);
-              showNotification(err?.response?.data?.message,'error')
+              showNotification(err?.response?.data?.message, 'error')
               setStatus({ success: false });
               setErrors({ submit: err.message });
               setSubmitting(false);
@@ -325,7 +331,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             values,
             setFieldValue
           }) => {
-            // console.log(errors);
 
             return (
               <form onSubmit={handleSubmit}>
@@ -375,6 +380,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         onChange={handleChange}
                         value={values.title}
                         variant="outlined"
+                        sx={{
+                          '& fieldset': {
+                            borderRadius: '3px'
+                          }
+                        }}
                       />
                     </Grid>
 
@@ -420,6 +430,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                               touched?.class_id &&
                               errors?.class_id
                             )}
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
                             helperText={
                               touched?.class_id &&
                               errors?.class_id
@@ -483,6 +498,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                   touched?.section_id &&
                                   errors?.section_id
                                 )}
+                                sx={{
+                                  '& fieldset': {
+                                    borderRadius: '3px'
+                                  }
+                                }}
                                 helperText={
                                   touched?.section_id &&
                                   errors?.section_id
@@ -539,7 +559,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           >
                             <Autocomplete
                               multiple
-                              
+
                               options={subjectList}
                               value={subject}
                               filterSelectedOptions
@@ -557,6 +577,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                     errors?.subject_id_list
                                   }
                                   name='subject_id_list'
+                                  sx={{
+                                    '& fieldset': {
+                                      borderRadius: '3px'
+                                    }
+                                  }}
                                 />
                               )}
                               onChange={(e, v) => {
@@ -582,12 +607,17 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                               {
                                 subject?.map((option, index) => (
                                   <TextField
-                                    sx={{ m: '5px' }}
+                                    sx={{
+                                      m: '5px', '& fieldset': {
+                                        borderRadius: '3px'
+                                      }
+                                    }}
                                     key={option.label}
                                     variant="outlined"
                                     label={`Input ${option.label} mark`}
                                     value={option.mark}
                                     type="number"
+
                                     onChange={(e) => {
                                       const temp = [...subject];
                                       temp[index].mark = e.target.value;
@@ -603,44 +633,120 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         </>
 
                       )}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <Checkbox
-                          checked={checked}
-                          onChange={(event) => {
-                            console.log(event.target.checked);
-
-                            setChecked(event.target.checked);
+                    {/* Exam date */}
+                    {
+                      subject.length > 0 &&
+                      <>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={4}
+                          md={3}
+                          justifyContent="flex-end"
+                          textAlign={{ sm: 'right' }}
+                        >
+                          <Box
+                            pr={3}
+                            sx={{
+                              pt: `${theme.spacing(2)}`,
+                              pb: { xs: 1, md: 0 }
+                            }}
+                            alignSelf="center"
+                          >
+                            <b>{t('Select Exam date')}:</b>
+                          </Box>
+                        </Grid>
+                        <Grid
+                          sx={{
+                            mb: `${theme.spacing(3)}`
                           }}
-                          inputProps={{ 'aria-label': 'controlled' }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      Will this exam add to the final grade?
-                    </Grid>
+                          item
+                          xs={12}
+                          sm={8}
+                          md={9}
+                          justifyContent="flex-end"
+                          textAlign={{ sm: 'right' }}
+
+                        >
+                          {/* <DatePickerWrapper
+                            label={'Exam Date'}
+                            date={values.exam_date}
+                            handleChange={(e) => setFieldValue('exam_date', e)}
+                          /> */}
+
+
+                          <DateTimePicker
+                            label="Exam Date"
+                            value={values.exam_date}
+                            onChange={(n: any) => {
+                              console.log('n_______', n);
+
+                              setFieldValue('exam_date', n)
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                required
+                                fullWidth
+                                size="small"
+                                sx={{
+                                  '& fieldset': {
+                                    borderRadius: '3px'
+                                  }
+                                }}
+                                {...params}
+                              />
+                            )}
+                          />
+
+
+
+                        </Grid>
+                      </>
+                    }
+                    {/* Is add mark to final */}
+                    {
+                      values.exam_date &&
+                      <>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={4}
+                          md={3}
+                          justifyContent="flex-end"
+                          textAlign={{ sm: 'right' }}
+                        >
+                          <Box
+                            pr={3}
+                            sx={{
+                              pt: `${theme.spacing(2)}`,
+                              pb: { xs: 1, md: 0 }
+                            }}
+                            alignSelf="center"
+                          >
+                            <Checkbox
+                              checked={checked}
+                              onChange={(event) => {
+                                console.log(event.target.checked);
+
+                                setChecked(event.target.checked);
+                              }}
+                              inputProps={{ 'aria-label': 'controlled' }}
+                            />
+                          </Box>
+                        </Grid>
+                        <Grid
+                          sx={{
+                            mb: `${theme.spacing(3)}`
+                          }}
+                          item
+                          xs={12}
+                          sm={8}
+                          md={9}
+                        >
+                          Will this exam add to the final grade?
+                        </Grid>
+                      </>
+                    }
                     {
                       checked && <>
                         <Grid
@@ -681,6 +787,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                             type='number'
                             value={values.final_percent}
                             variant="outlined"
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
                           />
                         </Grid>
                       </>

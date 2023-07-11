@@ -419,7 +419,7 @@ model Exam {
   section_id       Int
   academic_year_id Int
   school_id        Int
-  exam_date        DateTime @db.Time()
+  exam_date        DateTime @db.DateTime()
   final_percent    Int?
 
   // class         Class        @relation(fields: [class_id], references: [id])

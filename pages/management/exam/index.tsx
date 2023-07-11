@@ -32,7 +32,11 @@ function Managementschools() {
       .get(
         `/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`
       )
-      .then((res) => setExams(res.data))
+      .then((res) => {
+        console.log("exam list__",res?.data[0], typeof(res?.data[0]?.exam_date));
+
+        setExams(res.data)
+      })
       .catch((err) => console.log(err));
   };
   useEffect(() => {

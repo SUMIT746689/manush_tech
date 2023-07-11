@@ -77,10 +77,10 @@ const index = async (req, res) => {
                     */
 
 
-                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.school_id || !req.body.subject_id_list) {
+                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.school_id || !req.body.subject_id_list || !req.body.exam_date) {
                     return res.status(400).send({ message: "parameter missing" })
                 }
-                const { title, section_id, academic_year_id, school_id, subject_id_list, class_id, final_percent } = req.body;
+                const { title, section_id, academic_year_id, school_id, subject_id_list, class_id, final_percent, exam_date } = req.body;
 
                 for (let i of subject_id_list) {
                     const temp = await prisma.subject.findFirst({
@@ -93,6 +93,7 @@ const index = async (req, res) => {
                         return res.status(400).send({ message: "selected subjects are not for the selected class" });
                     }
                 }
+                console.log("exam_date__", exam_date);
 
                 const exam = await prisma.exam.create({
                     // @ts-ignore
@@ -109,6 +110,7 @@ const index = async (req, res) => {
                         school: {
                             connect: { id: parseInt(school_id) }
                         },
+                        exam_date: new Date(exam_date),
                         final_percent: final_percent ? parseInt(final_percent) : null
                     }
                 })
@@ -196,16 +198,19 @@ const index = async (req, res) => {
 
 const handleUpdate = async (req, res) => {
     try {
-        let updateQuery = {}
-        if (req.body.title) {
-            updateQuery = { ...updateQuery, title: req.body.title }
-        }
-        if (req.body.final_percent) {
-            updateQuery = { ...updateQuery, final_percent: req.body.final_percent }
-        } else if (req.body.final_percent == 0) {
-            updateQuery = { ...updateQuery, final_percent: null }
-        }
 
+
+        const updateQuery = {}
+        if (req.body.title) {
+            updateQuery['title'] = req.body.title
+        }
+        if (req.body.final_percent || req.body.final_percent == 0) {
+            updateQuery['final_percent'] = req.body.final_percent == 0 ? null : req.body.final_percent
+        }
+        if (req.body.exam_date) {
+            updateQuery['exam_date'] = new Date(req.body.exam_date)
+        }
+        console.log("req.body__",req.body, "updateQuery__", updateQuery);
         const temp = await prisma.exam.update({
             where: {
                 id: parseInt(req.body.exam_id)

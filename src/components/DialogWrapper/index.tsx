@@ -35,7 +35,12 @@ const ButtonError = styled(Button)(
 );
 
 
-export const DialogWrapper = ({openConfirmDelete,closeConfirmDelete,handleDeleteCompleted,Transition}) => {
+export const DialogWrapper = ({
+  openConfirmDelete,
+  closeConfirmDelete,
+  handleDeleteCompleted,
+  Transition
+}) => {
   const { t }: { t: any } = useTranslation();
 
   return <DialogStyleWrapper
@@ -55,15 +60,15 @@ export const DialogWrapper = ({openConfirmDelete,closeConfirmDelete,handleDelete
         {t('Do you really want to delete this project')}?
       </Typography>
 
-      <Typography align="center" sx={{pt: 2, pb: 4, px: 6 }} fontWeight="normal" color="text.secondary" variant="h4">
+      <Typography align="center" sx={{ pt: 2, pb: 4, px: 6 }} fontWeight="normal" color="text.secondary" variant="h4">
         {t("You won't be able to revert after deletion")}
       </Typography>
 
       <Box>
-        <Button variant="text" sx={{ mx: 1}} onClick={closeConfirmDelete}>
+        <Button variant="text" sx={{ mx: 1 }} onClick={closeConfirmDelete}>
           {t('Cancel')}
         </Button>
-        <ButtonError onClick={handleDeleteCompleted} sx={{ mx: 1, px: 3}} variant="contained">
+        <ButtonError onClick={handleDeleteCompleted} sx={{ mx: 1, px: 3 }} variant="contained">
           {t('Delete')}
         </ButtonError>
       </Box>
@@ -83,7 +88,7 @@ export const DialogTitleWrapper = ({ editData, name }) => {
   </DialogTitle>
 }
 
-export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, isSubmitting,title }) => {
+export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, isSubmitting, title }) => {
   const { t }: { t: any } = useTranslation();
 
   return (<DialogActions

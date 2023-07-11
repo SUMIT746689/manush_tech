@@ -373,10 +373,7 @@ const Results = ({
                         </TableCell>
                         <TableCell>
                           <Typography variant="h5">
-
-                            {exam?.exam_details?.map(i => <span key={i.id}>{i?.subject?.name} </span>)}
-
-
+                            {exam?.exam_details?.map(i => i?.subject?.name).join(", ")}
                           </Typography>
                         </TableCell>
 

@@ -165,7 +165,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-  // console.log("permissions__",permissions);
+  //  console.log("permissions__",permissions);
 
   const sub_menu = () => {
     ev.push(
@@ -412,7 +412,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Holidays' ||
       item.name === 'Result' ||
       item.name === 'Academic Years' ||
-      // item.name === 'Certification' ||
+      item.name === 'Leave Application' ||
       item.name === 'Department' ||
       item.name === 'Department' ||
       item.name === 'Package' ||
@@ -426,6 +426,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       //     break;
       // }
       if (item.name === 'Sections' && permissions?.includes('section')) sub_menu();
+      if (item.name === 'Leave Application' && permissions?.includes('leave')) sub_menu();
       if (item.name === 'Subjects' && permissions?.includes('subject')) sub_menu();
       if (item.name === 'Schools' && permissions?.includes('school')) sub_menu();
       if (item.name === 'Teachers' && permissions?.includes('teacher')) sub_menu();

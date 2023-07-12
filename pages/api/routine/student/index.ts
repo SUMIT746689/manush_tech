@@ -7,12 +7,10 @@ const index = async (req, res, refresh_token) => {
 
     switch (method) {
       case 'GET':
-        const { user_id } = req.query;
-        if (!user_id) return res.status(500).json({ message: " student user id is missing" })
-
+        
         const responseStudent = await prisma.student.findFirst({
           where: {
-            student_info: { user_id: Number(user_id), school_id: refresh_token.school_id },
+            student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id },
             // section: { class: { has_section: true } }
           },
           select: { section: { include: { class: true } } }

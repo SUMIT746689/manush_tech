@@ -330,15 +330,9 @@ const Results: FC<ResultsProps> = ({
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllschools}
-                        indeterminate={selectedSomeschools}
-                        onChange={handleSelectAllschools}
-                      />
-                    </TableCell>
-                    <TableCell>{t('Title')}</TableCell>
-                    <TableCell>{t('Date')}</TableCell>
+                    
+                    <TableCell align="center">{t('Title')}</TableCell>
+                    <TableCell align="center">{t('Date')}</TableCell>
 
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
@@ -354,22 +348,14 @@ const Results: FC<ResultsProps> = ({
                         key={holiday.id}
                         selected={isschoolselected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isschoolselected}
-                            onChange={(event) =>
-                              handleSelectOneProject(event, holiday.id)
-                            }
-                            value={isschoolselected}
-                          />
-                        </TableCell>
-                        <TableCell>
+                        
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {holiday.title}
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {dayjs(holiday.date).format('YYYY-MM-DD')}
                           </Typography>
@@ -403,17 +389,6 @@ const Results: FC<ResultsProps> = ({
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* <Box p={2}>
-                <TablePagination
-                  component="div"
-                  count={filteredschools.length}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleLimitChange}
-                  page={page}
-                  rowsPerPage={limit}
-                  rowsPerPageOptions={[5, 10, 15]}
-                />
-              </Box> */}
           </>
         )}
       </Card>

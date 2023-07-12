@@ -141,7 +141,12 @@ export const patch = async (req, res) => {
             permanent_address,
             present_address,
             joining_date: joining_date ? new Date(joining_date) : new Date(),
-            resume: resume?.newFilename
+            resume: resume?.newFilename,
+            user:{
+              update:{
+                user_photo: photo?.newFilename
+              }
+            }
           }
         });
         return res.status(200).json({ teacher: teacher, success: true });

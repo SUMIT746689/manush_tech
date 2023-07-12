@@ -158,6 +158,7 @@ export const post = async (req, res) => {
               create: {
                 username: username,
                 password: encrypePassword,
+                user_photo: photo?.newFilename || null,
                 role: { connect: { id: teacher_role.id } },
                 user_role: { connect: { id: teacher_role.id } },
                 school: { connect: { id: user.school_id } }

@@ -6,51 +6,51 @@ import formidable from 'formidable';
 
 export const config = {
     api: {
-      bodyParser: false
+        bodyParser: false
     }
-  };
+};
 
 const prisma = new PrismaClient()
 
 const saveImage = (req, saveLocally) => {
     const options: formidable.Options = {};
-  
+
     if (saveLocally) {
-      options.uploadDir = path.join(process.cwd(), '/public/files');
-      //@ts-ignore
-      options.filename = (name, ext, path, form) => {
-        return Date.now().toString() + '_' + path.originalFilename;
-      };
+        options.uploadDir = path.join(process.cwd(), '/public/files');
+        //@ts-ignore
+        options.filename = (name, ext, path, form) => {
+            return Date.now().toString() + '_' + path.originalFilename;
+        };
     }
     // options.maxFileSize = 4000 * 1024 * 1024;
     const form = formidable(options);
 
     //  console.log("entered!!!!!!",req.body);
-    
+
     return new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        
-        // console.log("ddddddddddddd___",err,fields, files);
-        
-        if (err) reject(err);
-        if (
-          !fields.first_name ||
-          !fields.section_id ||
-          !fields.academic_year_id ||
-          !fields.username ||
-          !fields.admission_date ||
-          !fields.date_of_birth ||
-          !fields.roll_no ||
-          !fields.registration_no ||
-          !fields.phone ||
-          !fields.school_id
-        ) {
-          reject({ message: 'field value missing !!' });
-        }
-        resolve({ fields, files });
-      });
+        form.parse(req, (err, fields, files) => {
+
+            // console.log("ddddddddddddd___",err,fields, files);
+
+            if (err) reject(err);
+            if (
+                !fields.first_name ||
+                !fields.section_id ||
+                !fields.academic_year_id ||
+                !fields.username ||
+                !fields.admission_date ||
+                !fields.date_of_birth ||
+                !fields.roll_no ||
+                !fields.registration_no ||
+                !fields.phone ||
+                !fields.school_id
+            ) {
+                reject({ message: 'field value missing !!' });
+            }
+            resolve({ fields, files });
+        });
     });
-  };
+};
 const id = async (req, res) => {
     try {
         const { method } = req;
@@ -128,10 +128,13 @@ const id = async (req, res) => {
 
 
                         const userUpdateQuery = {
-                            username: fields.username,
+                            username: fields.username
                         }
                         if (hashPassword) {
                             userUpdateQuery['password'] = hashPassword
+                        }
+                        if (student_photo_path) {
+                            userUpdateQuery['user_photo'] = student_photo_path
                         }
 
                         const student = await transaction.student.update({

@@ -10,6 +10,8 @@ import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 import dayjs from 'dayjs';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export async function getServerSideProps(context: any) {
 
@@ -150,6 +152,11 @@ export async function getServerSideProps(context: any) {
 }
 
 function DashboardReports({ blockCount }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    // router.reload()
+  }, [])
 
   switch (blockCount?.role) {
     case 'teacher':

@@ -210,7 +210,7 @@ function HeaderUserbox() {
   return (
     <>
       <UserBoxButton color="primary" ref={ref} onClick={handleOpen}>
-        <UserAvatar alt={user?.username} src={user?.avatar} />
+        <UserAvatar alt={user?.username} src={user?.user_photo} />
       </UserBoxButton>
       <Popover
         disableScrollLock
@@ -232,7 +232,8 @@ function HeaderUserbox() {
           }}
           display="flex"
         >
-          <Avatar variant="rounded" alt={user?.username} src={user?.avatar} />
+          <Avatar variant="rounded" alt={'profile photo'} src={user?.user_photo} />
+          
           <UserBoxText>
             <UserBoxLabel variant="body1">{user?.username}</UserBoxLabel>
             <UserBoxDescription variant="body2">

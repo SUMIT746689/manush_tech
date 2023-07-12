@@ -121,16 +121,16 @@ const Alert = forwardRef(function Alert(
   props,
   ref,
 ) {
-     //@ts-ignore
+  //@ts-ignore
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 export const AuthProvider: FC<AuthProviderProps> = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialAuthState);
   const router = useRouter();
-
+  const { asPath, query, locale } = router
   const { t }: { t: any } = useTranslation();
-  
+
   const [notification, setNotification] = useState({
     open: false,
     vertical: 'top',
@@ -237,7 +237,12 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             user: response?.user || null
           }
         });
-        router.push('/dashboards');
+        
+        router.push("/dashboards").then(() => location.reload() );
+        // router.push('/dashboards').then(() => {router.reload();});
+        // router.push('/dashboards');
+
+
       })
       .catch((err) => {
         console.log(err.message);
@@ -248,7 +253,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
           horizontal: 'right',
           message: err.message
         });
-        
+
       });
   }
 
@@ -290,14 +295,14 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
       }}
     >
       <Snackbar
-      //@ts-ignore
+        //@ts-ignore
         anchorOrigin={{ vertical: notification.vertical, horizontal: notification.horizontal }}
         open={notification.open}
         onClose={handleClose}
         message={`frbghefhethdethetdhbned`}
         key={notification.vertical + notification.horizontal}
       >
-              {/* @ts-ignore */}
+        {/* @ts-ignore */}
         <Alert onClose={handleClose} severity='error' sx={{ width: '100%' }}>
           {notification.message}
         </Alert>

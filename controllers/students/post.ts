@@ -144,6 +144,7 @@ const postHandle = async (req, res, authenticate_user) => {
             create: {
               username: fields.username,
               password: hashPassword,
+              user_photo: student_photo_path,
               user_role: { connect: { id: student_role.id } },
               role: { connect: { id: student_role.id } },
               school: { connect: { id: parseInt(fields.school_id) } }
@@ -244,7 +245,7 @@ const postHandle = async (req, res, authenticate_user) => {
     })
 
     const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.title}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${fields?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${fields.first_name}, Your username: ${fields.username} and password: ${fields.password}`)}`)
-    
+
     if (sms_res.data == 1015) {
       res.status(200).json({ success: 'student created successfully but sms sending failed' });
     }

@@ -165,7 +165,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-  //  console.log("permissions__",permissions);
+    // console.log("permissions__",permissions);
 
   const sub_menu = () => {
     ev.push(
@@ -417,7 +417,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Department' ||
       item.name === 'Package' ||
       item.name === 'Front End' ||
-      item.name === 'Pending Package'
+      item.name === 'Pending Package'||
+      item.name === 'Users'
 
     ) {
       // switch(item.name){
@@ -444,7 +445,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Result' && permissions?.includes('result')) sub_menu();
       if (item.name === 'Academic Years' && permissions?.includes('academic_years')) sub_menu();
       if (item.name === 'Department' && permissions?.includes('department')) sub_menu();
-      // if (item.name === 'Certification' && permissions?.includes('certificate')) sub_menu();
+      if (item.name === 'Users' && permissions?.includes('user')) sub_menu();
       if (item.name === 'Package' && permissions?.includes('package')) sub_menu();
       if (item.name === 'Front End' && permissions?.includes('front_end')) sub_menu();
       if (item.name === 'Pending Package' && permissions?.includes('pending_package')) sub_menu();

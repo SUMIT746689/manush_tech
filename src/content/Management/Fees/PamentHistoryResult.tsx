@@ -333,8 +333,6 @@ function FeesPaymentReport({ data }) {
 
             </Grid>
 
-
-
             <Grid sx={{
                 display: 'none',
             }} >

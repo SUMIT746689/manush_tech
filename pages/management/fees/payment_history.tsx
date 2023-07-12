@@ -168,9 +168,8 @@ export async function getServerSideProps(context: any) {
   return { props: parse }
 }
 
-function ManagementFees({ student, data }) {
-  console.log({ student, data })
-
+function ManagementFees({ data }) {
+  
   return (
     <>
       <Head>
@@ -189,7 +188,7 @@ function ManagementFees({ student, data }) {
         spacing={3}
       >
         <Grid item xs={12}>
-          <PamentHistoryResult student={student} studentClass={student.section.class.name} data={data} />
+          <PamentHistoryResult data={data} />
         </Grid>
       </Grid>
       <Footer />

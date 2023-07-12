@@ -1,6 +1,10 @@
 import { get } from 'controllers/users/get';
 import { post } from 'controllers/users/post';
-
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
 const index = async (req, res) => {
   try {
     const { method } = req;

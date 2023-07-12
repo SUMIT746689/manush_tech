@@ -30,6 +30,9 @@ async function seed() {
     data: { name: 'List Pending Packages', value: 'list_pending_packages', group: 'pending_package' }
   });
 
+  const create_user_permission = await prisma.permission.create({
+    data: { name: 'create user', value: 'create_user', group: 'user' }
+  });
   const createSuperAdminRole = await prisma.role.create({
     data: {
       title: "SUPER_ADMIN",
@@ -38,7 +41,8 @@ async function seed() {
           { id: createAdminPermission.id },
           { id: createAdminPermissionforSchool.id },
           { id: createPakcagePermissionforSchool.id },
-          { id: pendingPakcagePermissionforSchool.id }
+          { id: pendingPakcagePermissionforSchool.id },
+          { id: create_user_permission.id },
         ]
       }
     }
@@ -57,6 +61,7 @@ async function seed() {
 
   await prisma.permission.createMany({
     data: [
+      
       { name: 'create academic years', value: 'create_academic_yaers', group: 'academic_years' },
       { name: 'create student', value: 'create_student', group: 'student' },
       { name: 'create gurdian', value: 'create_gurdian', group: 'guardian' },
@@ -182,17 +187,20 @@ async function seed() {
     }
   });
 
+  const teacherPermissions = []
+  for (const i of permissions) {
+    if (i.value == 'create_exam' || i.value == 'create_result' || i.value == 'create_attendence' ||
+      i.value == 'create_leave' || i.value == 'view_holiday') {
+      teacherPermissions.push({ id: i.id })
+    }
+  }
+
+
   const createTeacherRole = await prisma.role.create({
     data: {
       title: "TEACHER",
       permissions: {
-        connect: [
-          { id: permissions.find(i => i.value == 'create_exam').id },
-          { id: permissions.find(i => i.value == 'create_result').id },
-          { id: permissions.find(i => i.value == 'create_attendence').id },
-          { id: permissions.find(i => i.value == 'create_leave').id },
-          { id: permissions.find(i => i.value == 'view_holiday').id },
-        ]
+        connect: teacherPermissions
       }
     }
   })

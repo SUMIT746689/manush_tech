@@ -19,6 +19,7 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { FileUploadFieldWrapper } from '@/components/TextFields';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
@@ -63,11 +64,26 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     setOpen(false);
   };
 
-  const handleFormSubmit = async(_values,formValue) => {
-    const {resetForm, setErrors, setStatus, setSubmitting } = formValue
+  const handleFormSubmit = async (_values, formValue) => {
+    const { resetForm, setErrors, setStatus, setSubmitting } = formValue
     try {
+      console.log("_values___", _values);
+
+      const formData = new FormData();
+      for (const i in _values) {
+        if (i == 'role') {
+          formData.append(`${i}`, JSON.stringify(_values[i]))
+        }
+        else {
+          formData.append(`${i}`, _values[i])
+        }
+
+
+      }
+      console.log("formData__", formData);
+
       if (editUser)
-        axios.patch(`/api/user/${editUser.id}`, _values).then(() => {
+        axios.patch(`/api/user/${editUser.id}`, formData).then(() => {
           resetForm();
           setStatus({ success: true });
           setSubmitting(false);
@@ -75,7 +91,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           reFetchData(true);
         });
       else
-        axios.post(`/api/user`, _values).then(() => {
+        axios.post(`/api/user`, formData).then(() => {
           resetForm();
           setStatus({ success: true });
           setSubmitting(false);
@@ -146,8 +162,8 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             username: editUser?.username || '',
             password: '',
             confirm_password: '',
-            school_id: editUser?.school_id || user?.school_id,
-            role: ''
+            user_photo: undefined,
+            role: undefined
           }}
           validationSchema={Yup.object().shape({
             username: Yup.string()
@@ -163,9 +179,10 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
               .max(255)
               .required(t('confirm_password field is required'))
               .oneOf([Yup.ref('password'), null], 'Passwords must match'),
-            role: Yup.object().required(t('Role field is required'))
+            role: Yup.object().required(t('Role field is required')),
+            // user_photo: Yup.object(),
           })}
-          onSubmit={(_values,getValue:any)=>handleFormSubmit(_values,getValue)}
+          onSubmit={(_values, getValue: any) => handleFormSubmit(_values, getValue)}
         >
           {({
             errors,
@@ -177,118 +194,129 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             values,
             setFieldValue
           }) => (
-              <form onSubmit={handleSubmit}>
-                <DialogContent
-                  dividers
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.username && errors.username)}
-                        fullWidth
-                        helperText={touched.username && errors.username}
-                        label={t('Username')}
-                        name="username"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.username}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.password && errors.password)}
-                        fullWidth
-                        helperText={touched.password && errors.password}
-                        label={t('Password')}
-                        name="password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.password}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(
-                          touched.confirm_password && errors.confirm_password
-                        )}
-                        fullWidth
-                        helperText={
-                          touched.confirm_password && errors.confirm_password
-                        }
-                        label={t('Confirm password')}
-                        name="confirm_password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.confirm_password}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Autocomplete
-                        disablePortal
-                        value={
-                          userPrermissionRoles.find(
-                            // @ts-ignore
-                            (permRole) => permRole.value === values?.role?.permission
-                          ) || null
-                        }
-                        options={userPrermissionRoles}
-                        isOptionEqualToValue={(option: any, value: any) =>
-                          option.value === value.value
-                        }
-                        getOptionLabel={(option) => option?.label}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            fullWidth
-                            name="role"
-                            label={t('User role')}
-                            error={Boolean(
-                              touched.role && errors.role
-                            )}
-
-                            helperText={touched.role && errors.role}
-                            onBlur={handleBlur}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(event, value: any) => {
-                          console.log({ value });
-                          setFieldValue('role', { role_title: value?.role, permission: value?.value } || '');
-                        }}
-                      />
-                    </Grid>
+            <form onSubmit={handleSubmit}>
+              <DialogContent
+                dividers
+                sx={{
+                  p: 3
+                }}
+              >
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      error={Boolean(touched.username && errors.username)}
+                      fullWidth
+                      helperText={touched.username && errors.username}
+                      label={t('Username')}
+                      name="username"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.username}
+                      variant="outlined"
+                    />
                   </Grid>
-                </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
+                  <Grid item xs={12}>
+                    <TextField
+                      error={Boolean(touched.password && errors.password)}
+                      fullWidth
+                      helperText={touched.password && errors.password}
+                      label={t('Password')}
+                      name="password"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      type="password"
+                      value={values.password}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      error={Boolean(
+                        touched.confirm_password && errors.confirm_password
+                      )}
+                      fullWidth
+                      helperText={
+                        touched.confirm_password && errors.confirm_password
+                      }
+                      label={t('Confirm password')}
+                      name="confirm_password"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      type="password"
+                      value={values.confirm_password}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Autocomplete
+                      disablePortal
+                      value={
+                        userPrermissionRoles.find(
+                          // @ts-ignore
+                          (permRole) => permRole.value === values?.role?.permission
+                        ) || null
+                      }
+                      options={userPrermissionRoles}
+                      isOptionEqualToValue={(option: any, value: any) =>
+                        option.value === value.value
+                      }
+                      getOptionLabel={(option) => option?.label}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          fullWidth
+                          name="role"
+                          label={t('User role')}
+                          error={Boolean(
+                            touched.role && errors.role
+                          )}
+
+                          helperText={touched.role && errors.role}
+                          onBlur={handleBlur}
+                        />
+                      )}
+                      // @ts-ignore
+                      onChange={(event, value: any) => {
+                        console.log({ value });
+                        setFieldValue('role', { role_title: value?.role, permission: value?.value } || '');
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={9} md={10}>
+                    <FileUploadFieldWrapper
+                      htmlFor="user photo"
+                      label="Select user photo"
+                      name="user_photo"
+                      value={values?.user_photo?.name || ''}
+                      handleChangeFile={(e) => { setFieldValue('user_photo', e.target.files[0]) }}
+                      handleRemoveFile={(e) => { setFieldValue('user_photo', undefined) }}
+                    />
+
+                  </Grid>
+                </Grid>
+              </DialogContent>
+              <DialogActions
+                sx={{
+                  p: 3
+                }}
+              >
+                <Button color="secondary" onClick={handleCreateUserClose}>
+                  {t('Cancel')}
+                </Button>
+                <Button
+                  type="submit"
+                  startIcon={
+                    isSubmitting ? <CircularProgress size="1rem" /> : null
+                  }
+                  // @ts-ignore
+                  disabled={Boolean(errors.submit) || isSubmitting}
+                  variant="contained"
                 >
-                  <Button color="secondary" onClick={handleCreateUserClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    // @ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(editUser ? 'Edit user' : 'Add new user')}
-                  </Button>
-                </DialogActions>
-              </form>
-            )}
+                  {t(editUser ? 'Edit user' : 'Add new user')}
+                </Button>
+              </DialogActions>
+            </form>
+          )}
         </Formik>
       </Dialog>
     </>

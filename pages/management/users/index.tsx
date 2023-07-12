@@ -44,7 +44,7 @@ function ManagementUsers() {
 }
 
 ManagementUsers.getLayout = (page) => (
-  <Authenticated>
+  <Authenticated name="user">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

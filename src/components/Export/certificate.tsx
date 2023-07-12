@@ -55,7 +55,7 @@ export function GenerateCertificateExport({ _for = "employee", publicationDate, 
   );
 }
 
-export const GenerateCertificate = ({ _for, publicationDate, datas, template }) => {
+export const GenerateCertificate = ({ _for, publicationDate, datas, template, width="1123px",height="794px" }) => {
   const { user } = useAuth()
   const description = template.content
 
@@ -110,8 +110,8 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template }) 
         <Card
           key={data.id}
           sx={{
-            width: '1123px',
-            height: '794px',
+            width,
+            height,
             pt: `${template.top_space}px`,
             pb: `${template.bottom_space}px`,
             pl: `${template.left_space}px`,

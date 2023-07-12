@@ -1,6 +1,6 @@
-import { FC, ChangeEvent, useState } from 'react';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Divider, TableCell, TableRow, Grid, Checkbox, Tooltip, IconButton, Modal } from '@mui/material';
+import { Card, Divider, TableCell, TableRow, Grid, Checkbox, Tooltip, IconButton, Modal, Box, Dialog } from '@mui/material';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import { TableContainerWrapper, TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
@@ -14,6 +14,7 @@ import CsvExport from '@/components/Export/Csv';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
 import PreviewIcon from '@mui/icons-material/Preview';
 import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface ResultsProps {
   student: any;
@@ -82,38 +83,10 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [selectedClass, setSelectedClass] = useState<number>();
-  const [sections, setSections] = useState<any>([{ title: "SELECT ALL", value: 0 }]);
-  const [selectedSection, setSelectedSection] = useState<number>();
-  const [selectedTemplate, setSelectedTemplate] = useState<number>();
+  const [selectedTemplate, setSelectedTemplate] = useState<any>();
   const [students, setStudents] = useState<any>([]);
   const [printDate, setPrintDate] = useState<any>(dayjs(Date.now()));
-  const [showTemplate, setShowTemplate] = useState<boolean>(false);
 
-
-
-
-
-  const handleSelectAllschools = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setSelectedschools(
-      event.target.checked ? paginatedFees.map((project) => project.id) : []
-    );
-  };
-
-  const handleSelectOneProject = (
-    _event: ChangeEvent<HTMLInputElement>,
-    projectId: string
-  ): void => {
-    if (!selectedItems.includes(projectId)) {
-      setSelectedschools((prevSelected) => [...prevSelected, projectId]);
-    } else {
-      setSelectedschools((prevSelected) =>
-        prevSelected.filter((id) => id !== projectId)
-      );
-    }
-  };
 
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
@@ -126,29 +99,6 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
   const filteredschools = applyFilters(templates, query, filters);
   const paginatedFees = applyPagination(filteredschools, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < paginatedFees.length;
-  const selectedAllschools = selectedItems.length === paginatedFees.length;
-
-  const handleClassChange = (e) => {
-
-    setSelectedClass(e.target.value);
-    const findcls = classes.find(cls => cls.id === e.target.value);
-
-    const allSection = [{ title: "SELECT ALL", value: 0 }];
-    allSection.push(...findcls?.sections?.map(section => ({ title: section.name, value: section.id })));
-    setSections(() => allSection);
-  }
-
-  const handleSectionChange = (e) => setSelectedSection(e.target.value);
-
-  const handleSearchClick = async () => {
-
-  }
-
-  const handleTemplateChange = (e) => {
-    console.log({ e: e.target.value });
-    setSelectedTemplate(e.target.value)
-  }
 
   const handleDateChange = (e) => setPrintDate(dayjs(e));
   const export_data = () => {
@@ -169,12 +119,16 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
   return (
     <>
 
-      <Modal open={showTemplate} onClose={() => setShowTemplate(false)}
-        ria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description" 
-        >
-        <div>aaa</div>
-      </Modal>
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={selectedTemplate} onClose={() => setSelectedTemplate(null)}
+      >
+        <Box padding={4} >
+          {selectedTemplate && <GenerateCertificate _for='student' publicationDate={printDate} datas={[student]} template={selectedTemplate} width='100%' height='100%' />}
+        </Box>
+
+      </Dialog>
 
 
       <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
@@ -269,34 +223,27 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
                               value={isschoolselected}
                             />
                           </TableCell> */}
-                          <TableCell sx={{ py: 1 }}>
+                          <TableCell sx={{ py: 0.5 }}>
                             {template.id}
                           </TableCell>
-                          <TableCell sx={{ py: 1 }}>
+                          <TableCell sx={{ py: 0.5 }}>
                             {template.name}
                           </TableCell>
-                          <TableCell sx={{ py: 1 }}>
+                          <TableCell sx={{ py: 0.5 }}>
                             {<img src={template.background_url} className=' h-10' alt='background_image' />}
                           </TableCell>
-                          <TableCell>
-                            <Tooltip title={t('Show')} arrow>
+                          <TableCell sx={{ py: 0.5, display: 'flex', gap: 2 }}>
+                            <Tooltip title={t('view')} arrow>
                               <IconButton
-                                onClick={() => { }
-                                  // handleConfirmDelete(fee.id)
-                                }
+                                onClick={() => { setSelectedTemplate(template) }}
                                 color="primary"
                               >
-                                <GenerateCertificate _for='student' publicationDate={printDate} datas={[student]} template={template} />
+                                <PreviewIcon sx={{ fontSize: '40px' }} />
                               </IconButton>
                             </Tooltip>
-                            {/* <Tooltip title={t('Download')} arrow>
-                                <IconButton
-                                  onClick={() =>{}}
-                                  color="primary"
-                                > */}
-                            <GenerateCertificateExport _for='student' publicationDate={printDate} datas={[student]} template={template} />
-                            {/* </IconButton>
-                              </Tooltip> */}
+                            <Grid mt={1.1}>
+                              <GenerateCertificateExport _for='student' publicationDate={printDate} datas={[student]} template={template} />
+                            </Grid>
                           </TableCell>
                         </TableRow>
                       );

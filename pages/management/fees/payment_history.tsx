@@ -13,11 +13,7 @@ import { Grid } from '@mui/material';
 // import { useRefMounted } from 'src/hooks/useRefMounted';
 import type { Project } from 'src/models/project';
 // import { schoolsApi } from 'src/mocks/schools';
-import PamentHistoryResult from 'src/content/Management/Fees/PamentHistoryResult';
-import { useClientFetch } from 'src/hooks/useClientFetch';
-import { DataSaverOnRounded } from '@mui/icons-material';
-import { useSearchUsers } from '@/hooks/useSearchUsers';
-import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import PamentHistoryResult from '@/content/Management/Fees/PaymentHistoryResult';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
 import dayjs from 'dayjs';
@@ -34,7 +30,7 @@ export async function getServerSideProps(context: any) {
     student = await prisma.student.findFirst({
       where: {
         student_info: {
-          user_id: refresh_token_varify.id,
+          user_id: Number(refresh_token_varify.id),
           school_id: refresh_token_varify.school_id
         }
       },

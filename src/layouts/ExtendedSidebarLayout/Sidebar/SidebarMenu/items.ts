@@ -330,13 +330,23 @@ const menuItems: MenuItems[] = [
         ]
       },
       {
-        name: 'Accounts',
+        name: 'Fees',
         icon: AccountBalanceIcon,
         items: [
           {
             name: ' Fees',
-            link: '/management/fees',
+            link: '/management/fees/index',
             icon: PaidIcon
+          },
+          {
+            name: 'Payment',
+            link: '/management/fees/student_payment',
+            icon: PaidIcon
+          },
+          {
+            name: 'Payment History',
+            icon: AccountTreeTwoToneIcon,
+            link: '/management/fees/student_payment_history',
           },
           {
             name: ' Collect Fee',
@@ -345,6 +355,7 @@ const menuItems: MenuItems[] = [
           },
         ]
       },
+
       {
         name: 'Holidays',
         link: '/management/holidays',
@@ -388,13 +399,18 @@ const menuItems: MenuItems[] = [
             icon: DesignServicesIcon
           },
           {
-            name: 'Generate Student',
-            link: '/certificate/generate_student',
+            name: 'Student Certificate',
+            link: '/certificate/student_certificate',
             icon: LocalPrintshopIcon
           },
           {
-            name: 'Generate Employee',
-            link: '/certificate/generate_employee',
+            name: 'Teacher Certificate',
+            link: '/certificate/teacher_certificate',
+            icon: LocalPrintshopIcon
+          },
+          {
+            name: 'Employee Certificate',
+            link: '/certificate/employee_certificate',
             icon: LocalPrintshopIcon
           },
         ]

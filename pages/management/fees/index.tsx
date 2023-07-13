@@ -82,7 +82,7 @@ function ManagementFees() {
 }
 
 ManagementFees.getLayout = (page) => (
-  <Authenticated name="fee">
+  <Authenticated name="student_fee">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

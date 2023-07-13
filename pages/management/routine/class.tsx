@@ -60,7 +60,7 @@ function Routine() {
 }
 
 Routine.getLayout = (page) => (
-  <Authenticated name="routine">
+  <Authenticated name="class_routine">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

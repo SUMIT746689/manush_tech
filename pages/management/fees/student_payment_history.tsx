@@ -193,7 +193,7 @@ function ManagementFees({ data }) {
 }
 
 ManagementFees.getLayout = (page) => (
-  <Authenticated >
+  <Authenticated name='student_payment_history' >
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

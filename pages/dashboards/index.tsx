@@ -17,16 +17,14 @@ export async function getServerSideProps(context: any) {
 
   let blockCount: any = { holidays: [] };
   try {
-    // const client = SSRHTTPClient(context)
-    // const res = await client.get(`${process.env.NEXT_PUBLIC_BASE_API}/api/dashboard`)
-    // blockCount = res.data;
 
     const cookie = context.req.headers.cookie.startsWith('refresh_token=') ? context.req.headers.cookie.replace('refresh_token=', '') : null;
-
+    console.log({cookie})
     const refresh_token: any = refresh_token_varify(cookie);
-
+    console.log({blockCount})
     // if (refresh_token) return {hasError: true}
-    if (!refresh_token) return blockCount;
+    // if (!refresh_token) return { props: {blockCount} };
+    if (!refresh_token) return { redirect: {destination: '/status/404'}};
     console.log({ refresh_token })
 
     console.log({ cookie: cookie });
@@ -137,22 +135,18 @@ export async function getServerSideProps(context: any) {
         break;
 
       default:
-
+        // return { redirect: {destination: '/status/404'}}
     }
 
   } catch (err) {
     console.log(err)
   }
-  const stringify = JSON.stringify(blockCount);
-  const parseJson = JSON.parse(stringify);
+  const parseJson = JSON.parse(JSON.stringify(blockCount));
 
-  return {
-    props: { blockCount: parseJson },
-  }
+  return { props: { blockCount: parseJson } }
 }
 
 function DashboardReports({ blockCount }) {
-  const router = useRouter();
 
   useEffect(() => {
     // router.reload()

@@ -239,7 +239,7 @@ function ManagementStudentPayment({ data }) {
 }
 
 ManagementStudentPayment.getLayout = (page) => (
-  <Authenticated>
+  <Authenticated name='student_payment'>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

@@ -17,7 +17,8 @@ import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface ResultsProps {
-  student: any;
+  student?: any;
+  teacher?: any;
   templates: any;
 }
 
@@ -73,7 +74,7 @@ const applyPagination = (
   return sent_sms.slice(page * limit, page * limit + limit);
 };
 
-const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
+const StudentTeacharResults: FC<ResultsProps> = ({ templates, student, teacher }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -84,7 +85,6 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
     status: null
   });
   const [selectedTemplate, setSelectedTemplate] = useState<any>();
-  const [students, setStudents] = useState<any>([]);
   const [printDate, setPrintDate] = useState<any>(dayjs(Date.now()));
 
 
@@ -102,7 +102,7 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
 
   const handleDateChange = (e) => setPrintDate(dayjs(e));
   const export_data = () => {
-    const filter_students = students.filter(std => selectedItems.includes(std.id));
+    const filter_students = student.filter(std => selectedItems.includes(std.id));
     const findTemplate = templates.find(tmp => selectedTemplate === tmp.id);
     const customize_data = filter_students.map((student, index) => ({
       SL: index + 1,
@@ -125,31 +125,38 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
         open={selectedTemplate} onClose={() => setSelectedTemplate(null)}
       >
         <Box padding={4} >
-          {selectedTemplate && <GenerateCertificate _for='student' publicationDate={printDate} datas={[student]} template={selectedTemplate} width='100%' height='100%' />}
+          {selectedTemplate && <GenerateCertificate _for={student ? 'student' : 'employee'} publicationDate={printDate} datas={student ? [student] : [teacher]} template={selectedTemplate} width='100%' height='100%' />}
         </Box>
 
       </Dialog>
 
 
-      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
-        <Grid>
-          <UncontrolledTextFieldWrapper label="Name" value={student.student_info?.first_name + (student.student_info?.middle_name || " ") + (student.student_info?.last_name || " ")} />
-        </Grid>
-        <Grid>
-          <UncontrolledTextFieldWrapper label="Class" value={student.section?.class?.name} />
-          {/* <DynamicDropDownSelectWrapper value={selectedClass} label='Select Class' name='' handleChange={handleClassChange} menuItems={classes?.map(cls => ({ title: cls.name, value: cls.id }))} /> */}
-        </Grid>
-        <Grid >
-          <UncontrolledTextFieldWrapper label="Section" value={student.section.class.has_section ? student.section?.name : ''} />
-          {/* <DynamicDropDownSelectWrapper value={selectedSection} label='Select Section' name='' handleChange={handleSectionChange} menuItems={sections} /> */}
-        </Grid>
-        {/* <Grid >
-          <DynamicDropDownSelectWrapper value={selectedTemplate} label='Select Template' name='' handleChange={handleTemplateChange} menuItems={templates.map(tmplt => ({ title: tmplt.name, value: tmplt.id }))} />
-        </Grid>
-        <Grid item container justifyContent={"flex-end"} >
-          <ButtonWrapper disabled={!selectedTemplate } handleClick={handleSearchClick}>Search</ButtonWrapper>
-        </Grid> */}
-      </Card>
+      {student
+        &&
+        <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
+          <Grid>
+            <UncontrolledTextFieldWrapper label="Name" value={student.student_info?.first_name + (student.student_info?.middle_name || " ") + (student.student_info?.last_name || " ")} />
+          </Grid>
+          <Grid>
+            <UncontrolledTextFieldWrapper label="Class" value={student.section?.class?.name} />
+          </Grid>
+          <Grid >
+            <UncontrolledTextFieldWrapper label="Section" value={student.section.class.has_section ? student.section?.name : ''} />
+          </Grid>
+        </Card>
+      }
+      {
+        teacher
+        &&
+        <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr min-content' }, gap: { sm: 1 } }}>
+          <Grid>
+            <UncontrolledTextFieldWrapper label="Name" value={teacher?.first_name + (teacher?.middle_name || " ") + (teacher?.last_name || " ")} />
+          </Grid>
+          <Grid>
+            <UncontrolledTextFieldWrapper label="Department" value={student?.department?.title || ''} />
+          </Grid>
+        </Card >
+      }
 
       <Card sx={{ minHeight: 'calc(100vh - 350px)' }}>
 
@@ -242,7 +249,7 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
                               </IconButton>
                             </Tooltip>
                             <Grid mt={1.1}>
-                              <GenerateCertificateExport _for='student' publicationDate={printDate} datas={[student]} template={template} />
+                              <GenerateCertificateExport _for={student ? 'student' : 'employee'} publicationDate={printDate} datas={[student]} template={template} />
                             </Grid>
                           </TableCell>
                         </TableRow>
@@ -255,9 +262,8 @@ const StudentResults: FC<ResultsProps> = ({ templates, student }) => {
             </>
           )}
       </Card>
-
     </>
   );
 };
 
-export default StudentResults;
+export default StudentTeacharResults;

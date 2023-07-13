@@ -61,7 +61,7 @@ async function seed() {
 
   await prisma.permission.createMany({
     data: [
-      
+
       { name: 'create academic years', value: 'create_academic_yaers', group: 'academic_years' },
       { name: 'create student', value: 'create_student', group: 'student' },
       { name: 'create gurdian', value: 'create_gurdian', group: 'guardian' },
@@ -89,7 +89,9 @@ async function seed() {
       { name: 'create holiday', value: 'create_holiday', group: 'holiday' },
       { name: 'create result', value: 'create_result', group: 'result' },
       { name: 'create department', value: 'create_department', group: 'department' },
-      { name: 'create certificate', value: 'create_certificate', group: 'certificate' },
+      { name: 'create certificate template', value: 'create_certificate_template', group: 'certificate_template' },
+      { name: 'create student certificate', value: 'show_student_certificate', group: 'student_certificate' },
+      { name: 'create employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
       { name: 'academic', value: 'academic', group: 'academic' },
       { name: 'teacher', value: 'teacher', group: 'teacher' },
       { name: 'accounts', value: 'accounts', group: 'accounts' },
@@ -100,6 +102,7 @@ async function seed() {
       { name: 'create bulk sms & email', value: 'create_bulk_sms_&_email', group: 'bulk_sms_&_email' },
       { name: 'create leave', value: 'create_leave', group: 'leave' },
       { name: 'view holiday', value: 'view_holiday', group: 'holiday' },
+      { name: 'create notice', value: 'create_notice', group: 'notice' },
     ]
   });
 
@@ -259,13 +262,18 @@ async function seed() {
     }
   });
 
-  const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
-
+  // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
   const createStudentRole = await prisma.role.create({
     data: {
       title: "STUDENT",
       permissions: {
-        connect: { id: createPermissionForStudentRole.id }
+        connectOrCreate: [
+          { name: 'show student fee', value: 'show_student_fee', group: 'student_fee_payment' },
+          { name: 'student fee payment history', value: 'student_fee_payment_history', group: 'student_fee_payment_history' },
+          { name: 'show student class routine', value: 'show_student_class_routine', group: 'class_routine' },
+          { name: 'show student certificate', value: 'show_student_certificate', group: 'student_certificate' },
+      
+        ]
       }
     }
   })
@@ -331,4 +339,12 @@ async function seed() {
 
 
 
-seed();
+seed().main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })

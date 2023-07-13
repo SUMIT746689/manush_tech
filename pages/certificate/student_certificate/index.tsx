@@ -5,9 +5,7 @@ import { Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import Result from '@/content/Certificate/GenerateStudent/Results';
-import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
-import { useAuth } from '@/hooks/useAuth';
-import StudentResults from '@/content/Certificate/GenerateStudent/StudentResult';
+import StudentTeacherResults from '@/content/Certificate/GenerateStudent/StudentTeacherResult';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
 
@@ -109,7 +107,7 @@ const Packages = ({ student, templates, classes }) => {
         >
           {
             student ?
-              <StudentResults student={student} templates={templates} />
+              <StudentTeacherResults student={student} templates={templates} />
               :
               <Result classes={classes} templates={templates} />
           }
@@ -122,7 +120,7 @@ const Packages = ({ student, templates, classes }) => {
 };
 
 Packages.getLayout = (page) => (
-  <Authenticated >
+  <Authenticated name='student_certificate' >
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

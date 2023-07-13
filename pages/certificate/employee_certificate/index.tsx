@@ -33,7 +33,7 @@ const Packages = () => {
 };
 
 Packages.getLayout = (page) => (
-  <Authenticated >
+  <Authenticated name="employee_certificate" >
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

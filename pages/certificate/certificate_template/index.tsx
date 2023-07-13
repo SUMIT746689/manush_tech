@@ -46,7 +46,7 @@ const EmailTemplates = () => {
 };
 
 EmailTemplates.getLayout = (page) => (
-  <Authenticated>
+  <Authenticated name='certificate_template'>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

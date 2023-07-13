@@ -77,9 +77,9 @@ const ButtonError = styled(Button)(
 
 
 interface ResultsProps {
-  rooms: Project[];
-  editRooms: object;
-  setEditRooms: Function;
+  grade: Project[];
+  editGrade: object;
+  setEditGrade: Function;
 }
 
 interface Filters {
@@ -141,8 +141,8 @@ const applyPagination = (
   return rooms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
-  const [selectedItems, setSelectedschools] = useState<string[]>([]);
+const Results: FC<ResultsProps> = ({ grade, setEditGrade,editGrade }) => {
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
@@ -161,8 +161,8 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedschools(
-      event.target.checked ? rooms.map((project) => project.id) : []
+    setSelectedItems(
+      event.target.checked ? grade.map((project) => project.id) : []
     );
   };
 
@@ -171,9 +171,9 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
     projectId: string
   ): void => {
     if (!selectedItems.includes(projectId)) {
-      setSelectedschools((prevSelected) => [...prevSelected, projectId]);
+      setSelectedItems((prevSelected) => [...prevSelected, projectId]);
     } else {
-      setSelectedschools((prevSelected) =>
+      setSelectedItems((prevSelected) =>
         prevSelected.filter((id) => id !== projectId)
       );
     }
@@ -186,13 +186,13 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-  console.log({ rooms });
-  const filteredschools = applyFilters(rooms, query, filters);
-  const paginatedschools = applyPagination(filteredschools, page, limit);
+
+  const filteredGrades = applyFilters(grade, query, filters);
+  const paginatedGrades = applyPagination(filteredGrades, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools =
-    selectedItems.length > 0 && selectedItems.length < rooms.length;
-  const selectedAllschools = selectedItems.length === rooms.length;
+  const selectedSomesGrades =
+    selectedItems.length > 0 && selectedItems.length < grade.length;
+  const selectedAllGrades = selectedItems.length === grade.length;
   ;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -267,11 +267,11 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:
               </Typography>{' '}
-              <b>{paginatedschools.length}</b> <b>{t('grades')}</b>
+              <b>{paginatedGrades.length}</b> <b>{t('grades')}</b>
             </Box>
             <TablePagination
               component="div"
-              count={filteredschools.length}
+              count={filteredGrades.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
@@ -282,7 +282,7 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
         )}
         <Divider />
 
-        {paginatedschools.length === 0 ? (
+        {paginatedGrades.length === 0 ? (
           <>
             <Typography
               sx={{
@@ -307,8 +307,8 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
                   <TableRow>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedAllschools}
-                        indeterminate={selectedSomeschools}
+                        checked={selectedAllGrades}
+                        indeterminate={selectedSomesGrades}
                         onChange={handleSelectAllschools}
                       />
                     </TableCell>
@@ -322,21 +322,21 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paginatedschools.map((project) => {
+                  {paginatedGrades.map((singleGrade) => {
                     const isschoolselected = selectedItems.includes(
-                      project.id
+                      singleGrade.id
                     );
                     return (
                       <TableRow
                         hover
-                        key={project.id}
+                        key={singleGrade.id}
                         selected={isschoolselected}
                       >
                         <TableCell padding="checkbox">  
                           <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
-                              handleSelectOneProject(event, project.id)
+                              handleSelectOneProject(event, singleGrade.id)
                             }
                             value={isschoolselected}
                           />
@@ -344,25 +344,25 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
 
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project?.lower_mark}
+                            {singleGrade?.lower_mark}
                           </Typography>
                         </TableCell>
 
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project?.upper_mark}
+                            {singleGrade?.upper_mark}
                           </Typography>
                         </TableCell>
 
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project?.point}
+                            {singleGrade?.point}
                           </Typography>
                         </TableCell>
 
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project?.grade}
+                            {singleGrade?.grade}
                           </Typography>
                         </TableCell>
 
@@ -370,7 +370,7 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
-                                onClick={() => setEditRooms(project)}
+                                onClick={() => setEditGrade(singleGrade)}
                                 color="primary"
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
@@ -379,7 +379,7 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
-                                  handleConfirmDelete(project.id)
+                                  handleConfirmDelete(singleGrade.id)
                                 }
                                 color="primary"
                               >
@@ -473,11 +473,11 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
 };
 
 Results.propTypes = {
-  rooms: PropTypes.array.isRequired
+  grade: PropTypes.array.isRequired
 };
 
 Results.defaultProps = {
-  rooms: []
+  grade: []
 };
 
 export default Results;

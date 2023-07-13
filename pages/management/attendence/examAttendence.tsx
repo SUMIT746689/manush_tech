@@ -15,6 +15,8 @@ import axios from 'axios';
 import { LocalizationProvider, MobileDatePicker } from '@mui/lab';
 import { ClassAndSectionSelect, VirtuosoTable } from '@/components/Attendence';
 import { TableVirtuoso } from 'react-virtuoso';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 const allAttandenceOptions = [
   { label: 'Not Taken', id: 'notTaken' },
@@ -56,7 +58,7 @@ function fixedHeaderContent() {
 
           key={column.dataKey}
           variant="head"
-          align={'center'}
+          // align={'center'}
           // style={{ width: column.width }}
           sx={{
             backgroundColor: 'background.paper',
@@ -90,7 +92,7 @@ function rowContent(_index, row, setSectionAttendence) {
       {columns.map((column) => (
         <TableCell
           key={column.dataKey}
-          align={'center'}
+          // align={'center'}
 
         >
           {column.dataKey == 'attendence' ?
@@ -371,7 +373,7 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+       sx={{ px:4, minHeight: 'calc(100vh - 305px) !important' }}
         container
         direction="row"
         justifyContent="center"
@@ -382,119 +384,89 @@ function Attendence() {
           <Card
             sx={{
               p: 1,
-              mb: 3
+              pb: 1,
+              mb: 2,
+              maxWidth: 1200,
+              display: 'grid',
+              gridTemplateColumns: {
+                sx: '1fr',
+                md: '2fr 1fr 1fr 1fr',
+                sm: '2fr 2fr'
+              },
+              mx: 'auto',
+              gap: 2,
             }}
           >
-            <Grid container spacing={{ xs: 2, md: 3 }} >
-              <Grid item  >
-                <Box p={1}>
-                  <ClassAndSectionSelect
-                    flag={true}
-                    classes={classes}
-                    selectedDate={null}
-                    selectedSection={selectedSection}
-                    setSelectedSection={setSelectedSection}
-                  />
-                </Box>
-              </Grid>
-              {
-                examlist && <Grid item xs={6} sm={4} md={3} >
-                  <Box p={1}>
-                    <Autocomplete
-                      fullWidth
-                      sx={{
-                        mr: 10
-                      }}
-                      limitTags={2}
-                      options={examlist}
-                      value={selectedExam}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          variant="outlined"
-                          label={t('Exams')}
-                          placeholder={t('Select Exam...')}
-                        />
-                      )}
-                      onChange={(e, value) => setSelectedExam(value)}
-                    />
-                  </Box>
-                </Grid>
-              }
 
-              {
-                selectedSection && selectedExam && <Grid item xs={6} sm={4} md={1} >
-                  <Box p={1}>
-                    <Button variant="contained" size='medium'
-                      onClick={() => handleAttendenceFind()}>Find</Button>
-                  </Box>
-                </Grid>
-              }
+            <Grid item  >
+
+              <ClassAndSectionSelect
+                flag={true}
+                classes={classes}
+                selectedDate={null}
+                selectedSection={selectedSection}
+                setSelectedSection={setSelectedSection}
+              />
 
             </Grid>
+            {
+              examlist && <Grid item  >
+
+                <AutoCompleteWrapper
+                  options={examlist}
+                  value={selectedExam}
+                  handleChange={(e, value) => setSelectedExam(value)}
+                  label={'Select Exams'}
+                  placeholder={'Exam...'}
+
+
+                />
+              </Grid>
+            }
+
+            {
+              selectedSection && selectedExam && <Grid item >
+
+                <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
+
+              </Grid>
+            }
+            {
+              students && students.length > 0 &&
+              <Grid >
+                <AutoCompleteWrapper
+                  minWidth={200}
+                  options={allAttandenceOptions}
+                  value={selectedForAll}
+                  handleChange={(e, value: any) => {
+                    if (value) {
+                      if (value.id !== 'notTaken') {
+                        setSelectedForAll(value)
+                      }
+                      else {
+                        setSelectedForAll(null)
+                      }
+
+                    }
+
+                  }}
+                  label={'Select For Everyone'}
+                  placeholder={'Everyone...'}
+
+
+                />
+              </Grid>
+            }
+
+
+
           </Card>
 
           <Divider />
 
-          <Grid container spacing={0} sx={{ minHeight: 'calc(100vh - 450px) !important' }} justifyContent={'flex-end'} >
+          <Grid container spacing={0} justifyContent={'flex-end'} >
             <Paper style={{ height: 400, width: '100%' }}>
 
-              {
-                students && students.length > 0 &&
-                <Grid sx={{
-                  display: 'flex',
-                  justifyContent: 'end',
-                }}>
-                  <Autocomplete
-                    fullWidth
-                    size='medium'
-                    sx={{
-                      maxWidth: '300px',
-                      paddingTop: 2
-
-                    }}
-                    limitTags={2}
-                    // getOptionLabel={(option) => option.id}
-                    options={allAttandenceOptions}
-                    value={selectedForAll}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        label={t('Select For Everyone')}
-                        placeholder={t('Everyone...')}
-                      />
-                    )}
-                    onChange={(e, value: any) => {
-                      if (value) {
-                        if (value.id !== 'notTaken') {
-                          setSelectedForAll(value)
-                        }
-                        else {
-                          setSelectedForAll(null)
-                        }
-
-                      }
-
-
-
-                    }}
-                  />
-                </Grid>
-              }
-
-
-              {/* <VirtuosoTable
-                examFlag={true}
-                selectedExam={selectedExam}
-                columns={columns}
-                students={students}
-                selectedSection={selectedSection}
-                selectedDate={null}
-                
-              /> */}
               <TableVirtuoso
                 data={students || []}
                 // @ts-ignore
@@ -505,7 +477,7 @@ function Attendence() {
             </Paper>
           </Grid>
 
-          <Grid container justifyContent="flex-end">
+          <Grid container justifyContent="flex-end" pt={1} >
             <Button onClick={handleSubmit} variant='contained' >
               submit
             </Button>

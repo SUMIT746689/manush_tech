@@ -14,6 +14,8 @@ import useNotistick from '@/hooks/useNotistick';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 
 import { MobileDatePicker } from '@mui/lab';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 
 
@@ -68,7 +70,7 @@ function fixedHeaderContent() {
 
           key={column.dataKey}
           variant="head"
-          align={'center'}
+          // align={'center'}
           // style={{ width: column.width }}
           sx={{
             backgroundColor: 'background.paper',
@@ -91,7 +93,7 @@ function rowContent(_index, row, setSectionAttendence) {
       {columns.map((column) => (
         <TableCell
           key={column.dataKey}
-          align={'center'}
+        // align={'center'}
 
         >
           {column.dataKey == 'attendence' ?
@@ -361,114 +363,101 @@ const Results = () => {
   }
 
   return (
-    <>
+    <Grid sx={{minHeight: 'calc(100vh - 330px) !important'}}>
       <Card
         sx={{
           p: 1,
-          mb: 3
+          pb: selectedDate ? 0 : 1,
+          mb: 2,
+          maxWidth: 1200,
+          display: 'grid',
+          gridTemplateColumns: {
+            sx: '1fr',
+            md: '1fr 2fr 1fr 1fr',
+            sm: '2fr 2fr'
+          },
+          mx: 'auto',
+          gap: 2,
         }}
       >
-        <Grid container spacing={{ xs: 2, md: 3 }} >
-          <Grid item >
-            <Box p={1}>
-              <MobileDatePicker
-                label="Select Date"
-                inputFormat='dd/MM/yyyy'
+        <Grid item sx={{
+          minWidth: '200px',
 
-                value={selectedDate}
-                onChange={(newValue) => {
-                  setSelectedDate(newValue);
-                }}
-                renderInput={(params) => <TextField fullWidth {...params} />}
-              />
-            </Box>
-          </Grid>
-          <Grid item  >
-            <Box p={1}>
-              <ClassAndSectionSelect
-                flag={false}
-                classes={classes}
-                selectedDate={selectedDate}
-                selectedSection={selectedSection}
-                setSelectedSection={setSelectedSection}
-              />
-            </Box>
-          </Grid>
-          {
-            selectedSection && <Grid item xs={6} sm={4} md={1} >
-              <Box p={1}>
-                <Button variant="contained" size='medium'
-                  onClick={() => handleAttendenceFind()}>Find</Button>
-              </Box>
-            </Grid>
-          }
+        }}>
+          <MobileDatePicker
+            label="Select Date"
+            inputFormat='dd/MM/yyyy'
+
+            value={selectedDate}
+            onChange={(newValue) => {
+              setSelectedDate(newValue);
+            }}
+            renderInput={(params) => <TextField size='small' fullWidth {...params} />}
+          />
 
         </Grid>
+
+
+        <ClassAndSectionSelect
+          flag={false}
+          classes={classes}
+          selectedDate={selectedDate}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+        />
+
+
+        {
+          selectedSection &&
+          <Grid item  >
+            <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
+          </Grid>
+        }
+        {
+          students && students.length > 0 &&
+          <Grid >
+            <AutoCompleteWrapper
+              minWidth={200}
+              options={allAttandenceOptions}
+              value={selectedForAll}
+              handleChange={(e, value: any) => {
+                if (value) {
+                  if (value.id !== 'notTaken') {
+                    setSelectedForAll(value)
+                  }
+                  else {
+                    setSelectedForAll(null)
+                  }
+
+                }
+              }}
+              label={'Select For Everyone'}
+              placeholder={'Everyone...'}
+
+            />
+          </Grid>
+        }
       </Card>
 
-
-      <Divider />
-      <Grid container spacing={0} sx={{ minHeight: 'calc(100vh - 450px) !important' }} justifyContent={'flex-end'} >
+      <Grid container spacing={0}  justifyContent={'flex-end'} >
         <Paper style={{ height: 400, width: '100%' }}>
-
-          {
-            students && students.length > 0 && <Grid sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              pr:'10px'
-            }}>
-              <Autocomplete
-                fullWidth
-                size='medium'
-                sx={{
-                  maxWidth: '250px',
-                  paddingTop: 2
-
-                }}
-                limitTags={2}
-                // getOptionLabel={(option) => option.id}
-                options={allAttandenceOptions}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    variant="outlined"
-                    label={t('Select For Everyone')}
-                    placeholder={t('Everyone...')}
-                  />
-                )}
-                value={selectedForAll}
-                onChange={(e, value: any) => {
-                  if (value) {
-                    if (value.id !== 'notTaken') {
-                      setSelectedForAll(value)
-                    }
-                    else {
-                      setSelectedForAll(null)
-                    }
-
-                  }
-                }}
-              />
-            </Grid>
-          }
-
           <TableVirtuoso
-
             data={students || []}
             // @ts-ignore
             components={VirtuosoTableComponents}
             fixedHeaderContent={fixedHeaderContent}
             itemContent={(_index, row) => rowContent(_index, row, setSectionAttendence)}
           />
+
+
         </Paper>
       </Grid>
-      <Grid container justifyContent="flex-end">
+      <Grid container justifyContent="flex-end" pt={1}>
         <Button onClick={handleSubmit} variant='contained' >
           submit
         </Button>
       </Grid>
-    </>
+    </Grid>
   );
 };
 

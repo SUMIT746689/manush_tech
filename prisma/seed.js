@@ -84,7 +84,9 @@ async function seed() {
       },
       { name: 'create room', value: 'create_room', group: 'room' },
       { name: 'create exam', value: 'create_exam', group: 'exam' },
-      { name: 'create attendence', value: 'create_attendence', group: 'attendence' },
+      { name: 'create student attendence', value: 'create_student_attendence', group: 'attendence' },
+      { name: 'create exam attendence', value: 'create_exam_attendence', group: 'attendence' },
+      { name: 'create employee attendence', value: 'create_employee_attendence', group: 'attendence' },
       { name: 'create collect fee', value: 'create_collect_fee', group: 'collect_fee' },
       { name: 'create holiday', value: 'create_holiday', group: 'holiday' },
       { name: 'create result', value: 'create_result', group: 'result' },
@@ -98,6 +100,7 @@ async function seed() {
       { name: 'front end', value: 'front_end', group: 'front_end' },
       { name: 'package request', value: 'package_request', group: 'package_request' },
       { name: 'create grade', value: 'create_grade', group: 'grade' },
+      { name: 'view grade', value: 'view_grade', group: 'grade' },
       { name: 'create report', value: 'create_report', group: 'report' },
       { name: 'create bulk sms & email', value: 'create_bulk_sms_&_email', group: 'bulk_sms_&_email' },
       { name: 'create leave', value: 'create_leave', group: 'leave' },
@@ -193,7 +196,9 @@ async function seed() {
   const teacherPermissions = []
   for (const i of permissions) {
     if (i.value == 'create_exam' || i.value == 'create_result' || i.value == 'create_attendence' ||
-      i.value == 'create_leave' || i.value == 'view_holiday') {
+      i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
+      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence'
+    ) {
       teacherPermissions.push({ id: i.id })
     }
   }

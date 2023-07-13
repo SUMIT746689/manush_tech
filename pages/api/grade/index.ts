@@ -14,6 +14,8 @@ const index = async (req, res, refresh_token) => {
             school_id: refresh_token.school_id
           }
         });
+        console.log("grade__",data);
+        
         res.status(200).json(data);
         break;
       case 'POST':

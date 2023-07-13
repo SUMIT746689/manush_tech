@@ -40,13 +40,17 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
 
     }
     return (
-        <Grid gap={4} sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            // minWidth: '450px',
-            flexWrap:'wrap',
-            // border: '1px solid black'
-        }} container >
+        <Grid gap={2} sx={{
+            // display: 'flex',
+            // justifyContent: 'flex-start',
+            // // minWidth: '450px',
+            // flexWrap: 'wrap',
+            display:'grid',
+            gridTemplateColumns:{
+                xs:'1fr',
+                sm:'1fr 1fr'
+            }
+        }}  >
 
             {
                 flag ?

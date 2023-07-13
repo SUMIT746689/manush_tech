@@ -165,7 +165,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-    // console.log("permissions__",permissions);
+  console.log("permissions__", permissions, item);
 
   const sub_menu = () => {
     ev.push(
@@ -245,7 +245,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Attendence') {
-      if (permissions.includes('attendence')) ev.push(
+      if (permissions.findIndex(i => i.group == 'attendence') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -263,10 +263,13 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
             items: item.items
           })}
         </SidebarMenuItem>
+
       );
+      console.log("item__", item);
+
     }
     else if (item.name === 'Certificate') {
-      if (permissions.includes('certificate')) ev.push(
+      if (permissions.findIndex(i => i.group == 'certificate') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -287,7 +290,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Bulk Sms And Email') {
-      if (permissions.includes('bulk_sms_&_email')) ev.push(
+      if (permissions.findIndex(i => i.group == 'bulk_sms_&_email') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -308,7 +311,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Result') {
-      if (permissions.includes('result')) ev.push(
+      if (permissions.findIndex(i => i.group == 'result') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -329,7 +332,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Reports') {
-      if (permissions.includes('report')) ev.push(
+      if (permissions.findIndex(i => i.group == 'report') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -350,7 +353,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'System') {
-      if (permissions.includes('package_request')) ev.push(
+      if (permissions.findIndex(i => i.group == 'package_request') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -417,8 +420,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Department' ||
       item.name === 'Package' ||
       item.name === 'Front End' ||
-      item.name === 'Pending Package'||
-      item.name === 'Users'
+      item.name === 'Pending Package' ||
+      item.name === 'Users' ||
+      item.name === 'Students Attendence' ||
+      item.name === 'Exam Attendence' ||
+      item.name === 'Employee Attendence'
 
     ) {
       // switch(item.name){
@@ -426,30 +432,35 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       //     sub_menu();
       //     break;
       // }
-      if (item.name === 'Sections' && permissions?.includes('section')) sub_menu();
-      if (item.name === 'Leave Application' && permissions?.includes('leave')) sub_menu();
-      if (item.name === 'Subjects' && permissions?.includes('subject')) sub_menu();
-      if (item.name === 'Schools' && permissions?.includes('school')) sub_menu();
-      if (item.name === 'Teachers' && permissions?.includes('teacher')) sub_menu();
-      if (item.name === 'Students' && permissions?.includes('student')) sub_menu();
-      if (item.name === 'Sessions' && permissions?.includes('session')) sub_menu();
-      if (item.name === 'Period' && permissions?.includes('period')) sub_menu();
-      if (item.name === 'Routine' && permissions?.includes('routine')) sub_menu();
-      if (item.name === 'Classes' && permissions?.includes('class')) sub_menu();
-      if (item.name === 'Fees' && permissions?.includes('fee')) sub_menu();
-      if (item.name === 'Rooms' && permissions?.includes('room')) sub_menu();
-      if (item.name === 'Grading system' && permissions?.includes('grade')) sub_menu();
-      if (item.name === 'Exam' && permissions?.includes('exam')) sub_menu();
-      if (item.name === 'CollectFee' && permissions?.includes('collect_fee')) sub_menu();
-      if (item.name === 'Holidays' && permissions?.includes('holiday')) sub_menu();
-      if (item.name === 'Result' && permissions?.includes('result')) sub_menu();
-      if (item.name === 'Academic Years' && permissions?.includes('academic_years')) sub_menu();
-      if (item.name === 'Department' && permissions?.includes('department')) sub_menu();
-      if (item.name === 'Users' && permissions?.includes('user')) sub_menu();
-      if (item.name === 'Package' && permissions?.includes('package')) sub_menu();
-      if (item.name === 'Front End' && permissions?.includes('front_end')) sub_menu();
-      if (item.name === 'Pending Package' && permissions?.includes('pending_package')) sub_menu();
-    } else sub_menu();
+      if (item.name === 'Sections' && permissions?.findIndex(i => i.group == 'section') > -1) sub_menu();
+      if (item.name === 'Leave Application' && permissions?.findIndex(i => i.group == 'leave') > -1) sub_menu();
+      if (item.name === 'Subjects' && permissions?.findIndex(i => i.group == 'subject') > -1) sub_menu();
+      if (item.name === 'Schools' && permissions?.findIndex(i => i.group == 'school') > -1) sub_menu();
+      if (item.name === 'Teachers' && permissions?.findIndex(i => i.group == 'teacher') > -1) sub_menu();
+      if (item.name === 'Students' && permissions?.findIndex(i => i.group == 'student') > -1) sub_menu();
+      if (item.name === 'Sessions' && permissions?.findIndex(i => i.group == 'session') > -1) sub_menu();
+      if (item.name === 'Period' && permissions?.findIndex(i => i.group == 'period') > -1) sub_menu();
+      if (item.name === 'Routine' && permissions?.findIndex(i => i.group == 'routine') > -1) sub_menu();
+      if (item.name === 'Classes' && permissions?.findIndex(i => i.group == 'class') > -1) sub_menu();
+      if (item.name === 'Fees' && permissions?.findIndex(i => i.group == 'fee') > -1) sub_menu();
+      if (item.name === 'Rooms' && permissions?.findIndex(i => i.group == 'room') > -1) sub_menu();
+      if (item.name === 'Grading system' && permissions?.findIndex(i => i.group == 'grade') > -1) sub_menu();
+      if (item.name === 'Exam' && permissions?.findIndex(i => i.group == 'exam') > -1) sub_menu();
+      if (item.name === 'CollectFee' && permissions?.findIndex(i => i.group == 'collect_fee') > -1) sub_menu();
+      if (item.name === 'Holidays' && permissions?.findIndex(i => i.group == 'holiday') > -1) sub_menu();
+      if (item.name === 'Result' && permissions?.findIndex(i => i.group == 'result') > -1) sub_menu();
+      if (item.name === 'Academic Years' && permissions?.findIndex(i => i.group == 'academic_years') > -1) sub_menu();
+      if (item.name === 'Department' && permissions?.findIndex(i => i.group == 'department') > -1) sub_menu();
+      if (item.name === 'Users' && permissions?.findIndex(i => i.group == 'user') > -1) sub_menu();
+      if (item.name === 'Package' && permissions?.findIndex(i => i.group == 'package') > -1) sub_menu();
+      if (item.name === 'Front End' && permissions?.findIndex(i => i.group == 'front_end') > -1) sub_menu();
+      if (item.name === 'Pending Package' && permissions?.findIndex(i => i.group == 'pending_package') > -1) sub_menu();
+      
+      if (item.name === 'Students Attendence' && permissions?.findIndex(i => i.value == 'create_student_attendence') > -1) sub_menu();
+      if (item.name === 'Exam Attendence' && permissions?.findIndex(i => i.value == 'create_exam_attendence') > -1) sub_menu();
+      if (item.name === 'Employee Attendence' && permissions?.findIndex(i => i.value == 'create_employee_attendence') > -1) sub_menu();
+    }
+    else sub_menu();
     // {
     // if (!permissions?.includes('create_admin')) sub_menu();
     // } else sub_menu();
@@ -474,13 +485,13 @@ function SidebarMenu() {
     <>
       <AuthConsumer>
         {({ user }) => {
-          let permissions = [];
+
+          const permissions = [];
           if (user?.permissions?.length > 0) {
             user.permissions.map((permission: any) =>
-              permissions.push(permission.group)
+              permissions.push(permission)
             );
           }
-
           return menuItems.map((section: any) => (
             <MenuWrapper key={section.heading}>
               <List

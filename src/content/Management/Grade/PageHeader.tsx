@@ -23,7 +23,7 @@ import useNotistick from '@/hooks/useNotistick';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 
-function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
+function PageHeader({contentPermission, editGrade, setEditGrade, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
@@ -32,10 +32,10 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
 
 
   useEffect(() => {
-    if (editRooms) {
+    if (editGrade) {
       handleCreateProjectOpen();
     }
-  }, [editRooms]);
+  }, [editGrade]);
 
   const handleCreateProjectOpen = () => {
     setOpen(true);
@@ -43,7 +43,7 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
 
   const handleCreateProjectClose = () => {
     setOpen(false);
-    setEditRooms(null);
+    setEditGrade(null);
   };
 
   const handleCreateProjectSuccess = (message) => {
@@ -62,7 +62,8 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
             {t('These are your Gradeing system')}
           </Typography>
         </Grid>
-        <Grid item>
+        {
+          contentPermission?.create_grade && <Grid item>
           <Button
             sx={{
               mt: { xs: 2, sm: 0 }
@@ -74,6 +75,8 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
             {t('Create new Grade')}
           </Button>
         </Grid>
+        }
+        
       </Grid>
       <Dialog
         fullWidth
@@ -87,21 +90,21 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {editRooms ? t('Edit grade') : t('Create new grade')}
+            {editGrade ? t('Edit grade') : t('Create new grade')}
           </Typography>
           <Typography variant="subtitle2">
             {t(
-              `Use this dialog window to ${editRooms ? 'Edit ' : 'add a new'
+              `Use this dialog window to ${editGrade ? 'Edit ' : 'add a new'
               } Grade`
             )}
           </Typography>
         </DialogTitle>
         <Formik
           initialValues={{
-            lower_mark: editRooms ? editRooms?.lower_mark : undefined,
-            upper_mark: editRooms ? editRooms?.upper_mark : undefined,
-            point: editRooms ? editRooms?.point : undefined,
-            grade: editRooms ? editRooms?.grade : undefined,
+            lower_mark: editGrade ? editGrade?.lower_mark : undefined,
+            upper_mark: editGrade ? editGrade?.upper_mark : undefined,
+            point: editGrade ? editGrade?.point : undefined,
+            grade: editGrade ? editGrade?.grade : undefined,
             academic_year_id: academicYear.id,
             submit: null
           }}
@@ -129,13 +132,13 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
                 resetForm();
                 setStatus({ success: true });
                 setSubmitting(false);
-                setEditRooms(null);
+                setEditGrade(null);
                 handleCreateProjectSuccess(message);
                 reFetchData();
               };
-              if (editRooms) {
+              if (editGrade) {
                 const res = await axios.patch(
-                  `/api/grade?grade_id=${editRooms.id}`,
+                  `/api/grade?grade_id=${editGrade.id}`,
                   _values
                 );
                 if (res.status == 200) successProcess(t('A grad has been updated successfully'));
@@ -371,7 +374,7 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
                       variant="contained"
                       size="large"
                     >
-                      {editRooms ? t('Edit grade') : t('Create grade')}
+                      {editGrade ? t('Edit grade') : t('Create grade')}
                     </Button>
                     <Button
                       color="secondary"

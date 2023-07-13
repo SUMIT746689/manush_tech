@@ -186,17 +186,17 @@ const menuItems: MenuItems[] = [
         icon: CheckCircleOutlineIcon,
         items: [
           {
-            name: 'Students',
+            name: 'Students Attendence',
             link: '/management/attendence/normalAttendence',
             icon: AccessibilityIcon
           },
           {
-            name: 'Exam',
+            name: 'Exam Attendence',
             link: '/management/attendence/examAttendence',
             icon: ArticleIcon
           },
           {
-            name: 'Employee',
+            name: 'Employee Attendence',
             link: '/management/attendence/employeeAttendence',
             icon: GroupIcon
           },

@@ -10,15 +10,18 @@ import { Grid } from '@mui/material';
 import type { Project } from 'src/models/project';
 import Results from '@/content/Management/Grade/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
+import { useAuth } from '@/hooks/useAuth';
 function Managementrooms() {
-  const [rooms, setRooms] = useState([]);
-  const [editRooms, setEditRooms] = useState(null);
-  const { data,reFetchData, error } = useClientFetch('/api/grad');
+  const [grade, setGrade] = useState([]);
+  const [editGrade, setEditGrade] = useState(null);
+  const { data, reFetchData, error } = useClientFetch('/api/grade');
+  const auth = useAuth();
 
   useEffect(() => {
-    if (data) setRooms(data);
+    if (data) setGrade(data);
   }, [data, error]);
 
+  const create_grade = auth?.user?.permissions?.find(i => i?.value == 'create_grade')
   return (
     <>
       <Head>
@@ -26,10 +29,13 @@ function Managementrooms() {
       </Head>
       <PageTitleWrapper>
         <PageHeader
-          editRooms={editRooms}
-          setEditRooms={setEditRooms}
+          contentPermission={{
+            create_grade
+          }}
+          editGrade={editGrade}
+          setEditGrade={setEditGrade}
           reFetchData={reFetchData}
-         
+
         />
       </PageTitleWrapper>
 
@@ -43,9 +49,9 @@ function Managementrooms() {
       >
         <Grid item xs={12}>
           <Results
-            rooms={rooms}
-            editRooms={editRooms}
-            setEditRooms={setEditRooms}
+            grade={grade}
+            editGrade={editGrade}
+            setEditGrade={setEditGrade}
           />
         </Grid>
       </Grid>
@@ -55,7 +61,7 @@ function Managementrooms() {
 }
 
 Managementrooms.getLayout = (page) => (
-  <Authenticated name='room'>
+  <Authenticated name='grade'>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

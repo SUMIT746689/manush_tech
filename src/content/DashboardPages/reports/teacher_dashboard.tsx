@@ -14,9 +14,9 @@ function StudentDashboardReportsContent({ blockCount }) {
   const extraInfo = [['department', teacher.department.title]];
   const quickLinks = [
     { name: 'Exam', src: "exam.svg", href: "/management/exam" },
-    { name: 'Class Attendance', src: "attendance.svg", href: "/management/exam" },
-    { name: 'Routine', src: "routine.svg", href: "/management/exam" },
-    { name: 'Exam Attendance', src: "exam_attendance.svg", href: "/management/exam" }
+    { name: 'Class Attendance', src: "attendance.svg", href: "/management/attendence/normalAttendence" },
+    { name: 'Routine', src: "routine.svg", href: "/management/routine/class" },
+    { name: 'Exam Attendance', src: "exam_attendance.svg", href: "/management/attendence/examAttendence" }
   ]
 
   return (

@@ -6,11 +6,12 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Autocomplete, Box, Button, Card, Grid, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme } from '@mui/material';
 
-import { AuthConsumer } from 'src/contexts/JWTAuthContext';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
+import prisma from '@/lib/prisma_client';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 
 function Managementschools() {
 
@@ -466,7 +467,7 @@ function Managementschools() {
 }
 
 Managementschools.getLayout = (page) => (
-    <Authenticated name='teacher'>
+    <Authenticated name='student_wise_result'>
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

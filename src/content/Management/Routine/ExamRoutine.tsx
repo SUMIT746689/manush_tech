@@ -8,16 +8,13 @@ import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
-import ReactToPrint from 'react-to-print';
-import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
-import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { BasicPdfExport } from '@/components/Export/Pdf';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
 
-const Results = () => {
+const ExamResults = () => {
     const { t }: { t: any } = useTranslation();
     const [routine, setRoutine] = useState(null);
     const [slotHeader, setSlotHeader] = useState([]);
@@ -247,12 +244,12 @@ const Results = () => {
     );
 };
 
-Results.propTypes = {
+ExamResults.propTypes = {
     schools: PropTypes.array.isRequired
 };
 
-Results.defaultProps = {
+ExamResults.defaultProps = {
     schools: []
 };
 
-export default Results;
+export default ExamResults;

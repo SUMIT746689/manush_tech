@@ -46,7 +46,7 @@ const Notice = () => {
 };
 
 Notice.getLayout = (page) => (
-  <Authenticated>
+  <Authenticated name="notice">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

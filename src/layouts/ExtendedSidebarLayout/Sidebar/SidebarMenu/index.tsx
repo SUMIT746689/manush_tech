@@ -6,6 +6,7 @@ import menuItems, { MenuItem } from './items';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 import { AuthConsumer, AuthProvider } from '@/contexts/JWTAuthContext';
+import { permissionVerify } from '@/utils/permissionVerify';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -245,7 +246,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Attendence') {
-      if (permissions.findIndex(i => i.group == 'attendence') > -1) ev.push(
+      if (permissions.findIndex(i => i.group == 'attendence') > -1 || permissionVerify(permissions,['show_student_exam_attendence'])) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -269,7 +270,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
     }
     else if (item.name === 'Certificate') {
-      if (permissions.findIndex(i => i.group == 'certificate') > -1) ev.push(
+      console.log({ permissions })
+      if (permissionVerify(permissions, ['create_certificate_template', 'show_student_certificate', 'show_teacher_certificate', 'show_employee_certificate'])) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -311,7 +313,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Result') {
-      if (permissions.findIndex(i => i.group == 'result') > -1) ev.push(
+      // if (permissionVerify(permissions,['show_section_wise_result','show_student_wise_result','show_student_result'])) 
+      ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -373,6 +376,28 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+
+    else if (item.name === 'Fees') {
+      if (permissionVerify(permissions, ['create_fee', 'show_fee', 'collect_fee', 'student_fee_payment', 'student_fee_payment_history'])) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
     else {
       ev.push(
         <SidebarMenuItem
@@ -405,26 +430,47 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Students' ||
       item.name === 'Sessions' ||
       item.name === 'Period' ||
-      item.name === 'Routine' ||
+
       item.name === 'Classes' ||
+
+      item.name === 'Class Routine' ||
+      item.name === 'Exam Routine' ||
+
       item.name === 'Fees' ||
+      item.name === 'Collect Fee' ||
+      item.name === 'Payment' ||
+      item.name === 'Payment History' ||
+
       item.name === 'Rooms' ||
       item.name === 'Grading system' ||
       item.name === 'Exam' ||
       item.name === 'CollectFee' ||
       item.name === 'Holidays' ||
-      item.name === 'Result' ||
+
+      item.name === 'Section Wise Result' ||
+      item.name === 'Student Wise Result' ||
+      item.name === 'Student Result' ||
+
       item.name === 'Academic Years' ||
       item.name === 'Leave Application' ||
-      item.name === 'Department' ||
       item.name === 'Department' ||
       item.name === 'Package' ||
       item.name === 'Front End' ||
       item.name === 'Pending Package' ||
       item.name === 'Users' ||
+      
       item.name === 'Students Attendence' ||
       item.name === 'Exam Attendence' ||
-      item.name === 'Employee Attendence'
+      item.name === 'Employee Attendence' ||
+      item.name === 'Student Exam Attendence' ||
+      
+      item.name === 'Notice' ||
+
+      item.name === 'Certificate Template' ||
+      item.name === 'Student Certificate' ||
+      item.name === 'Teacher Certificate' ||
+      item.name === 'Employee Certificate'
+
 
     ) {
       // switch(item.name){
@@ -440,25 +486,53 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Students' && permissions?.findIndex(i => i.group == 'student') > -1) sub_menu();
       if (item.name === 'Sessions' && permissions?.findIndex(i => i.group == 'session') > -1) sub_menu();
       if (item.name === 'Period' && permissions?.findIndex(i => i.group == 'period') > -1) sub_menu();
-      if (item.name === 'Routine' && permissions?.findIndex(i => i.group == 'routine') > -1) sub_menu();
+
+      // if (item.name === 'Routine' && permissions?.findIndex(i => i.group == 'routine') > -1) sub_menu();
+
       if (item.name === 'Classes' && permissions?.findIndex(i => i.group == 'class') > -1) sub_menu();
-      if (item.name === 'Fees' && permissions?.findIndex(i => i.group == 'fee') > -1) sub_menu();
       if (item.name === 'Rooms' && permissions?.findIndex(i => i.group == 'room') > -1) sub_menu();
       if (item.name === 'Grading system' && permissions?.findIndex(i => i.group == 'grade') > -1) sub_menu();
       if (item.name === 'Exam' && permissions?.findIndex(i => i.group == 'exam') > -1) sub_menu();
       if (item.name === 'CollectFee' && permissions?.findIndex(i => i.group == 'collect_fee') > -1) sub_menu();
       if (item.name === 'Holidays' && permissions?.findIndex(i => i.group == 'holiday') > -1) sub_menu();
-      if (item.name === 'Result' && permissions?.findIndex(i => i.group == 'result') > -1) sub_menu();
       if (item.name === 'Academic Years' && permissions?.findIndex(i => i.group == 'academic_years') > -1) sub_menu();
       if (item.name === 'Department' && permissions?.findIndex(i => i.group == 'department') > -1) sub_menu();
       if (item.name === 'Users' && permissions?.findIndex(i => i.group == 'user') > -1) sub_menu();
       if (item.name === 'Package' && permissions?.findIndex(i => i.group == 'package') > -1) sub_menu();
       if (item.name === 'Front End' && permissions?.findIndex(i => i.group == 'front_end') > -1) sub_menu();
+      if (item.name === 'Notice' && permissions?.findIndex(i => i.group === 'notice') > -1) { console.log('sssss') };
       if (item.name === 'Pending Package' && permissions?.findIndex(i => i.group == 'pending_package') > -1) sub_menu();
-      
+
       if (item.name === 'Students Attendence' && permissions?.findIndex(i => i.value == 'create_student_attendence') > -1) sub_menu();
       if (item.name === 'Exam Attendence' && permissions?.findIndex(i => i.value == 'create_exam_attendence') > -1) sub_menu();
       if (item.name === 'Employee Attendence' && permissions?.findIndex(i => i.value == 'create_employee_attendence') > -1) sub_menu();
+
+
+      //validate using permissions values
+
+      // attendence
+      if (item.name === 'Student Exam Attendence' && permissionVerify(permissions, [item.value])) sub_menu();
+
+      //Routine 
+      if (item.name === 'Class Routine' && permissionVerify(permissions, ['show_class_routine'])) sub_menu();
+      if (item.name === 'Exam Routine' && permissionVerify(permissions, ['show_exam_routine'])) sub_menu();
+
+      //result section 
+      if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['show_section_wise_result'])) sub_menu();
+      if (item.name === 'Student Wise Result' && permissionVerify(permissions, ['show_student_wise_result'])) sub_menu();
+      if (item.name === 'Student Result' && permissionVerify(permissions, ['show_student_result'])) sub_menu();
+
+      //fees
+      if (item.name === 'Fees' && permissionVerify(permissions, ['create_fee', 'show_fee'])) sub_menu();
+      if (item.name === 'Collect Fee' && permissionVerify(permissions, ['collect_fee'])) sub_menu();
+      if (item.name === 'Payment' && permissionVerify(permissions, ['student_fee_payment'])) sub_menu();
+      if (item.name === 'Payment History' && permissionVerify(permissions, ['student_fee_payment_history'])) sub_menu();
+
+      // certificates
+      if (item.name === 'Certificate Template' && permissionVerify(permissions, ['create_certificate_template'])) sub_menu();
+      if (item.name === 'Student Certificate' && permissionVerify(permissions, ['show_student_certificate'])) sub_menu();
+      if (item.name === 'Teacher Certificate' && permissionVerify(permissions, ['show_teacher_certificate'])) sub_menu();
+      if (item.name === 'Employee Certificate' && permissionVerify(permissions, ['show_employee_certificate'])) sub_menu();
     }
     else sub_menu();
     // {

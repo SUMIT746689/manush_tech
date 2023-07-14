@@ -5,15 +5,14 @@ import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Divider, TableBody, Grid, Paper, TextField, TableContainer, TableHead, Typography, TableRow, TableCell, Table, FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Button, Card, Divider, TableBody, Grid, Paper, TextField, TableContainer, TableHead, TableRow, TableCell, Table, FormControl, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import useNotistick from '@/hooks/useNotistick';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import axios from 'axios';
-import { LocalizationProvider, MobileDatePicker } from '@mui/lab';
-import { ClassAndSectionSelect, VirtuosoTable } from '@/components/Attendence';
+import { ClassAndSectionSelect } from '@/components/Attendence';
 import { TableVirtuoso } from 'react-virtuoso';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
@@ -114,7 +113,6 @@ function rowContent(_index, row, setSectionAttendence) {
   );
 }
 const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence }) => {
-  const { user } = useAuth();
   const [attendenceValue, setAttendenceValue] = useState(attendence);
   const [remarkValue, setRemarkValue] = useState(remark);
   const { showNotification } = useNotistick()

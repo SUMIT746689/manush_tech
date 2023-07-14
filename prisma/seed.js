@@ -75,25 +75,37 @@ async function seed() {
       { name: 'create subject', value: 'create_subject', group: 'subject' },
       { name: 'create session', value: 'create_session', group: 'session' },
       { name: 'create period', value: 'create_period', group: 'period' },
-      { name: 'create routine', value: 'create_routine', group: 'routine' },
+
+      // { name: 'create routine', value: 'create_routine', group: 'routine' },
+      { name: 'show class routine', value: 'show_class_routine', group: 'class_routine' },
+      { name: 'show exam routine', value: 'show_exam_routine', group: 'exam_routine' },
+
       { name: 'create fee', value: 'create_fee', group: 'fee' },
-      {
-        name: 'student fee collect',
-        value: 'student_fee_collect',
-        group: 'student_fee_collect'
-      },
+      { name: 'show fee', value: 'show_fee', group: 'fee' },
+      { name: 'collect fee', value: 'collect_fee', group: 'collect_fee' },
+      // { name: 'student fee payment', value: 'student_fee_payment', group: 'student_fee_payment' },
+      // { name: 'student fee payment history', value: 'student_fee_payment_history', group: 'student_fee_payment_history' },
+
+
       { name: 'create room', value: 'create_room', group: 'room' },
       { name: 'create exam', value: 'create_exam', group: 'exam' },
+
       { name: 'create student attendence', value: 'create_student_attendence', group: 'attendence' },
       { name: 'create exam attendence', value: 'create_exam_attendence', group: 'attendence' },
       { name: 'create employee attendence', value: 'create_employee_attendence', group: 'attendence' },
-      { name: 'create collect fee', value: 'create_collect_fee', group: 'collect_fee' },
+      { name: 'show student exam attendence', value: 'show_student_exam_attendence', group: 'show_student_exam_attendence' },
+
       { name: 'create holiday', value: 'create_holiday', group: 'holiday' },
+
       { name: 'create result', value: 'create_result', group: 'result' },
+      { name: 'show section wise', value: 'show_section_wise_result', group: 'result' },
+      { name: 'show student wise', value: 'show_student_wise_result', group: 'student_wise_result' },
+
       { name: 'create department', value: 'create_department', group: 'department' },
       { name: 'create certificate template', value: 'create_certificate_template', group: 'certificate_template' },
-      { name: 'create student certificate', value: 'show_student_certificate', group: 'student_certificate' },
-      { name: 'create employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
+      { name: 'show student certificate', value: 'show_student_certificate', group: 'student_certificate' },
+      { name: 'show teacher certificate', value: 'show_teacher_certificate', group: 'teacher_certificate' },
+      { name: 'show employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
       { name: 'academic', value: 'academic', group: 'academic' },
       { name: 'teacher', value: 'teacher', group: 'teacher' },
       { name: 'accounts', value: 'accounts', group: 'accounts' },
@@ -195,9 +207,9 @@ async function seed() {
 
   const teacherPermissions = []
   for (const i of permissions) {
-    if (i.value == 'create_exam' || i.value == 'create_result' || i.value == 'create_attendence' ||
+    if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
       i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
-      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence'
+      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence' || i.value === 'show_teacher_certificate'
     ) {
       teacherPermissions.push({ id: i.id })
     }
@@ -268,20 +280,32 @@ async function seed() {
   });
 
   // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
+  const studentPermissions = []
+  for (const i of permissions) {
+    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine' || i.value == 'show_student_exam_attendence'
+    ) {
+      studentPermissions.push({ id: i.id })
+    }
+  }
+
   const createStudentRole = await prisma.role.create({
     data: {
       title: "STUDENT",
       permissions: {
-        connectOrCreate: [
-          { name: 'show student fee', value: 'show_student_fee', group: 'student_fee_payment' },
+        create: [
+          { name: 'student fee payment', value: 'student_fee_payment', group: 'student_fee_payment' },
           { name: 'student fee payment history', value: 'student_fee_payment_history', group: 'student_fee_payment_history' },
-          { name: 'show student class routine', value: 'show_student_class_routine', group: 'class_routine' },
-          { name: 'show student certificate', value: 'show_student_certificate', group: 'student_certificate' },
-      
-        ]
+
+          // { name: 'show student class routine', value: 'show_student_class_routine', group: 'student_class_routine' },
+
+          { name: 'show student result', value: 'show_student_result', group: 'show_student_result' },
+
+        ],
+        connect: studentPermissions
       }
     }
-  })
+  }
+  )
 
   const studentInformation = await prisma.studentInformation.create({
     // @ts-ignore
@@ -344,7 +368,7 @@ async function seed() {
 
 
 
-seed().main()
+seed()
   .then(async () => {
     await prisma.$disconnect()
   })

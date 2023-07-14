@@ -58,6 +58,7 @@ export interface MenuItem {
 
   items?: MenuItem[];
   name: string;
+  value?: string;
 }
 
 export interface MenuItems {
@@ -138,15 +139,21 @@ const menuItems: MenuItems[] = [
         icon: AssignmentTurnedInIcon,
         items: [
           {
-            name: 'Section wise result',
+            name: 'Section Wise Result',
             link: '/management/result',
             icon: AssignmentIcon
           },
           {
-            name: 'Single student result',
+            name: 'Student Wise Result',
             link: '/management/result/single',
             icon: AutoAwesomeMotionIcon
-          }
+          },
+          {
+            name: 'Student Result',
+            link: '/management/result/student_result',
+            icon: AutoAwesomeMotionIcon
+          },
+
         ]
       },
 
@@ -200,6 +207,12 @@ const menuItems: MenuItems[] = [
             link: '/management/attendence/employeeAttendence',
             icon: GroupIcon
           },
+          {
+            name: 'Student Exam Attendence',
+            value:'show_student_exam_attendence',
+            link: '/management/attendence/show_student_attendence',
+            icon: GroupIcon
+          }
         ]
       },
       {
@@ -207,13 +220,13 @@ const menuItems: MenuItems[] = [
         icon: CalendarTodayIcon,
         items: [
           {
-            name: 'Class',
-            link: '/management/routine/class',
+            name: 'Class Routine',
+            link: '/management/routine/class_routine',
             icon: AccessibilityIcon
           },
           {
-            name: 'Exam',
-            link: '/management/routine/exam',
+            name: 'Exam Routine',
+            link: '/management/routine/exam_routine',
             icon: AccessibilityIcon
           },
 
@@ -334,8 +347,8 @@ const menuItems: MenuItems[] = [
         icon: AccountBalanceIcon,
         items: [
           {
-            name: ' Fees',
-            link: '/management/fees/index',
+            name: 'Fees',
+            link: '/management/fees',
             icon: PaidIcon
           },
           {
@@ -349,7 +362,7 @@ const menuItems: MenuItems[] = [
             link: '/management/fees/student_payment_history',
           },
           {
-            name: ' Collect Fee',
+            name: 'Collect Fee',
             icon: AccountTreeTwoToneIcon,
             link: '/management/student_fees_collection',
           },

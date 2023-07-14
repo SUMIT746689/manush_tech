@@ -10,7 +10,7 @@ import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { BasicPdfExport } from '@/components/Export/Pdf';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
-const StudentResults = () => {
+const StudentResults = ({data}) => {
   const { t }: { t: any } = useTranslation();
   const [routine, setRoutine] = useState(null);
   const [slotHeader, setSlotHeader] = useState([]);
@@ -119,13 +119,9 @@ const StudentResults = () => {
   return (
     <>
       <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr min-content' }, gap: { sm: 1 } }}>
-        <Grid>
-          <UncontrolledTextFieldWrapper label="Class" value={studentClass} />
-        </Grid>
-        <Grid>
-          <UncontrolledTextFieldWrapper label="Section" value={section} />
-        </Grid>
-
+        <UncontrolledTextFieldWrapper label="Class" value={data.class} />
+        <UncontrolledTextFieldWrapper label="Section" value={data.section} />
+        
         {routine?.length > 0 &&
           <Grid item className='w-full'>
             <BasicPdfExport ref={routineRef} />

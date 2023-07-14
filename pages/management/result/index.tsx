@@ -176,7 +176,7 @@ function Managementschools() {
 }
 
 Managementschools.getLayout = (page) => (
-  <Authenticated name="teacher">
+  <Authenticated name="result">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

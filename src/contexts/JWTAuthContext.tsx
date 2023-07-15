@@ -195,6 +195,10 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
       .login({ username, password })
       .then((response) => {
         console.log({ response });
+        router.push("/dashboards")
+        // router.prefetch('/dashboards')
+        // .then(() => location.reload() );
+        
         dispatch({
           type: 'LOGIN',
           payload: {
@@ -226,7 +230,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     await authApi
       .superAdminLogInAsAdmin({ user_id })
       .then((response) => {
-        console.log({ response });
+        router.push('/dashboards')
         dispatch({
           type: 'LOGIN',
           payload: {
@@ -238,10 +242,6 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
           }
         });
         
-        router.push("/dashboards").then(() => location.reload() );
-        // router.push('/dashboards').then(() => {router.reload();});
-        // router.push('/dashboards');
-
 
       })
       .catch((err) => {

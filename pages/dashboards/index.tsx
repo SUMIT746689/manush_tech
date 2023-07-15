@@ -6,28 +6,19 @@ import { Authenticated } from 'src/components/Authenticated';
 import DashboardReportsContent from 'src/content/DashboardPages/reports';
 import { SSRHTTPClient } from 'repositories/base';
 import prisma from '@/lib/prisma_client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import { access_token_varify, refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 
 export async function getServerSideProps(context: any) {
-
   let blockCount: any = { holidays: [] };
   try {
 
-    const cookie = context.req.headers.cookie.startsWith('refresh_token=') ? context.req.headers.cookie.replace('refresh_token=', '') : null;
-    console.log({cookie})
-    const refresh_token: any = refresh_token_varify(cookie);
-    console.log({blockCount})
-    // if (refresh_token) return {hasError: true}
-    // if (!refresh_token) return { props: {blockCount} };
-    if (!refresh_token) return { redirect: {destination: '/status/404'}};
-    console.log({ refresh_token })
-
-    console.log({ cookie: cookie });
+    const refresh_token: any = serverSideAuthentication(context);
+    if (!refresh_token) return { redirect: { destination: '/auth/login/basic' } };
 
     const updateHolidays = async () => {
       const resHolidays = await prisma.holiday.findMany({
@@ -135,7 +126,7 @@ export async function getServerSideProps(context: any) {
         break;
 
       default:
-        // return { redirect: {destination: '/status/404'}}
+      // return { redirect: {destination: '/status/404'}}
     }
 
   } catch (err) {

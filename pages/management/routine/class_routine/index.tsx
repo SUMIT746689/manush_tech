@@ -8,9 +8,7 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
 import { Grid } from '@mui/material';
-import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/Routine/Results';
-import { useAuth } from '@/hooks/useAuth';
 import StudentResults from '@/content/Management/Routine/StudentResult';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';

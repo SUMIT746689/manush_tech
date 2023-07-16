@@ -313,7 +313,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Result') {
-      // if (permissionVerify(permissions,['show_section_wise_result','show_student_wise_result','show_student_result'])) 
+      if (permissionVerify(permissions,['create_result','show_section_wise_result','show_student_wise_result','show_student_result'])) 
       ev.push(
         <SidebarMenuItem
           key={key}
@@ -518,7 +518,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Exam Routine' && permissionVerify(permissions, ['show_exam_routine'])) sub_menu();
 
       //result section 
-      if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['show_section_wise_result'])) sub_menu();
+      if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['create_result','show_section_wise_result'])) sub_menu();
       if (item.name === 'Student Wise Result' && permissionVerify(permissions, ['show_student_wise_result'])) sub_menu();
       if (item.name === 'Student Result' && permissionVerify(permissions, ['show_student_result'])) sub_menu();
 

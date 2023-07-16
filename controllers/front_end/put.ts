@@ -34,7 +34,7 @@ async function put(req, res, refresh_token) {
             }
         })
 
-        const query = {};
+        const query:any = {};
         if (files.header_image?.newFilename) {
 
             const header_imageNewName = Date.now().toString() + '_' + files.header_image.originalFilename;
@@ -135,6 +135,7 @@ async function put(req, res, refresh_token) {
                     })
 
                 if (websiteUirow && !flag) {
+                    // @ts-ignore 
                     for (const l of websiteUirow.carousel_image) {
                         const filePath = path.join(process.cwd(),"public", l.path);
                         console.log("filePath__", filePath);

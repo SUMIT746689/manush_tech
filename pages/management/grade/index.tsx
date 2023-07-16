@@ -7,7 +7,6 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
 import { Grid } from '@mui/material';
-import type { Project } from 'src/models/project';
 import Results from '@/content/Management/Grade/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,7 +20,7 @@ function Managementrooms() {
     if (data) setGrade(data);
   }, [data, error]);
 
-  const create_grade = auth?.user?.permissions?.find(i => i?.value == 'create_grade')
+  const create_grade = auth?.user?.permissions?.find((i:any) => i?.value == 'create_grade')
   return (
     <>
       <Head>

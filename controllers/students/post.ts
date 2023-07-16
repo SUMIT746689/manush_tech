@@ -237,7 +237,7 @@ const postHandle = async (req, res, authenticate_user) => {
 
     })
 
-    const sms_res_gatewayinfo = await prisma.smsGateway.findFirst({
+    const sms_res_gatewayinfo:any = await prisma.smsGateway.findFirst({
       where: {
         school_id: authenticate_user?.school_id,
         is_active: true

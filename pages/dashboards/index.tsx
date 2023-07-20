@@ -70,6 +70,13 @@ export async function getServerSideProps(context: any) {
             where: { student_info: { school_id: refresh_token?.school_id } }
           })
         };
+
+        const school = await prisma.school.findFirst({
+          where: {
+            id: refresh_token?.school_id
+          }
+        })
+        blockCount['domain'] = school?.domain || '';
         blockCount['teachers'] = {
           count: await prisma.teacher.count({
             where: { school_id: refresh_token?.school_id }

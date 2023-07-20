@@ -27,13 +27,16 @@ import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
 import Calander from '../calender/calander';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 function DashboardReportsContent({ blockCount = null }) {
   // const [holidays, setHolidays] = useState([]);
   const [dbBtN, setDbBtN] = useState(false)
   const { user } = useAuth();
   const { showNotification } = useNotistick()
-
+  const { t }: { t: any } = useTranslation();
   // useEffect(() => {
   //   // @ts-ignore
   //   axios
@@ -65,6 +68,7 @@ function DashboardReportsContent({ blockCount = null }) {
 
   // }, []);
 
+  console.log("blockCount____________", blockCount.domain);
 
   const handleDBbackup = () => {
     axios.post('/api/db_backup')
@@ -84,10 +88,18 @@ function DashboardReportsContent({ blockCount = null }) {
             <PageHeader />
           </Grid>
           <Grid item>
-            <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
-              Database backup
-            </Button>
-          </Grid>
+
+            <Grid container gap={10}>
+              <Button variant='contained' color='secondary'>
+                <Link href={`${blockCount?.domain}`} color="primary" rel="noopener noreferrer" target="_blank" rel="noopener noreferrer">
+                  {t('Front end link')}
+                </Link>
+              </Button>
+              <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
+                Database backup
+              </Button>
+            </Grid></Grid>
+
 
         </Grid>
       </PageTitleWrapper>

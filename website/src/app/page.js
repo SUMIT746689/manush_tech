@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 import ImgSlider from './ImageSlider';
 import { useRef } from 'react';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
-
+import { useClientFetch } from '../hooks/useClientFetch';
 const inter = Inter({ subsets: ['latin'] });
 
 const navLink = 'px-4 py-3 hover:cursor-pointer hover:bg-blue-900 duration-150';
@@ -203,6 +203,8 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 };
 
 export default function Home() {
+  const { data, reFetchData } = useClientFetch(`${process.env.NEXT_PUBLIC_BASE_API}/api/front_end`);
+  console.log("data__",data);
   // const ref = useRef(null);
   const announceref = useRef(null);
   const noticeRef = useRef(null);

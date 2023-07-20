@@ -576,14 +576,14 @@ model WebsiteUi {
   id                  Int     @id @default(autoincrement())
   header_image        String
   carousel_image      Json?
-  school_history      String?
+  school_history      String? @db.Text
   school_id           Int
   history_photo       String
-  history_description String
+  history_description String? @db.Text
   chairman_photo      String
-  chairman_speech     String
+  chairman_speech     String? @db.Text
   principal_photo     String
-  principal_speech    String
+  principal_speech    String? @db.Text
   latest_news         Json
 
   school School @relation(fields: [school_id], references: [id])

@@ -15,7 +15,7 @@ const postSchool = async (req, res, authenticate_user) => {
     if (authenticate_user_Info.role.title !== 'SUPER_ADMIN')
       throw new Error('Your role have no permissions');
 
-    const { name, phone, email, address, admin_ids, currency } = req.body;
+    const { name, phone, email, address, admin_ids, currency,domain } = req.body;
 
     if (!name || !phone || !email || !address) throw new Error('provide valid data');
     const admins = admin_ids.map((id) => ({ id }));
@@ -26,6 +26,7 @@ const postSchool = async (req, res, authenticate_user) => {
         email,
         address,
         currency,
+        domain,
         admins: { connect: admins }
       }
     });

@@ -39,8 +39,8 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
 
   useEffect(() => {
     if (editSchool) {
-      console.log("editSchool__",editSchool);
-      
+      console.log("editSchool__", editSchool);
+
       handleCreateProjectOpen();
     }
   }, [editSchool]);
@@ -135,6 +135,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               ? Array.from(editSchool.admins, (x: any) => x.id)
               : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
+            domain: editSchool?.domain ? editSchool?.domain : null,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -152,7 +153,8 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               .required(t('The address field is required')),
             admin_ids: Yup.array(
               Yup.number().required(t('The admin_ids field must be number'))
-            ).required('Please select admin.')
+            ).required('Please select admin.'),
+            domain: Yup.string().nullable(),
           })}
           onSubmit={async (
             _values,
@@ -446,6 +448,47 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                     />
                   </Grid>
 
+
+                  <Grid
+                    item
+                    xs={12}
+                    sm={4}
+                    md={3}
+                    justifyContent="flex-end"
+                    textAlign={{ sm: 'right' }}
+                  >
+                    <Box
+                      pr={3}
+                      sx={{
+                        pt: `${theme.spacing(2)}`,
+                        pb: { xs: 1, md: 0 }
+                      }}
+                      alignSelf="center"
+                    >
+                      <b>{t('School Domain')}:</b>
+                    </Box>
+                  </Grid>
+                  <Grid
+                    sx={{
+                      mb: `${theme.spacing(1)}`
+                    }}
+                    item
+                    xs={12}
+                    sm={8}
+                    md={9}
+                  >
+                    <TextField
+                      error={Boolean(touched.domain && errors.domain)}
+                      fullWidth
+                      helperText={touched.domain && errors.domain}
+                      name="domain"
+                      placeholder={t('School domain here...')}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.domain}
+                      variant="outlined"
+                    />
+                  </Grid>
                   <Grid
                     item
                     xs={12}

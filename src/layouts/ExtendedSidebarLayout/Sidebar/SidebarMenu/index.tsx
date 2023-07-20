@@ -183,7 +183,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   };
   if (item.items) {
     if (item.name === 'Academic') {
-      if (permissions.includes('academic')) ev.push(
+      if (permissions.findIndex(i => i.group == 'academic') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -204,7 +204,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Teachers') {
-      if (permissions.includes('teacher')) ev.push(
+      if (permissions.findIndex(i => i.group == 'teacher') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -225,7 +225,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Accounts') {
-      if (permissions.includes('accounts')) ev.push(
+      if (permissions.findIndex(i => i.group == 'accounts') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -266,11 +266,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
 
       );
-      console.log("item__", item);
+      
 
     }
     else if (item.name === 'Certificate') {
-      console.log({ permissions })
+      
       if (permissionVerify(permissions, ['create_certificate_template', 'show_student_certificate', 'show_teacher_certificate', 'show_employee_certificate'])) ev.push(
         <SidebarMenuItem
           key={key}

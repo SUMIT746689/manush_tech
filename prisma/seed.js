@@ -206,7 +206,7 @@ async function seed() {
 
   const teacherPermissions = []
   for (const i of permissions) {
-    if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
+    if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'show_class_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
       i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
       i.value == 'create_student_attendence' || i.value == 'create_exam_attendence' || i.value === 'show_teacher_certificate'
     ) {

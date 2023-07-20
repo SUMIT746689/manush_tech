@@ -398,6 +398,27 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+    else if (item.name === 'Routine') {
+      if (permissionVerify(permissions, ['show_class_routine','show_exam_routine'])) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
     else {
       ev.push(
         <SidebarMenuItem

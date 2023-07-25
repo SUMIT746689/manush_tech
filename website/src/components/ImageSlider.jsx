@@ -1,4 +1,3 @@
-'use client';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -9,7 +8,7 @@ function SamplePrevArrow(props) {
   return (
     <div
       className={`${className}  text-2xl  `}
-      style={{ ...style, display:"relative",left:"10px",zIndex:"50" }}
+      style={{ ...style, display: "relative", left: "10px", zIndex: "50" }}
       onClick={onClick}
     />
   );
@@ -20,13 +19,13 @@ function SampleNextArrow(props) {
   return (
     <div
       className={className}
-      style={{ ...style,display:"relative",right:"10px",zIndex:"50" }}
+      style={{ ...style, display: "relative", right: "10px", zIndex: "50" }}
       onClick={onClick}
     />
   );
 }
 
-const ImageSlider = () => {
+const ImageSlider = ({ carousel_image }) => {
   const settings = {
     dots: true,
     arrows: true,
@@ -69,13 +68,16 @@ const ImageSlider = () => {
   return (
     <>
       <Slider {...settings}>
-          <img src="slider-1.jpg"/>
-          <img src="slider-1.jpg"/>
-          <img src="slider-1.jpg"/>
-          <img src="slider-1.jpg"/>
-        
+        {
+          carousel_image?.map(i=><img className=" max-h-96 object-fill w-screen" src={`${process.env.SERVER_HOST}/${i?.path?.replace(/\\/g, '/')}`} />)
+        }
+        {/* <img src="slider-1.jpg" />
+        <img src="slider-1.jpg" />
+        <img src="slider-1.jpg" />
+        <img src="slider-1.jpg" /> */}
+
       </Slider>
-      </>
+    </>
   )
 };
 

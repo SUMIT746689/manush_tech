@@ -1,82 +1,45 @@
 import Image from 'next/image'
 import React from 'react'
+import prisma from '../../../../src/lib/prisma_client';
+import { headers } from 'next/headers';
 
 
 async function getData() {
-  try {
-    const res = await fetch('http://localhost:3001/api/teacher', { next: { revalidate: 0 } });
-    console.log({ res })
-    if (!res.ok) {
-      throw new Error('Failed to fetch data');
-    }
-    return await res.json();
 
-  }
-  catch (err) {
+  try {
+    const headersList = headers();
+    const domain = headersList.get('host')
+
+    const school = await prisma.school.findFirst({
+      where: {
+        domain: domain
+      }
+    })
+    const data = await prisma.teacher.findMany({
+      where: {
+        school_id: school?.id
+      },
+      select: {
+        first_name: true,
+        photo: true,
+        department: {
+          select: {
+            title: true
+          }
+        }
+      }
+    })
+    return data;
+
+  } catch (err) {
     console.log(err);
     return []
   }
 }
 async function page() {
   const data = await getData();
-  console.log("data__", data);
-  const content = [
-    {
-      id: 1,
-      imgUrl: 'teacher_1.jpg',
-      title: 'A SALEH MD SADEK HOSSAIN',
-      designation: 'Kamil'
-    },
-    {
-      id: 2,
-      imgUrl: 'teacher_2.jpg',
-      title: 'MD GOLAM MOSTAFA (Ap)',
-      designation: 'Kamil'
-    },
-    {
-      id: 3,
-      imgUrl: 'teacher_3.jpg',
-      title: 'MD MONIRUZZAMAN',
-      designation: 'MA'
-    },
-    {
-      id: 4,
-      imgUrl: 'teacher_4.jpg',
-      title: 'MD FAIZULLAH SIDDIQUE',
-      designation: 'Kamil'
-    },
-    // {
-    //   id: 5,
-    //   imgUrl: 'teacher_1.jpg',
-    //   title: 'A SALEH MD SADEK HOSSAIN',
-    //   designation: 'Kamil'
-    // },
-    // {
-    //   id: 6,
-    //   imgUrl: 'teacher_3.jpg',
-    //   title: 'MD MONIRUZZAMAN',
-    //   designation: 'MA'
-    // },
-    // {
-    //   id: 7,
-    //   imgUrl: 'teacher_2.jpg',
-    //   title: 'MD GOLAM MOSTAFA (Ap)',
-    //   designation: 'Kamil'
-    // },
-    // {
-    //   id: 8,
-    //   imgUrl: 'teacher_3.jpg',
-    //   title: 'MD MONIRUZZAMAN',
-    //   designation: 'MA'
-    // },
-    // {
-    //   id: 9,
-    //   imgUrl: 'teacher_4.jpg',
-    //   title: 'MD FAIZULLAH SIDDIQUE',
-    //   designation: 'Kamil'
-    // },
+  // console.log("data__", data);
 
-  ]
   return (
     <div className=' container mx-auto'>
 
@@ -86,20 +49,20 @@ async function page() {
           data?.map(i => (
             <div key={i.id} className="shadow-md p-4 flex justify-between flex-col">
 
-              {/* <Image
+              <Image
                 height={500}
                 width={500}
                 quality={100}
                 className="w-full object-cover h-full"
-                src={i.photo ? `http://localhost:3001/files/${i.photo}` : '/dummy.jpg'}
+                src={i.photo ? `${process.env.SERVER_HOST}/files/${i?.photo}` : '/dummy.jpg'}
                 loading="lazy"
                 alt={""}
-              /> */}
+              />
 
               <div className='grid place-content-center text-center bg-violet-200 p-2'>
-                <h2 className='font-bold'>{i.first_name}
+                <h2 className='font-bold'>{i?.first_name}
                 </h2>
-                {/* <h3>{i.designation}</h3> */}
+                <h3>From {i?.department?.title} department</h3>
               </div>
             </div>
           ))

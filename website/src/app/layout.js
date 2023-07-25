@@ -22,12 +22,13 @@ export default async function RootLayout({ children }) {
       domain: domain
     }
   })
-  console.log("school__", domain, school);
+
   const school_info = await prisma.websiteUi.findFirst({
     where: {
       school_id: school?.id
     }
   })
+  console.log("aaaaaaaaaaaa school_info__", domain, school_info);
 
   return (
     <html lang="en">
@@ -37,7 +38,7 @@ export default async function RootLayout({ children }) {
       <body>
         <LayoutWrapper>
           <Header header_image={school_info?.header_image} />
-          <Nav />
+          <Nav serverhost={process.env.SERVER_HOST} />
           {children}
         </LayoutWrapper>
         <Footer />

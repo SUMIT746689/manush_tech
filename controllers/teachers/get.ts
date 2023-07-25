@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 // @ts-ignore
 export const get = async (req, res) => {
   try {
-    // console.log("request domain__", req.headers.host);
+     console.log("request domain__", req.headers.host);
     let query = {}
 
     if (!req.cookies.refresh_token) {

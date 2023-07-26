@@ -5,14 +5,10 @@ import { headers } from 'next/headers';
 
 export default async function Home(props) {
 
-
   try {
-
     const headersList = headers();
-    const domain = headersList.get('referer')?.slice(0, -1)
-
-
-
+    const domain = headersList.get('host')
+   
     const school_info = await prisma.websiteUi.findFirstOrThrow({
       where: {
         school: {
@@ -22,6 +18,7 @@ export default async function Home(props) {
     })
     // console.log("school_info___",school_info);
     props['params']['school_info'] = "testing"
+
     const speechDatas = [
       {
         title: 'প্রতিষ্ঠানের ইতিহাস',
@@ -40,10 +37,14 @@ export default async function Home(props) {
       },
 
     ]
+
+    const carousel_image = school_info?.carousel_image.map(i => ({
+      path: `${process.env.SERVER_HOST}/${i?.path?.replace(/\\/g, '/')}`
+    }))
     // console.log("domain___",domain,school,school_info);
     return (
       <div>
-        <HomeContent carousel_image={school_info?.carousel_image} speechDatas={speechDatas || []} />
+        <HomeContent carousel_image={carousel_image || []} speechDatas={speechDatas || []} />
       </div>
     )
 

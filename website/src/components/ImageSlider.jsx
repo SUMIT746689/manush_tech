@@ -69,7 +69,7 @@ const ImageSlider = ({ carousel_image }) => {
     <>
       <Slider {...settings}>
         {
-          carousel_image?.map(i=><img className=" max-h-96 object-fill w-screen" src={`${process.env.SERVER_HOST}/${i?.path?.replace(/\\/g, '/')}`} />)
+          carousel_image?.map(i=><img className=" max-h-96 object-fill w-screen" src={`${i?.path}`} />)
         }
         {/* <img src="slider-1.jpg" />
         <img src="slider-1.jpg" />

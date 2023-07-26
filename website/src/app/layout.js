@@ -14,11 +14,11 @@ export const metadata = {
 
 
 export default async function RootLayout(props) {
-  console.log("props___________", props);
+  // console.log("props___________", props);
   const { children } = props
   try {
     const headersList = headers();
-    const domain = headersList.get('referer')?.slice(0, -1)
+    const domain = headersList.get('host')
 
     const school_info = await prisma.websiteUi.findFirstOrThrow({
       where: {

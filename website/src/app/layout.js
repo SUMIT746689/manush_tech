@@ -6,6 +6,7 @@ import LayoutWrapper from '../layout/LayoutWrapper';
 import Nav from '../layout/Nav';
 import prisma from '../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: 'Create Next App',
@@ -13,51 +14,41 @@ export const metadata = {
 };
 
 
-export default async function RootLayout(props) {
-  // console.log("props___________", props);
-  const { children } = props
-  try {
-    const headersList = headers();
-    const domain = headersList.get('host')
+export default async function RootLayout({ children }) {
 
-    const school_info = await prisma.websiteUi.findFirstOrThrow({
-      where: {
-        school: {
-          domain: domain
-        }
-      },
-      select: {
-        header_image: true
+  const headersList = headers();
+  const domain = headersList.get('host')
+
+  const school_info = await prisma.websiteUi.findFirst({
+    where: {
+      school: {
+        domain: domain
       }
-    })
-
-    return (
-      <html lang="en">
-        <Head>
-          <title>Home</title>
-        </Head>
-        <body>
-          <LayoutWrapper>
-            <Header header_image={school_info?.header_image} />
-            <Nav serverhost={process.env.SERVER_HOST} />
-            {children}
-          </LayoutWrapper>
-          <Footer />
-        </body>
-      </html>
-    );
-
-
-  } catch (err) {
-    return (
-      <div className=' grid place-content-center h-screen border-2 text-4xl'>
-
-        <h1 className=" text-center font-bold">
-          Your domain is not registered !!
-        </h1>
-
-      </div>
-    )
+    },
+    select: {
+      header_image: true
+    }
+  })
+  if (!school_info) {
+    redirect('/school-not-found')
   }
+  return (
+    <html lang="en">
+      <Head>
+        <title>Home</title>
+      </Head>
+      <body>
+        <LayoutWrapper>
+          <Header header_image={school_info?.header_image} />
+          <Nav serverhost={process.env.SERVER_HOST} />
+          {children}
+        </LayoutWrapper>
+        <Footer />
+      </body>
+    </html>
+  );
+
+
+
 
 }

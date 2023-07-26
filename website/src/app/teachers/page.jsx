@@ -10,14 +10,11 @@ async function getData() {
     const headersList = headers();
     const domain = headersList.get('host')
 
-    const school = await prisma.school.findFirst({
-      where: {
-        domain: domain
-      }
-    })
     const data = await prisma.teacher.findMany({
       where: {
-        school_id: school?.id
+        school:{
+          domain: domain
+        }
       },
       select: {
         first_name: true,

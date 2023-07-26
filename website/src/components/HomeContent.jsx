@@ -222,7 +222,7 @@ export default function HomeContent({ carousel_image,speechDatas }) {
   // console.log(`Render Section `, { isVisible })
  
 
-console.log("speechDatas__",speechDatas);
+// console.log("speechDatas__",speechDatas);
   return (
     <div>
       {/* slider */}

@@ -13,23 +13,24 @@ export const metadata = {
 };
 
 
-export default async function RootLayout({ children }) {
-
+export default async function RootLayout(props) {
+  console.log("props___________", props);
+  const { children } = props
   try {
     const headersList = headers();
     const domain = headersList.get('referer')?.slice(0, -1)
 
-    const school = await prisma.school.findFirstOrThrow({
+    const school_info = await prisma.websiteUi.findFirstOrThrow({
       where: {
-        domain: domain
+        school: {
+          domain: domain
+        }
+      },
+      select: {
+        header_image: true
       }
     })
 
-    const school_info = await prisma.websiteUi.findFirstOrThrow({
-      where: {
-        school_id: school.id
-      }
-    })
     return (
       <html lang="en">
         <Head>

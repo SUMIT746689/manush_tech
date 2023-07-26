@@ -3,24 +3,25 @@ import HomeContent from "../components/HomeContent";
 import prisma from '../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
 
-export default async function Home() {
+export default async function Home(props) {
+
 
   try {
+
     const headersList = headers();
     const domain = headersList.get('referer')?.slice(0, -1)
 
-    const school = await prisma.school.findFirstOrThrow({
-      where: {
-        domain: domain
-      }
-    })
+
 
     const school_info = await prisma.websiteUi.findFirstOrThrow({
       where: {
-        school_id: school.id
-      }
+        school: {
+          domain: domain
+        }
+      },
     })
-
+    // console.log("school_info___",school_info);
+    props['params']['school_info'] = "testing"
     const speechDatas = [
       {
         title: 'প্রতিষ্ঠানের ইতিহাস',
@@ -42,7 +43,7 @@ export default async function Home() {
     // console.log("domain___",domain,school,school_info);
     return (
       <div>
-        <HomeContent school_info={school_info} carousel_image={school_info?.carousel_image} speechDatas={speechDatas || []} />
+        <HomeContent carousel_image={school_info?.carousel_image} speechDatas={speechDatas || []} />
       </div>
     )
 

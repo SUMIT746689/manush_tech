@@ -14,35 +14,49 @@ export const metadata = {
 
 
 export default async function RootLayout({ children }) {
-  const headersList = headers();
-  const domain = headersList.get('host')
 
-  const school = await prisma.school.findFirst({
-    where: {
-      domain: domain
-    }
-  })
+  try {
+    const headersList = headers();
+    const domain = headersList.get('referer')?.slice(0, -1)
 
-  const school_info = await prisma.websiteUi.findFirst({
-    where: {
-      school_id: school?.id
-    }
-  })
-  console.log("aaaaaaaaaaaa school_info__", domain, school_info);
+    const school = await prisma.school.findFirstOrThrow({
+      where: {
+        domain: domain
+      }
+    })
 
-  return (
-    <html lang="en">
-      <Head>
-        <title>Home</title>
-      </Head>
-      <body>
-        <LayoutWrapper>
-          <Header header_image={school_info?.header_image} />
-          <Nav serverhost={process.env.SERVER_HOST} />
-          {children}
-        </LayoutWrapper>
-        <Footer />
-      </body>
-    </html>
-  );
+    const school_info = await prisma.websiteUi.findFirstOrThrow({
+      where: {
+        school_id: school.id
+      }
+    })
+    return (
+      <html lang="en">
+        <Head>
+          <title>Home</title>
+        </Head>
+        <body>
+          <LayoutWrapper>
+            <Header header_image={school_info?.header_image} />
+            <Nav serverhost={process.env.SERVER_HOST} />
+            {children}
+          </LayoutWrapper>
+          <Footer />
+        </body>
+      </html>
+    );
+
+
+  } catch (err) {
+    return (
+      <div className=' grid place-content-center h-screen border-2 text-4xl'>
+
+        <h1 className=" text-center font-bold">
+          Your domain is not registered !!
+        </h1>
+
+      </div>
+    )
+  }
+
 }

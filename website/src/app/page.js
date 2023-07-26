@@ -4,43 +4,59 @@ import prisma from '../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
 
 export default async function Home() {
-  const headersList = headers();
-  const domain = headersList.get('host')
 
-  const school = await prisma.school.findFirst({
-    where: {
-      domain: domain
-    }
-  })
+  try {
+    const headersList = headers();
+    const domain = headersList.get('referer')?.slice(0, -1)
 
-  const school_info = await prisma.websiteUi.findFirst({
-    where: {
-      school_id: school?.id
-    }
-  })
-  console.log("aaaaaaaaaaaa school_info__", domain, school_info);
+    const school = await prisma.school.findFirstOrThrow({
+      where: {
+        domain: domain
+      }
+    })
 
-  const speechDatas = [
-    {
-      title: 'প্রতিষ্ঠানের ইতিহাস',
-      image: `${process.env.SERVER_HOST}/${school_info?.history_photo?.replace(/\\/g, '/')}`,
-      description: school_info?.school_history
-    },
-    {
-      title: 'সভাপতির বাণী',
-      image: `${process.env.SERVER_HOST}/${school_info?.chairman_photo?.replace(/\\/g, '/')}`,
-      description: school_info?.chairman_speech
-    },
-    {
-      title: 'অধ্যক্ষের বাণী',
-      image: `${process.env.SERVER_HOST}/${school_info?.principal_photo?.replace(/\\/g, '/')}`,
-      description: school_info?.principal_speech
-    },
+    const school_info = await prisma.websiteUi.findFirstOrThrow({
+      where: {
+        school_id: school.id
+      }
+    })
 
-  ]
-  return (
-    <div>
-      <HomeContent carousel_image={school_info?.carousel_image} speechDatas={speechDatas || []} />
-    </div>
-  );
+    const speechDatas = [
+      {
+        title: 'প্রতিষ্ঠানের ইতিহাস',
+        image: `${process.env.SERVER_HOST}/${school_info?.history_photo?.replace(/\\/g, '/')}`,
+        description: school_info?.school_history
+      },
+      {
+        title: 'সভাপতির বাণী',
+        image: `${process.env.SERVER_HOST}/${school_info?.chairman_photo?.replace(/\\/g, '/')}`,
+        description: school_info?.chairman_speech
+      },
+      {
+        title: 'অধ্যক্ষের বাণী',
+        image: `${process.env.SERVER_HOST}/${school_info?.principal_photo?.replace(/\\/g, '/')}`,
+        description: school_info?.principal_speech
+      },
+
+    ]
+    // console.log("domain___",domain,school,school_info);
+    return (
+      <div>
+        <HomeContent school_info={school_info} carousel_image={school_info?.carousel_image} speechDatas={speechDatas || []} />
+      </div>
+    )
+
+  } catch (err) {
+    console.log(err);
+    return (
+      <div className=' grid place-content-center h-screen border-2 text-4xl'>
+
+        <h1 className=" text-center font-bold">
+          Your domain is not registered !!
+        </h1>
+
+      </div>
+    )
+  }
+
 }

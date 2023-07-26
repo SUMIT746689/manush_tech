@@ -116,7 +116,7 @@ const NavLinks = ({serverhost}) => {
         </div>
         <div className="absolute z-10 hidden bg-grey-200 group-hover:block">
 
-          <div className={`px-2 pt-2 pb-4 ${primaryBgColor} ${primaryColor} shadow-lg`}>
+          <div className={`px-2 pt-2 pb-4 ${primaryBgColor} ${primaryColor} shadow-lg rounded-b-lg`}>
             <div className={`flex flex-col h-80 w-full overflow-y-scroll  scrollbar `}>
               {
                 classList.map(i =>

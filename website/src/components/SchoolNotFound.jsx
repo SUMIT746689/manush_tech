@@ -1,5 +1,5 @@
 
-async function page() {
+const SchoolNotFound = () => {
     return (
         <div className=' grid place-content-center h-screen border-2 text-4xl'>
 
@@ -8,7 +8,8 @@ async function page() {
             </h1>
 
         </div>
-    )
-}
+    );
+};
 
-export default page
+export default SchoolNotFound;
+

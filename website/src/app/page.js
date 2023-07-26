@@ -2,12 +2,15 @@ import HomeContent from "../components/HomeContent";
 
 import prisma from '../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
+import { redirect } from "next/navigation";
 
 
 export default async function Home(props) {
 
   const headersList = headers();
   const domain = headersList.get('host')
+  
+ console.log("path___",headersList.get('x-url'));
 
   const school_info = await prisma.websiteUi.findFirst({
     where: {
@@ -16,10 +19,11 @@ export default async function Home(props) {
       }
     },
   })
+ 
   // if (!school_info) {
   //   redirect('/school-not-found')
   // }
-  // console.log("school_info___",school_info);
+ 
   props['params']['school_info'] = "testing"
 
   const speechDatas = [

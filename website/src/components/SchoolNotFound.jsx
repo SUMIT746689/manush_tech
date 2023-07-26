@@ -1,13 +1,18 @@
 
 const SchoolNotFound = () => {
     return (
-        <div className=' grid place-content-center h-screen border-2 text-4xl'>
+        <html lang="en">
+            <body>
+                <div className=' grid place-content-center h-screen border-2 text-4xl'>
 
-            <h1 className=" text-center font-bold">
-                Your domain is not registered !!
-            </h1>
+                    <h1 className=" text-center font-bold">
+                        Your domain is not registered !!
+                    </h1>
 
-        </div>
+                </div>
+            </body>
+        </html>
+
     );
 };
 

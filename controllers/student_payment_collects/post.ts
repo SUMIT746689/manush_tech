@@ -44,15 +44,18 @@ export const post = async (req, res, refresh_token) => {
 
     const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
 
-    const last_date = dayjs(fee.last_date).valueOf()
-    const last_trnsation_date = isAlreadyAvaliable._max.created_at ? dayjs(isAlreadyAvaliable._max.created_at).valueOf() : dayjs().valueOf();
+    const last_date = new Date(fee.last_date)
+
+    const last_trnsation_date = isAlreadyAvaliable._max.created_at ? new Date(isAlreadyAvaliable._max.created_at) : new Date();
+
     const late_fee = fee.late_fee ? fee.late_fee : 0;
 
     if (last_trnsation_date > last_date) {
 
-      if (totalPaidAmount === fee.amount + late_fee) throw new Error('Already Paid Amount last_trnsation_date > last_date');
+      if (totalPaidAmount === fee.amount + late_fee) throw new Error('Already Paid in Late');
+      
       else if (totalPaidAmount < fee.amount + late_fee) {
-        if (collected_amount + totalPaidAmount > fee.amount + late_fee) throw new Error(`Only pay ${fee.amount + late_fee-totalPaidAmount} !`)
+        if (collected_amount + totalPaidAmount > fee.amount + late_fee) throw new Error(`Only pay ${fee.amount + late_fee - totalPaidAmount} !`)
         else {
           const temp = await prisma.studentFee.create({
             data
@@ -74,26 +77,25 @@ export const post = async (req, res, refresh_token) => {
       }
     }
     else {
-      
-        if (fee.amount == collected_amount + totalPaidAmount) throw new Error(`Already Paid Amount ${last_trnsation_date}   ${new Date(last_date)} ${fee.amount} == ${collected_amount + totalPaidAmount}`);
-        else if (totalPaidAmount + collected_amount > fee.amount) throw new Error(`you paid ${totalPaidAmount},now pay ${ fee.amount-totalPaidAmount} amount !`)
-        else {
-          const temp = await prisma.studentFee.create({
-            data
-          });
-          await prisma.transaction.create({
-            data: {
-              amount: data.collected_amount,
-              payment_method: data.payment_method,
-              voucher_id: voucher.id,
-              school_id: refresh_token.school_id,
-              created_at: temp.created_at
-            }
-          })
-          res.status(200).json({
-            success: true
-          });
-        }
+
+      if (totalPaidAmount + collected_amount > fee.amount) throw new Error(`you paid ${fee.amount - totalPaidAmount},now pay ${totalPaidAmount + collected_amount - fee.amount} amount !`)
+      else {
+        const temp = await prisma.studentFee.create({
+          data
+        });
+        await prisma.transaction.create({
+          data: {
+            amount: data.collected_amount,
+            payment_method: data.payment_method,
+            voucher_id: voucher.id,
+            school_id: refresh_token.school_id,
+            created_at: temp.created_at
+          }
+        })
+        res.status(200).json({
+          success: true
+        });
+      }
     }
 
   } catch (err) {

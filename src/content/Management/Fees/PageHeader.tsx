@@ -146,7 +146,7 @@ function PageHeader({
                 handleCreateUserSuccess();
                 reFetchData();
               };
-              _values['last_date'] = new Date(_values.last_date).setHours(12,0,0,0);
+              _values['last_date'] = new Date(_values.last_date).setHours(23,59,0,0);
               // dayjs(_values.last_date).format('YYYY-MM-DD')
 
 

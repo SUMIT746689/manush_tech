@@ -5,7 +5,7 @@ import { serialize } from 'cookie';
 
 const prisma = new PrismaClient();
 
-export default async function put(req, res, refresh_token) {
+export default async function post(req, res, refresh_token) {
   try {
     const {
       title,

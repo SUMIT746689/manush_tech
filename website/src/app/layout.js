@@ -28,7 +28,7 @@ export default async function RootLayout({ children }) {
       header_image: true
     }
   })
-
+  console.log("in layout__", domain, school_info);
   return (
     school_info ?
       <html lang="en">

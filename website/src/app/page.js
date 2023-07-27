@@ -48,7 +48,7 @@ export default async function Home(props) {
   const carousel_image = school_info?.carousel_image.map(i => ({
     path: `${process.env.SERVER_HOST}/${i?.path?.replace(/\\/g, '/')}`
   }))
-  // console.log("domain___",domain,school,school_info);
+   console.log("domain___",domain,school,school_info);
   return (
     <div>
       <HomeContent carousel_image={carousel_image || []} speechDatas={speechDatas || []} />

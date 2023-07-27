@@ -376,7 +376,7 @@ const Results: FC<ResultsProps> = ({
                           <Typography noWrap variant="h5" sx={{
                             color: 'green'
                           }}>
-                            {dayjs(fee?.last_date).format('YYYY-MM-DD , hh:mm A')}
+                            {dayjs(fee?.last_date).format('YYYY-MM-DD , HH:mm')}
                           </Typography>
                         </TableCell>
                         <TableCell>

@@ -20,13 +20,13 @@ import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import useNotistick from '@/hooks/useNotistick';
-import { DateTimePicker, MobileDatePicker, MobileTimePicker } from '@mui/lab';
+import { DateTimePicker, MobileDatePicker, MobileDateTimePicker, MobileTimePicker } from '@mui/lab';
 
 function RegistrationFirstPart({
   setTotalFormData,
   setActiveStep,
   handleCreateClassClose,
-  student=null,
+  student = null,
 }) {
   console.log("heelo", student);
   const { t }: { t: any } = useTranslation();
@@ -135,15 +135,13 @@ function RegistrationFirstPart({
           admission_no: Yup.string().required(
             t('Admission number is required!')
           ),
-          admission_date: Yup.string().required(
-            t('Admission date is required!')
-          ),
+          admission_date: Yup.date().required(t('Admission date is required!')),
           date_of_birth: Yup.date().required(t('Date of birth is required!')),
           gender: Yup.string().required(t('select a gender')),
           blood_group: Yup.string().nullable(true),
           religion: Yup.string().nullable(true),
           phone: Yup.string().required(t('Phone number is required!'))
-          .min(11, 'Phone number must be 11 character'),
+            .min(11, 'Phone number must be greater then or equals 11 character'),
           email: Yup.string(),
           national_id: Yup.string()
         })}
@@ -157,7 +155,7 @@ function RegistrationFirstPart({
             setActiveStep(1);
           } catch (err) {
             console.error(err);
-            showNotification('There was an error, try again later','error');
+            showNotification('There was an error, try again later', 'error');
             setStatus({ success: false });
             // @ts-ignore
             setErrors({ submit: err.message });
@@ -190,7 +188,7 @@ function RegistrationFirstPart({
                     {/* first_name */}
                     <Grid item xs={12} sm={6} md={4}>
                       <TextField
-                        required
+                        // required
                         size="small"
                         sx={{
                           '& fieldset': {
@@ -254,7 +252,7 @@ function RegistrationFirstPart({
                     {/* admission_no   */}
                     <Grid item xs={12}>
                       <TextField
-                        required
+                        // required
                         size="small"
                         sx={{
                           '& fieldset': {
@@ -277,73 +275,84 @@ function RegistrationFirstPart({
 
                     {/* admission_date */}
                     <Grid item xs={12} md={6}>
-                     
-                        <DateTimePicker
-                          label="admission Date"
-                          value={values.admission_date}
-                          onChange={(n:any) => {
-                            const newValue = dayjs(n)
 
-                            // dayjs(newValue).format('H:m:ss')
-                            if (n) {
-                              console.log("admission_date__",newValue);
-                              //@ts-ignore
-                              setFieldValue('admission_date', newValue.$d);
-                              setAdmission_date(newValue);
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              required
-                              fullWidth
-                              size="small"
-                              sx={{
-                                '& fieldset': {
-                                  borderRadius: '3px'
-                                }
-                              }}
-                              {...params}
-                            />
-                          )}
-                        />
-                     
+                      <MobileDateTimePicker
+                        label="admission Date"
+                        value={values.admission_date}
+                        renderInput={(params) => (
+                          <TextField
+                            required
+                            fullWidth
+                            size="small"
+                            name='admission_date'
+                            onBlur={handleBlur}
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              },
+                              // color:"red"
+                            }}
+                            {...params}
+                          />
+                        )}
+                        onChange={(n: any) => {
+                          const newValue = dayjs(n)
+
+                          // dayjs(newValue).format('H:m:ss')
+                          if (n) {
+                            console.log("admission_date__", newValue);
+                            //@ts-ignore
+                            setFieldValue('admission_date', newValue.$d);
+
+                          }
+                        }}
+
+
+                      />
+                      {
+                        errors.admission_date && <span style={{ color: 'red' }}> Admission date are required</span>
+                      }
                     </Grid>
 
                     {/* date_of_birth */}
                     <Grid item xs={12} md={6}>
-                        <MobileDatePicker
-                          label="Date of birth"
-                          value={values.date_of_birth}
-                          onChange={(n) => {
-                            // console.log("start time__hour",newValue.$H);
-                            // console.log("start time__hour",newValue.$m);
-                            if (n) {
-                              // setFieldValue("date_of_birth", `1970-05-02 ${newValue.$H}:${newValue.$m}:00+0000`)
-                              // @ts-ignore
-                              const newValue = dayjs(n)
+                      <MobileDatePicker
+                        label="Date of birth"
+                        value={values.date_of_birth}
+                        onChange={(n) => {
+                          // console.log("start time__hour",newValue.$H);
+                          // console.log("start time__hour",newValue.$m);
+                          if (n) {
+                            // setFieldValue("date_of_birth", `1970-05-02 ${newValue.$H}:${newValue.$m}:00+0000`)
+                            // @ts-ignore
+                            const newValue = dayjs(n)
 
-                                  // dayjs(newValue).format('H:m:ss')
-                                 //@ts-ignore
-                              setFieldValue('date_of_birth', newValue.$d);
-                              setDate_of_birth(newValue);
-                              console.log(newValue);
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              required
-                              fullWidth
-                              size="small"
-                              sx={{
-                                '& fieldset': {
-                                  borderRadius: '3px'
-                                }
-                              }}
-                              {...params}
-                            />
-                          )}
-                        />
-                     
+                            // dayjs(newValue).format('H:m:ss')
+                            //@ts-ignore
+                            setFieldValue('date_of_birth', newValue.$d);
+                            setDate_of_birth(newValue);
+                            console.log(newValue);
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            required
+                            fullWidth
+                            name='date_of_birth'
+                            size="small"
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                            {...params}
+                          />
+                        )}
+                      />
+                      {
+                        errors.date_of_birth && <span style={{ color: 'red' }}> Date of birth are required</span>
+                      }
+
                     </Grid>
 
                     {/* Gender */}
@@ -439,7 +448,7 @@ function RegistrationFirstPart({
                         onBlur={handleBlur}
                         onChange={handleChange}
                         type="text"
-                        required
+                        // required
                         value={values.phone}
                         variant="outlined"
                       />

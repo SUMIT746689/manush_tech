@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+  app:
+    build:
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: mysql://root:mypassword@db:3306/school
+    ports:
+      - "3000:3000"
+    # todo: need to persist files
+    #map ports
+    #tell to use system network, if I use system network then should I need to map?
+    # network_mode: host

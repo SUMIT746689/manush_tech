@@ -1,0 +1,29 @@
+
+FROM node
+
+ENV PORT 3000
+
+# Create app directory
+RUN mkdir -p /app
+WORKDIR /app
+
+# Installing dependencies
+COPY . /app
+# COPY package*.json /app
+RUN npm install -g npm@9.8.0
+RUN npm install --legacy-peer-deps
+
+# Copying source files
+
+RUN npx prisma generate 
+# RUN npx prisma migrate dev
+
+# Building app
+RUN npm run build
+
+# RUN npm run dev
+EXPOSE 3000
+
+# Running the app
+CMD "npm" "start"
+# CMD "npm" "run" "dev"

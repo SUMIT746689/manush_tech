@@ -439,7 +439,7 @@ model ExamDetails {
   exam_id       Int
   subject_id    Int
   subject_total Float
-  exam_date     DateTime @db.DateTime()
+  exam_date     DateTime
 
   exam    Exam    @relation(fields: [exam_id], references: [id])
   subject Subject @relation(fields: [subject_id], references: [id])

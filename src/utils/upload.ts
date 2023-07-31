@@ -1,6 +1,7 @@
 import formidable from "formidable";
 import path from "path";
-import fs from "fs/promises";
+import fsp from "fs/promises";
+import fs from 'fs';
 
 export const saveImage = (req, saveLocally) => {
 
@@ -31,25 +32,25 @@ export const saveImage = (req, saveLocally) => {
 };
 export const imageFolder = async () => {
     try {
-        await fs.readdir(path.join(process.cwd() + "/public", "/files"));
+        await fsp.readdir(path.join(process.cwd() + "/public", "/files"));
     } catch (error) {
-        await fs.mkdir(path.join(process.cwd() + "/public", "/files"));
+        await fsp.mkdir(path.join(process.cwd() + "/public", "/files"));
     }
 }
 export const certificateTemplateFolder = async (foldername: string) => {
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/files`));
+        await fsp.readdir(path.join(process.cwd(), `/files`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/files`));
+        await fsp.mkdir(path.join(process.cwd(), `/files`));
     }
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/files`, `${foldername}`));
+        await fsp.readdir(path.join(process.cwd(), `/files`, `${foldername}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/files`, `${foldername}`));
+        await fsp.mkdir(path.join(process.cwd(), `/files`, `${foldername}`));
     }
 
 }
@@ -147,15 +148,15 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
     let error = null;
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.readdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
+        await fsp.readdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fs.mkdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
+        await fsp.mkdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
     }
 
 
     const uploadDir = path.join(process.cwd() + "/public", `${uploadFolderName}`);
-console.log("uploadDir__",uploadDir);
+    console.log("uploadDir__", uploadDir);
 
     const customOptions = {
         keepExtensions: true,
@@ -210,11 +211,18 @@ console.log("uploadDir__",uploadDir);
 export const fileRename = async (file, newFilePath) => {
     return new Promise(async (resolve, reject) => {
         try {
-            await fs.rename(file.filepath, newFilePath)
+            await fsp.rename(file.filepath, newFilePath)
             resolve('File renamed !')
         } catch (err) {
             reject('File rename failed!')
         }
     })
 
+}
+
+export const fileDelete = (path) => {
+    const filePath = path.join(process.cwd(), ...path);
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+    }
 }

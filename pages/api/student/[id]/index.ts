@@ -5,7 +5,7 @@ import fsp from 'fs/promises';
 import fs from 'fs';
 import formidable from 'formidable';
 import prisma from '@/lib/prisma_client';
-import { fileUpload } from '@/utils/upload';
+import { fileDelete, fileUpload } from '@/utils/upload';
 
 export const config = {
     api: {
@@ -53,14 +53,6 @@ const id = async (req, res) => {
 
             case 'PATCH':
                 try {
-
-                    try {
-                        await fsp.readdir(path.join(process.cwd() + '/public', '/files'));
-                    } catch (error) {
-                        await fsp.mkdir(path.join(process.cwd() + '/public', '/files'));
-                    }
-
-
                     const uploadFolderName = "files";
                     const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
                     const filterFiles = {
@@ -94,6 +86,10 @@ const id = async (req, res) => {
                         }
                         throw new Error('Required field value missing !!')
                     }
+
+
+                  
+
 
                     const hashPassword = fields?.password && fields?.password != '' ? await bcrypt.hash(
                         fields?.password,
@@ -174,6 +170,34 @@ const id = async (req, res) => {
                                 }
                             }
                         });
+                        const studentPast = await transaction.student.findFirst({
+                            where: {
+                                id: student_id
+                            },
+                            select: {
+                                student_photo: true,
+                                guardian_photo: true,
+                                student_info: {
+                                    select: {
+                                        father_photo: true,
+                                        mother_photo: true,
+                                    }
+                                }
+                            }
+                        })
+    
+                        if (student_photo_name) {
+                            fileDelete(["public", "files", studentPast?.student_photo])
+                        }
+                        if (father_photo_name) {
+                            fileDelete(["public", "files", studentPast?.student_info?.father_photo])
+                        }
+                        if (mother_photo_name) {
+                            fileDelete(["public", "files", studentPast?.student_info?.mother_photo])
+                        }
+                        if (guardian_photo_name) {
+                            fileDelete(["public", "files", studentPast?.guardian_photo])
+                        }
 
                     })
 

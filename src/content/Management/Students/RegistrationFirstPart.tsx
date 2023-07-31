@@ -20,7 +20,7 @@ import Radio from '@mui/material/Radio';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import useNotistick from '@/hooks/useNotistick';
-import { DateTimePicker, MobileDatePicker, MobileDateTimePicker, MobileTimePicker } from '@mui/lab';
+import { MobileDatePicker, MobileDateTimePicker } from '@mui/lab';
 
 function RegistrationFirstPart({
   setTotalFormData,
@@ -28,61 +28,10 @@ function RegistrationFirstPart({
   handleCreateClassClose,
   student = null,
 }) {
-  console.log("heelo", student);
   const { t }: { t: any } = useTranslation();
-  const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
-
-  const [academicYears, setacademicYears] = useState([]);
-  const [classes, setClasses] = useState([]);
-  const [selectedClass, setselectedClass] = useState(null);
-  const [admission_date, setAdmission_date] = useState<Dayjs | null>(null);
-  const [date_of_birth, setDate_of_birth] = useState<Dayjs | null>(null);
-  const [sectionsForSelectedClass, setSectionsForSelectedClass] = useState([]);
   const [gender, setGender] = useState('male');
 
-
-  useEffect(() => {
-    if (selectedClass) {
-      axios
-        .get(`/api/class/${selectedClass}`)
-        .then((res) => {
-          console.log(res.data);
-          setSectionsForSelectedClass(res.data?.sections);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [selectedClass]);
-
-  useEffect(() => {
-    axios
-      .get('/api/academic_years')
-      .then((res) =>
-        setacademicYears(
-          res?.data?.data?.map((i) => {
-            return {
-              label: i.title,
-              id: i.id
-            };
-          }) || []
-        )
-      )
-      .catch((err) => console.log(err));
-
-    axios
-      .get('/api/class')
-      .then((res) => {
-        setClasses(
-          res.data?.map((i) => {
-            return {
-              label: i.name,
-              id: i.id
-            };
-          })
-        );
-      })
-      .catch((err) => console.log(err));
-  }, []);
   return (
     <>
       <Formik
@@ -90,41 +39,16 @@ function RegistrationFirstPart({
           first_name: student ? student?.student_info?.first_name : undefined,
           middle_name: student ? student?.student_info?.middle_name : '',
           last_name: student ? student?.student_info?.last_name : '',
-          // section_id: null,
-          // password: '',
-          // confirm_password: '',
-          // academic_year_id: 0,
-          admission_no: student ? student?.student_info?.admission_no : '',
+          admission_no: student ? student?.student_info?.admission_no : undefined,
           admission_date: student ? student?.student_info?.admission_date : null,
-          // admission_status: '',
           date_of_birth: student ? student?.student_info?.date_of_birth : null,
           gender: student ? student?.student_info?.gender : 'male',
           blood_group: student ? student?.student_info?.blood_group : '',
           religion: student ? student?.student_info?.religion : '',
           phone: student ? student?.student_info?.phone : undefined,
           email: student ? student?.student_info?.email : '',
-          national_id: '',
-          // roll_no: '',
-          // registration_no: '',
-          // discount: 0,
+          national_id: student ? student?.student_info?.national_id : '',
           student_photo: null
-          // student_admission_status: '',
-          // father_name: '',
-          // father_phone: '',
-          // father_profession: '',
-          // father_photo: null,
-          // mather_name: '',
-          // mather_phone: '',
-          // mather_profession: '',
-          // mather_photo: null,
-          // guardian_name: '',
-          // guardian_phone: '',
-          // guardian_profession: '',
-          // guardian_photo: null,
-          // relation_with_guardian: '',
-          // student_present_address: '',
-          // student_permanent_address: '',
-          // previous_school: ''
         }}
         validationSchema={Yup.object().shape({
           first_name: Yup.string()
@@ -278,6 +202,7 @@ function RegistrationFirstPart({
 
                       <MobileDateTimePicker
                         label="admission Date"
+                        inputFormat='dd/MM/yyyy hh:mm a'
                         value={values.admission_date}
                         renderInput={(params) => (
                           <TextField
@@ -302,7 +227,7 @@ function RegistrationFirstPart({
                           if (n) {
                             console.log("admission_date__", newValue);
                             //@ts-ignore
-                            setFieldValue('admission_date', newValue.$d);
+                            setFieldValue('admission_date', newValue);
 
                           }
                         }}
@@ -318,6 +243,7 @@ function RegistrationFirstPart({
                     <Grid item xs={12} md={6}>
                       <MobileDatePicker
                         label="Date of birth"
+                        inputFormat='dd/MM/yyyy'
                         value={values.date_of_birth}
                         onChange={(n) => {
                           // console.log("start time__hour",newValue.$H);
@@ -329,9 +255,8 @@ function RegistrationFirstPart({
 
                             // dayjs(newValue).format('H:m:ss')
                             //@ts-ignore
-                            setFieldValue('date_of_birth', newValue.$d);
-                            setDate_of_birth(newValue);
-                            console.log(newValue);
+                            setFieldValue('date_of_birth', newValue);
+
                           }
                         }}
                         renderInput={(params) => (

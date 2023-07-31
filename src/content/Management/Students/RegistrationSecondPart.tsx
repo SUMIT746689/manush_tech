@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,9 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import { registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import { FileUploadFieldWrapper } from '@/components/TextFields';
+import Image from 'next/image';
 
 function RegistrationSecondPart({
   totalFormData,
@@ -32,6 +35,7 @@ function RegistrationSecondPart({
   const [selectedClass, setselectedClass] = useState(null);
   const [selecetedSection, setSelecetedSection] = useState(null);
   const [sectionsForSelectedClass, setSectionsForSelectedClass] = useState([]);
+  const [student_photo, setStudent_photo] = useState(null)
 
   const [classesOptions, setClassesOptions] = useState(null)
 
@@ -49,7 +53,7 @@ function RegistrationSecondPart({
     if (classesOptions && student) {
       setselectedClass(classesOptions?.find(i => i.id == student?.section?.class_id))
     }
-  }, [classesOptions , student])
+  }, [classesOptions, student])
 
 
   useEffect(() => {
@@ -73,12 +77,12 @@ function RegistrationSecondPart({
   }, [student])
 
   useEffect(() => {
-    if (student && sectionsForSelectedClass.length > 0) {
+    if (student && sectionsForSelectedClass?.length > 0) {
       console.log("sectionsForSelectedClass__", sectionsForSelectedClass);
       setSelecetedSection(sectionsForSelectedClass.find(i => i.id == student.section.id))
     }
     // setSelecetedSection(sectionsForSelectedClass)
-  }, [sectionsForSelectedClass,student])
+  }, [sectionsForSelectedClass, student])
 
   const handleClassSelect = (event, value, setFieldValue) => {
     setFieldValue("class_id", value?.id)
@@ -119,11 +123,11 @@ function RegistrationSecondPart({
           section_id: student ? student?.section?.id : undefined,
           academic_year_id: student ? student?.academic_year_id : undefined,
           roll_no: student ? student?.class_roll_no : undefined,
-          registration_no: registration_no_generate(),
+          registration_no: student ? student?.class_registration_no : registration_no_generate(),
           discount: student ? student?.discount : 0,
           student_photo: null,
-          student_present_address: student ? student?.student_info?.student_permanent_address : '',
-          student_permanent_address: student ? student?.student_info?.student_present_address : '',
+          student_present_address: student ? student?.student_present_address : '',
+          student_permanent_address: student ? student?.student_info?.student_permanent_address : '',
           previous_school: student ? student?.student_info?.previous_school : ''
         }}
         validationSchema={Yup.object().shape({
@@ -167,43 +171,8 @@ function RegistrationSecondPart({
           { resetForm, setErrors, setStatus, setSubmitting }
         ) => {
           try {
-            console.log('clicked');
-
             setActiveStep(2);
             setTotalFormData((value) => ({ ...value, ..._values }));
-            // _values = {
-            //   ..._values,
-            //   // @ts-ignore
-            //   school_id: user?.school_id
-            // };
-            // console.log('__values ', _values);
-
-            // const formData = new FormData();
-
-            // for (let i in _values) {
-            //   formData.append(`${i}`, _values[i]);
-            // }
-
-            // for (const pair of formData.entries()) {
-            //   console.log(`${pair[0]}, ${pair[1]}`);
-            // }
-
-            // await axios
-            //   .post(`/api/student`, formData, {
-            //     // headers: {
-            //     //   Authorization: `Bearer ${token}`
-            //     // }
-            //   })
-            //   .then(() => {
-            //     resetForm();
-            //     setStatus({ success: true });
-            //     setSubmitting(false);
-            //     handleCreateUserSuccess();
-            //     setUsersFlag(true);
-            //     setselectedClass(null);
-            //     setSectionsForSelectedClass([]);
-            //   });
-            // await wait(1000);
           } catch (err) {
             console.error(err);
             showNotification('There was an error, try again later', 'error');
@@ -404,11 +373,6 @@ function RegistrationSecondPart({
                           />
                         )}
                         onChange={(event, value) => {
-                          console.log('selected session__', {
-                            event,
-                            value
-                          });
-
                           setFieldValue('academic_year_id', value?.id);
                         }}
                       />
@@ -577,15 +541,30 @@ function RegistrationSecondPart({
                     </Grid>
 
                     {/* student photo */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <label htmlFor="student_photo">Student photo:</label> <br />
-                      <input
-                        accept="image/*"
-                        type="file"
+                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
+                      <Grid item>
+                        <Image src={student_photo ? student_photo : `/files/${student?.student_photo?.replace(/\\/g, '/')}`}
+                          height={150}
+                          width={150}
+                          alt='Student photo'
+                          loading='lazy'
+                        />
+
+                      </Grid>
+                      <br />
+                      <FileUploadFieldWrapper
+                        htmlFor="student_photo"
+                        label="Select Student photo:"
                         name="student_photo"
-                        onChange={(e) => {
-                          console.log(e.target.files[0]);
-                          setFieldValue('student_photo', e.target.files[0]);
+                        value={values?.student_photo?.name || student?.student_photo || ''}
+                        handleChangeFile={(e) => {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setStudent_photo(photoUrl)
+                          setFieldValue('student_photo', e.target.files[0])
+                        }}
+                        handleRemoveFile={(e) => {
+                          setStudent_photo(null);
+                          setFieldValue('student_photo', undefined)
                         }}
                       />
                     </Grid>

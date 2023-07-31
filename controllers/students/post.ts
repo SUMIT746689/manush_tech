@@ -64,17 +64,8 @@ const postHandle = async (req, res, authenticate_user) => {
       !fields.academic_year_id ||
       !fields.phone
     ) {
-      const pwd = path.join(process.cwd(), "public", "/files");
-
-      const fileList = {}
-      if (student_photo_name) fileList['student_photo_filePath'] = path.join(pwd, student_photo_name)
-      if (father_photo_name) fileList['father_photo_filePath'] = path.join(pwd, father_photo_name)
-      if (mother_photo_name) fileList['mother_photo_filePath'] = path.join(pwd, mother_photo_name)
-      if (guardian_photo_name) fileList['guardian_photo_filePath'] = path.join(pwd, guardian_photo_name)
-      for (const i in fileList) {
-        if (fs.existsSync(fileList[i])) {
-          fs.unlinkSync(fileList[i])
-        }
+      for (const i in files) {
+        fs.unlinkSync(files[i].filepath)
       }
       throw new Error('Required field value missing !!')
     }

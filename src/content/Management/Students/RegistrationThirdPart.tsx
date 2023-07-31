@@ -16,6 +16,8 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
+import Image from 'next/image';
+import { FileUploadFieldWrapper } from '@/components/TextFields';
 
 function RegistrationFirstPart({
   totalFormData,
@@ -29,6 +31,9 @@ function RegistrationFirstPart({
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const { user } = useAuth();
+  const [father_photo, setFather_photo] = useState(null);
+  const [mother_photo, setMother_photo] = useState(null);
+  const [guardian_photo, setGuardian_photo] = useState(null);
 
   return (
     <>
@@ -80,15 +85,6 @@ function RegistrationFirstPart({
                 setActiveStep(0);
                 showNotification('Student updated Successfully');
                 router.push('/management/students');
-                // axios.get(`/api/student/${router.query.id}`)
-                //   .then(res => {
-                //     console.log("single__", res.data);
-
-                //     setStudent(res.data)
-                //   })
-                //   .catch(err => {
-                //     showNotification(err?.response?.data?.message, 'error')
-                //   })
               }
             }
             else {
@@ -101,7 +97,8 @@ function RegistrationFirstPart({
                 setSubmitting(false);
                 setUsersFlag(true);
                 setActiveStep(0);
-                showNotification('Successfully student registration completed');
+                showNotification(res.data.success);
+                router.push('/management/students/registration');
               }
             }
 
@@ -213,15 +210,30 @@ function RegistrationFirstPart({
                       />
                     </Grid>
                     {/* father_photo */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <label htmlFor="student_photo">Father photo:</label> <br />
-                      <input
-                        accept="image/*"
-                        type="file"
+                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
+                      <Grid item>
+                        <Image src={father_photo ? father_photo : `/files/${student?.student_info?.father_photo?.replace(/\\/g, '/')}`}
+                          height={100}
+                          width={100}
+                          alt="Father's photo:"
+                          loading='lazy'
+                        />
+
+                      </Grid>
+                      <br />
+                      <FileUploadFieldWrapper
+                        htmlFor="father_photo"
+                        label="Select Father's photo::"
                         name="father_photo"
-                        onChange={(e) => {
-                          console.log(e.target.files[0]);
-                          setFieldValue('father_photo', e.target.files[0]);
+                        value={values?.father_photo?.name || student?.student_info?.father_photo || ''}
+                        handleChangeFile={(e) => {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setFather_photo(photoUrl)
+                          setFieldValue('father_photo', e.target.files[0])
+                        }}
+                        handleRemoveFile={(e) => {
+                          setFather_photo(null);
+                          setFieldValue('father_photo', undefined)
                         }}
                       />
                     </Grid>
@@ -300,15 +312,31 @@ function RegistrationFirstPart({
                       />
                     </Grid>
                     {/* mather_photo */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <label htmlFor="mother_photo">Mather photo:</label> <br />
-                      <input
-                        accept="image/*"
-                        type="file"
+                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
+
+                      <Grid item>
+                        <Image src={mother_photo ? mother_photo : `/files/${student?.student_info?.mother_photo?.replace(/\\/g, '/')}`}
+                          height={100}
+                          width={100}
+                          alt="Mother's photo:"
+                          loading='lazy'
+                        />
+
+                      </Grid>
+                      <br />
+                      <FileUploadFieldWrapper
+                        htmlFor="mother_photo"
+                        label="Select Mother's photo::"
                         name="mother_photo"
-                        onChange={(e) => {
-                          console.log(e.target.files[0]);
-                          setFieldValue('mother_photo', e.target.files[0]);
+                        value={values?.mother_photo?.name || student?.student_info?.mother_photo || ''}
+                        handleChangeFile={(e) => {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setMother_photo(photoUrl)
+                          setFieldValue('mother_photo', e.target.files[0])
+                        }}
+                        handleRemoveFile={(e) => {
+                          setMother_photo(null);
+                          setFieldValue('mother_photo', undefined)
                         }}
                       />
                     </Grid>
@@ -393,15 +421,31 @@ function RegistrationFirstPart({
                       />
                     </Grid>
                     {/* guardian_photo */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <label htmlFor="guardian_photo">Guardian photo:</label> <br />
-                      <input
-                        accept="image/*"
-                        type="file"
+                    <Grid container p={1} gap={1} item xs={12} sm={6} md={6}>
+
+                      <Grid item>
+                        <Image src={guardian_photo ? guardian_photo : `/files/${student?.guardian_photo?.replace(/\\/g, '/')}`}
+                          height={100}
+                          width={100}
+                          alt="Guardian's photo:"
+                          loading='lazy'
+                        />
+
+                      </Grid>
+                      <br />
+                      <FileUploadFieldWrapper
+                        htmlFor="guardian_photo"
+                        label="Select Guardian's photo:"
                         name="guardian_photo"
-                        onChange={(e) => {
-                          console.log(e.target.files[0]);
-                          setFieldValue('guardian_photo', e.target.files[0]);
+                        value={values?.guardian_photo?.name || student?.guardian_photo || ''}
+                        handleChangeFile={(e) => {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setGuardian_photo(photoUrl)
+                          setFieldValue('guardian_photo', e.target.files[0])
+                        }}
+                        handleRemoveFile={(e) => {
+                          setGuardian_photo(null);
+                          setFieldValue('guardian_photo', undefined)
                         }}
                       />
                     </Grid>

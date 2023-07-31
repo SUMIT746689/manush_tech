@@ -30,7 +30,7 @@ import { FileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
 
 function ManagementClasses() {
-  const isMountedRef = useRefMounted();
+
   const [students, setStudents] = useState([]);
   const { t }: { t: any } = useTranslation();
   const router = useRouter();
@@ -47,23 +47,21 @@ function ManagementClasses() {
 
   const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
 
-  useEffect(() => {
-    try {
-      if (academicYear && selectedSection) {
-        axios
-          .get(
-            `/api/student?${selectedSection.id == 'all' ? `class_id=${selectedClass?.id}` : `section_id=${selectedSection?.id}`}&academic_year_id=${academicYear?.id}`
-          )
-          .then((res) => {
-            console.log('ref__', res.data);
-            setStudents(res.data);
+  const handleStudentList = () => {
 
-          });
-      }
-    } catch (err) {
-      console.error(err);
+    if (academicYear && selectedSection) {
+      axios
+        .get(
+          `/api/student?${selectedSection.id == 'all' ? `class_id=${selectedClass?.id}` : `section_id=${selectedSection?.id}`}&academic_year_id=${academicYear?.id}`
+        )
+        .then((res) => {
+          console.log('ref__', res.data);
+          setStudents(res.data);
+
+        });
     }
-  }, [academicYear, selectedSection]);
+
+  }
 
 
   const handleClassSelect = (event, newValue) => {
@@ -242,7 +240,7 @@ function ManagementClasses() {
             item
             xs={6}
             sm={4}
-            md={3}
+            md={2}
             justifyContent="flex-end"
             textAlign={{ sm: 'right' }}
           >
@@ -275,7 +273,7 @@ function ManagementClasses() {
                 item
                 xs={6}
                 sm={4}
-                md={3}
+                md={2}
                 justifyContent="flex-end"
                 textAlign={{ sm: 'right' }}
               >
@@ -299,24 +297,27 @@ function ManagementClasses() {
               </Grid>
             </>
           )}
-          {students.length > 0 && (
-            <Grid
+          {
+            selectedSection && <Grid
               item
               xs={6}
               sm={4}
-              md={3}
+              md={2}
+              >
+              <Button 
+                
+                variant="contained" onClick={handleStudentList}> Find</Button>
+            </Grid>
+          }
+          {students.length > 0 && (
+            <Grid
+              item
               justifyContent="flex-end"
               textAlign={{ sm: 'right' }}
+              xs={6}
+              sm={4}
+              md={2}
             >
-              {/* <ReactToPrint
-              content={() => idCard.current}
-              // pageStyle={`{ size: 2.5in 4in }`}
-              trigger={() => (
-                <Button variant="contained">
-                  print Id card
-                </Button>
-              )}
-            /> */}
               <Button
                 fullWidth
                 sx={{ height: '100%' }}

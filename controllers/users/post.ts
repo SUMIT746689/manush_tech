@@ -85,7 +85,7 @@ export const post = async (req, res) => {
     }
     if (files?.user_photo?.newFilename) {
       const user_imageNewName = Date.now().toString() + '_' + files.user_photo.originalFilename;
-      await fspromises.rename(files.user_photo.filepath, path.join(process.cwd(), 'public', uploadFolderName, user_imageNewName))
+      await fspromises.rename(files.user_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, user_imageNewName))
         .then(() => {
           data['user_photo'] = path.join(uploadFolderName, user_imageNewName).replace(/\\/g, '/')
           

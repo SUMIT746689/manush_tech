@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import fsp from 'fs/promises';
 
 const prisma = new PrismaClient();
 
@@ -360,6 +361,11 @@ async function seed() {
       { title: "RECEPTIONIST" }
     ]
   })
+  try {
+    await fsp.readdir(path.join(process.cwd(), `/AllFiles`));
+  } catch (error) {
+    await fsp.mkdir(path.join(process.cwd(), `/AllFiles`));
+  }
 }
 
 

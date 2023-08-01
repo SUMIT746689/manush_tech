@@ -187,16 +187,16 @@ const id = async (req, res) => {
                         })
     
                         if (student_photo_name) {
-                            fileDelete(["public", "files", studentPast?.student_photo])
+                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_photo])
                         }
                         if (father_photo_name) {
-                            fileDelete(["public", "files", studentPast?.student_info?.father_photo])
+                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_info?.father_photo])
                         }
                         if (mother_photo_name) {
-                            fileDelete(["public", "files", studentPast?.student_info?.mother_photo])
+                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_info?.mother_photo])
                         }
                         if (guardian_photo_name) {
-                            fileDelete(["public", "files", studentPast?.guardian_photo])
+                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.guardian_photo])
                         }
 
                     })

@@ -9,7 +9,7 @@ export const saveImage = (req, saveLocally) => {
 
     if (saveLocally) {
 
-        options.uploadDir = path.join(process.cwd(), "/public/files");
+        options.uploadDir = path.join(process.cwd(), `${process.env.FILESFOLDER}/files`);
 
         options.filename = (name, ext, path, form) => {
             return Date.now().toString() + "_" + path.originalFilename;
@@ -32,25 +32,25 @@ export const saveImage = (req, saveLocally) => {
 };
 export const imageFolder = async () => {
     try {
-        await fsp.readdir(path.join(process.cwd() + "/public", "/files"));
+        await fsp.readdir(path.join(process.cwd() +`${process.env.FILESFOLDER}`, "/files"));
     } catch (error) {
-        await fsp.mkdir(path.join(process.cwd() + "/public", "/files"));
+        await fsp.mkdir(path.join(process.cwd() + `${process.env.FILESFOLDER}`, "/files"));
     }
 }
 export const certificateTemplateFolder = async (foldername: string) => {
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.readdir(path.join(process.cwd(), `/files`));
+        await fsp.readdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.mkdir(path.join(process.cwd(), `/files`));
+        await fsp.mkdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`));
     }
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.readdir(path.join(process.cwd(), `/files`, `${foldername}`));
+        await fsp.readdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`, `${foldername}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.mkdir(path.join(process.cwd(), `/files`, `${foldername}`));
+        await fsp.mkdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`, `${foldername}`));
     }
 
 }
@@ -148,14 +148,14 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
     let error = null;
     try {
         // await fs.readdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.readdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
+        await fsp.readdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`, `${uploadFolderName}`));
     } catch (error) {
         // await fs.mkdir(path.join(process.cwd() + "/public", `/${foldername}`));
-        await fsp.mkdir(path.join(process.cwd(), `/public`, `${uploadFolderName}`));
+        await fsp.mkdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`, `${uploadFolderName}`));
     }
 
 
-    const uploadDir = path.join(process.cwd() + "/public", `${uploadFolderName}`);
+    const uploadDir = path.join(process.cwd(), `${process.env.FILESFOLDER}`, `${uploadFolderName}`);
     console.log("uploadDir__", uploadDir);
 
     const customOptions = {

@@ -6,8 +6,8 @@ const index = async (req, res) => {
 
     switch (method) {
       case 'GET':
-        const { file_path } = req.query;
-        const updateFilePath = path.join(process.cwd(),"public", ...file_path);
+        const { file_path } = req.query;  
+        const updateFilePath = path.join(process.cwd(),`${process.env.FILESFOLDER}`, ...file_path);
      
         if (!fs.existsSync(updateFilePath)) return res.json({ error: "no file found" });
         fs.createReadStream(updateFilePath).pipe(res);

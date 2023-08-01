@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 async function post(req, res, refresh_token) {
   try {
     const uploadFolderName = "certificate_templates";
-    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_API}/api/get_file/${uploadFolderName}`;
+    const fileUrl = `/${uploadFolderName}`;
     
     await certificateTemplateFolder(uploadFolderName);
 

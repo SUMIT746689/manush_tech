@@ -46,6 +46,8 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         reFetchData();
         handleCreateClassClose();
       };
+      console.log("_values__",_values);
+      
       if (editData) {
         const res = await axios.patch(`/api/certificate_templates/${editData.id}`, _values);
         successResponse('updated');
@@ -302,7 +304,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         &&
                         <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
                           {/* <Image src={editData?.logo_url} width={100} height={100} alt="logo" /> */}
-                          <img src={editData?.logo_url} className=" h-fit w-20" alt='logo' />
+                          <img src={`/api/get_file${editData?.logo_url}`} className=" h-fit w-20" alt='logo' />
                         </Avatar>
                       }
 
@@ -319,7 +321,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         &&
                         <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
                           {/* <Image src={editData?.signature_url} width={100} height={100} alt="logo" /> */}
-                          <img src={editData?.signature_url} className=" h-fit w-20" alt="signature" />
+                          <img src={`/api/get_file${editData?.signature_url}`} className=" h-fit w-20" alt="signature" />
                         </Avatar>
                       }
 
@@ -341,7 +343,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         &&
                         <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
                           {/* <Image src={editData?.background_url} width={100} height={100} alt="logo" /> */}
-                          <img src={editData?.background_url} className=" h-fit w-20" />
+                          <img src={`/api/get_file${editData?.background_url}`} className=" h-fit w-20" />
                         </Avatar>
                       }
                     </Grid>

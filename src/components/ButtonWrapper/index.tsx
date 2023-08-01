@@ -1,11 +1,12 @@
 import { Button, Grid } from "@mui/material"
 
-export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = false, children }) => {
+export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = false, children, sx = {} }) => {
 
   return (
     <Grid container sx={{ pb: 1, justifyContent: 'center' }}>
       <Button variant="contained" size="small" disabled={disabled}
         sx={{
+          ...sx,
           borderRadius: 0.5,
           height: 36,
           width: '100%',
@@ -21,7 +22,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
   )
 }
 
-export const DisableButtonWrapper = ({ startIcon=undefined , children }) => {
+export const DisableButtonWrapper = ({ startIcon = undefined, children }) => {
 
   return (
     <Grid container sx={{ pb: 1, justifyContent: 'center' }}>

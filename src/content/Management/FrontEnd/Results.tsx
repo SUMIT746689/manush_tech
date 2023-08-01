@@ -1,27 +1,28 @@
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Button, CircularProgress, DialogActions, DialogContent, Grid, TextField, Zoom } from '@mui/material';
-import { NewHTTPClient } from '@/lib/HTTPClient';
-import { FC, useEffect, useState } from 'react';
-import { ResultProps } from '@/models/front_end';
+import { Button, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 
 const Results = ({ data, reFetchData }) => {
 
-  console.log("data__", data);
 
   const { t }: { t: any } = useTranslation();
   const [notice, setNotice] = useState(['']);
 
-  // const [header_image, setHeader_image] = useState(null)
-  // const [carousel_image, setCarousel_image] = useState(null)
-  // const [chairman_photo, setChairman_photo] = useState(null)
-  // const [principal_photo, setPrincipal_photo] = useState(null)
+  const [header_image, setHeader_image] = useState(null)
+  const [carousel_image, setCarousel_image] = useState(null)
+  const [history_photo, setHistory_photo] = useState(null)
+  const [chairman_photo, setChairman_photo] = useState(null)
+  const [principal_photo, setPrincipal_photo] = useState(null)
 
+  const { showNotification } = useNotistick();
   // useEffect(() => {
   //   console.log("carousel_image__", typeof (carousel_image), carousel_image);
 
@@ -49,21 +50,19 @@ const Results = ({ data, reFetchData }) => {
       enableReinitialize
 
       initialValues={{
-        header_image: data ? data?.header_image?.replace(/\\/g, '/') : undefined,
+        header_image: data ? data?.header_image : undefined,
         carousel_image: undefined,
 
-        history_photo: data?.history_photo.replace(/\\/g, '/') || '',
+        history_photo: data?.history_photo || '',
         school_history: data?.school_history || '',
 
-        chairman_photo: data?.chairman_photo?.replace(/\\/g, '/') || '',
+        chairman_photo: data?.chairman_photo || '',
         chairman_speech: data?.chairman_speech || '',
 
-        principal_photo: data?.principal_photo?.replace(/\\/g, '/') || '',
+        principal_photo: data?.principal_photo || '',
         principal_speech: data?.principal_speech || '',
 
-        latest_news: notice,
-
-        submit: data?.latest_news || null
+        submit: null
       }}
       // validationSchema={Yup.object().shape({
       //   title: Yup.string().max(255).required(t('The title field is required')),
@@ -78,29 +77,12 @@ const Results = ({ data, reFetchData }) => {
       ) => {
         try {
           const successResponse = (message) => {
-            resetForm();
             setStatus({ success: true });
             setSubmitting(false);
-            reFetchData();
+            showNotification(message)
           };
 
-          // console.log("incomming _values", _values);
-
-          // let cnt = [];
-          // for (const j in _values['carousel_image']) {
-          //   console.log({ j })
-          //   if (typeof (_values['carousel_image'][j]) == 'object') {
-          //     cnt.push(_values['carousel_image'][j])
-          //   }
-
-          // }
-          // console.log("cnt__", cnt);
-
-          // _values['carousel_image'] = cnt
-
-
           console.log("_values", _values);
-
 
           const formData = new FormData();
 
@@ -114,35 +96,24 @@ const Results = ({ data, reFetchData }) => {
                   formData.append('carousel_image', temp[j])
                 }
               }
-              // if (nameList.length) {
-              //   nameList.forEach(element => {
-              //     console.log({element})
-              //     formData.append(`carousel_image_name_list[]`, element.name);
-              //     // formData.append(`carousel_image_name_list[]`, nameList);
-              //   });
-              // }
             }
             else {
-              if (i == 'latest_news') {
-                notice.forEach(element => {
-                  console.log({ element })
-                  formData.append(`latest_news[]`, element);
-                });
-              } else {
-                formData.append(`${i}`, _values[i]);
-              }
-
+              formData.append(`${i}`, _values[i]);
             }
           }
-
+          notice.forEach(element => {
+            console.log({ element })
+            formData.append(`latest_news[]`, element);
+          });
 
           axios.put('/api/front_end', formData)
             .then(res => {
               console.log(res);
               reFetchData();
+              successResponse('Front end information updated !');
             }).catch(err => {
               console.log(err);
-
+              showNotification('Front end information update failed !', 'error')
             })
 
         } catch (err) {
@@ -165,19 +136,21 @@ const Results = ({ data, reFetchData }) => {
         values,
         setFieldValue
       }) => {
+        console.log("isSubmitting__", isSubmitting, errors);
+
         return (
           <>
             <form onSubmit={handleSubmit}>
 
-              <Grid spacing={2} gap={2} >
+              <Grid container spacing={2} gap={2} paddingTop={2} border='1px solid lightGray' p={2}>
 
                 {/* header_image */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
                   <Grid item>
-                    <Image src={`/${data?.header_image.replace(/\\/g, '/')}`}
-                      height={200}
-                      width={200}
-                      alt='Header Image'
+                    <Image src={header_image ? header_image : `/api/get_file/${data?.header_image.replace(/\\/g, '/')}`}
+                      height={150}
+                      width={150}
+                      alt='Header image'
                       loading='lazy'
                     />
 
@@ -190,36 +163,52 @@ const Results = ({ data, reFetchData }) => {
                       label="select Header image"
                       name="header_image"
                       value={values?.header_image?.name || values?.header_image || ''}
-                      handleChangeFile={(e) => { setFieldValue('header_image', e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setFieldValue('header_image', undefined) }}
+                      handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setHeader_image(photoUrl)
+                          setFieldValue('header_image', e.target.files[0])
+                        }
+                      }}
+                      handleRemoveFile={(e) => {
+                        setHeader_image(null);
+                        setFieldValue('header_image', undefined)
+                      }}
                     />
 
                   </Grid>
+
                 </Grid>
                 {/* carousel_image */}
                 <Grid container gap={1} justifyContent='center' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
+                  <Grid display={'flex'} flexDirection={'row'} flexWrap={'wrap'}>
 
-                  {
-                    data &&
-                    <>
-                      {
-                        data?.carousel_image?.map(i => <Grid item >
+                    {
+                      carousel_image ? carousel_image?.map(j =>
+                        <Grid >
                           <Image
-                            src={`/${i.path.replace(/\\/g, '/')}`}
+                            src={j}
                             height={120}
                             width={120}
                             alt='Carousel Image'
                             loading='lazy'
-
+                            objectFit='cover'
                           />
 
-                        </Grid>)
-                      }
+                        </Grid>) : data?.carousel_image?.map(i =>
+                          <Grid  >
+                            <Image
+                              src={`/api/get_file/${i.path.replace(/\\/g, '/')}`}
+                              height={120}
+                              width={120}
+                              alt='Carousel Image'
+                              loading='lazy'
+                              objectFit='cover'
+                            />
 
-                    </>
-                  }
-
-
+                          </Grid>)
+                    }
+                  </Grid>
 
                   <Grid container justifyContent='center' sx={{
                     pt: '25px'
@@ -232,14 +221,23 @@ const Results = ({ data, reFetchData }) => {
                       value={values?.carousel_image ? getValue(values?.carousel_image) : ''}
                       // carousel_image?.map(j=>j?.name)?.join(', ') ||
                       handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          const container = []
+                          for (const i of e.target.files) {
+                            const photoUrl = URL.createObjectURL(i);
+                            container.push(photoUrl)
+                          }
+                          setCarousel_image(container)
+                          setFieldValue('carousel_image', e.target.files)
+                        }
 
-
-
-                        setFieldValue('carousel_image', e.target.files)
                       }}
-                      handleRemoveFile={(e) => { setFieldValue('carousel_image', undefined) }}
-                    />
+                      handleRemoveFile={(e) => {
+                        setCarousel_image(null)
+                        setFieldValue('carousel_image', undefined)
+                      }}
 
+                    />
                   </Grid>
                 </Grid>
 
@@ -257,8 +255,8 @@ const Results = ({ data, reFetchData }) => {
                     onChange={handleChange}
                     value={values?.school_history}
                     variant="outlined"
-                    minRows={4}
-                    maxRows={5}
+                    minRows={10}
+                    maxRows={14}
                     multiline
                   />
                 </Grid>
@@ -270,7 +268,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='History photo'
-                      src={`/${data?.history_photo?.replace(/\\/g, '/')}`}
+                      src={history_photo ? history_photo : `/api/get_file/${data?.history_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -283,8 +281,18 @@ const Results = ({ data, reFetchData }) => {
                       label="select History photo"
                       name="history_photo"
                       value={values?.history_photo?.name || values?.history_photo || ''}
-                      handleChangeFile={(e) => { setFieldValue('history_photo', e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setFieldValue('history_photo', undefined) }}
+                      handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setHistory_photo(photoUrl)
+                          setFieldValue('history_photo', e.target.files[0])
+                        }
+
+                      }}
+                      handleRemoveFile={(e) => {
+                        setHistory_photo(null)
+                        setFieldValue('history_photo', undefined)
+                      }}
                     />
 
                   </Grid>
@@ -296,7 +304,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Chairman photo'
-                      src={`/${data?.chairman_photo?.replace(/\\/g, '/')}`}
+                      src={chairman_photo ? chairman_photo : `/api/get_file/${data?.chairman_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -309,8 +317,20 @@ const Results = ({ data, reFetchData }) => {
                       label="select chairman photo"
                       name="chairman_photo"
                       value={values?.chairman_photo?.name || values?.chairman_photo || ''}
-                      handleChangeFile={(e) => { setFieldValue('chairman_photo', e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setFieldValue('chairman_photo', undefined) }}
+                      handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          console.log("e.target.files__", e.target.files);
+
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setChairman_photo(photoUrl)
+                          setFieldValue('chairman_photo', e.target.files[0])
+                        }
+
+                      }}
+                      handleRemoveFile={(e) => {
+                        setChairman_photo(null)
+                        setFieldValue('chairman_photo', undefined)
+                      }}
                     />
 
                   </Grid>
@@ -342,7 +362,7 @@ const Results = ({ data, reFetchData }) => {
                       height={200}
                       width={200}
                       alt='Principal photo'
-                      src={`/${data?.principal_photo?.replace(/\\/g, '/')}`}
+                      src={principal_photo ? principal_photo : `/api/get_file/${data?.principal_photo?.replace(/\\/g, '/')}`}
                       loading='lazy'
                     />
 
@@ -355,11 +375,23 @@ const Results = ({ data, reFetchData }) => {
                       label="select principal photo"
                       name="principal_photo"
                       value={values?.principal_photo?.name || values?.principal_photo || ''}
-                      handleChangeFile={(e) => { setFieldValue('principal_photo', e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setFieldValue('principal_photo', undefined) }}
+                      handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          const photoUrl = URL?.createObjectURL(e.target.files[0]);
+                          setPrincipal_photo(photoUrl)
+                          setFieldValue('principal_photo', e.target.files[0])
+                        }
+
+                      }}
+                      handleRemoveFile={(e) => {
+                        setPrincipal_photo(null);
+                        setFieldValue('principal_photo', undefined);
+                      }}
                     />
 
                   </Grid>
+
+
                 </Grid>
                 {/* principal_speech */}
                 <Grid container item borderRadius='10px' marginBottom='10px'>
@@ -380,62 +412,74 @@ const Results = ({ data, reFetchData }) => {
                     multiline
                   />
                 </Grid>
-                <Grid item borderRadius='10px' marginBottom='10px'>
 
-                  {notice.map((field, index) => (
-                    <Grid container gap={2}>
-                      <Grid >
-                        <TextField
-                          key={index}
-                          value={field}
-                          onChange={(e) => {
-                            const updatedFields = [...notice];
-                            updatedFields[index] = e.target.value;
-                            setNotice(updatedFields);
-                          }}
-                          label="Input Field"
-                          variant="outlined"
-                          margin="normal"
-                        />
-                      </Grid>
-                      <Grid >
-                        <Button variant="contained" sx={{
-                          marginTop: '18px'
-                        }} onClick={() => {
+
+
+                {notice.map((field, index) => (
+                  <Grid container gap={2} display={'grid'} gridTemplateColumns={'70% 30%'}>
+                    <TextField
+                      key={index}
+                      value={field}
+                      onChange={(e) => {
+                        const updatedFields = [...notice];
+                        updatedFields[index] = e.target.value;
+                        setNotice(updatedFields);
+                      }}
+                      label="Notice"
+                      variant="outlined"
+                      margin="normal"
+                      maxRows={4}
+                      minRows={2}
+                      multiline
+                      fullWidth
+                    />
+                    <Grid display={'grid'} justifyContent={'center'} alignContent={'center'}>
+                      <ButtonWrapper
+                        handleClick={() => {
                           const temp = [...notice]
                           temp.splice(index, 1)
                           setNotice(temp)
                         }}>
-                          remove
-                        </Button>
-                      </Grid>
-
-
+                        remove
+                      </ButtonWrapper>
                     </Grid>
-                  ))}
-                  <Button variant="contained" onClick={() => setNotice([...notice, ''])}>
-                    Add notice
-                  </Button>
 
+
+
+
+
+                  </Grid>
+                ))}
+
+                <Grid container display={'grid'} justifyContent={'center'}>
+
+                  <ButtonWrapper handleClick={() => setNotice([...notice, ''])}>
+                    Add notice
+                  </ButtonWrapper>
                 </Grid>
+
+
+
               </Grid>
 
-              <DialogActions
-                sx={{
-                  p: 3
-                }}
-              >
+              <Grid display={'flex'} justifyContent={'center'} paddingTop={4}>
 
                 <Button
+                  sx={{
+                    borderRadius: 0.5,
+                    height: 36,
+                    width:'50%',
+                  }}
                   type="submit"
                   startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
-
                   disabled={Boolean(errors.submit) || isSubmitting}
                   variant="contained"
                 >
-                  {t('Add frontend')}
+                  {t('Save')}
                 </Button>
-              </DialogActions>
+
+
+              </Grid>
             </form>
           </>
         );

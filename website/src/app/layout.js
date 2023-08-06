@@ -38,7 +38,7 @@ export default async function RootLayout({ children }) {
         <body>
           <LayoutWrapper>
             <Header header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`} />
-            <Nav serverhost={process.env.SERVER_HOST} />
+            <Nav serverhost={`${process.env.SERVER_HOST}`} />
             {children}
           </LayoutWrapper>
           <Footer />

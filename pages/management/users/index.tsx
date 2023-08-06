@@ -11,8 +11,10 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 
 function ManagementUsers() {
 
-  const { data:users,reFetchData } = useClientFetch('/api/user')
+  const { data: users, reFetchData } = useClientFetch('/api/user')
   const [editUser, setEditUser] = useState(null);
+  console.log({ editUser });
+
   return (
     <>
       <Head>

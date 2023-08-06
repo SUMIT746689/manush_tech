@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export const post = async (req, res) => {
   try {
-    const uploadFolderName = "files";
+    const uploadFolderName = "usersPhoto";
 
     const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
     const filterFiles = {
@@ -87,11 +87,11 @@ export const post = async (req, res) => {
       const user_imageNewName = Date.now().toString() + '_' + files.user_photo.originalFilename;
       await fspromises.rename(files.user_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, user_imageNewName))
         .then(() => {
-          data['user_photo'] = path.join(uploadFolderName, user_imageNewName).replace(/\\/g, '/')
+          data['user_photo'] = path.join(uploadFolderName, user_imageNewName)
           
         })
         .catch(err => {
-          data['user_photo'] = path.join(uploadFolderName, files.user_photo?.newFilename).replace(/\\/g, '/')
+          data['user_photo'] = path.join(uploadFolderName, files.user_photo?.newFilename)
         })
 
     }

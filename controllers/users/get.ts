@@ -61,7 +61,8 @@ export const get = async (req, res) => {
         },
         // @ts-ignore
         is_enabled: true,
-        permissions: true
+        permissions: true,
+        user_photo: true
       }
     });
 

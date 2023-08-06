@@ -1,8 +1,12 @@
-import { PrismaClient } from '@prisma/client';
+
+import prisma from '@/lib/prisma_client';
 import { patch } from 'controllers/users/user/patch';
 
-const prisma = new PrismaClient();
-
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
 const id = async (req, res) => {
   try {
     const { method } = req;

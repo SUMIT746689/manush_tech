@@ -20,9 +20,11 @@ import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
+import Image from 'next/image';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
+  const [user_photo, setUser_photo] = useState(null)
 
   useEffect(() => {
     if (editUser) handleCreateUserOpen();
@@ -34,7 +36,9 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
     { label: 'Accountant', role: 'ACCOUNTANT', value: 'create_accountant' },
     { label: 'Librarian', role: 'LIBRARIAN', value: 'create_librarian' },
-    { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' }
+    { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' },
+    { label: 'Student', role: 'STUDENT', value: 'create_student' },
+    { label: 'Teacher', role: 'TEACHER', value: 'create_teacher' }
   ];
   const available_permissions = user?.permissions?.map(
     (permission) => permission.value
@@ -54,6 +58,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   };
 
   const handleCreateUserClose = () => {
+    setUser_photo(null)
     setOpen(false);
     setEditUser(null);
   };
@@ -110,6 +115,9 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     }
   }
 
+  const temp = userPrermissionRoles.find(i => i.role == editUser?.user_role?.title);
+  console.log("temp___", temp);
+
   return (
     <>
       <Grid container justifyContent="space-between" alignItems="center">
@@ -162,25 +170,39 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             username: editUser?.username || '',
             password: '',
             confirm_password: '',
-            user_photo: undefined,
-            role: undefined
+            user_photo: editUser?.user_photo || '',
+            role: temp ? {
+              role_title: temp?.role,
+              permission: temp?.value
+            } : undefined
           }}
           validationSchema={Yup.object().shape({
             username: Yup.string()
               .max(255)
-              .required(t('The username field is required')),
-            password: Yup.string()
-              .max(255)
-              .required(t('The password field is required'))
-              // .matches(/[0-9]/, 'Password requires a number'),
-              .min(8, 'Password is too short - should be 8 chars minimum.'),
+              .when("role", (role, schema) => {
+                if (!role)
+                  return schema.required(t('The username field is required'))
+                return schema
+              }),
+
+            password: Yup.string().max(255)
+              .when("role", (role, schema) => {
+                if (!role)
+                  return schema.required(t('The password field is required')).min(8, 'Password is too short - should be 8 chars minimum.')
+                return schema
+              }),
+
+            // .matches(/[0-9]/, 'Password requires a number'),
             // .matches(/[a-zA-Z]/, 'Password can only contain Latin letters.'),
             confirm_password: Yup.string()
               .max(255)
-              .required(t('confirm_password field is required'))
-              .oneOf([Yup.ref('password'), null], 'Passwords must match'),
+              .when("role", (role, schema) => {
+                if (!role)
+                  return schema.required(t('confirm_password field is required')).oneOf([Yup.ref('password'), null], 'Passwords must match')
+                return schema
+              })
+            ,
             role: Yup.object().required(t('Role field is required')),
-            // user_photo: Yup.object(),
           })}
           onSubmit={(_values, getValue: any) => handleFormSubmit(_values, getValue)}
         >
@@ -247,50 +269,78 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       variant="outlined"
                     />
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Autocomplete
-                      disablePortal
-                      value={
-                        userPrermissionRoles.find(
-                          // @ts-ignore
-                          (permRole) => permRole.value === values?.role?.permission
-                        ) || null
-                      }
-                      options={userPrermissionRoles}
-                      isOptionEqualToValue={(option: any, value: any) =>
-                        option.value === value.value
-                      }
-                      getOptionLabel={(option) => option?.label}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          name="role"
-                          label={t('User role')}
-                          error={Boolean(
-                            touched.role && errors.role
-                          )}
+                  {
+                    !editUser && <Grid item xs={12} md={6}>
+                      <Autocomplete
+                        disablePortal
+                        value={
+                          userPrermissionRoles.find(
+                            // @ts-ignore
+                            (permRole) => permRole.value === values?.role?.permission
+                          ) || null
+                        }
+                        options={userPrermissionRoles}
+                        isOptionEqualToValue={(option: any, value: any) =>
+                          option.value === value.value
+                        }
+                        getOptionLabel={(option) => option?.label}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            name="role"
+                            label={t('User role')}
+                            error={Boolean(
+                              touched.role && errors.role
+                            )}
 
-                          helperText={touched.role && errors.role}
-                          onBlur={handleBlur}
-                        />
-                      )}
-                      // @ts-ignore
-                      onChange={(event, value: any) => {
-                        console.log({ value });
-                        setFieldValue('role', { role_title: value?.role, permission: value?.value } || '');
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={9} md={10}>
-                    <FileUploadFieldWrapper
-                      htmlFor="user photo"
-                      label="Select user photo"
-                      name="user_photo"
-                      value={values?.user_photo?.name || ''}
-                      handleChangeFile={(e) => { setFieldValue('user_photo', e.target.files[0]) }}
-                      handleRemoveFile={(e) => { setFieldValue('user_photo', undefined) }}
-                    />
+                            helperText={touched.role && errors.role}
+                            onBlur={handleBlur}
+                          />
+                        )}
+                        // @ts-ignore
+                        onChange={(event, value: any) => {
+                          console.log({ value });
+                          setFieldValue('role',
+                            {
+                              role_title: value?.role,
+                              permission: value?.value
+                            }
+                            || '');
+                        }}
+                      />
+                    </Grid>
+                  }
+
+                  <Grid item xs={12}>
+                    <Grid container gap={2}>
+                      <Image src={user_photo ? user_photo : `/api/get_file/${editUser?.user_photo?.replace(/\\/g, '/')}`}
+                        height={150}
+                        width={150}
+                        alt='User photo'
+                        loading='lazy'
+                      />
+
+
+                      <FileUploadFieldWrapper
+                        htmlFor="user photo"
+                        label="Select user photo"
+                        name="user_photo"
+                        value={values?.user_photo?.name || values?.user_photo || ''}
+                        handleChangeFile={(e) => {
+                          if (e.target.files.length) {
+                            const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            setUser_photo(photoUrl)
+                            setFieldValue('user_photo', e.target.files[0])
+                          }
+
+                        }}
+                        handleRemoveFile={(e) => {
+                          setUser_photo(null)
+                          setFieldValue('user_photo', undefined)
+                        }}
+                      />
+                    </Grid>
 
                   </Grid>
                 </Grid>

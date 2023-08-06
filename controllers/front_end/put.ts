@@ -43,24 +43,7 @@ async function put(req, res, refresh_token) {
 
             await fsP.rename(files.header_image.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, header_imageNewName))
                 .then(() => {
-                    console.log('rename');
-                    const aa = path.join(uploadFolderName, header_imageNewName)
-                    console.log("aa__", aa);
-
-                    query['header_image'] = aa
-
-                    console.log('rename 2');
-
-                    if (websiteUirow) {
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.header_image);
-                        if (fs.existsSync(filePath)) {
-                            console.log("header_image__");
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
-                        }
-                    }
+                    query['header_image'] = path.join(uploadFolderName, header_imageNewName)
 
                 })
                 .catch(err => {
@@ -68,6 +51,16 @@ async function put(req, res, refresh_token) {
                     console.log("error____", err);
                     query['header_image'] = path.join(uploadFolderName, files.header_image?.newFilename)
                 })
+            if (websiteUirow) {
+                const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.header_image);
+                if (fs.existsSync(filePath)) {
+                    console.log("header_image__");
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.log('photo deletion failed');
+                        else console.log("photo deleted");
+                    })
+                }
+            }
 
         }
         if (files.history_photo?.newFilename) {
@@ -76,22 +69,23 @@ async function put(req, res, refresh_token) {
                 .then(() => {
                     query['history_photo'] = path.join(uploadFolderName, history_photoNewName)
 
-                    if (websiteUirow) {
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.history_photo);
-                        if (fs.existsSync(filePath)) {
-                            console.log("history_photo");
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
-                        }
-                    }
                 })
                 .catch(err => {
                     console.log("err__", err);
 
                     query['history_photo'] = path.join(uploadFolderName, files.history_photo?.newFilename)
                 })
+
+            if (websiteUirow) {
+                const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.history_photo);
+                if (fs.existsSync(filePath)) {
+                    console.log("history_photo");
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.log('photo deletion failed');
+                        else console.log("photo deleted");
+                    })
+                }
+            }
 
         }
         if (files.chairman_photo?.newFilename) {
@@ -100,47 +94,46 @@ async function put(req, res, refresh_token) {
             await fsP.rename(files.chairman_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, chairman_photoNewName))
                 .then(() => {
                     query['chairman_photo'] = path.join(uploadFolderName, chairman_photoNewName)
-                    if (websiteUirow) {
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.chairman_photo);
-                        if (fs.existsSync(filePath)) {
-                            console.log("chairman_photo");
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
-
-                        }
-                    }
 
                 })
                 .catch(err => {
                     console.log("err__", err);
                     query['chairman_photo'] = path.join(uploadFolderName, files.chairman_photo?.newFilename)
                 })
+            if (websiteUirow) {
+                const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.chairman_photo);
+                if (fs.existsSync(filePath)) {
+                    console.log("chairman_photo");
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.log('photo deletion failed');
+                        else console.log("photo deleted");
+                    })
+
+                }
+            }
         }
         if (files.principal_photo?.newFilename) {
             const principal_photoNewName = Date.now().toString() + '_' + files.principal_photo.originalFilename;
 
-
             await fsP.rename(files.principal_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, principal_photoNewName))
                 .then(() => {
                     query['principal_photo'] = path.join(uploadFolderName, principal_photoNewName)
-                    if (websiteUirow) {
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.principal_photo);
-                        if (fs.existsSync(filePath)) {
-                            console.log("principal_photo");
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
-                        }
-                    }
 
                 })
                 .catch(err => {
                     console.log("err__", err);
                     query['principal_photo'] = path.join(uploadFolderName, files.principal_photo?.newFilename)
                 })
+            if (websiteUirow) {
+                const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.principal_photo);
+                if (fs.existsSync(filePath)) {
+                    console.log("principal_photo");
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.log('photo deletion failed');
+                        else console.log("photo deleted");
+                    })
+                }
+            }
         }
         let flag = false;
 

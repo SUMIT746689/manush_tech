@@ -269,7 +269,7 @@ const Results: FC<ResultsProps> = ({
                           <TableCell>
                             <Typography noWrap variant="h5">
                               {/* @ts-ignore */}
-                              <img src={fee.background_url} className="w-fit h-10" alt="background_image" />
+                              <img src={`/api/get_file${fee.background_url}`} className="w-fit h-10" alt="background_image" />
                               {/* <Image height={50} width={50} src={fee.background_url} /> */}
                             </Typography>
                           </TableCell>

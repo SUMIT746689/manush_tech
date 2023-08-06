@@ -93,7 +93,7 @@ function DashboardReportsContent({ blockCount = null }) {
               user?.role?.title === "ADMIN" &&<Grid container gap={10}>
                 <Button variant='contained' color='secondary'>
                   
-                  <Link href={`${blockCount?.domain}`} color="primary" rel="noopener noreferrer" target="_blank">
+                  <Link href={`http://${blockCount?.domain}`} color="primary" rel="noopener noreferrer" target="_blank">
                     {t('Front end link')}
                   </Link>
                 </Button>

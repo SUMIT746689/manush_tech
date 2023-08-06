@@ -21,30 +21,28 @@ export default async function Home(props) {
   })
  
 
- 
-
 
   const speechDatas = [
     {
       title: 'প্রতিষ্ঠানের ইতিহাস',
-      image: `${process.env.SERVER_HOST}/${school_info?.history_photo?.replace(/\\/g, '/')}`,
+      image: `${process.env.SERVER_HOST}/api/get_file/${school_info?.history_photo?.replace(/\\/g, '/')}`,
       description: school_info?.school_history
     },
     {
       title: 'সভাপতির বাণী',
-      image: `${process.env.SERVER_HOST}/${school_info?.chairman_photo?.replace(/\\/g, '/')}`,
+      image: `${process.env.SERVER_HOST}/api/get_file/${school_info?.chairman_photo?.replace(/\\/g, '/')}`,
       description: school_info?.chairman_speech
     },
     {
       title: 'অধ্যক্ষের বাণী',
-      image: `${process.env.SERVER_HOST}/${school_info?.principal_photo?.replace(/\\/g, '/')}`,
+      image: `${process.env.SERVER_HOST}/api/get_file/${school_info?.principal_photo?.replace(/\\/g, '/')}`,
       description: school_info?.principal_speech
     },
 
   ]
 
   const carousel_image = school_info?.carousel_image.map(i => ({
-    path: `${process.env.SERVER_HOST}/${i?.path?.replace(/\\/g, '/')}`
+    path: `${process.env.SERVER_HOST}/api/get_file/${i?.path?.replace(/\\/g, '/')}`
   }))
   return (
     <div>

@@ -212,7 +212,7 @@ function RegistrationFirstPart({
                     {/* father_photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={father_photo ? father_photo : `/files/${student?.student_info?.father_photo?.replace(/\\/g, '/')}`}
+                        <Image src={father_photo ? father_photo : `/api/get_file/${student?.student_info?.father_photo?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Father's photo:"
@@ -315,7 +315,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={mother_photo ? mother_photo : `/files/${student?.student_info?.mother_photo?.replace(/\\/g, '/')}`}
+                        <Image src={mother_photo ? mother_photo : `/api/get_file/${student?.student_info?.mother_photo?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Mother's photo:"
@@ -424,7 +424,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} item xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={guardian_photo ? guardian_photo : `/files/${student?.guardian_photo?.replace(/\\/g, '/')}`}
+                        <Image src={guardian_photo ? guardian_photo : `/api/get_file/${student?.guardian_photo?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Guardian's photo:"

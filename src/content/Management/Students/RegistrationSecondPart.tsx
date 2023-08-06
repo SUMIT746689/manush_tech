@@ -543,7 +543,7 @@ function RegistrationSecondPart({
                     {/* student photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={student_photo ? student_photo : `/files/${student?.student_photo?.replace(/\\/g, '/')}`}
+                        <Image src={student_photo ? student_photo : `/api/get_file/${student?.student_photo?.replace(/\\/g, '/')}`}
                           height={150}
                           width={150}
                           alt='Student photo'

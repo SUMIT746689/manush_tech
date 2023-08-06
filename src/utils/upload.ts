@@ -220,8 +220,12 @@ export const fileRename = async (file, newFilePath) => {
 
 }
 
-export const fileDelete = (path) => {
-    const filePath = path.join(process.cwd(), ...path);
+export const fileDelete = (pathParams) => {
+    console.log("parampath__",...pathParams);
+    
+    const filePath = path.join(process.cwd(), ...pathParams);
+    console.log("filePath__",filePath);
+    
     if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
     }

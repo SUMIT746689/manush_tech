@@ -53,7 +53,7 @@ const id = async (req, res) => {
 
             case 'PATCH':
                 try {
-                    const uploadFolderName = "files";
+                    const uploadFolderName = "studentsPhoto";
                     const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
                     const filterFiles = {
                         logo: fileType,
@@ -66,10 +66,11 @@ const id = async (req, res) => {
                     console.log(files, fields);
 
 
-                    const student_photo_name = files?.student_photo?.newFilename;
-                    const father_photo_name = files?.father_photo?.newFilename;
-                    const mother_photo_name = files?.mother_photo?.newFilename;
-                    const guardian_photo_name = files?.guardian_photo?.newFilename;
+                    const student_photo_path = files?.student_photo?.newFilename ? path.join(uploadFolderName, files?.student_photo?.newFilename) : undefined;
+                    const father_photo_path = files?.father_photo?.newFilename ? path.join(uploadFolderName, files?.father_photo?.newFilename) : undefined;
+                    const mother_photo_path = files?.mother_photo?.newFilename ? path.join(uploadFolderName, files?.mother_photo?.newFilename) : undefined;
+                    const guardian_photo_path = files?.guardian_photo?.newFilename ? path.join(uploadFolderName, files?.guardian_photo?.newFilename) : undefined;
+
                     if (
                         !fields.first_name ||
                         !fields.section_id ||
@@ -87,10 +88,6 @@ const id = async (req, res) => {
                         throw new Error('Required field value missing !!')
                     }
 
-
-                  
-
-
                     const hashPassword = fields?.password && fields?.password != '' ? await bcrypt.hash(
                         fields?.password,
                         Number(process.env.SALTROUNDS)
@@ -105,8 +102,8 @@ const id = async (req, res) => {
                         if (hashPassword) {
                             userUpdateQuery['password'] = hashPassword
                         }
-                        if (student_photo_name) {
-                            userUpdateQuery['user_photo'] = student_photo_name
+                        if (student_photo_path) {
+                            userUpdateQuery['user_photo'] = student_photo_path
                         }
 
                         const student = await transaction.student.update({
@@ -120,11 +117,11 @@ const id = async (req, res) => {
                                 // academic_year_id: 1,
                                 class_registration_no: fields?.registration_no,
                                 discount: parseFloat(fields?.discount),
-                                student_photo: student_photo_name,
+                                student_photo: student_photo_path,
                                 guardian_name: fields?.guardian_name,
                                 guardian_phone: fields?.guardian_phone,
                                 guardian_profession: fields?.guardian_profession,
-                                guardian_photo: guardian_photo_name,
+                                guardian_photo: guardian_photo_path,
                                 relation_with_guardian: fields?.relation_with_guardian,
                                 student_present_address: fields?.student_present_address,
                                 section: {
@@ -153,12 +150,12 @@ const id = async (req, res) => {
                                         father_name: fields?.father_name,
                                         father_phone: fields?.father_phone,
                                         father_profession: fields?.father_profession,
-                                        father_photo: father_photo_name,
+                                        father_photo: father_photo_path,
                                         // @ts-ignore
                                         mother_name: fields?.mother_name,
                                         mother_phone: fields?.mother_phone,
                                         mother_profession: fields?.mother_profession,
-                                        mother_photo: mother_photo_name,
+                                        mother_photo: mother_photo_path,
 
                                         student_permanent_address: fields?.student_permanent_address,
                                         previous_school: fields?.previous_school,
@@ -185,18 +182,19 @@ const id = async (req, res) => {
                                 }
                             }
                         })
-    
-                        if (student_photo_name) {
-                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_photo])
+
+                        if (student_photo_path) {
+                            fileDelete([`${process.env.FILESFOLDER}`, studentPast?.student_photo])
                         }
-                        if (father_photo_name) {
-                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_info?.father_photo])
+                        if (father_photo_path) {
+                            fileDelete([`${process.env.FILESFOLDER}`, studentPast?.student_info?.father_photo])
                         }
-                        if (mother_photo_name) {
-                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.student_info?.mother_photo])
+                        if (mother_photo_path) {
+                            fileDelete([`${process.env.FILESFOLDER}`, studentPast?.student_info?.mother_photo])
                         }
-                        if (guardian_photo_name) {
-                            fileDelete([`${process.env.FILESFOLDER}`, "files", studentPast?.guardian_photo])
+                        if (guardian_photo_path) {
+                            
+                            fileDelete([`${process.env.FILESFOLDER}`, studentPast?.guardian_photo])
                         }
 
                     })

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import fsp from 'fs/promises';
+import path from 'path';
 
 const prisma = new PrismaClient();
 

@@ -6,7 +6,7 @@ import axios from 'axios';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 
-import { fileUpload } from '@/utils/upload';
+import { fileRename, fileUpload } from '@/utils/upload';
 
 const postHandle = async (req, res, authenticate_user) => {
   try {
@@ -43,11 +43,30 @@ const postHandle = async (req, res, authenticate_user) => {
     if (error) {
       throw new Error('Server Error !')
     }
+    const filePathQuery = {}
 
-    const student_photo_path = files?.student_photo?.newFilename ? path.join(uploadFolderName, files?.student_photo?.newFilename) : null;
-    const father_photo_path = files?.father_photo?.newFilename ? path.join(uploadFolderName, files?.father_photo?.newFilename) : null;
-    const mother_photo_path = files?.mother_photo?.newFilename ? path.join(uploadFolderName, files?.mother_photo?.newFilename) : null;
-    const guardian_photo_path = files?.guardian_photo?.newFilename ? path.join(uploadFolderName, files?.guardian_photo?.newFilename) : null;
+    if (files?.student_photo?.newFilename) {
+      filePathQuery['student_photo_path'] = await fileRename(files,
+        uploadFolderName, "student_photo",
+        Date.now().toString() + '_' + files?.student_photo?.originalFilename)
+    }
+    if (files?.father_photo?.newFilename) {
+      filePathQuery['father_photo_path'] = await fileRename(files,
+        uploadFolderName, "father_photo",
+        Date.now().toString() + '_' + files?.father_photo?.originalFilename)
+    }
+    if (files?.mother_photo?.newFilename) {
+      filePathQuery['mother_photo_path'] = await fileRename(files,
+        uploadFolderName, "mother_photo",
+        Date.now().toString() + '_' + files?.mother_photo?.originalFilename)
+    }
+    if (files?.guardian_photo?.newFilename) {
+      filePathQuery['guardian_photo_path'] = await fileRename(files,
+        uploadFolderName, "guardian_photo",
+        Date.now().toString() + '_' + files?.guardian_photo?.originalFilename)
+    }
+    console.log({ filePathQuery });
+
     if (
       !fields.first_name ||
       !fields.class_id ||
@@ -100,12 +119,12 @@ const postHandle = async (req, res, authenticate_user) => {
           father_name: fields?.father_name,
           father_phone: fields?.father_phone,
           father_profession: fields?.father_profession,
-          father_photo: father_photo_path,
+          father_photo: filePathQuery?.father_photo_path,
           // @ts-ignore
           mother_name: fields?.mother_name,
           mother_phone: fields?.mother_phone,
           mother_profession: fields?.mother_profession,
-          mother_photo: mother_photo_path,
+          mother_photo: filePathQuery?.mother_photo_path,
 
           student_permanent_address: fields?.student_permanent_address,
           previous_school: fields?.previous_school,
@@ -117,7 +136,7 @@ const postHandle = async (req, res, authenticate_user) => {
             create: {
               username: fields.username,
               password: hashPassword,
-              user_photo: student_photo_path,
+              user_photo: filePathQuery?.student_photo_path,
               user_role: { connect: { id: student_role.id } },
               role: { connect: { id: student_role.id } },
               school: { connect: { id: parseInt(fields.school_id) } }
@@ -126,29 +145,17 @@ const postHandle = async (req, res, authenticate_user) => {
         }
       });
 
-      // await prisma.studentStatus.create({
-      //     data: {
-      //         section_id: parseInt(fields?.section_id),
-      //         student_id: student?.id,
-      //         session_id: parseInt(fields?.session_id),
-      //     }
-      // })
-
-      // console.log(fields?.section_id)
 
       const student = await transaction.student.create({
         data: {
-          // student_info: studentInformation,
-          // student_information_id: studentInformation.id,
           class_roll_no: fields?.roll_no,
-          // academic_year_id: 1,
           class_registration_no: fields?.registration_no,
           discount: parseFloat(fields?.discount),
-          student_photo: student_photo_path,
+          student_photo: filePathQuery?.student_photo_path,
           guardian_name: fields?.guardian_name,
           guardian_phone: fields?.guardian_phone,
           guardian_profession: fields?.guardian_profession,
-          guardian_photo: guardian_photo_path,
+          guardian_photo: filePathQuery?.guardian_photo_path,
           relation_with_guardian: fields?.relation_with_guardian,
           student_present_address: fields?.student_present_address,
           section: {
@@ -162,8 +169,6 @@ const postHandle = async (req, res, authenticate_user) => {
           }
         }
       });
-
-
 
       const fees = await transaction.fee.findMany({
         where: {
@@ -189,24 +194,6 @@ const postHandle = async (req, res, authenticate_user) => {
       await transaction.studentFee.createMany({
         data: StudentFeeContainer
       });
-      //   host: '880sms.com',
-      //   port: 3000,
-      //   path: `/smsapi?api_key=(APIKEY)&type=text&contacts=(NUMBER)&senderid=(Approved Sender ID)&msg=(Message Content)`,
-      //   method: 'POST',
-      //   headers: {
-      //     // headers such as "Cookie" can be extracted from req object and sent to /test
-      //   }
-      // }, (response) => {
-      //   var data = '';
-      //   response.setEncoding('utf8');
-      //   response.on('data', (chunk) => {
-      //     data += chunk;
-      //   });
-      //   response.on('end', () => {
-      //     res.end('check result: ' + data);
-      //   });
-      // });
-      // request.end();
 
     })
 

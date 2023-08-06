@@ -32,7 +32,7 @@ export const saveImage = (req, saveLocally) => {
 };
 export const imageFolder = async () => {
     try {
-        await fsp.readdir(path.join(process.cwd() +`${process.env.FILESFOLDER}`, "/files"));
+        await fsp.readdir(path.join(process.cwd() + `${process.env.FILESFOLDER}`, "/files"));
     } catch (error) {
         await fsp.mkdir(path.join(process.cwd() + `${process.env.FILESFOLDER}`, "/files"));
     }
@@ -208,24 +208,28 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
     return { files, fields, error };
 }
 
-export const fileRename = async (file, newFilePath) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await fsp.rename(file.filepath, newFilePath)
-            resolve('File renamed !')
-        } catch (err) {
-            reject('File rename failed!')
-        }
-    })
+export const fileRename = async (files, uploadFolderName, queryName, newFileName) => {
 
+    try {
+        await fsp.rename(
+            files[queryName]['filepath'],
+            path.join(process.cwd(),
+                `${process.env.FILESFOLDER}`,
+                uploadFolderName,
+                newFileName))
+        return path.join(uploadFolderName, newFileName)
+    }
+    catch (err) {
+        return path.join(uploadFolderName, files[queryName]['newFilename'])
+    }
 }
 
 export const fileDelete = (pathParams) => {
-    console.log("parampath__",...pathParams);
-    
-    const filePath = path.join(process.cwd(), ...pathParams);
-    console.log("filePath__",filePath);
-    
+    console.log("parampath__", ...pathParams);
+
+    const filePath = path.join(process.cwd(),`${process.env.FILESFOLDER}`, ...pathParams);
+    console.log("filePath__", filePath);
+
     if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
     }

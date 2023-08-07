@@ -46,8 +46,8 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         reFetchData();
         handleCreateClassClose();
       };
-      console.log("_values__",_values);
-      
+      console.log("_values__", _values);
+
       if (editData) {
         const res = await axios.patch(`/api/certificate_templates/${editData.id}`, _values);
         successResponse('updated');
@@ -297,7 +297,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         name="logo"
                         value={values.logo?.name || ''}
 
-                        handleChangeFile={(e) => { setFieldValue("logo", e.target.files[0]) }}
+                        handleChangeFile={(e) => { if (e.target?.files?.length) { setFieldValue("logo", e.target.files[0]) } }}
                         handleRemoveFile={() => { setFieldValue("logo", undefined) }}
                       />
                       {editData?.logo_url
@@ -313,7 +313,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         label="Signature Image"
                         name="signature"
                         value={values.signature?.name || ''}
-                        handleChangeFile={(e) => { setFieldValue("signature", e.target.files[0]) }}
+                        handleChangeFile={(e) => { if (e.target?.files?.length) { setFieldValue("signature", e.target.files[0]) } }}
                         handleRemoveFile={(e) => { setFieldValue("signature", undefined) }}
                       />
 
@@ -332,7 +332,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         value={values.background_image?.name || ''}
                         // touched={touched.background_image}
                         // errors={errors.background_image}
-                        handleChangeFile={(e) => { setFieldValue("background_image", e.target.files[0]) }}
+                        handleChangeFile={(e) => { if (e.target?.files?.length) { setFieldValue("background_image", e.target.files[0]) } }}
                         handleRemoveFile={(e) => { setFieldValue("background_image", undefined) }}
 
                       // handleBlur={handleBlur}

@@ -164,7 +164,7 @@ const Results = ({ data, reFetchData }) => {
                       name="header_image"
                       value={values?.header_image?.name || values?.header_image || ''}
                       handleChangeFile={(e) => {
-                        if (e.target.files.length) {
+                        if (e.target?.files?.length) {
                           const photoUrl = URL.createObjectURL(e.target.files[0]);
                           setHeader_image(photoUrl)
                           setFieldValue('header_image', e.target.files[0])
@@ -282,7 +282,7 @@ const Results = ({ data, reFetchData }) => {
                       name="history_photo"
                       value={values?.history_photo?.name || values?.history_photo || ''}
                       handleChangeFile={(e) => {
-                        if (e.target.files.length) {
+                        if (e.target.files?.length) {
                           const photoUrl = URL.createObjectURL(e.target.files[0]);
                           setHistory_photo(photoUrl)
                           setFieldValue('history_photo', e.target.files[0])
@@ -318,7 +318,7 @@ const Results = ({ data, reFetchData }) => {
                       name="chairman_photo"
                       value={values?.chairman_photo?.name || values?.chairman_photo || ''}
                       handleChangeFile={(e) => {
-                        if (e.target.files.length) {
+                        if (e.target.files?.length) {
                           console.log("e.target.files__", e.target.files);
 
                           const photoUrl = URL.createObjectURL(e.target.files[0]);
@@ -376,7 +376,7 @@ const Results = ({ data, reFetchData }) => {
                       name="principal_photo"
                       value={values?.principal_photo?.name || values?.principal_photo || ''}
                       handleChangeFile={(e) => {
-                        if (e.target.files.length) {
+                        if (e.target.files?.length) {
                           const photoUrl = URL?.createObjectURL(e.target.files[0]);
                           setPrincipal_photo(photoUrl)
                           setFieldValue('principal_photo', e.target.files[0])

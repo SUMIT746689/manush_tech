@@ -328,7 +328,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                         name="user_photo"
                         value={values?.user_photo?.name || values?.user_photo || ''}
                         handleChangeFile={(e) => {
-                          if (e.target.files.length) {
+                          if (e.target.files?.length) {
                             const photoUrl = URL.createObjectURL(e.target.files[0]);
                             setUser_photo(photoUrl)
                             setFieldValue('user_photo', e.target.files[0])

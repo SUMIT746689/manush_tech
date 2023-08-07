@@ -79,7 +79,9 @@ const patchHandle = async (req, res, authenticate_user) => {
             if (hashPassword) {
                 userUpdateQuery['password'] = hashPassword
             }
+            //@ts-ignore
             if (filePathQuery?.student_photo_path) {
+                //@ts-ignore
                 userUpdateQuery['user_photo'] = filePathQuery?.student_photo_path
             }
 
@@ -98,17 +100,17 @@ const patchHandle = async (req, res, authenticate_user) => {
                     }
                 }
             })
-
-            if (filePathQuery?.student_photo_path) {
+            //@ts-ignore
+            if (filePathQuery?.student_photo_path && studentPast?.student_photo) {
                 fileDelete([studentPast?.student_photo])
-            }
-            if (filePathQuery?.father_photo_path) {
+            }//@ts-ignore
+            if (filePathQuery?.father_photo_path && studentPast?.student_info?.father_photo) {
                 fileDelete([studentPast?.student_info?.father_photo])
-            }
-            if (filePathQuery?.mother_photo_path) {
+            }//@ts-ignore
+            if (filePathQuery?.mother_photo_path && studentPast?.student_info?.mother_photo) {
                 fileDelete([studentPast?.student_info?.mother_photo])
-            }
-            if (filePathQuery?.guardian_photo_path) {
+            }//@ts-ignore
+            if (filePathQuery?.guardian_photo_path && studentPast?.guardian_photo) {
                 fileDelete([studentPast?.guardian_photo])
             }
 
@@ -123,10 +125,12 @@ const patchHandle = async (req, res, authenticate_user) => {
                     // academic_year_id: 1,
                     class_registration_no: fields?.registration_no,
                     discount: parseFloat(fields?.discount),
+                    //@ts-ignore
                     student_photo: filePathQuery?.student_photo_path,
                     guardian_name: fields?.guardian_name,
                     guardian_phone: fields?.guardian_phone,
                     guardian_profession: fields?.guardian_profession,
+                    //@ts-ignore
                     guardian_photo: filePathQuery?.guardian_photo_path,
                     relation_with_guardian: fields?.relation_with_guardian,
                     student_present_address: fields?.student_present_address,
@@ -156,11 +160,12 @@ const patchHandle = async (req, res, authenticate_user) => {
                             father_name: fields?.father_name,
                             father_phone: fields?.father_phone,
                             father_profession: fields?.father_profession,
+                            //@ts-ignore
                             father_photo: filePathQuery?.father_photo_path,
-                            // @ts-ignore
                             mother_name: fields?.mother_name,
                             mother_phone: fields?.mother_phone,
                             mother_profession: fields?.mother_profession,
+                            //@ts-ignore
                             mother_photo: filePathQuery?.mother_photo_path,
 
                             student_permanent_address: fields?.student_permanent_address,

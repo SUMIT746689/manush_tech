@@ -133,6 +133,10 @@ const index = async (req, res, refresh_token) => {
 
                 const targetGrad = allGrad.find(i => i.lower_mark <= mark_obtained && i.upper_mark >= mark_obtained)
 
+                if(!targetGrad){
+                    throw new Error('Grade not found !')
+                }
+
                 if (uniqueStudentResult) {
 
                     const isExist = await prisma.studentResultDetails.findFirst({

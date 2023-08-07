@@ -5,8 +5,7 @@ import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } fr
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
-import { DropDownSelectWrapper, DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
-import { MobileDatePicker } from '@mui/lab';
+import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
@@ -14,7 +13,7 @@ import { fetchData } from '@/utils/post';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
-  const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }:any = useFormikContext()
+  const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }: any = useFormikContext()
 
 
   console.log({ sms_datas });
@@ -136,9 +135,9 @@ const TypeIndividual = () => {
 
   const handleRoleSelect = async (e) => {
     const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${e.target.value}`, 'get', {});
-    console.log({ err,res });
-  
-    if(!err) setSelecteNameList(() => res.map(user=>({value:user.id,title: user.username})));
+    console.log({ err, res });
+
+    if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, title: user.username })));
     setFieldValue("name", []);
     const findSelectedTemplate = roles.find(data => data.id === e.target.value)
     if (!findSelectedTemplate) return;
@@ -148,7 +147,7 @@ const TypeIndividual = () => {
     setSelecteNameList((value) => customize_select_sectionlist)
     // setFieldValue("body", findSelectedTemplate.body)
     // handleBlur("body")
-  
+
   };
 
   const handleNameSelect = (e) => {
@@ -174,7 +173,7 @@ const TypeIndividual = () => {
 const DynamicTypeSelect = () => {
   // const { data: sms_datas } = useClientDataFetch("/api/")
   // const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue } = useFormikContext()
-  const { values, setFieldValue }:any = useFormikContext()
+  const { values, setFieldValue }: any = useFormikContext()
   console.log({ 'values__': values })
   const types = [{ value: "SELECT", title: "SELECT" }, { value: "CLASS", title: "CLASS" }, { value: "GROUP", title: "GROUP" }, { value: 'INDIVIDUAL', title: "INDIVIDUAL" }]
 
@@ -217,8 +216,8 @@ function PageHeader() {
         // reFetchData();
       };
 
-      const {data} = await axios.post(`/api/sent_sms`, _values);
-      console.log({data})
+      const { data } = await axios.post(`/api/sent_sms`, _values);
+      console.log({ data })
       successResponse('created');
 
     } catch (err) {
@@ -262,7 +261,7 @@ function PageHeader() {
             sms_gateway_id: Yup.number()
               .min(0)
               .required(t('The sms gateway field is required')),
-              recipient_type: Yup.string()
+            recipient_type: Yup.string()
               .min(4)
               .required(t('The type field is required')),
           })}
@@ -273,7 +272,7 @@ function PageHeader() {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
-            console.log({errors})
+            console.log({ errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

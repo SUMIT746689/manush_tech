@@ -1,14 +1,15 @@
 import { Authenticated } from '@/components/Authenticated';
 import Footer from '@/components/Footer';
-import { useClientFetch } from '@/hooks/useClientFetch';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
-import { Grid } from '@mui/material';
+import { Button, ButtonGroup, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
-import PageHeader from '@/content/BulkSmsAndEmail/SendEmailOrSms/PageHeader';
+import SmsPage from '@/content/BulkSmsAndEmail/SendEmailOrSms/SmsPage';
+import EmailPage from '@/content/BulkSmsAndEmail/SendEmailOrSms/EmailPage';
+import { useState } from 'react';
 
 const Packages = () => {
-  // const { data: packages } = useClientFetch('/api/packages');
+  const [type, setType] = useState("SMS")
   return (
     <>
       <Head>
@@ -21,7 +22,23 @@ const Packages = () => {
           gap={2}
           px={1}
         >
-          <PageHeader/>
+          <Grid display="flex" justifyContent="center">
+            <ButtonGroup
+              disableElevation
+              variant="contained"
+              aria-label="Disabled elevation buttons"
+              sx={{ borderRadius: 0.5, mt: 1 }}
+            >
+              <Button onClick={() => { setType("SMS") }} variant={type === "SMS" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> SENT SMS</Button>
+              <Button onClick={() => { setType("EMAIL") }} variant={type === "EMAIL" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> SENT EMAIL</Button>
+            </ButtonGroup>
+          </Grid>
+
+          {type === "SMS" ?
+            <SmsPage />
+            :
+            <EmailPage />
+          }
         </Grid>
 
         <Footer />

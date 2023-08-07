@@ -21,8 +21,7 @@ interface Filters {
 }
 
 
-const applyFilters = (sessions,query,filters) => {
-  console.log({ sessions })
+const applyFilters = (sessions, query, filters) => {
   return sessions?.filter((project) => {
     let matches = true;
 
@@ -102,17 +101,16 @@ const Results: FC<ResultsProps> = ({ }) => {
   const selectedAllschools = selectedItems.length === reportDatas.length;
 
   const handleChange = (e) => {
-    console.log({ e: e.target.value });
     setType(e.target.value)
+    setReportDatas([])
   }
   const handleCompaignChange = (e) => {
-    console.log({ e: e.target.value });
+
     setCompaignType(e.target.value)
   }
   const handleSearchClick = async () => {
     const url = type === 'SMS' ? '/api/sent_sms' : '/api/sent_email';
     const [err, res] = await fetchData(url, 'get', {});
-    console.log({ err, res });
     if (res?.success) setReportDatas(res.data);
     else setReportDatas([]);
   }
@@ -126,7 +124,7 @@ const Results: FC<ResultsProps> = ({ }) => {
           <DropDownSelectWrapper value={compaignType} label={'Campaign Type'} handleChange={handleCompaignChange} menuItems={['SELECT ALL']} />
         </Grid>
         <Grid item container justifyContent={"flex-end"} >
-          <DropDownSelectWrapper value={'sss'} label={'Campaign Type'} handleChange={handleChange} menuItems={['a', 'b', 'v']} />
+          {/* <DropDownSelectWrapper value={'sss'} label={'Campaign Type'} handleChange={handleChange} menuItems={['a', 'b', 'v']} /> */}
           <ButtonWrapper handleClick={handleSearchClick}>Search</ButtonWrapper>
         </Grid>
       </Card>
@@ -140,7 +138,7 @@ const Results: FC<ResultsProps> = ({ }) => {
         {!selectedBulkActions && (
           <>
             <TableHeadWrapper
-              title="sms templates"
+              title="reports"
               total={paginatedFees.length}
               count={filteredschools.length}
               page={page}
@@ -153,7 +151,7 @@ const Results: FC<ResultsProps> = ({ }) => {
         <Divider />
 
         {paginatedFees.length === 0 ? (
-          <TableEmptyWrapper title="no sent sms found" />
+          <TableEmptyWrapper title={`no ${type} report found`} />
         )
           :
           (
@@ -162,7 +160,12 @@ const Results: FC<ResultsProps> = ({ }) => {
                 tableHead={
                   <TableRow>
                     <TableCell>{t('ID')}</TableCell>
-                    <TableCell>{t('sms gateway')}</TableCell>
+                    {
+                      type === 'SMS' ?
+                        <TableCell>{t('sms gateway')}</TableCell>
+                        :
+                        <TableCell>{t('email subject')}</TableCell>
+                    }
                     <TableCell>{t('Recipient type')}</TableCell>
                     <TableCell>{t('recipient count')}</TableCell>
                     <TableCell>{t('created at')}</TableCell>
@@ -186,7 +189,12 @@ const Results: FC<ResultsProps> = ({ }) => {
                             {fee.id}
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
-                            {fee.amount}
+                            {
+                              type === 'SMS' ?
+                                fee?.smsGateway?.title
+                                :
+                                 fee.subject 
+                            }
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
                             {fee.recipient_type}

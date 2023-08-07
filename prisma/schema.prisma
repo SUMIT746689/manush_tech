@@ -31,6 +31,7 @@ model User {
   EmployeeAttendance EmployeeAttendance[]
   StudentFee         StudentFee[]
   Leave              Leave[]
+  SentEmailDetail    SentEmailDetail[]
 
   @@map("users")
 }
@@ -69,6 +70,8 @@ model School {
   Transaction         Transaction[]
   GradingSystem       GradingSystem[]
   Notice              Notice[]
+  EmailTemplate       EmailTemplate[]
+  SentEmail           SentEmail[]
 
   // routines Routine[]
   @@map("schools")
@@ -643,13 +646,13 @@ enum RecipientType {
 }
 
 model SentSmsDetail {
-  id          Int           @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   sent_sms_id Int
   name        String
   phone       String
   user_id     Int
-  status      SentSmsStatus
-  created_at  DateTime      @default(now())
+  status      SentStatus
+  created_at  DateTime   @default(now())
 
   sentSms SentSms @relation(fields: [sent_sms_id], references: [id])
   user    User    @relation(fields: [user_id], references: [id])
@@ -657,10 +660,56 @@ model SentSmsDetail {
   @@map("sent_sms_details")
 }
 
-enum SentSmsStatus {
+enum SentStatus {
   pending
   success
   failed
+}
+
+model EmailTemplate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  body       String
+  school_id  Int
+  created_at DateTime @default(now())
+
+  school    School      @relation(fields: [school_id], references: [id])
+  SentEmail SentEmail[]
+
+  @@map("email_templates")
+}
+
+model SentEmail {
+  id                Int            @id @default(autoincrement())
+  name              String
+  recipient_type    RecipientType?
+  recipient_count   Int?
+  email_template_id Int?
+  subject           String
+  school_id         Int
+  custom_body       String?
+  created_at        DateTime       @default(now())
+
+  school          School            @relation(fields: [school_id], references: [id])
+  emailTemplate   EmailTemplate?    @relation(fields: [email_template_id], references: [id])
+  sentEmailDetail SentEmailDetail[]
+
+  @@map("sent_email")
+}
+
+model SentEmailDetail {
+  id            Int        @id @default(autoincrement())
+  sent_email_id Int
+  name          String
+  phone         String
+  user_id       Int
+  status        SentStatus
+  created_at    DateTime   @default(now())
+
+  sentEmail SentEmail @relation(fields: [sent_email_id], references: [id])
+  user      User      @relation(fields: [user_id], references: [id])
+
+  @@map("sent_email_details")
 }
 
 model CertificateTemplate {

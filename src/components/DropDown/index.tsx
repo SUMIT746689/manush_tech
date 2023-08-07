@@ -40,7 +40,7 @@ export function DynamicDropDownSelectWrapper({ value, name, label, handleChange,
             borderRadius: 0.6,
           }
         }}
-        >
+      >
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select
           labelId="demo-simple-select-label"
@@ -73,7 +73,15 @@ export function DynamicDropDownMuilipleSelectWrapper({ value, name, label, handl
   return (
 
     <Grid container sx={{ pb: 1 }}>
-      <FormControl fullWidth>
+      <FormControl
+        fullWidth
+        size='small'
+        sx={{
+          [`& fieldset`]: {
+            borderRadius: 0.6,
+          }
+        }}
+      >
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select
           labelId="demo-simple-select-label"

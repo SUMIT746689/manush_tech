@@ -4,7 +4,7 @@ import {
   TableRow, TextField, Typography, Button, useTheme, CircularProgress, Paper, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { forwardRef, Fragment, useContext, useEffect, useState } from 'react';
+import { forwardRef, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
@@ -26,20 +26,20 @@ const columns = [
     dataKey: 'name',
   },
   {
-    width: 20,
+    width: 30,
     label: 'class roll no',
     dataKey: 'class_roll_no',
 
   },
 
   {
-    width: 60,
+    width: 50,
     label: 'attendence',
     dataKey: 'attendence',
 
   },
   {
-    width: 60,
+    width: 30,
     label: 'Guardian Phone',
     dataKey: 'guardian_phone',
 
@@ -49,38 +49,38 @@ const columns = [
 const VirtuosoTableComponents = {
   Scroller: forwardRef((props, ref) => (
     // @ts-ignore
-    <TableContainer component={Paper} {...props} ref={ref} />
+    <div component={Paper} {...props} ref={ref} />
   )),
   Table: (props) => (
-    <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />
+    <table {...props} style={{ borderCollapse: 'separate', width: '100%' }} />
   ),
   TableHead,
-  TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+  TableRow: ({ item: _item, ...props }) => <tr {...props} />,
   // @ts-ignore
-  TableBody: forwardRef((props, ref) => <TableBody {...props} ref={ref} />),
+  TableBody: forwardRef((props, ref) => <tbody {...props} ref={ref} />),
 };
 
 function fixedHeaderContent() {
-
-
   return (
-    <TableRow >
+    <tr >
       {columns.map((column) => (
-        <TableCell
+        <th
 
           key={column.dataKey}
-          variant="head"
-          // align={'center'}
-          // style={{ width: column.width }}
-          sx={{
-            backgroundColor: 'background.paper',
-          }}
-        >
-          {column.label}<br />
 
-        </TableCell>
+          align={'center'}
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+
+          }}
+
+        >
+          {column.label}
+
+        </th>
       ))}
-    </TableRow>
+    </tr>
   );
 }
 
@@ -89,29 +89,35 @@ function rowContent(_index, row, setSectionAttendence) {
 
   return (
 
-    <Fragment>
-      {columns.map((column) => (
-        <TableCell
-          key={column.dataKey}
-        // align={'center'}
+    columns.map((column) => (
+      <td
+        key={column.dataKey}
+        style={{
+          whiteSpace: 'nowrap',
+          minWidth: column.width,
+          padding: 3,
+          margin: 'auto',
+          textAlign:'center'
+        }}
+      >
 
-        >
-          {column.dataKey == 'attendence' ?
-            <>
-              <AttendenceSwitch
-                attendence={row['attendence']}
-                student_id={row.id}
-                remark={row['remark']}
-                setSectionAttendence={setSectionAttendence}
-              />
-            </>
-            : row[column.dataKey]
-          }
+        {column.dataKey == 'attendence' ?
+
+          <AttendenceSwitch
+            attendence={row['attendence']}
+            student_id={row.id}
+            remark={row['remark']}
+            setSectionAttendence={setSectionAttendence}
+          />
+
+          : row[column.dataKey]
+        }
 
 
-        </TableCell>
-      ))}
-    </Fragment>
+
+      </td>
+    ))
+
   );
 }
 
@@ -141,9 +147,6 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
   }
 
   const handleUpdateApi = (e) => {
-
-    console.log("remarkValue__", remarkValue);
-
     setSectionAttendence(prev => {
 
       const temp = {
@@ -154,15 +157,11 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
         temp['remark'] = remarkValue
       }
       const isExistIndex = prev.findIndex(i => i?.student_id == student_id)
-      console.log("isExistIndex__", isExistIndex);
-
       if (isExistIndex < 0) {
         return [...prev, temp]
       }
       else {
         prev[isExistIndex] = temp
-        console.log("prev__", prev);
-
         return [...prev]
 
       }
@@ -176,61 +175,48 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
   }
 
   return (
-    <>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      // border:'1px solid red',
+      justifyContent:'center'
+    }}>
       {/* <Switch checked={value} onChange={handleUpdate} /> */}
+      <RadioGroup
+        row
+        name="attendance"
+        value={attendenceValue}
+        onChange={handleUpdate}
+        sx={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+        }}
+      >
+        <FormControlLabel value="present" control={<Radio />} label="Present" />
+        <FormControlLabel value="absent" control={<Radio />} label="Absent" />
+        <FormControlLabel value="late" control={<Radio />} label="Late" />
+        <FormControlLabel value="bunk" control={<Radio />} label="Bunk" />
+        <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
+      </RadioGroup>
 
-      <FormControl sx={{
-        marginRight: 1
-      }}>
-        <RadioGroup
-          row
-          name="attendance"
-          value={attendenceValue}
-          onChange={handleUpdate}
-          sx={{
-            display: 'flex',
-            flexWrap: 'nowrap'
-          }}
-        >
-          <FormControlLabel value="present" control={<Radio />} label="Present" />
-          <FormControlLabel value="absent" control={<Radio />} label="Absent" />
-          <FormControlLabel value="late" control={<Radio />} label="Late" />
-          <FormControlLabel value="bunk" control={<Radio />} label="Bunk" />
-          <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
-          <TextField
-            size='small'
-            sx={{
-              width: '100px',
-              height: '20px',
-              p: 0
-            }}
-            variant="outlined"
-            value={remarkValue}
-            onChange={(e) => {
+      <TextField
+      sx={{
+        minWidth:'150px'
+      }}
+        size='small'
+        variant="outlined"
+        value={remarkValue}
+        onChange={(e) => { setRemarkValue(e.target.value) }}
+        onBlur={(e) => {
+          console.log("onblue", attendenceValue, remarkValue);
+          if (attendenceValue && remarkValue !== '') { handleUpdateApi(attendenceValue) }
+        }}
+        label="Remarks"
+        type='text'
+      />
 
-
-              setRemarkValue(e.target.value)
-
-            }}
-            onBlur={(e) => {
-              console.log("onblue", attendenceValue, remarkValue);
-              if (attendenceValue && remarkValue !== '') {
-                //  console.log(attendenceValue, remarkValue);
-
-
-                handleUpdateApi(attendenceValue)
-                // setRemarkValue(null)
-              }
-            }}
-            label="Remarks"
-            type='text'
-          />
-        </RadioGroup>
-      </FormControl>
-
-
-
-    </>
+    </div>
   );
 };
 
@@ -363,7 +349,7 @@ const Results = () => {
   }
 
   return (
-    <Grid sx={{minHeight: 'calc(100vh - 330px) !important'}}>
+    <Grid sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
       <Card
         sx={{
           p: 1,
@@ -439,7 +425,7 @@ const Results = () => {
         }
       </Card>
 
-      <Grid container spacing={0}  justifyContent={'flex-end'} >
+      <Grid container spacing={0} justifyContent={'flex-end'} >
         <Paper style={{ height: 400, width: '100%' }}>
           <TableVirtuoso
             data={students || []}

@@ -227,9 +227,11 @@ function RegistrationFirstPart({
                         name="father_photo"
                         value={values?.father_photo?.name || student?.student_info?.father_photo || ''}
                         handleChangeFile={(e) => {
-                          const photoUrl = URL.createObjectURL(e.target.files[0]);
-                          setFather_photo(photoUrl)
-                          setFieldValue('father_photo', e.target.files[0])
+                          if (e.target?.files?.length) {
+                            const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            setFather_photo(photoUrl)
+                            setFieldValue('father_photo', e.target.files[0])
+                          }
                         }}
                         handleRemoveFile={(e) => {
                           setFather_photo(null);
@@ -330,9 +332,11 @@ function RegistrationFirstPart({
                         name="mother_photo"
                         value={values?.mother_photo?.name || student?.student_info?.mother_photo || ''}
                         handleChangeFile={(e) => {
-                          const photoUrl = URL.createObjectURL(e.target.files[0]);
-                          setMother_photo(photoUrl)
-                          setFieldValue('mother_photo', e.target.files[0])
+                          if (e.target?.files?.length) {
+                            const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            setMother_photo(photoUrl)
+                            setFieldValue('mother_photo', e.target.files[0])
+                          }
                         }}
                         handleRemoveFile={(e) => {
                           setMother_photo(null);
@@ -439,9 +443,11 @@ function RegistrationFirstPart({
                         name="guardian_photo"
                         value={values?.guardian_photo?.name || student?.guardian_photo || ''}
                         handleChangeFile={(e) => {
-                          const photoUrl = URL.createObjectURL(e.target.files[0]);
-                          setGuardian_photo(photoUrl)
-                          setFieldValue('guardian_photo', e.target.files[0])
+                          if (e.target?.files?.length) {
+                            const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            setGuardian_photo(photoUrl)
+                            setFieldValue('guardian_photo', e.target.files[0])
+                          }
                         }}
                         handleRemoveFile={(e) => {
                           setGuardian_photo(null);

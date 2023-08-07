@@ -88,20 +88,27 @@ function DashboardReportsContent({ blockCount = null }) {
             <PageHeader />
           </Grid>
           <Grid item>
-            {
-              // @ts-ignore
-              user?.role?.title === "ADMIN" &&<Grid container gap={10}>
-                <Button variant='contained' color='secondary'>
-                  
+
+
+            <Grid container gap={10}>
+              {
+                // @ts-ignore
+                user?.role?.title === "ADMIN" && <Button variant='contained' color='secondary'>
+
                   <Link href={`http://${blockCount?.domain}`} color="primary" rel="noopener noreferrer" target="_blank">
                     {t('Front end link')}
                   </Link>
                 </Button>
-                <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
+              }
+              {
+                // @ts-ignore
+                user?.role?.title === "SUPER_ADMIN" && <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained' >
                   Database backup
                 </Button>
-              </Grid>
-            }
+              }
+
+            </Grid>
+
 
           </Grid>
 

@@ -226,8 +226,7 @@ export const fileRename = async (files, uploadFolderName, queryName, newFileName
 
 export const fileDelete = (pathParams) => {
     console.log("parampath__", ...pathParams);
-
-    const filePath = path.join(process.cwd(),`${process.env.FILESFOLDER}`, ...pathParams);
+    const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, ...pathParams);
     console.log("filePath__", filePath);
 
     if (fs.existsSync(filePath)) {

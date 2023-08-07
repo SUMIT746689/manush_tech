@@ -558,9 +558,11 @@ function RegistrationSecondPart({
                         name="student_photo"
                         value={values?.student_photo?.name || student?.student_photo || ''}
                         handleChangeFile={(e) => {
-                          const photoUrl = URL.createObjectURL(e.target.files[0]);
-                          setStudent_photo(photoUrl)
-                          setFieldValue('student_photo', e.target.files[0])
+                          if (e.target?.files?.length) {
+                            const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            setStudent_photo(photoUrl)
+                            setFieldValue('student_photo', e.target.files[0])
+                          }
                         }}
                         handleRemoveFile={(e) => {
                           setStudent_photo(null);

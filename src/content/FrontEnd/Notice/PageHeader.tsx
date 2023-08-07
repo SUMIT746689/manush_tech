@@ -64,7 +64,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         console.log({ res })
         successResponse('created');
       }
-    } 
+    }
     catch (err) {
       console.error(err);
       showNotification(err?.response?.data?.message, 'error');
@@ -154,7 +154,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                         name="photo"
                         value={values.photo?.name || ''}
 
-                        handleChangeFile={(e) => { setFieldValue("photo", e.target.files[0]) }}
+                        handleChangeFile={(e) => { if (e.target?.files?.length) { setFieldValue("photo", e.target.files[0]) } }}
                         handleRemoveFile={() => { setFieldValue("photo", undefined) }}
                       />
 

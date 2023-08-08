@@ -178,7 +178,7 @@ function ManagementClasses() {
                 <Button
                   size='small'
                   variant="contained"
-                  href='/files/student.xlsx'
+                  href={`/student.xlsx`}
                 >
                   Download Excel format
 
@@ -205,7 +205,7 @@ function ManagementClasses() {
                   label="select Excel file"
                   name="excelUpload"
                   value={excelFileUpload?.name || ''}
-                  handleChangeFile={(e) => {  if (e.target?.files?.length) { setExcelFileUpload(e.target.files[0]) }}}
+                  handleChangeFile={(e) => { if (e.target?.files?.length) { setExcelFileUpload(e.target.files[0]) } }}
                   handleRemoveFile={(e) => { setExcelFileUpload(undefined) }}
                 />
               </Grid>
@@ -303,9 +303,9 @@ function ManagementClasses() {
               xs={6}
               sm={4}
               md={2}
-              >
-              <Button 
-                
+            >
+              <Button
+
                 variant="contained" onClick={handleStudentList}> Find</Button>
             </Grid>
           }

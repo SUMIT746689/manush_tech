@@ -119,11 +119,12 @@ const postHandle = async (req, res, authenticate_user) => {
           father_name: fields?.father_name,
           father_phone: fields?.father_phone,
           father_profession: fields?.father_profession,
-          father_photo: filePathQuery?.father_photo_path,
           // @ts-ignore
+          father_photo: filePathQuery?.father_photo_path,
           mother_name: fields?.mother_name,
           mother_phone: fields?.mother_phone,
           mother_profession: fields?.mother_profession,
+          // @ts-ignore
           mother_photo: filePathQuery?.mother_photo_path,
 
           student_permanent_address: fields?.student_permanent_address,
@@ -136,6 +137,7 @@ const postHandle = async (req, res, authenticate_user) => {
             create: {
               username: fields.username,
               password: hashPassword,
+              // @ts-ignore
               user_photo: filePathQuery?.student_photo_path,
               user_role: { connect: { id: student_role.id } },
               role: { connect: { id: student_role.id } },
@@ -151,10 +153,12 @@ const postHandle = async (req, res, authenticate_user) => {
           class_roll_no: fields?.roll_no,
           class_registration_no: fields?.registration_no,
           discount: parseFloat(fields?.discount),
+          // @ts-ignore
           student_photo: filePathQuery?.student_photo_path,
           guardian_name: fields?.guardian_name,
           guardian_phone: fields?.guardian_phone,
           guardian_profession: fields?.guardian_profession,
+          // @ts-ignore
           guardian_photo: filePathQuery?.guardian_photo_path,
           relation_with_guardian: fields?.relation_with_guardian,
           student_present_address: fields?.student_present_address,

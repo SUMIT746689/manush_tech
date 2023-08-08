@@ -314,11 +314,12 @@ const Results: FC<ResultsProps> = ({
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">
-                      <Checkbox
+                      {/* <Checkbox
                         checked={selectedAllschools}
                         indeterminate={selectedSomeschools}
                         onChange={handleSelectAllschools}
-                      />
+                      /> */}
+                      <TableCell align="center">{t('ID')}</TableCell>
                     </TableCell>
                     <TableCell>{t('Title')}</TableCell>
                     <TableCell>{t('Fee for')}</TableCell>
@@ -344,13 +345,16 @@ const Results: FC<ResultsProps> = ({
                         selected={isschoolselected}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox
+                          {/* <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
                               handleSelectOneProject(event, fee.id)
                             }
                             value={isschoolselected}
-                          />
+                          /> */}
+                          <Typography noWrap align="center" variant="h5">
+                            {fee.id}
+                          </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
@@ -395,7 +399,7 @@ const Results: FC<ResultsProps> = ({
                                 <LaunchTwoToneIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title={t('Delete')} arrow>
+                            {/* <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
                                   handleConfirmDelete(fee.id)
@@ -404,7 +408,7 @@ const Results: FC<ResultsProps> = ({
                               >
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>
-                            </Tooltip>
+                            </Tooltip> */}
                           </Typography>
                         </TableCell>
                       </TableRow>

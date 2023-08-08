@@ -116,7 +116,7 @@ const handlePost = async (req, res, refresh_token) => {
                             const uniquePassword = (!value || value == '') ? unique_password_generate() : value;
                             student['mainPassword'] = uniquePassword
                             const hashPassword = await bcrypt.hash(
-                                uniquePassword ,
+                                uniquePassword,
                                 Number(process.env.SALTROUNDS)
                             );
                             calculatedValue = hashPassword
@@ -329,20 +329,28 @@ const handlePost = async (req, res, refresh_token) => {
                 for (let i of fees) {
                     StudentFeeContainer.push({
                         student_id: student?.id,
-                        fee_id: i.id
+                        fee_id: i.id,
+                        collected_amount: 0,
+                        payment_method: 'pending'
                     });
                 }
                 await transaction.studentFee.createMany({
                     data: StudentFeeContainer
                 });
-                const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${i?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
-                // const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${fields?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(fields?.phone)}`)
 
-                if (sms_res.data == 1015) {
+                try {
+                    const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${i?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
+                    if (sms_res.data == 1015) {
+                        faildedSmS.push(student.id)
+                    }
+                    else if (sms_res.data.startsWith('SMS SUBMITTED')) {
+                        successSmS.push(student.id)
+                    }
+                    else {
+                        successSmS.push(student.id)
+                    }
+                } catch (err) {
                     faildedSmS.push(student.id)
-                }
-                else if (sms_res.data.startsWith('SMS SUBMITTED')) {
-                    successSmS.push(student.id)
                 }
             })
 

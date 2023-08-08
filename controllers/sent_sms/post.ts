@@ -23,31 +23,35 @@ const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
   })
 };
 
-const sentSmsToUsers = async (user, responseSentSms_id) => {
+const sentSmsToUsers = async (user, responseSentSms) => {
   let status = "pending"
   try {
-    const { data: sms_res } = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${user?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${"mehedi"}`)}`)
+    const name = [user?.first_name, user?.middle_name, user?.last_name].join(' ');
+    const { data: sms_res } = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${user?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${name}, ${responseSentSms?.custom_body}`)
+      }`)
     if (typeof sms_res === "string" && sms_res?.startsWith("SMS SUBMITTED")) status = "success"
     else status = "failed"
-    insertDataToSentSmsDetails({ responseSentSms_id, status, user })
+    insertDataToSentSmsDetails({ responseSentSms_id: responseSentSms.id, status, user })
   }
   catch (err) {
     status = "failed"
-    insertDataToSentSmsDetails({ responseSentSms_id, status, user })
+    insertDataToSentSmsDetails({ responseSentSms_id: responseSentSms.id, status, user })
     console.log({ "send sms error": err.message })
   }
 }
 
 const sentSmsHandler = ({ sentSmsUsers, responseSentSms }) => {
+  console.log("responseSentSms__", responseSentSms);
+
   //individual user sent sms and insert response and data into sent sms details table
   sentSmsUsers.forEach((user) => {
     // if (user) 
-    sentSmsToUsers(user, responseSentSms.id)
+    sentSmsToUsers(user, responseSentSms)
   })
 };
 
 // insert data to sent sms table
-const insertsentSms = async ({ recipient_type, campaign_name, sms_template_id, sms_gateway_id, school_id, custom_body,recipient_count=0 }) => {
+const insertsentSms = async ({ recipient_type, campaign_name, sms_template_id, sms_gateway_id, school_id, custom_body, recipient_count = 0 }) => {
 
   const data = {
     name: campaign_name,
@@ -79,11 +83,11 @@ const updateSentSms = async ({ responseSentSms, sentSmsUsers }) => {
 const getUsers = async ({ role, where }) => {
   switch (role.title) {
     case "TEACHER":
-      return await prisma.teacher.findMany({ where: { ...where }, select: { phone: true, user_id: true } });
+      return await prisma.teacher.findMany({ where: { ...where }, select: { phone: true, user_id: true, first_name: true, middle_name: true, last_name: true } });
 
     case "STUDENT":
 
-      return await prisma.studentInformation.findMany({ where: { ...where }, select: { phone: true, user_id: true } });
+      return await prisma.studentInformation.findMany({ where: { ...where }, select: { phone: true, user_id: true, first_name: true, middle_name: true, last_name: true } });
 
     default:
       where['user_role_id'] = role.id;
@@ -122,7 +126,7 @@ async function post(req, res, refresh_token) {
         // const permissions = user.role?.permissions ? user.role.permissions : user.permissions;
 
         // check user have that permission or not
-        // const some = permissions.some(permission => permission.value === `create_${role?.title?.toLowerCase() || ''}`)
+        // const some = permissions.some(permission => permission.value === `create_${ role?.title?.toLowerCase() || '' } `)
 
         // if (!some) throw new Error("permissions denied");
 
@@ -167,11 +171,11 @@ async function post(req, res, refresh_token) {
         // });
 
         sentSmsUsers = await prisma.$queryRawUnsafe(`
-        SELECT phone,student_informations.user_id as id FROM students
+        SELECT phone, student_informations.user_id as id,student_informations.first_name as first_name,student_informations.middle_name as middle_name,student_informations.last_name as last_name FROM students
         JOIN student_informations ON student_informations.id = students.student_information_id
         JOIN sections ON students.section_id = sections.id
         WHERE class_id = ${class_id} AND school_id = ${refresh_token.school_id} ${(Array.isArray(section_id) && section_id.length > 0) ? `AND section_id IN (${section_id})` : ''}
-        `);
+  `);
 
         break;
 

@@ -6,7 +6,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 
 
-import { Button, Card, Grid, Typography, Zoom } from '@mui/material';
+import { Button, Card, Grid, Typography } from '@mui/material';
 import { useRefMounted } from 'src/hooks/useRefMounted';
 
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
@@ -22,12 +22,12 @@ import { Autocomplete } from '@mui/material';
 import { TextField } from '@mui/material';
 import { useAuth } from '@/hooks/useAuth';
 import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
-import { useSnackbar } from 'notistack';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
 import { ExportData } from '@/content/Management/Students/ExportData';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
+import useNotistick from '@/hooks/useNotistick';
 
 function ManagementClasses() {
 
@@ -36,13 +36,14 @@ function ManagementClasses() {
   const router = useRouter();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { user } = useAuth();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showNotification } = useNotistick();
 
   const [sections, setSections] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
   const idCard = useRef();
+
   const [excelFileUpload, setExcelFileUpload] = useState(null);
 
   const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
@@ -106,26 +107,11 @@ function ManagementClasses() {
         .post('/api/student/bulk-admission', form)
         .then((res) => {
           setExcelFileUpload(null);
-          enqueueSnackbar(t('All students data inserted'), {
-            variant: 'success',
-            anchorOrigin: {
-              vertical: 'top',
-              horizontal: 'right'
-            },
-            TransitionComponent: Zoom
-          });
+          showNotification(t('All students data inserted'))
         })
         .catch((err) => {
           console.log(err);
-
-          enqueueSnackbar(t(`${err?.response?.data?.message}`), {
-            variant: 'error',
-            anchorOrigin: {
-              vertical: 'top',
-              horizontal: 'right'
-            },
-            TransitionComponent: Zoom
-          });
+          showNotification(t(`${err?.response?.data?.message}`), 'error')
         });
     }
   };
@@ -138,7 +124,6 @@ function ManagementClasses() {
     }`
   });
   // size: 85.725mm 53.975mm;
-  console.log("excelFileUpload__", excelFileUpload);
 
   return (
     <>
@@ -204,9 +189,14 @@ function ManagementClasses() {
                   htmlFor="excelUpload"
                   label="select Excel file"
                   name="excelUpload"
+                  accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
                   value={excelFileUpload?.name || ''}
-                  handleChangeFile={(e) => { if (e.target?.files?.length) { setExcelFileUpload(e.target.files[0]) } }}
-                  handleRemoveFile={(e) => { setExcelFileUpload(undefined) }}
+                  handleChangeFile={(e) => {
+                    if (e.target?.files?.length && e.target.files[0].type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+                      setExcelFileUpload(e.target.files[0])
+                    }
+                  }}
+                  handleRemoveFile={(e) => { setExcelFileUpload(null) }}
                 />
               </Grid>
               <Button

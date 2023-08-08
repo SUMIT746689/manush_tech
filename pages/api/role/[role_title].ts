@@ -24,7 +24,8 @@ const role_title = async (req, res) => {
                     }
                 }
                 if (tableName) {
-                    const data = await prisma[tableName].findMany({
+                    //@ts-ignore
+                    const data = await prisma[tableName]?.findMany({
                         where: {
                             school_id: parseInt(req.query.school_id)
                         },

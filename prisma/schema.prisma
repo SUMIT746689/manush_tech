@@ -14,6 +14,7 @@ model User {
   /// 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
   user_role_id Int
   role_id      Int?
+  deleted_at   DateTime?          
   is_enabled   Boolean             @default(true)
   created_at   DateTime            @default(now())
   updated_at   DateTime            @updatedAt

@@ -6,6 +6,7 @@ import formidable from 'formidable';
 import prisma from '@/lib/prisma_client';
 import { fileDelete, fileRename, fileUpload } from '@/utils/upload';
 import patch from 'controllers/students/patch';
+import Delete from 'controllers/students/delete';
 
 export const config = {
     api: {
@@ -53,6 +54,9 @@ const id = async (req, res) => {
 
             case 'PATCH':
                 patch(req, res)
+                break;
+            case 'DELETE':
+                Delete (res, res);
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'PATCH']);

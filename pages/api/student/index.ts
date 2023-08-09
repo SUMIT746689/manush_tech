@@ -1,6 +1,7 @@
 import { mySqlDateConverter } from 'utilities_api/mysqlDateConverter';
 import get from 'controllers/students/get';
 import post from 'controllers/students/post';
+import Delete from 'controllers/students/delete';
 
 export const config = {
   api: {
@@ -18,7 +19,6 @@ const index = async (req, res) => {
         break;
       case 'POST':
         post(req, res);
-        
         break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);

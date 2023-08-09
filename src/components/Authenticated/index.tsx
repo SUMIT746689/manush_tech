@@ -14,7 +14,7 @@ interface AuthenticatedProps {
 export const Authenticated: FC<AuthenticatedProps> = (props) => {
   const { children, name = undefined } = props;
   const auth = useAuth();
-  console.log("auth", auth);
+  // console.log("auth", auth);
   const router = useRouter();
   const [verified, setVerified] = useState(false);
   const { showNotification } = useNotistick();
@@ -23,12 +23,13 @@ export const Authenticated: FC<AuthenticatedProps> = (props) => {
     auth?.user?.permissions?.length > 0
       ? auth?.user?.permissions?.map((permission: any) => permission.group)
       : [];
+  console.log("permissionsArray__", permissionsArray);
 
   useEffect(() => {
     if (!router.isReady) {
       return;
     }
-    if (auth?.error) showNotification(auth?.error,'error');
+    if (auth?.error) showNotification(auth?.error, 'error');
 
     if (!auth.isAuthenticated) {
       router.push({

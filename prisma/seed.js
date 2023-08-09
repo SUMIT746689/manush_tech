@@ -115,6 +115,7 @@ async function seed() {
       { name: 'create grade', value: 'create_grade', group: 'grade' },
       { name: 'view grade', value: 'view_grade', group: 'grade' },
       { name: 'create report', value: 'create_report', group: 'report' },
+      { name: 'create sms gateway', value: 'create_sms_gateway', group: 'sms_gateway' },
       { name: 'create bulk sms & email', value: 'create_bulk_sms_&_email', group: 'bulk_sms_&_email' },
       { name: 'create leave', value: 'create_leave', group: 'leave' },
       { name: 'view holiday', value: 'view_holiday', group: 'holiday' },

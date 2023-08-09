@@ -1,13 +1,13 @@
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
-import { Field, Form, Formik, useFormik } from 'formik';
+import {  Formik } from 'formik';
 import { Button, Card, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
-import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
+
 
 const SMSSettings = () => {
   const { t }: { t: any } = useTranslation();
@@ -181,7 +181,7 @@ const SMSSettings = () => {
 
 SMSSettings.getLayout = (page) => {
   return (
-    <Authenticated name='SMS'>
+    <Authenticated name='sms_gateway'>
       <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
   );

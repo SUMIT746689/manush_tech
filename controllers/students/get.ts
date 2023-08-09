@@ -21,7 +21,16 @@ async function get(req, res, refresh_token) {
     if (academic_year_id) where['academic_year_id'] = parseInt(academic_year_id);
 
     const students = await prisma.student.findMany({
-      where,
+      where: {
+        ...where,
+        student_info: {
+          user: {
+            deleted_at: {
+              equals: null
+            }
+          }
+        }
+      },
       select: {
         id: true,
         student_photo: true,

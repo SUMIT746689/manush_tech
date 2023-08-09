@@ -37,6 +37,8 @@ import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import BulkActions from './BulkActions';
 import useNotistick from '@/hooks/useNotistick';
 import NextLink from 'next/link';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import axios from 'axios';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -85,7 +87,7 @@ const applyFilters = (
   query,
   filters
 ) => {
-  return users.filter((user) => {
+  return users?.filter((user) => {
     let matches = true;
 
     if (query) {
@@ -127,7 +129,7 @@ const applyPagination = (
   page: number,
   limit: number
 ): User[] => {
-  return users.slice(page * limit, page * limit + limit);
+  return users?.slice(page * limit, page * limit + limit);
 };
 
 const Results = ({ users }) => {
@@ -176,21 +178,27 @@ const Results = ({ users }) => {
 
   ;
 
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
 
 
   const closeConfirmDelete = () => {
-    setOpenConfirmDelete(false);
+    setOpenConfirmDelete(null);
   };
 
   const handleDeleteCompleted = () => {
-    setOpenConfirmDelete(false);
-    showNotification('The student has been removed');
+    axios.delete(`/api/student/${openConfirmDelete}`)
+      .then(res => {
+        setOpenConfirmDelete(null);
+        showNotification('The student has been removed');
+      })
+      .catch(err => {
+        setOpenConfirmDelete(null);
+        showNotification('Student deletion failed !', 'error');
+      })
   };
-  useEffect(() => {
-    console.log(selectedItems);
-
-  }, [selectedItems])
+  const handleConfirmDelete = (id) => {
+    setOpenConfirmDelete(id)
+  }
 
   return (
     <>
@@ -305,14 +313,7 @@ const Results = ({ users }) => {
                         {/*      </IconButton>*/}
                         {/*    </Tooltip> *!/*/}
 
-                        {/*    /!* <Tooltip title={t('Delete')} arrow>*/}
-                        {/*      <IconButton*/}
-                        {/*        onClick={handleConfirmDelete}*/}
-                        {/*        color="primary"*/}
-                        {/*      >*/}
-                        {/*        <DeleteTwoToneIcon fontSize="small" />*/}
-                        {/*      </IconButton>*/}
-                        {/*    </Tooltip> *!/*/}
+
 
                         {/*  </Typography>*/}
                         {/*</TableCell>*/}
@@ -322,6 +323,15 @@ const Results = ({ users }) => {
                               color="primary"
                             >
                               <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={() => handleConfirmDelete(i.id)}
+                              color="primary"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -336,7 +346,7 @@ const Results = ({ users }) => {
       </Card>
 
       <DialogWrapper
-        open={openConfirmDelete}
+        open={openConfirmDelete ? true : false}
         maxWidth="sm"
         fullWidth
         TransitionComponent={Transition}

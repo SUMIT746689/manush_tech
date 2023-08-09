@@ -1,10 +1,4 @@
-import bcrypt from 'bcrypt';
-import path from 'path';
-import fsp from 'fs/promises';
-import fs from 'fs';
-import formidable from 'formidable';
 import prisma from '@/lib/prisma_client';
-import { fileDelete, fileRename, fileUpload } from '@/utils/upload';
 import patch from 'controllers/students/patch';
 import Delete from 'controllers/students/delete';
 

@@ -23,11 +23,11 @@ const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
   })
 };
 
-const sentSmsToUsers = async (user, responseSentSms) => {
+const sentSmsToUsers = async (user,sms_res_gatewayinfo, responseSentSms) => {
   let status = "pending"
   try {
     const name = [user?.first_name, user?.middle_name, user?.last_name].join(' ');
-    const { data: sms_res } = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${user?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${name}, ${responseSentSms?.custom_body}`)
+    const { data: sms_res } = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${user?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${name}, ${responseSentSms?.custom_body}`)
       }`)
     if (typeof sms_res === "string" && sms_res?.startsWith("SMS SUBMITTED")) status = "success"
     else status = "failed"
@@ -40,13 +40,19 @@ const sentSmsToUsers = async (user, responseSentSms) => {
   }
 }
 
-const sentSmsHandler = ({ sentSmsUsers, responseSentSms }) => {
+const sentSmsHandler = async ({ sentSmsUsers, school_id, responseSentSms }) => {
   console.log("responseSentSms__", responseSentSms);
 
+  const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
+    where: {
+      school_id,
+      is_active: true
+    }
+  })
   //individual user sent sms and insert response and data into sent sms details table
   sentSmsUsers.forEach((user) => {
     // if (user) 
-    sentSmsToUsers(user, responseSentSms)
+    sentSmsToUsers(user,sms_res_gatewayinfo, responseSentSms)
   })
 };
 
@@ -147,7 +153,7 @@ async function post(req, res, refresh_token) {
           //udpate sentsms table
           updateSentSms({ sentSmsUsers: singleGroupUsers, responseSentSms });
           // every group individually sending sms handles
-          sentSmsHandler({ sentSmsUsers: singleGroupUsers, responseSentSms });
+          sentSmsHandler({ sentSmsUsers: singleGroupUsers, school_id, responseSentSms });
         })
 
         return res.status(200).json({ message: "successfull" });
@@ -194,7 +200,7 @@ async function post(req, res, refresh_token) {
     // insert sent sms in sentsms table   
     responseSentSms = await insertsentSms({ recipient_type, campaign_name, sms_template_id, sms_gateway_id, school_id: refresh_token.school_id, custom_body, recipient_count: sentSmsUsers.length });
     // users sending sms handle 
-    sentSmsUsers.length > 0 && sentSmsHandler({ sentSmsUsers, responseSentSms });
+    sentSmsUsers.length > 0 && sentSmsHandler({ sentSmsUsers, school_id, responseSentSms });
 
     return res.json({ message: 'success' });
 

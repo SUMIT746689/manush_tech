@@ -605,5 +605,6 @@ export default RegistrationSecondPart;
 
 
 function generateUsername(firstName: string) {
-  return firstName.split(' ').join('').toLowerCase() + Date.now().toString().substring(0, 4)
+  const text = Date.now().toString()
+  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
 }

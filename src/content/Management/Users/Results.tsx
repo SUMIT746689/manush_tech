@@ -228,7 +228,7 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
 
   //change user active or disable 
   const handleUserEnabled = async(user)=> {
-    console.log({user})
+    // console.log({user})
     const [err,response]:any =  await fetchData(`/api/user/activition/${user.id}`,'patch',{is_enabled:!user.is_enabled,role:user.user_role});
     if(response.message) reFetchData(true)
     console.log({err,response});

@@ -8,12 +8,11 @@ export const config = {
     }
 };
 
-
-
 const id = async (req, res) => {
     try {
         const { method } = req;
         const student_id = parseInt(req.query.id)
+        
         if (!student_id) {
             return res.status(400).json({ message: 'valid id required' })
 
@@ -50,7 +49,7 @@ const id = async (req, res) => {
                 patch(req, res)
                 break;
             case 'DELETE':
-                Delete (res, res);
+                Delete (req, res);
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'PATCH']);

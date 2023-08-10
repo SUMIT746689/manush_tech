@@ -132,7 +132,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users }) => {
+const Results = ({ users,refetch }) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -186,9 +186,12 @@ const Results = ({ users }) => {
   };
 
   const handleDeleteCompleted = () => {
+    console.log(openConfirmDelete);
+    
     axios.delete(`/api/student/${openConfirmDelete}`)
       .then(res => {
         setOpenConfirmDelete(null);
+        refetch();
         showNotification('The student has been removed');
       })
       .catch(err => {

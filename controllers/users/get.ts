@@ -13,13 +13,22 @@ export const get = async (req, res) => {
     console.log({ refresh_token });
 
     const user = await prisma.user.findFirst({
-      where: { id: refresh_token.id },
+      where: {
+        id: refresh_token.id,
+        
+          deleted_at: null
+        
+      },
       include: {
         role: true
       }
     });
+    console.log({ user });
 
     const AND = [];
+    AND.push({
+        deleted_at: null
+    })
     if (user.role.title === 'SUPER_ADMIN') AND.push({
       role: {
         title: 'ADMIN'
@@ -41,7 +50,8 @@ export const get = async (req, res) => {
     // : [{ school_id: user.school_id }, { id: { not: user.id } }]
     const users = await prisma.user.findMany({
       where: {
-        AND
+        AND,
+        
       },
       select: {
         id: true,
@@ -69,6 +79,8 @@ export const get = async (req, res) => {
     console.log({ users });
     res.status(200).json(users);
   } catch (err) {
+    console.log(err);
+    
     res.status(404).json({ error: err.message });
   }
 };

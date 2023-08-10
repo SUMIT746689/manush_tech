@@ -333,7 +333,7 @@ function ManagementClasses() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results users={students} />
+          <Results users={students} refetch={handleStudentList}/>
         </Grid>
       </Grid>
       <div style={{ display: 'none', visibility: 'hidden' }}>

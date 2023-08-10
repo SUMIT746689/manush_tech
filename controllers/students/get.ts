@@ -8,9 +8,7 @@ async function get(req, res, refresh_token) {
     const { section_id, academic_year_id, class_id } = req.query;
 
     const where = {};
-    where['student_info'] = {
-      school_id: refresh_token.school_id
-    };
+
     if (section_id) {
       where['section_id'] = parseInt(section_id);
     } else if (class_id) {
@@ -24,9 +22,10 @@ async function get(req, res, refresh_token) {
       where: {
         ...where,
         student_info: {
+          school_id: refresh_token.school_id,
           user: {
-            deleted_at: {
-              equals: null
+            is: {
+              deleted_at: null
             }
           }
         }
@@ -76,8 +75,11 @@ async function get(req, res, refresh_token) {
         class_roll_no: true
       }
     });
+
     res.status(200).json(students);
   } catch (error) {
+    console.log(error);
+
     res.status(404).json({ Error: error.message });
   }
 }

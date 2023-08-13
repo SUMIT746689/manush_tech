@@ -257,13 +257,14 @@ const Results = ({
     }
   };
 
-  const handleCollection = (student_id, fee_id, fee, amount, payment_method) => {
+  const handleCollection = (student_id, fee_id, fee, amount, payment_method, transID) => {
     axios.post('/api/student_payment_collect', {
       student_id: student_id,
       collected_by_user: user?.id,
       fee_id: fee_id,
       payment_method: payment_method,
-      collected_amount: amount
+      collected_amount: amount,
+      transID: transID
     })
       .then((res) => {
         console.log({ res });
@@ -579,11 +580,11 @@ const Results = ({
                     if (project?.status == 'paid' || project?.status === 'paid late') {
                       due = 0
                     } else {
-                      due  = (project?.amount + (project.late_fee ? project.late_fee : 0) -
+                      due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
                         (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
-                      console.log(today ,"  ", last_date);
-                      
-                        if (today < last_date) {
+                      console.log(today, "  ", last_date);
+
+                      if (today < last_date) {
                         due -= (project.late_fee ? project.late_fee : 0)
                       }
                     }
@@ -634,7 +635,7 @@ const Results = ({
 
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            { due}
+                            {due}
                           </Typography>
                         </TableCell>
 
@@ -770,7 +771,8 @@ const Results = ({
 const AmountCollection = ({ project, student_id, handleCollection }) => {
   const { t }: { t: any } = useTranslation();
   const [amount, setAmount] = useState(null);
-  const [payment_method, setPayment_method] = useState('cash');
+  const [payment_method, setPayment_method] = useState('Cash');
+  const [transID, setTransID] = useState(null)
 
   return (
     <Grid container sx={{
@@ -784,7 +786,7 @@ const AmountCollection = ({ project, student_id, handleCollection }) => {
         <Autocomplete
 
           // getOptionLabel={(option) => option.name}
-          options={['cash', 'online']}
+          options={['Cash', 'Bkash', 'Nagad', 'Rocket', 'Upay', 'Trustpay', 'UCash', 'Card']}
           value={payment_method}
           renderInput={(params) => (
             <TextField
@@ -797,11 +799,32 @@ const AmountCollection = ({ project, student_id, handleCollection }) => {
           )}
           onChange={(e, value) => {
             console.log(value);
+            if (value == 'Cash') {
+              setTransID(null)
+            }
             setPayment_method(value)
           }}
         />
 
       </Grid>
+      {
+        payment_method && payment_method !== 'Cash' && <Grid item sx={{
+          minWidth: '130px'
+        }}>
+          <TextField
+            sx={{
+              width: '100px'
+            }}
+            variant="outlined"
+            value={transID}
+            required={payment_method !== 'Cash' ? true : false}
+            onChange={(e) => setTransID(e.target.value)}
+            label="trans ID"
+            type='text'
+          />
+
+        </Grid>
+      }
       <Grid item>
         <TextField
           sx={{
@@ -809,16 +832,7 @@ const AmountCollection = ({ project, student_id, handleCollection }) => {
           }}
           variant="outlined"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)
-            //   {
-            //   if(e.target.value && Number(e.target.value) > 0){
-            //     console.log(Number(e.target.value));
-
-            //     setAmount(Number(e.target.value))
-            //   }
-
-            // } 
-          }
+          onChange={(e) => setAmount(e.target.value)}
           label="Amount"
           type="number"
         />
@@ -827,9 +841,9 @@ const AmountCollection = ({ project, student_id, handleCollection }) => {
       <Grid item>
         <Button
           variant="contained"
-          disabled={amount && payment_method && Number(amount) > 0 ? false : true}
+          disabled={amount && payment_method && Number(amount) > 0 && (payment_method !== 'Cash' && transID || payment_method == 'Cash' && !transID) ? false : true}
           onClick={() => {
-            handleCollection(student_id, project.id, project, amount, payment_method);
+            handleCollection(student_id, project.id, project, amount, payment_method, transID);
             setPayment_method(null)
             setAmount(null);
           }}

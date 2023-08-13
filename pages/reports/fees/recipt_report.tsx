@@ -42,9 +42,6 @@ function FeesPaymentReport() {
     const [endDate, setEndDate] = useState(null)
     const [payment_method, setPayment_method] = useState(null);
 
-
-
-
     const handlePageChange = (_event: any, newPage: number): void => {
 
         setPage(newPage);
@@ -58,8 +55,6 @@ function FeesPaymentReport() {
         return sessions.slice(page * limit, page * limit + limit);
     };
 
-
-    // @ts-ignore
     useEffect(() => {
         // @ts-ignore
 
@@ -71,28 +66,30 @@ function FeesPaymentReport() {
     }, [datas, filter, page])
 
     useEffect(() => {
-        console.log(startDate, endDate);
+        getData(dayjs().startOf('date'),dayjs().endOf('date'),'All')
+    }, [])
 
-    }, [startDate, endDate])
-
+    const getData = (startDate,endDate,payment_method) => {
+        const tempToDate = new Date(endDate)
+        tempToDate.setDate(tempToDate.getDate() + 1)
+        axios.get(`/api/reports/student_payment_collection_history?from_date=${startDate}&to_date=${dayjs(tempToDate).format('YYYY-MM-DD')}${payment_method == 'All' ? '' : `&payment_method=${payment_method}`}`)
+            .then(res => {
+                let sumTotal = 0, SumCollectedAmount = 0
+                for (const c of res.data) {
+                    sumTotal += (c?.collected_amount - c?.student?.discount)
+                    SumCollectedAmount += c?.collected_amount
+                }
+                setDatas({
+                    sumTotal: sumTotal?.toFixed(2),
+                    SumCollectedAmount: SumCollectedAmount?.toFixed(2),
+                    data: res.data
+                })
+            }).catch(err => console.log(err))
+    }
     const handlePaymentHistoryFind = (e) => {
         e.preventDefault();
         if (startDate && endDate && payment_method) {
-            const tempToDate = new Date(endDate)
-            tempToDate.setDate(tempToDate.getDate() + 1)
-            axios.get(`/api/reports/student_payment_collection_history?from_date=${startDate}&to_date=${dayjs(tempToDate).format('YYYY-MM-DD')}${payment_method == 'both' ? '' : `&payment_method=${payment_method}`}`)
-                .then(res => {
-                    let sumTotal = 0, SumCollectedAmount = 0
-                    for (const c of res.data) {
-                        sumTotal += (c?.collected_amount - c?.student?.discount)
-                        SumCollectedAmount += c?.collected_amount
-                    }
-                    setDatas({
-                        sumTotal: sumTotal?.toFixed(1),
-                        SumCollectedAmount: SumCollectedAmount?.toFixed(1),
-                        data: res.data
-                    })
-                }).catch(err => console.log(err))
+            getData(startDate,endDate,payment_method)
         }
 
     }
@@ -117,7 +114,7 @@ function FeesPaymentReport() {
                     <Grid item >
                         <Autocomplete
                             id="tags-outlined"
-                            options={['both', 'cash', 'online']}
+                            options={['All', 'Cash', 'Bkash', 'Nagad', 'Rocket', 'Upay', 'Trustpay', 'UCash', 'Card']}
                             filterSelectedOptions
                             renderInput={(params) => (
                                 <TextField
@@ -268,7 +265,6 @@ function FeesPaymentReport() {
                                             {
                                                 paginatedTransection?.map((i) => {
 
-
                                                     let name = i?.student?.student_info?.first_name;
                                                     if (i?.student?.student_info?.middle_name) {
                                                         name += i?.student?.student_info?.middle_name
@@ -276,7 +272,7 @@ function FeesPaymentReport() {
                                                     if (i?.student?.student_info?.last_name) {
                                                         name += i?.student?.student_info?.last_name
                                                     }
-                                                    let total = i?.collected_amount - i?.student?.discount
+                                                    const total = i?.collected_amount - i?.student?.discount
 
                                                     return (
                                                         <TableRow
@@ -345,13 +341,13 @@ function FeesPaymentReport() {
 
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {i?.student?.discount}
+                                                                    {i?.student?.discount?.toFixed(2)}
                                                                 </Typography>
                                                             </TableCell>
 
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {total?.toFixed(1)}
+                                                                    {total?.toFixed(2)}
                                                                 </Typography>
                                                             </TableCell>
 
@@ -392,7 +388,9 @@ function FeesPaymentReport() {
                         paddingBottom: 1
                     }}>
 
-                        <h1>Recipt Report</h1>
+                        <h1 style={{
+                            fontSize:'25px'
+                        }}>Recipt Report</h1>
 
 
                     </Grid>
@@ -440,8 +438,8 @@ function FeesPaymentReport() {
                                         <td style={tableStyle}>{i?.payment_method}</td>
                                         <td style={tableStyle}>{i?.fee?.title}</td>
                                         <td style={tableStyle}>{i?.collected_amount}</td>
-                                        <td style={tableStyle}>{i?.student?.discount}</td>
-                                        <td style={tableStyle}>{total}</td>
+                                        <td style={tableStyle}>{i?.student?.discount?.toFixed(2)}</td>
+                                        <td style={tableStyle}>{total?.toFixed(2)}</td>
                                     </tr>
                                 );
                             })}
@@ -469,7 +467,7 @@ function FeesPaymentReport() {
 
 
 FeesPaymentReport.getLayout = (page) => (
-    <Authenticated name="student_fee_collect">
+    <Authenticated name="report">
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

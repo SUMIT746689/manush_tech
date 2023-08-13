@@ -14,7 +14,7 @@ model User {
   /// 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
   user_role_id Int
   role_id      Int?
-  deleted_at   DateTime?          
+  deleted_at   DateTime?
   is_enabled   Boolean             @default(true)
   created_at   DateTime            @default(now())
   updated_at   DateTime            @updatedAt
@@ -371,25 +371,21 @@ model Fee {
 }
 
 model StudentFee {
-  id               Int           @id @default(autoincrement())
+  id               Int     @id @default(autoincrement())
   student_id       Int
   fee_id           Int
   collected_amount Float
-  payment_method   PaymentMethod
-  collected_by     Int?
-  created_at       DateTime      @default(now())
+  payment_method   String
+  transID          String?
+
+  collected_by Int?
+  created_at   DateTime @default(now())
 
   student           Student @relation(fields: [student_id], references: [id])
   fee               Fee     @relation(fields: [fee_id], references: [id])
   collected_by_user User?   @relation(fields: [collected_by], references: [id])
 
   @@map("student_fees")
-}
-
-enum PaymentMethod {
-  cash
-  online
-  pending
 }
 
 model Holiday {
@@ -795,6 +791,7 @@ model Transaction {
   id             Int      @id @default(autoincrement())
   amount         Float
   payment_method String
+  transID        String?
   voucher_id     Int
   school_id      Int
   created_at     DateTime @default(now())

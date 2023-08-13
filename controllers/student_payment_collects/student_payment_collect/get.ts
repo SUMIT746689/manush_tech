@@ -13,7 +13,12 @@ export const get = async (req, res) => {
     const student_fee = await prisma.studentFee.findMany({
       where: { student_id: Number(id) },
       include: {
-        fee: true
+        fee: true,
+        collected_by_user: {
+          select: {
+            username: true
+          }
+        }
       }
     });
 
@@ -61,32 +66,33 @@ export const get = async (req, res) => {
 
 
       // console.log("fee", fee);
-
+      console.log("findStudentFee__", findStudentFee);
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
         const paidAmount = findStudentFee.reduce((a, c) => a + c.collected_amount, 0)
-        // console.log("paidAmount__", paidAmount);
+
         const last_date = dayjs(fee.last_date).valueOf()
         const last_trnsation_date = dayjs(findStudentFee[findStudentFeeSize - 1].created_at).valueOf()
         const late_fee = fee.late_fee ? fee.late_fee : 0;
 
 
         if (last_trnsation_date > last_date && fee.amount == paidAmount) {
-          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'Fine unpaid',paidAmount })
+          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'Fine unpaid', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
         else if (last_trnsation_date > last_date && paidAmount >= fee.amount + late_fee) {
-          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid late',paidAmount })
+          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid late', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
 
         else if (last_date >= last_trnsation_date && fee.amount == paidAmount) {
-          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid' })
+          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid', collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
         else {
           return ({
             ...fee,
             last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at,
             paidAmount: paidAmount,
-            status: 'partial paid'
+            status: 'partial paid',
+            collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
           })
         }
 

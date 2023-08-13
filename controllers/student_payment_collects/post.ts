@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const post = async (req, res, refresh_token) => {
   try {
-    const { student_id, fee_id, payment_method, collected_by_user }: any = req.body;
+    const { student_id, fee_id, payment_method, collected_by_user,transID }: any = req.body;
     const collected_amount = parseFloat(req.body.collected_amount);
 
     if (!student_id || !fee_id || !collected_amount)
@@ -38,9 +38,9 @@ export const post = async (req, res, refresh_token) => {
       fee_id,
       collected_amount,
       payment_method,
+      transID,
       collected_by: parseInt(collected_by_user)
     }
-    console.log(data);
 
     const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
 
@@ -65,6 +65,7 @@ export const post = async (req, res, refresh_token) => {
               amount: data.collected_amount,
               payment_method: data.payment_method,
               voucher_id: voucher.id,
+              transID,
               school_id: refresh_token.school_id,
               created_at: temp.created_at
             }
@@ -89,6 +90,7 @@ export const post = async (req, res, refresh_token) => {
             payment_method: data.payment_method,
             voucher_id: voucher.id,
             school_id: refresh_token.school_id,
+            transID,
             created_at: temp.created_at
           }
         })

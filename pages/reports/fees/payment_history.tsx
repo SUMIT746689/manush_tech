@@ -22,8 +22,8 @@ const tableStyle: object = {
     borderCollapse: 'collapse',
     textAlign: 'center',
     padding: '2px',
-    fontSize:'0.8em'
-    
+    fontSize: '0.8em'
+
     // backgroundColor: '#cccccc'
 };
 function FeesPaymentReport() {
@@ -146,7 +146,6 @@ function FeesPaymentReport() {
         }
     };
 
-
     return (
         <>
             <Head>
@@ -195,6 +194,7 @@ function FeesPaymentReport() {
                                     placeholder="Name"
                                 />
                             )}
+
                             onChange={(e, v) => {
                                 setSelectedSection(v);
                                 setDatas([])
@@ -216,7 +216,7 @@ function FeesPaymentReport() {
                             isOptionEqualToValue={(option: any, value: any) =>
                                 option.id === value.id
                             }
-                            getOptionLabel={(option) => option.class_roll_no}
+                             getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
                             renderInput={(params) => (
                                 <TextField
                                     fullWidth
@@ -329,11 +329,12 @@ function FeesPaymentReport() {
                                                 <TableCell>{t('Fee Title')}</TableCell>
                                                 <TableCell>{t('Fee Amount')}</TableCell>
                                                 <TableCell>{t('Paid Amount')}</TableCell>
+                                                <TableCell>{t('Due')}</TableCell>
                                                 <TableCell>{t('Status')}</TableCell>
                                                 <TableCell>{t('Fine')}</TableCell>
                                                 <TableCell>{t('Last date')}</TableCell>
-                                                <TableCell>{t('Due')}</TableCell>
                                                 <TableCell>{t('Last payment date')}</TableCell>
+                                                <TableCell>{t('Collected by ')}</TableCell>
                                                 <TableCell>{t('Total payable amount')}</TableCell>
 
                                             </TableRow>
@@ -396,6 +397,11 @@ function FeesPaymentReport() {
                                                                 {project?.paidAmount?.toFixed(1)}
                                                             </Typography>
                                                         </TableCell>
+                                                        <TableCell>
+                                                            <Typography noWrap variant="h5">
+                                                                {due?.toFixed(1)}
+                                                            </Typography>
+                                                        </TableCell>
 
                                                         <TableCell
                                                             sx={
@@ -428,18 +434,18 @@ function FeesPaymentReport() {
 
                                                         <TableCell>
                                                             <Typography noWrap variant="h5">
-                                                                {due?.toFixed(1)}
-                                                            </Typography>
-                                                        </TableCell>
-
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
                                                                 {
                                                                     project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
                                                                         'MMMM D, YYYY h:mm A'
                                                                     ) : ''}
                                                             </Typography>
                                                         </TableCell>
+                                                        <TableCell>
+                                                            <Typography noWrap variant="h5">
+                                                                {project?.collected_by_user}
+                                                            </Typography>
+                                                        </TableCell>
+
 
                                                         <TableCell>
                                                             <Typography noWrap variant="h5" sx={changeColor}>
@@ -454,7 +460,7 @@ function FeesPaymentReport() {
                                     </Table>
                                 </TableContainer>
                             </>
-                        }   
+                        }
                     </Grid>
                 </Card>
 
@@ -464,111 +470,118 @@ function FeesPaymentReport() {
                 display: 'none',
             }} >
                 <Grid ref={printPageRef} sx={{
-                    p:1
+                    p: 1,
                 }}>
                     <Grid sx={{
                         textAlign: 'center',
-                        paddingBottom:1
+                        paddingBottom: 1
                     }}>
-                         
+                        <h1>Name : {[datas?.first_name,datas?.middle_name,datas?.last_name].join(' ')}</h1>
                         <h2>Class roll : {datas?.class_roll_no}</h2>
                         <h2>Class registration no : {datas?.class_registration_no}</h2>
                         <h2>Discount : {datas?.discount}</h2>
 
                     </Grid>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style={tableStyle}>{t('Fee Title')}</th>
-                                <th style={tableStyle}>{t('Fee Amount')}</th>
-                                <th style={tableStyle}>{t('Paid Amount')}</th>
-                                <th style={tableStyle}>{t('Status')}</th>
-                                <th style={tableStyle}>{t('Fine')}</th>
-                                <th style={tableStyle}>{t('Last date')}</th>
-                                <th style={tableStyle}>{t('Due')}</th>
-                                <th style={tableStyle}>{t('Last payment date')}</th>
-                                <th style={tableStyle}>{t('Total payable amount')}</th>
-                            </tr>
-                        </thead>
-                        <tbody style={{
-                            overflowX: 'auto',
-                            overflowY: 'auto'
-                        }}>
-                            {filteredFees?.map((project) => {
+                    <Grid sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                    }}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style={tableStyle}>{t('Fee Title')}</th>
+                                    <th style={tableStyle}>{t('Fee Amount')}</th>
+                                    <th style={tableStyle}>{t('Paid Amount')}</th>
+                                    <th style={tableStyle}>{t('Status')}</th>
+                                    <th style={tableStyle}>{t('Fine')}</th>
+                                    <th style={tableStyle}>{t('Last date')}</th>
+                                    <th style={tableStyle}>{t('Due')}</th>
+                                    <th style={tableStyle}>{t('Last payment date')}</th>
+                                    <th style={tableStyle}>{t('Collected by')}</th>
+                                    <th style={tableStyle}>{t('Total payable amount')}</th>
+                                </tr>
+                            </thead>
+                            <tbody style={{
+                                overflowX: 'auto',
+                                overflowY: 'auto'
+                            }}>
+                                {filteredFees?.map((project) => {
 
-                                const last_date = dayjs(project.last_date).valueOf()
-                                const today = dayjs(project.last_payment_date).valueOf();
-                                const changeColor = today > last_date ? {
-                                    color: 'red'
-                                } : {}
+                                    const last_date = dayjs(project.last_date).valueOf()
+                                    const today = dayjs(project.last_payment_date).valueOf();
+                                    const changeColor = today > last_date ? {
+                                        color: 'red'
+                                    } : {}
 
-                                let due = project?.amount;
+                                    let due = project?.amount;
 
 
-                                if (today > last_date) {
-                                    console.log(project?.title, dayjs(project?.last_payment_date).format(
-                                        'MMMM D, YYYY h:mm A'
-                                    ), "         ", dayjs(project.last_payment_date).format(
-                                        'MMMM D, YYYY h:mm A'
-                                    ), " late!!!!!!!!!!");
+                                    if (today > last_date) {
+                                        console.log(project?.title, dayjs(project?.last_payment_date).format(
+                                            'MMMM D, YYYY h:mm A'
+                                        ), "         ", dayjs(project.last_payment_date).format(
+                                            'MMMM D, YYYY h:mm A'
+                                        ), " late!!!!!!!!!!");
 
-                                    due += (project.late_fee ? project.late_fee : 0);
+                                        due += (project.late_fee ? project.late_fee : 0);
 
-                                    if (project.paidAmount) {
-                                        due -= project.paidAmount
+                                        if (project.paidAmount) {
+                                            due -= project.paidAmount
+                                        }
+
+                                    }
+                                    else {
+                                        if (project.paidAmount) {
+                                            due -= project.paidAmount
+                                        }
+                                    }
+                                    if (project?.status == 'paid' || project?.status === 'paid late') {
+                                        due = 0;
                                     }
 
-                                }
-                                else {
-                                    if (project.paidAmount) {
-                                        due -= project.paidAmount
-                                    }
-                                }
-                                if (project?.status == 'paid' || project?.status === 'paid late') {
-                                    due = 0;
-                                }
+                                    return (
+                                        <tr>
+                                            <td style={tableStyle}>{project?.title}</td>
+                                            <td style={tableStyle}>{project?.amount.toFixed(1)}</td>
+                                            <td style={tableStyle}>{project?.paidAmount?.toFixed(1)}</td>
+                                            <td style={{
+                                                ...tableStyle,
+                                                color: (project?.status === 'paid' || project?.status === 'paid late')
+                                                    ? 'green'
+                                                    :
+                                                    project?.status === 'partial paid'
+                                                        ? 'blue'
+                                                        : 'red'
+                                            }}
 
-                                return (
-                                    <tr>
-                                        <td style={tableStyle}>{project?.title}</td>
-                                        <td style={tableStyle}>{project?.amount.toFixed(1)}</td>
-                                        <td style={tableStyle}>{project?.paidAmount?.toFixed(1)}</td>
-                                        <td style={{
-                                            ...tableStyle,
-                                            color: (project?.status === 'paid' || project?.status === 'paid late')
-                                                ? 'green'
-                                                :
-                                                project?.status === 'partial paid'
-                                                    ? 'blue'
-                                                    : 'red'
-                                        }}
+                                            >
+                                                {project?.status.toUpperCase()}
 
-                                        >
-                                            {project?.status.toUpperCase()}
+                                            </td>
+                                            <td style={tableStyle}>{project?.late_fee?.toFixed(1)}</td>
+                                            <td style={tableStyle}>{dayjs(project?.last_date).format('MMMM D, YYYY h:mm A')}</td>
+                                            <td style={tableStyle}>{due?.toFixed(1)}</td>
+                                            <td style={tableStyle}>
 
-                                        </td>
-                                        <td style={tableStyle}>{project?.late_fee?.toFixed(1)}</td>
-                                        <td style={tableStyle}>{dayjs(project?.last_date).format('MMMM D, YYYY h:mm A')}</td>
-                                        <td style={tableStyle}>{due?.toFixed(1)}</td>
-                                        <td style={tableStyle}>
+                                                {
+                                                    project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
+                                                        'MMMM D, YYYY h:mm A'
+                                                    ) : ''}
 
-                                            {
-                                                project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
-                                                    'MMMM D, YYYY h:mm A'
-                                                ) : ''}
+                                            </td>
+                                            <td style={tableStyle}>{project?.collected_by_user}</td>
+                                            <td style={{ ...tableStyle, ...changeColor }}>
 
-                                        </td>
-                                        <td style={{ ...tableStyle, ...changeColor }}>
+                                                {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
 
-                                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
+                                            </td>
 
-                                        </td>
-
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </Grid>
 
                 </Grid>
 
@@ -583,7 +596,7 @@ function FeesPaymentReport() {
 
 
 FeesPaymentReport.getLayout = (page) => (
-    <Authenticated name="student_fee_collect">
+    <Authenticated name="report">
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

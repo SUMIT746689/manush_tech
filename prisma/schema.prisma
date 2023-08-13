@@ -452,7 +452,7 @@ model ExamDetails {
 model Attendance {
   id         Int              @id @default(autoincrement())
   student_id Int
-  date       DateTime         @db.Date
+  date       DateTime
   status     AttendenceStatus
   remark     String?
   section_id Int

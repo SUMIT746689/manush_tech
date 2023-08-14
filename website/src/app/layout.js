@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
       eiin_number: true
     }
   })
-  console.log("in layout__", domain, school_info);
+  
   return (
     school_info ?
       <html lang="en">
@@ -38,7 +38,10 @@ export default async function RootLayout({ children }) {
         </Head>
         <body>
           <LayoutWrapper>
-            <Header eiin_number={school_info?.eiin_number} header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`} />
+            <Header
+              eiin_number={school_info?.eiin_number}
+              header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`}
+            />
             <Nav serverhost={`${process.env.SERVER_HOST}`} />
             {children}
           </LayoutWrapper>

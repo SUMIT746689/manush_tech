@@ -237,9 +237,11 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
         </div>
         <div className={` ${secondaryColor} overflow-hidden md:col-span-10`}>
           <div className="relative animate-wiggle max-w-fit flex gap-6 mt-4 md:mt-3 w-full">
-
-            <div className="curson-pointer">🐳🦜 পাঠ্যপুস্তক সংক্রান্ত</div>
-            <div className=" cursor-pointer">🐳🦜 নতুন নেটিশ</div>
+            {
+              school_info?.latest_news?.map(i => <div className="curson-pointer">🐳🦜{i?.headLine}</div>)
+            }
+            {/* <div className="curson-pointer">🐳🦜 পাঠ্যপুস্তক সংক্রান্ত</div>
+            <div className=" cursor-pointer">🐳🦜 নতুন নেটিশ</div> */}
 
           </div>
         </div>
@@ -285,8 +287,11 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
             </div>
             <div className='bg-slate-200 overflow-hidden'>
               <div className="pb-2 px-2 h-40 flex flex-col gap-4 animate-top-to-bottom hover:pause">
-                <div className=' cursor-pointer'>👻 পাঠ্যপুস্তক সংক্রান্ত </div>
-                <div className=' cursor-pointer'>👻 নতুন নেটিশ</div>
+                {
+                  school_info?.latest_news?.map(i=><div className=' cursor-pointer'>👻 {i?. title} </div>)
+                }
+                {/* <div className=' cursor-pointer'>👻 পাঠ্যপুস্তক সংক্রান্ত </div>
+                <div className=' cursor-pointer'>👻 নতুন নেটিশ</div> */}
               </div>
             </div>
           </div>

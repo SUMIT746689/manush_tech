@@ -526,7 +526,7 @@ const Results = ({ data, reFetchData }) => {
                             temp.splice(index, 1)
                             setNotice(temp)
                           }}>
-                          remove
+                          Remove
                         </ButtonWrapper>
                       </Grid>
                     </Grid>

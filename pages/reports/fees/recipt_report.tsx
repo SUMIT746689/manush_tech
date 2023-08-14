@@ -66,10 +66,10 @@ function FeesPaymentReport() {
     }, [datas, filter, page])
 
     useEffect(() => {
-        getData(dayjs().startOf('date'),dayjs().endOf('date'),'All')
+        getData(dayjs().startOf('date'), dayjs().endOf('date'), 'All')
     }, [])
 
-    const getData = (startDate,endDate,payment_method) => {
+    const getData = (startDate, endDate, payment_method) => {
         const tempToDate = new Date(endDate)
         tempToDate.setDate(tempToDate.getDate() + 1)
         axios.get(`/api/reports/student_payment_collection_history?from_date=${startDate}&to_date=${dayjs(tempToDate).format('YYYY-MM-DD')}${payment_method == 'All' ? '' : `&payment_method=${payment_method}`}`)
@@ -89,7 +89,7 @@ function FeesPaymentReport() {
     const handlePaymentHistoryFind = (e) => {
         e.preventDefault();
         if (startDate && endDate && payment_method) {
-            getData(startDate,endDate,payment_method)
+            getData(startDate, endDate, payment_method)
         }
 
     }
@@ -192,31 +192,31 @@ function FeesPaymentReport() {
                             overflow: 'auto',
                         }}
                         justifyContent={'flex-end'}>
-                        {
-                            bulkAction && <Box
-                                p={2}
-                                display="flex"
-                                alignItems="center"
-                                justifyContent='space-between'
-                            >
 
-                                <Box>
-                                    <Typography component="span" variant="subtitle1">
-                                        {t('Showing')}:
-                                    </Typography>{' '}
-                                    <b>{paginatedTransection.length}</b> <b>{t('transections')}</b>
-                                </Box>
-                                <TablePagination
-                                    component="div"
-                                    count={bulkAction}
-                                    onPageChange={handlePageChange}
-                                    onRowsPerPageChange={handleLimitChange}
-                                    page={page}
-                                    rowsPerPage={limit}
-                                    rowsPerPageOptions={[5, 10, 15]}
-                                />
+                        <Box
+                            p={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent='space-between'
+                        >
+
+                            <Box>
+                                <Typography component="span" variant="subtitle1">
+                                    {t('Showing')}:
+                                </Typography>{' '}
+                                <b>{paginatedTransection.length}</b> <b>{t('transections')}</b>
                             </Box>
-                        }
+                            <TablePagination
+                                component="div"
+                                count={bulkAction}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleLimitChange}
+                                page={page}
+                                rowsPerPage={limit}
+                                rowsPerPageOptions={[5, 10, 15]}
+                            />
+                        </Box>
+
 
 
                         <Divider />
@@ -389,7 +389,7 @@ function FeesPaymentReport() {
                     }}>
 
                         <h1 style={{
-                            fontSize:'25px'
+                            fontSize: '25px'
                         }}>Recipt Report</h1>
 
 

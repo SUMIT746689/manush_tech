@@ -585,6 +585,8 @@ model WebsiteUi {
   principal_photo     String
   principal_speech    String? @db.LongText
   latest_news         Json
+  eiin_number         String
+  gallery             Json?
 
   school School @relation(fields: [school_id], references: [id])
 

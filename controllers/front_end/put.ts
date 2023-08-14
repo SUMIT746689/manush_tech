@@ -5,6 +5,7 @@ import { imageFolder, fileUpload, fileRename } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import fsP from "fs/promises";
+import { json } from 'node:stream/consumers';
 async function put(req, res, refresh_token) {
     const uploadFolderName = "frontendPhoto";
 
@@ -187,6 +188,56 @@ async function put(req, res, refresh_token) {
             }
             query['carousel_image'] = carousel_imageList
         }
+        if (files.gallery) {
+            const gallery_imageList = []
+            let index = 0;
+
+            const tempCarousel = Array.isArray(files.gallery) ? files.gallery : [files.gallery]
+
+            for (const i of tempCarousel) {
+                const newName = Date.now().toString() + '_' + i.originalFilename
+
+                const newFilePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, newName);
+
+                await fsP.rename(i.filepath, newFilePath)
+                    .then(() => {
+                        gallery_imageList.push({
+                            number: index,
+                            originalFilename: i.originalFilename,
+                            path: path.join(uploadFolderName, newName)
+                        })
+
+                    })
+                    .catch(err => {
+                        gallery_imageList.push({
+                            number: index,
+                            originalFilename: i.originalFilename,
+                            path: path.join(uploadFolderName, i.newFilename)
+                        })
+
+                    })
+
+                if (websiteUirow && !flag) {
+                    // @ts-ignore 
+                    for (const l of websiteUirow.gallery) {
+                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l.path);
+                        console.log("filePath__", filePath);
+
+                        if (fs.existsSync(filePath)) {
+                            console.log(`${l.number}`);
+
+                            fs.unlink(filePath, (err) => {
+                                if (err) console.log('photo deletion failed');
+                                else console.log("photo deleted");
+                            })
+                        }
+                    }
+                    flag = true;
+                }
+                index++;
+            }
+            query['gallery'] = gallery_imageList
+        }
         if (fields?.school_history) {
             query['school_history'] = fields?.school_history
         }
@@ -196,20 +247,18 @@ async function put(req, res, refresh_token) {
         if (fields?.principal_speech) {
             query['principal_speech'] = fields?.principal_speech
         }
-        console.log({ query });
+
         if (fields?.latest_news) {
-            query['latest_news'] = fields?.latest_news
+            query['latest_news'] = fields?.latest_news?.map(i=>JSON.parse(i))  
         }
+        console.log({ query });
         if (websiteUirow) {
-
-
             await prisma.websiteUi.update({
                 where: {
                     id: websiteUirow.id
                 },
                 data: query
             });
-
 
         }
         else {
@@ -224,12 +273,14 @@ async function put(req, res, refresh_token) {
                     chairman_speech: query?.chairman_speech || '',
                     principal_photo: query?.principal_photo || '',
                     principal_speech: query?.principal_speech || '',
+                    eiin_number: query?.eiin_number || '',
+                    gallery: Array.isArray(query?.gallery) ? query?.gallery : [query?.gallery] || [],
                     school: {
                         connect: {
                             id: refresh_token?.school_id
                         }
                     },
-                    latest_news: query?.latest_news || ''
+                    latest_news: query?.latest_news || []
                 }
             })
         }

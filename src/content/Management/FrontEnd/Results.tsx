@@ -1,7 +1,7 @@
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Button, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
+import { Button, Card, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
@@ -12,12 +12,14 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 const Results = ({ data, reFetchData }) => {
 
+  console.log({ data });
 
   const { t }: { t: any } = useTranslation();
-  const [notice, setNotice] = useState(['']);
+  const [notice, setNotice] = useState([{ title: '', headLine: '', body: '' }]);
 
   const [header_image, setHeader_image] = useState(null)
   const [carousel_image, setCarousel_image] = useState(null)
+  const [gallery, setGallery] = useState(null)
   const [history_photo, setHistory_photo] = useState(null)
   const [chairman_photo, setChairman_photo] = useState(null)
   const [principal_photo, setPrincipal_photo] = useState(null)
@@ -32,9 +34,10 @@ const Results = ({ data, reFetchData }) => {
   //   }
   //   console.log(cnt);
   // }, [carousel_image])
+
   useEffect(() => {
     if (data) {
-      setNotice(data?.latest_news)
+      setNotice(data?.latest_news?.map(i=>({ title: i?.title, headLine: i?.headLine, body: i?.body })))
     }
   }, [data])
 
@@ -61,6 +64,8 @@ const Results = ({ data, reFetchData }) => {
 
         principal_photo: data?.principal_photo || '',
         principal_speech: data?.principal_speech || '',
+        eiin_number: data?.eiin_number || '',
+        gallery: undefined,
 
         submit: null
       }}
@@ -82,7 +87,7 @@ const Results = ({ data, reFetchData }) => {
             showNotification(message)
           };
 
-          console.log("_values", _values);
+          console.log("_values", _values, notice);
 
           const formData = new FormData();
 
@@ -97,13 +102,22 @@ const Results = ({ data, reFetchData }) => {
                 }
               }
             }
+            else if (i == 'gallery') {
+              const temp = _values[i]
+              let nameList: any = []
+              for (const j in temp) {
+                if (typeof (temp[j]) == 'object') {
+                  nameList.push({ name: temp[j].name })
+                  formData.append('gallery', temp[j])
+                }
+              }
+            }
             else {
               formData.append(`${i}`, _values[i]);
             }
           }
           notice.forEach(element => {
-            console.log({ element })
-            formData.append(`latest_news[]`, element);
+            formData.append(`latest_news[]`, JSON.stringify(element));
           });
 
           axios.put('/api/front_end', formData)
@@ -143,6 +157,22 @@ const Results = ({ data, reFetchData }) => {
             <form onSubmit={handleSubmit}>
 
               <Grid container spacing={2} gap={2} paddingTop={2} border='1px solid lightGray' p={2}>
+                <Grid container item borderRadius='10px' marginBottom='10px'>
+                  <TextField
+                    id="outlined-basic"
+                    label="Eiin number"
+                    error={Boolean(touched?.eiin_number && errors?.eiin_number)}
+                    fullWidth
+                    helperText={touched?.eiin_number && errors?.eiin_number}
+                    name="eiin_number"
+                    placeholder={t(`Eiin number here...`)}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.eiin_number}
+                    variant="outlined"
+
+                  />
+                </Grid>
 
                 {/* header_image */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
@@ -235,6 +265,67 @@ const Results = ({ data, reFetchData }) => {
                       handleRemoveFile={(e) => {
                         setCarousel_image(null)
                         setFieldValue('carousel_image', undefined)
+                      }}
+
+                    />
+                  </Grid>
+                </Grid>
+                {/* gallery */}
+                <Grid container gap={1} justifyContent='center' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
+                  <Grid display={'flex'} flexDirection={'row'} flexWrap={'wrap'}>
+
+                    {
+                      gallery ? gallery?.map(j =>
+                        <Grid >
+                          <Image
+                            src={j}
+                            height={120}
+                            width={120}
+                            alt='Carousel Image'
+                            loading='lazy'
+                            objectFit='cover'
+                          />
+
+                        </Grid>) : data?.gallery?.map(i =>
+                          <Grid  >
+                            <Image
+                              src={`/api/get_file/${i.path.replace(/\\/g, '/')}`}
+                              height={120}
+                              width={120}
+                              alt='gallery'
+                              loading='lazy'
+                              objectFit='cover'
+                            />
+
+                          </Grid>)
+                    }
+                  </Grid>
+
+                  <Grid container justifyContent='center' sx={{
+                    pt: '25px'
+                  }}>
+                    <FileUploadFieldWrapper
+                      htmlFor="gallery"
+                      label="select gallery Image"
+                      name="gallery"
+                      multiple={true}
+                      value={values?.gallery ? getValue(values?.gallery) : ''}
+                      // carousel_image?.map(j=>j?.name)?.join(', ') ||
+                      handleChangeFile={(e) => {
+                        if (e.target.files.length) {
+                          const container = []
+                          for (const i of e.target.files) {
+                            const photoUrl = URL.createObjectURL(i);
+                            container.push(photoUrl)
+                          }
+                          setGallery(container)
+                          setFieldValue('gallery', e.target.files)
+                        }
+
+                      }}
+                      handleRemoveFile={(e) => {
+                        setGallery(null)
+                        setFieldValue('gallery', undefined)
                       }}
 
                     />
@@ -413,19 +504,54 @@ const Results = ({ data, reFetchData }) => {
                   />
                 </Grid>
 
-
-
                 {notice.map((field, index) => (
-                  <Grid container gap={2} display={'grid'} gridTemplateColumns={'70% 30%'}>
+                  <Card sx={{ p: 2 }} >
+                    <Grid container gap={2} display={'grid'} gridTemplateColumns={'50% 50%'}>
+                      <TextField
+                        key={index}
+                        value={field?.title}
+                        onChange={(e) => {
+                          const updatedFields = [...notice];
+                          updatedFields[index]['title'] = e.target.value;
+                          setNotice(updatedFields);
+                        }}
+                        label="Notice Title"
+                        variant="outlined"
+                        margin="normal"
+                      />
+                      <Grid display={'grid'} justifyContent={'center'} alignContent={'center'}>
+                        <ButtonWrapper
+                          handleClick={() => {
+                            const temp = [...notice]
+                            temp.splice(index, 1)
+                            setNotice(temp)
+                          }}>
+                          remove
+                        </ButtonWrapper>
+                      </Grid>
+                    </Grid>
                     <TextField
                       key={index}
-                      value={field}
+                      value={field?.headLine}
                       onChange={(e) => {
                         const updatedFields = [...notice];
-                        updatedFields[index] = e.target.value;
+                        updatedFields[index]['headLine'] = e.target.value;
                         setNotice(updatedFields);
                       }}
-                      label="Notice"
+                      label="Notice head line"
+                      variant="outlined"
+                      margin="normal"
+                      fullWidth
+                    />
+                    <TextField
+                      key={index}
+                      value={field?.body}
+                      onChange={(e) => {
+                        const updatedFields = [...notice];
+                        updatedFields[index]['body'] = e.target.value;
+                        setNotice(updatedFields);
+                      }}
+                      label="Notice body"
                       variant="outlined"
                       margin="normal"
                       maxRows={4}
@@ -433,27 +559,13 @@ const Results = ({ data, reFetchData }) => {
                       multiline
                       fullWidth
                     />
-                    <Grid display={'grid'} justifyContent={'center'} alignContent={'center'}>
-                      <ButtonWrapper
-                        handleClick={() => {
-                          const temp = [...notice]
-                          temp.splice(index, 1)
-                          setNotice(temp)
-                        }}>
-                        remove
-                      </ButtonWrapper>
-                    </Grid>
+                  </Card>
 
-
-
-
-
-                  </Grid>
                 ))}
 
                 <Grid container display={'grid'} justifyContent={'center'}>
 
-                  <ButtonWrapper handleClick={() => setNotice([...notice, ''])}>
+                  <ButtonWrapper handleClick={() => setNotice([...notice, { title: '', headLine: '', body: '' }])}>
                     Add notice
                   </ButtonWrapper>
                 </Grid>
@@ -468,7 +580,7 @@ const Results = ({ data, reFetchData }) => {
                   sx={{
                     borderRadius: 0.5,
                     height: 36,
-                    width:'50%',
+                    width: '50%',
                   }}
                   type="submit"
                   startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}

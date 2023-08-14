@@ -13,7 +13,7 @@ module.exports = {
       keyframes: {
         wiggle: {
           '0%': { transform: 'translateX(-150%)' },
-          '100%': { transform: 'translateX(250%);' }
+          '100%': { transform: 'translateX(200%);' }
         },
         'top-to-bottom': {
           '0%': { transform: 'translateY(100%)' },
@@ -21,7 +21,7 @@ module.exports = {
         },
       },
       animation: {
-        wiggle: 'wiggle 10s linear infinite',
+        wiggle: 'wiggle 18s linear infinite',
         'top-to-bottom': 'top-to-bottom 5s linear infinite',
       }
     }

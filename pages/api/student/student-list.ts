@@ -20,6 +20,13 @@ const index = async (req, res) => {
                         section: {
                             id: parseInt(req.query.section_id)
                         },
+                        student_info: {
+                            user: {
+                                is: {
+                                    deleted_at: null
+                                }
+                            }
+                        }
                         // student_info: {
                         //     school_id: parseInt(req.query.school_id)
                         // }

@@ -21,7 +21,8 @@ const id = async (req, res) => {
             case 'GET':
                 const user = await prisma.student.findUnique({
                     where: {
-                        id: student_id
+                        id: student_id,
+                        
                     },
                     include: {
                         section: {

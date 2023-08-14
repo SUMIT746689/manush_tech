@@ -1,7 +1,6 @@
-import { FC, ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
+import { FC, ChangeEvent, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Card, Slide, Divider, TableCell, TableRow, Typography, Grid } from '@mui/material';
-import { TransitionProps } from '@mui/material/transitions';
+import { Box, Card, Divider, TableCell, TableRow, Grid } from '@mui/material';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import BulkActions from '@/components/BulkAction';

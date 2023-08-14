@@ -55,13 +55,14 @@ export function GenerateCertificateExport({ _for = "employee", publicationDate, 
   );
 }
 
-export const GenerateCertificate = ({ _for, publicationDate, datas, template, width="1123px",height="794px" }) => {
+export const GenerateCertificate = ({ _for, publicationDate, datas, template, width = "1123px", height = "794px" }) => {
   const { user } = useAuth()
   const description = template.content
 
+  console.log({ datas })
   return (
     datas.map((data) => {
-
+      if (!data) return
       let size = description.length;
       let container = ''
       for (let i = 0; i < size; i++) {
@@ -84,8 +85,9 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
               centralFlag = true
             }
 
+            console.log({ data })
             if (cnt != '') {
-              const flag = data.student_info[`${cnt}`] || data[`${cnt}`]
+              const flag = data?.student_info ? data.student_info[`${cnt}`] : data[`${cnt}`]
               if (!flag && flag != 0) {
                 if (centralFlag) {
                   container += cnt
@@ -105,7 +107,7 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
         }
 
       }
-      console.log(container);
+      // console.log(container);
       return (
         <Card
           key={data.id}
@@ -118,22 +120,22 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
             pr: `${template.right_space}px`,
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
-            backgroundImage: `url(${template.background_url})`,
+            backgroundImage: `url(/api/get_file/${template.background_url})`,
             backgroundPosition: 'center',
             // backgroundSize: '100%',
             // backgroundSize: 'contain',
             // breakAfter: true,
-            // mt: 4,
+            mt: 4,
             boxShadow: 'none',
-            p: '15px',
+            // p: '15px',
             pageBreakAfter: 'always'
 
           }} >
           <Grid
             display="flex"
             flexDirection="column"
-            alignContent={"space-between"}
-            justifyContent={"space-between"}
+            alignContent="space-between"
+            justifyContent="space-between"
             sx={{
               textAlign: 'center',
               height: "100%"
@@ -151,8 +153,9 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
               <Avatar
                 alt="logo"
                 variant={template.photo_style}
-                src={data.student_photo}
+                src={`/api/get_file/${data.student_photo}`}
                 sx={{ width: template.photo_size, height: template.photo_size }}
+
               />
               <Typography width={300} variant='h5' textAlign={"center"}>{_for === "student" && `Addmission On: ${data?.created_at}`}</Typography>
             </Grid>
@@ -170,7 +173,7 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
               <Avatar
                 alt="signature"
                 // variant={template.photo_style}
-                src={template.signature_url}
+                src={`/api/get_file/${template.signature_url}`}
                 sx={{ width: template.photo_size, height: template.photo_size }}
               />
             </Grid>

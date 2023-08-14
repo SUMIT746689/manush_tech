@@ -15,6 +15,7 @@ import CsvExport from '@/components/Export/Csv';
 
 interface ResultsProps {
   // sent_sms: Project[];
+  defauleRole?: number;
   roles: any;
   templates: any;
 }
@@ -71,7 +72,7 @@ const applyPagination = (
   return sent_sms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ roles, templates }) => {
+const Results: FC<ResultsProps> = ({ defauleRole, roles, templates }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const [reportDatas, setReportDatas] = useState<any>([]);
   const { t }: { t: any } = useTranslation();
@@ -82,7 +83,7 @@ const Results: FC<ResultsProps> = ({ roles, templates }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [selectedRole, setSelectedRole] = useState<number>();
+  const [selectedRole, setSelectedRole] = useState<number>(defauleRole);
   const [selectedTemplate, setSelectedTemplate] = useState<number>();
   const [employees, setemployees] = useState<any>([]);
   const [printDate, setPrintDate] = useState<any>(dayjs(Date.now()));
@@ -183,7 +184,7 @@ const Results: FC<ResultsProps> = ({ roles, templates }) => {
         </Grid>
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 350px)',borderRadius:0.5 }}>
+      <Card sx={{ minHeight: 'calc(100vh - 350px)', borderRadius: 0.5 }}>
 
         <TableHeadWrapper
           title="employees"
@@ -209,7 +210,7 @@ const Results: FC<ResultsProps> = ({ roles, templates }) => {
           selectAllCheckbox={
             <Tooltip title={'Select All'} arrow>
               <Checkbox
-              sx={{p:0}}
+                sx={{ p: 0 }}
                 checked={selectedAllemployees}
                 onChange={handleSelectAllschools}
               />

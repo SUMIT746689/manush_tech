@@ -4,8 +4,8 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
-import Result from '@/content/Certificate/GenerateStudent/Results';
-import StudentTeacherResults from '@/content/Certificate/GenerateStudent/StudentTeacherResult';
+import Result from '@/content/Certificate/GenerateStudentByOther/Results';
+import StudentTeacherResults from '@/content/Certificate/GenerateStudentTeacher/StudentTeacherResult';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
 
@@ -92,7 +92,7 @@ export async function getServerSideProps(context: any) {
   return { props: { student, templates } }
 }
 const Packages = ({ student, templates, classes }) => {
-  console.log({ student })
+  // console.log({ student })
   return (
     <>
       <Head>
@@ -107,7 +107,7 @@ const Packages = ({ student, templates, classes }) => {
         >
           {
             student ?
-              <StudentTeacherResults student={student} templates={templates} />
+              <StudentTeacherResults certificateFor={"student"} student={student} templates={templates} />
               :
               <Result classes={classes} templates={templates} />
           }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, Dialog, DialogContent, Avatar, Button } from '@mui/material';
+import { Grid, Dialog, DialogContent, Avatar, Button, Typography } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
@@ -339,6 +339,9 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                       // required={editData?.background_url ? false : true}
                       // type="file"
                       />
+                      <Typography variant="body2" gutterBottom color="blue">
+                        provide width 1123 pixel and height 794 pixel photo
+                      </Typography>
                       {editData?.background_url
                         &&
                         <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>

@@ -227,49 +227,49 @@ const Results: FC<ResultsProps> = ({
 
                 tableBody={
                   <>
-                    {paginatedFees.map((fee) => {
+                    {paginatedFees.map((certificate) => {
                       const isschoolselected = selectedItems.includes(
-                        fee.id
+                        certificate.id
                       );
                       return (
                         <TableRow
                           hover
-                          key={fee.id}
+                          key={certificate.id}
                           selected={isschoolselected}
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={isschoolselected}
                               onChange={(event) =>
-                                handleSelectOneProject(event, fee.id)
+                                handleSelectOneProject(event, certificate.id)
                               }
                               value={isschoolselected}
                             />
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {fee.id}
+                              {certificate.id}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {fee.name}
+                              {certificate.name}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {fee.user_type}
+                              {certificate.user_type}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {fee.page_layout}
+                              {certificate.page_layout}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
                               {/* @ts-ignore */}
-                              <img src={`/api/get_file${fee.background_url}`} className="w-fit h-10" alt="background_image" />
+                              <img src={`/api/get_file${certificate.background_url}`} className="w-fit h-10" alt="background_image" />
                               {/* <Image height={50} width={50} src={fee.background_url} /> */}
                             </Typography>
                           </TableCell>
@@ -278,7 +278,7 @@ const Results: FC<ResultsProps> = ({
                             <Typography noWrap>
                               <Tooltip title={t('Edit')} arrow>
                                 <IconButton
-                                  onClick={() => setEditData(fee)}
+                                  onClick={() => setEditData(certificate)}
                                   color="primary"
                                 >
                                   <LaunchTwoToneIcon fontSize="small" />

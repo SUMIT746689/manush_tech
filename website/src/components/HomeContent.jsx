@@ -204,8 +204,8 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 
 
 
-export default function HomeContent({ carousel_image, speechDatas }) {
-  //  console.log("school_info__",school_info);
+export default function HomeContent({ school_info, carousel_image, speechDatas }) {
+  console.log("school_info__", school_info);
   // const ref = useRef(null);
   const announceref = useRef(null);
   const noticeRef = useRef(null);
@@ -237,8 +237,10 @@ export default function HomeContent({ carousel_image, speechDatas }) {
         </div>
         <div className={` ${secondaryColor} overflow-hidden md:col-span-10`}>
           <div className="relative animate-wiggle max-w-fit flex gap-6 mt-4 md:mt-3 w-full">
+
             <div className="curson-pointer">🐳🦜 পাঠ্যপুস্তক সংক্রান্ত</div>
             <div className=" cursor-pointer">🐳🦜 নতুন নেটিশ</div>
+
           </div>
         </div>
       </div>

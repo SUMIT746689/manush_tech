@@ -9,7 +9,7 @@ export default async function Home(props) {
 
   const headersList = headers();
   const domain = headersList.get('host')
-  
+
 
 
   const school_info = await prisma.websiteUi.findFirst({
@@ -19,7 +19,7 @@ export default async function Home(props) {
       }
     },
   })
- 
+
 
 
   const speechDatas = [
@@ -44,9 +44,14 @@ export default async function Home(props) {
   const carousel_image = school_info?.carousel_image.map(i => ({
     path: `${process.env.SERVER_HOST}/api/get_file/${i?.path?.replace(/\\/g, '/')}`
   }))
+  console.log(school_info);
   return (
     <div>
-      <HomeContent carousel_image={carousel_image || []} speechDatas={speechDatas || []} />
+      <HomeContent
+        school_info={school_info}
+        carousel_image={carousel_image || []}
+        speechDatas={speechDatas || []}
+      />
     </div>
   )
 

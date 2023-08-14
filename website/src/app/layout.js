@@ -25,7 +25,8 @@ export default async function RootLayout({ children }) {
       }
     },
     select: {
-      header_image: true
+      header_image: true,
+      eiin_number: true
     }
   })
   console.log("in layout__", domain, school_info);
@@ -37,7 +38,7 @@ export default async function RootLayout({ children }) {
         </Head>
         <body>
           <LayoutWrapper>
-            <Header header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`} />
+            <Header eiin_number={school_info?.eiin_number} header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`} />
             <Nav serverhost={`${process.env.SERVER_HOST}`} />
             {children}
           </LayoutWrapper>

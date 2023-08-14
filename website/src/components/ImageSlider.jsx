@@ -64,7 +64,6 @@ const ImageSlider = ({ carousel_image }) => {
     // ]
   };
   // const images = ["service1.png",]
-
   return (
     <>
       <Slider {...settings}>

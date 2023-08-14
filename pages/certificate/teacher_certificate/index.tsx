@@ -4,37 +4,40 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
-import Result from '@/content/Certificate/GenerateStudent/Results';
-import StudentTeacherResults from '@/content/Certificate/GenerateStudent/StudentTeacherResult';
+import Result from '@/content/Certificate/GenerateEmployee/Results';
+import StudentTeacherResults from '@/content/Certificate/GenerateStudentTeacher/StudentTeacherResult';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
 
 export async function getServerSideProps(context: any) {
-  let classes: any = [];
   let templates: any = [];
-  let student: any = null;
   let teacher: any = null;
+  let roles: any = [];
   try {
     const refresh_token_varify: any = serverSideAuthentication(context)
-    
+
     if (!refresh_token_varify) return { props: { teacher, templates } };
 
     templates = await prisma.certificateTemplate.findMany({ where: { user_type: 'employee' } })
     templates = JSON.parse(JSON.stringify(templates));
 
+    roles = await prisma.role.findFirst({ where: { title: "TEACHER" } })
+    roles = [JSON.parse(JSON.stringify(roles))];
+
     if (refresh_token_varify.role.title === 'TEACHER') {
 
-      teacher = await prisma.teacher.findFirst({ where: { user_id: Number(refresh_token_varify.id) },include:{department:true} })
-      const parseTeacher= JSON.parse(JSON.stringify(teacher));
-      return { props: { teacher:parseTeacher, templates } };
+      teacher = await prisma.teacher.findFirst({ where: { user_id: Number(refresh_token_varify.id) }, include: { department: true } })
+      const parseTeacher = JSON.parse(JSON.stringify(teacher));
+      return { props: { teacher: parseTeacher, templates, roles } };
     }
+
   }
   catch (error) {
     console.log({ error })
   }
-  return { props: { student, templates } }
+  return { props: { teacher, roles, templates } }
 }
-const Packages = ({ student, teacher, templates, classes }) => {
+const Packages = ({ teacher, templates, roles }) => {
   return (
     <>
       <Head>
@@ -49,9 +52,9 @@ const Packages = ({ student, teacher, templates, classes }) => {
         >
           {
             teacher ?
-              <StudentTeacherResults teacher={teacher} student={student} templates={templates} />
+              <StudentTeacherResults certificateFor={"teacher"} teacher={teacher} templates={templates} />
               :
-              <Result classes={classes} templates={templates} />
+              <Result defauleRole={ roles && roles?.length > 0 ? roles[0].id : undefined } roles={roles}  templates={templates} />
           }
         </Grid>
 

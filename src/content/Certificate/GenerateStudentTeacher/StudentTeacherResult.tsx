@@ -1,25 +1,20 @@
-import { FC, ChangeEvent, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Card, Divider, TableCell, TableRow, Grid, Checkbox, Tooltip, IconButton, Modal, Box, Dialog } from '@mui/material';
+import { FC, ChangeEvent, useState } from 'react';
+import { Card, Divider, TableCell, TableRow, Grid, Tooltip, IconButton, Box, Dialog } from '@mui/material';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import { TableContainerWrapper, TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
 import dayjs from 'dayjs';
-import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
-import { fetchData } from '@/utils/post';
 import { GenerateCertificate, GenerateCertificateExport } from '@/components/Export/certificate';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import CsvExport from '@/components/Export/Csv';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
 import PreviewIcon from '@mui/icons-material/Preview';
-import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface ResultsProps {
   student?: any;
   teacher?: any;
   templates: any;
+  certificateFor: "teacher" | "student"
 }
 
 interface Filters {
@@ -74,7 +69,7 @@ const applyPagination = (
   return sent_sms.slice(page * limit, page * limit + limit);
 };
 
-const StudentTeacharResults: FC<ResultsProps> = ({ templates, student, teacher }) => {
+const StudentTeacharResults: FC<ResultsProps> = ({ certificateFor, templates, student, teacher }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -125,13 +120,13 @@ const StudentTeacharResults: FC<ResultsProps> = ({ templates, student, teacher }
         open={selectedTemplate} onClose={() => setSelectedTemplate(null)}
       >
         <Box padding={4} >
-          {selectedTemplate && <GenerateCertificate _for={student ? 'student' : 'employee'} publicationDate={printDate} datas={student ? [student] : [teacher]} template={selectedTemplate} width='100%' height='100%' />}
+          {selectedTemplate && <GenerateCertificate _for={certificateFor === "student" ? 'student' : 'employee'} publicationDate={printDate} datas={certificateFor === "student" ? [student] : [teacher]} template={selectedTemplate} />}
         </Box>
 
       </Dialog>
 
 
-      {student
+      {certificateFor === "student"
         &&
         <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
           <Grid>
@@ -146,7 +141,7 @@ const StudentTeacharResults: FC<ResultsProps> = ({ templates, student, teacher }
         </Card>
       }
       {
-        teacher
+        certificateFor === "teacher"
         &&
         <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr min-content' }, gap: { sm: 1 } }}>
           <Grid>
@@ -249,7 +244,7 @@ const StudentTeacharResults: FC<ResultsProps> = ({ templates, student, teacher }
                               </IconButton>
                             </Tooltip>
                             <Grid mt={1.1}>
-                              <GenerateCertificateExport _for={student ? 'student' : 'employee'} publicationDate={printDate} datas={[student]} template={template} />
+                              <GenerateCertificateExport _for={student ? 'student' : 'employee'} publicationDate={printDate} datas={certificateFor === "student" ? [student] : [teacher]} template={template} />
                             </Grid>
                           </TableCell>
                         </TableRow>

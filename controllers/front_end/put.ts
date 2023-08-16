@@ -247,6 +247,24 @@ async function put(req, res, refresh_token) {
         if (fields?.principal_speech) {
             query['principal_speech'] = fields?.principal_speech
         }
+        if (fields?.eiin_number) {
+            query['eiin_number'] = fields?.eiin_number
+        }
+        if (fields?.facebook_link) {
+            query['facebook_link'] = fields?.facebook_link
+        }
+        if (fields?.twitter_link) {
+            query['twitter_link'] = fields?.twitter_link
+        }
+        if (fields?.google_link) {
+            query['google_link'] = fields?.google_link
+        }
+        if (fields?.linkedin_link) {
+            query['linkedin_link'] = fields?.linkedin_link
+        }
+        if (fields?.youtube_link) {
+            query['youtube_link'] = fields?.youtube_link
+        }
 
         if (fields?.latest_news) {
             query['latest_news'] = fields?.latest_news?.map(i=>JSON.parse(i))  
@@ -274,6 +292,11 @@ async function put(req, res, refresh_token) {
                     principal_photo: query?.principal_photo || '',
                     principal_speech: query?.principal_speech || '',
                     eiin_number: query?.eiin_number || '',
+                    facebook_link: query?.facebook_link || '',
+                    youtube_link: query?.youtube_link || '',
+                    twitter_link: query?.twitter_link || '',
+                    google_link: query?.google_link || '',
+                    linkedin_link: query?.linkedin_link || '',
                     gallery: Array.isArray(query?.gallery) ? query?.gallery : [query?.gallery] || [],
                     school: {
                         connect: {

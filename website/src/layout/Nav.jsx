@@ -108,9 +108,11 @@ const NavLinks = ({serverhost}) => {
       <Link href='/text-book'>
         <div className={navLink}> পাঠ্যপুস্তক</div>
       </Link>
+      <Link href='/online-admission'>
+        <div className={navLink}> অনলাইন ভর্তি</div>
+      </Link>
 
-      {/* <Link href='/student-information'><div className={navLink}> শিক্ষার্থীদের তথ্য </div></Link> */}
-      <div className="relative group">
+      {/* <div className="relative group">
         <div className={navLink} >
           <span>শিক্ষার্থীদের তথ্য</span>
         </div>
@@ -128,8 +130,8 @@ const NavLinks = ({serverhost}) => {
             </div>
           </div>
         </div>
-      </div>
-      <div className={navLink}> ডিজিটাল হাজিরা </div>
+      </div> */}
+      {/* <div className={navLink}> ডিজিটাল হাজিরা </div> */}
       <Link href="/notice">
         <div className={navLink}> নোটিশ</div>
       </Link>

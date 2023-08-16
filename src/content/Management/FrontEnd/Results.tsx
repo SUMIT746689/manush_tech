@@ -37,7 +37,7 @@ const Results = ({ data, reFetchData }) => {
 
   useEffect(() => {
     if (data) {
-      setNotice(data?.latest_news?.map(i=>({ title: i?.title, headLine: i?.headLine, body: i?.body })))
+      setNotice(data?.latest_news?.map(i => ({ title: i?.title, headLine: i?.headLine, body: i?.body })))
     }
   }, [data])
 
@@ -65,6 +65,13 @@ const Results = ({ data, reFetchData }) => {
         principal_photo: data?.principal_photo || '',
         principal_speech: data?.principal_speech || '',
         eiin_number: data?.eiin_number || '',
+
+        facebook_link: data?.facebook_link || '',
+        twitter_link: data?.twitter_link || '',
+        google_link: data?.google_link || '',
+        linkedin_link: data?.linkedin_link || '',
+        youtube_link: data?.youtube_link || '',
+
         gallery: undefined,
 
         submit: null
@@ -502,6 +509,89 @@ const Results = ({ data, reFetchData }) => {
                     maxRows={5}
                     multiline
                   />
+                </Grid>
+                <Grid container gap={2} display={'grid'} gridTemplateColumns={'50% 50%'}>
+
+                  {/* facebook_link */}
+                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                    <TextField
+                      id="outlined-basic"
+                      label="Facebook page link"
+                      error={Boolean(touched?.facebook_link && errors?.facebook_link)}
+                      fullWidth
+                      helperText={touched?.facebook_link && errors?.facebook_link}
+                      name="facebook_link"
+                      placeholder={t(`Facebook page link here...`)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values?.facebook_link}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* twitter_link */}
+                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                    <TextField
+                      id="outlined-basic"
+                      label="Twitter page link"
+                      error={Boolean(touched?.twitter_link && errors?.twitter_link)}
+                      fullWidth
+                      helperText={touched?.twitter_link && errors?.twitter_link}
+                      name="twitter_link"
+                      placeholder={t(`Twitter link here...`)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values?.twitter_link}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* google_link */}
+                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                    <TextField
+                      id="outlined-basic"
+                      label="Google++ profile link"
+                      error={Boolean(touched?.google_link && errors?.google_link)}
+                      fullWidth
+                      helperText={touched?.google_link && errors?.google_link}
+                      name="google_link"
+                      placeholder={t(`Google++ profile link here...`)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values?.google_link}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* linkedin_link */}
+                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                    <TextField
+                      id="outlined-basic"
+                      label="Linkedin profile link"
+                      error={Boolean(touched?.linkedin_link && errors?.linkedin_link)}
+                      fullWidth
+                      helperText={touched?.linkedin_link && errors?.linkedin_link}
+                      name="linkedin_link"
+                      placeholder={t(`Linkedin link profile link here...`)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values?.linkedin_link}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* youtube_link */}
+                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                    <TextField
+                      id="outlined-basic"
+                      label="Youtube profile link"
+                      error={Boolean(touched?.youtube_link && errors?.youtube_link)}
+                      fullWidth
+                      helperText={touched?.youtube_link && errors?.youtube_link}
+                      name="youtube_link"
+                      placeholder={t(`Linkedin link profile link here...`)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values?.youtube_link}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
 
                 {notice.map((field, index) => (

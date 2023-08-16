@@ -5,6 +5,7 @@ import ImgSlider from './ImageSlider';
 import { useEffect, useRef, useState } from 'react';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
 import { useClientFetch } from '../hooks/useClientFetch';
+import Link from 'next/link';
 const inter = Inter({ subsets: ['latin'] });
 
 const navLink = 'px-4 py-3 hover:cursor-pointer hover:bg-blue-900 duration-150';
@@ -106,17 +107,17 @@ const SpeechesCard = ({ title, image, description }) => {
 // ];
 
 const serviceDatas = [
-  {
-    title: 'ছাত্র/ছাত্রী তথ্য/রেজাল্ট',
-    image: 'service1.png',
-    lists: [
-      'অনলাইন ভর্তি',
-      'পরিক্ষা এডমিট কার্ড',
-      'সার্টিফিকেট',
-      'রেজাল্ট (মঙ্গলকান্দি ইসলামিয়া ফাজিল মাদ্রাসা)',
-      'রেজাল্ট বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড'
-    ]
-  },
+  // {
+  //   title: 'ছাত্র/ছাত্রী তথ্য/রেজাল্ট',
+  //   image: 'service1.png',
+  //   lists: [
+  //     'অনলাইন ভর্তি',
+  //     'পরিক্ষা এডমিট কার্ড',
+  //     'সার্টিফিকেট',
+  //     'রেজাল্ট (মঙ্গলকান্দি ইসলামিয়া ফাজিল মাদ্রাসা)',
+  //     'রেজাল্ট বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড'
+  //   ]
+  // },
   {
     title: 'ই-বুক',
     image: 'service2.png',
@@ -138,18 +139,18 @@ const serviceDatas = [
       'পরীক্ষার রুটিন ডাউনলোড'
     ]
   },
-  {
-    title: 'নোটিশ',
-    image: 'service4.png',
-    lists: [
-      'নোটিশ (ইসলামি আরবি বিশ্ববিদ্যালয়)',
-      'নোটিশ (মাদ্রাাসা শিক্ষা অধিদপ্তর)',
-      'নোটিশ (বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড)',
-      'নোটিশ (উপবৃত্তি)',
-      'নোটিশ (এনটিআরসিএ)',
-      'নোটিশ তিতাস উপজেলা'
-    ]
-  }
+  // {
+  //   title: 'নোটিশ',
+  //   image: 'service4.png',
+  //   lists: [
+  //     'নোটিশ (ইসলামি আরবি বিশ্ববিদ্যালয়)',
+  //     'নোটিশ (মাদ্রাাসা শিক্ষা অধিদপ্তর)',
+  //     'নোটিশ (বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড)',
+  //     'নোটিশ (উপবৃত্তি)',
+  //     'নোটিশ (এনটিআরসিএ)',
+  //     'নোটিশ তিতাস উপজেলা'
+  //   ]
+  // }
 ];
 
 const color = [
@@ -161,12 +162,30 @@ const color = [
 ];
 
 const otherSites = [
-  'শিক্ষা মন্ত্রণালয়',
-  'মাদ্রাসা শিক্ষা অধিদপ্তর',
-  'ইসলামি আরবী বিশ্ববিদ্যালয়',
-  'বাংলাদেশ মাদরাসা শিক্ষা বোর্ড',
-  'শিক্ষক বাতায়ন',
-  'সকল অনলাইন পত্রিকা'
+  {
+    title: 'শিক্ষা মন্ত্রণালয়',
+    link: 'https://www.moedu.gov.bd/'
+  },
+  {
+    title: 'মাদ্রাসা শিক্ষা অধিদপ্তর',
+    link: 'https://dme.gov.bd/'
+  },
+  {
+    title: 'ইসলামি আরবী বিশ্ববিদ্যালয়',
+    link: 'https://iau.edu.bd/'
+  },
+  {
+    title: 'বাংলাদেশ মাদরাসা শিক্ষা বোর্ড',
+    link: 'https://bmeb.gov.bd/'
+  },
+  {
+    title: 'শিক্ষক বাতায়ন',
+    link: 'https://teachers.gov.bd/'
+  },
+  {
+    title: 'সকল অনলাইন পত্রিকা',
+    link: 'http://www.bdembassyusa.org/uploads/bonp/index.html'
+  },
 ];
 
 const ServiceCard = ({ title, image, lists, headColor }) => {
@@ -204,8 +223,8 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 
 
 
-export default function HomeContent({ school_info, carousel_image, speechDatas }) {
-  console.log("school_info__", school_info);
+export default function HomeContent({ latest_news, carousel_image, speechDatas,facebook_link }) {
+
   // const ref = useRef(null);
   const announceref = useRef(null);
   const noticeRef = useRef(null);
@@ -238,7 +257,7 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
         <div className={` ${secondaryColor} overflow-hidden md:col-span-10`}>
           <div className="relative animate-wiggle max-w-fit flex gap-6 mt-4 md:mt-3 w-full">
             {
-              school_info?.latest_news?.map(i => <div className="curson-pointer">🐳🦜{i?.headLine}</div>)
+              latest_news?.map(i => <div className="curson-pointer">🐳🦜{i?.headLine}</div>)
             }
             {/* <div className="curson-pointer">🐳🦜 পাঠ্যপুস্তক সংক্রান্ত</div>
             <div className=" cursor-pointer">🐳🦜 নতুন নেটিশ</div> */}
@@ -288,7 +307,7 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
             <div className='bg-slate-200 overflow-hidden'>
               <div className="pb-2 px-2 h-40 flex flex-col gap-4 animate-top-to-bottom hover:pause">
                 {
-                  school_info?.latest_news?.map(i=><div className=' cursor-pointer'>👻 {i?. title} </div>)
+                  latest_news?.map(i => <div className=' cursor-pointer'>👻 {i?.title} </div>)
                 }
                 {/* <div className=' cursor-pointer'>👻 পাঠ্যপুস্তক সংক্রান্ত </div>
                 <div className=' cursor-pointer'>👻 নতুন নেটিশ</div> */}
@@ -304,10 +323,10 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
             {otherSites.map((site, index) => (
               <div
                 key={index}
-                className=" bg-gradient-to-r from-red-700 to-red-300 hover:from-amber-900 hover:to-amber-500 px-8 py-3 cursor-pointer duration-150 "
+                className=" bg-gradient-to-r from-red-700 to-red-300 hover:from-amber-900 hover:to-amber-500 px-8 py-3 duration-150 "
               >
                 {' '}
-                ❄️ {site}
+                <Link href={site.link} rel="noopener noreferrer" target="_blank">❄️ {site.title}</Link>
               </div>
             ))}
           </div>
@@ -315,7 +334,7 @@ export default function HomeContent({ school_info, carousel_image, speechDatas }
           {/*  facebook page */}
           <div className="my-4">
             <div className={` ${primaryBgColor} ${primaryColor} py-3 px-2`}>
-              Our Facebook Page
+              <Link href={facebook_link} rel="noopener noreferrer" target="_blank"> Our Facebook Page</Link>
             </div>
           </div>
         </div>

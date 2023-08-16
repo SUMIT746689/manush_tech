@@ -5,22 +5,18 @@ import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
 
-export default async function Home(props) {
+export default async function Home() {
 
   const headersList = headers();
   const domain = headersList.get('host')
-
-
 
   const school_info = await prisma.websiteUi.findFirst({
     where: {
       school: {
         domain: domain
-      }
-    },
+      },
+    }
   })
-
-
 
   const speechDatas = [
     {
@@ -48,9 +44,10 @@ export default async function Home(props) {
   return (
     <div>
       <HomeContent
-        school_info={school_info}
+        latest_news={school_info?.latest_news || []}
         carousel_image={carousel_image || []}
         speechDatas={speechDatas || []}
+        facebook_link={school_info?.facebook_link || ''}
       />
     </div>
   )

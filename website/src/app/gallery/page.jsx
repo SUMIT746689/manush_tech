@@ -1,50 +1,29 @@
-import Image from 'next/image';
+
 import React from 'react';
-const গ্যালারী = [
-    {
-        url: 'slider-1.jpg'
-    }
-]
-const page = () => {
+import Gallery from "../../components/GalleryContent";
+import prisma from '../../../../src/lib/prisma_client';
+import { headers } from 'next/headers';
+
+const page = async () => {
+    const headersList = headers();
+    const domain = headersList.get('host')
+
+    const school_info = await prisma.websiteUi.findFirst({
+        where: {
+            school: {
+                domain: domain
+            }
+        },
+        select: {
+            gallery: true
+        }
+    })
+    const gallery = school_info?.gallery?.map(i => ({
+        path: `${process.env.SERVER_HOST}/api/get_file/${i?.path?.replace(/\\/g, '/')}`
+    }))
+
     return (
-        <div className=' grid px-20 mt-4'>
-
-            <div >
-                <hr class="h-px my-3 bg-gray-200 border-0 dark:bg-gray-700" />
-                <h3 className=' h-6 text-center pt-1 font-bold'>
-                    গ্যালারী
-                </h3>
-
-                <hr class="h-px my-3 bg-gray-200 border-0 dark:bg-gray-700" />
-            </div>
-            <div className='grid gap-2 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 place-content-center'>
-                {
-                    গ্যালারী.map(i =>
-                        <div className='p-2 shadow-md'>
-                            <Image
-                                height={500}
-                                width={500}
-                                quality={100}
-                                className="w-full object-cover h-full"
-                                src={`/${i.url}`}
-                                loading="lazy"
-                                alt={""}
-                            />
-                            {/* <Image
-                                width={200}
-                                height={300}
-                                className="w-full object-cover h-full"
-                                src={i.url}
-                                loading="lazy"
-                                quality={100}
-                                alt={""}
-                            /> */}
-                        </div>
-                    )
-                }
-            </div>
-
-        </div>
+        <Gallery gallery={gallery || []} />
     );
 };
 

@@ -587,6 +587,11 @@ model WebsiteUi {
   latest_news         Json
   eiin_number         String
   gallery             Json?
+  facebook_link       String?
+  youtube_link        String?
+  twitter_link        String?
+  google_link         String?
+  linkedin_link       String?
 
   school School @relation(fields: [school_id], references: [id])
 

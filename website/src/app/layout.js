@@ -7,6 +7,7 @@ import Nav from '../layout/Nav';
 import prisma from '../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
 import SchoolNotFound from '../components/SchoolNotFound'
+import React from 'react';
 
 // export const metadata = {
 //   title: 'Create Next App',
@@ -49,7 +50,9 @@ export default async function RootLayout({ children }) {
               header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`}
             />
             <Nav serverhost={`${process.env.SERVER_HOST}`} />
-            {children}
+            <div onClick={console.log("hi....")}>
+              {children}
+            </div>
           </LayoutWrapper>
           <Footer
             facebook_link={school_info?.facebook_link || ''}

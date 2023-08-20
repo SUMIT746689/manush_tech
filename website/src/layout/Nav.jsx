@@ -147,44 +147,50 @@ const NavLinks = ({ serverhost }) => {
 
 const MobileNavBar = ({ serverhost }) => {
 
-  const [isHideNav,setisHideNav] = useState(true);
+  const [isHideNav, setisHideNav] = useState(true);
   const handleClick = () => {
-    setisHideNav((value)=>!value);
+    setisHideNav((value) => !value);
+  }
+  const handleHideNavbar = () => {
+    setisHideNav((value) => true);
   }
   return (
     <>
+      <nav className={`${isHideNav ? "hidden" : " fixed"} z-40  top-0 left-0 w-screen h-screen backdrop-blur-sm`} onClick={handleHideNavbar}>
+      </nav>
+
       <nav
         id="sidenav-6"
-        className="fixed left-0 top-0 z-[1035] h-screen w-60 duration-300 -translate-x-full overflow-hidden bg-sky-700 shadow-[0_4px_12px_0_rgba(0,0,0,0.07),_0_2px_4px_rgba(0,0,0,0.05)] data-[te-sidenav-hidden='false']:translate-x-0"
+        className="fixed left-0 top-0 z-[1035] h-screen w-60 duration-300 -translate-x-full overflow-hidden bg-sky-700 shadow-[0_4px_12px_0_rgba(0,0,0,0.5),_0_2px_4px_rgba(0,0,0,0.6)] data-[te-sidenav-hidden='false']:translate-x-0"
         data-te-sidenav-init
         data-te-sidenav-hidden={isHideNav}
         data-te-sidenav-accordion={"true"}>
         <ul className="relative m-0 list-none px-[0.2rem]" data-te-sidenav-menu-ref>
 
-          <Link href="/">
+          <Link href="/" onClick={handleHideNavbar}>
             <div className={navLink}>প্রধান পাতা</div>
           </Link>
-          <Link href="/teachers">
+          <Link href="/teachers" onClick={handleHideNavbar}>
             <div className={navLink}> শিক্ষক</div>
           </Link>
-          <Link href="/suborna-joyonti">
+          <Link href="/suborna-joyonti" onClick={handleHideNavbar}>
             <div className={navLink}> সুবর্ণজয়ন্তী কর্ণার</div>
           </Link>
-          <Link href="/gallery">
+          <Link href="/gallery" onClick={handleHideNavbar}>
             <div className={navLink}> গ্যালারী</div>
           </Link>
 
           <div className={navLink}> পরিক্ষা সংক্রান্ত</div>
           <Link href='/text-book'>
-            <div className={navLink}> পাঠ্যপুস্তক</div>
+            <div className={navLink} onClick={handleHideNavbar}> পাঠ্যপুস্তক</div>
           </Link>
-          <Link href='/online-admission'>
-            <div className={navLink}> অনলাইন ভর্তি</div>
+          <Link href='/online-admission' onClick={handleHideNavbar}>
+            <div className={navLink} > অনলাইন ভর্তি</div>
           </Link>
-          <Link href="/notice">
-            <div className={navLink}> নোটিশ</div>
+          <Link href="/notice" onClick={handleHideNavbar}>
+            <div className={navLink} > নোটিশ</div>
           </Link>
-          <Link href={`${serverhost}`}>
+          <Link href={`${serverhost}`} onClick={handleHideNavbar}>
             <div className={navLink}>
               লগইন
             </div>
@@ -279,8 +285,8 @@ function Nav({ serverhost }) {
         <NavLinks serverhost={serverhost} />
       </nav>
       <nav
-      // className={`${primaryBgColor} ${primaryColor} lg:hidden grid lg: text-sm grid-flow-col justify-end divide-x`}
-      className={`${primaryBgColor} ${primaryColor} lg:hidden flex justify-end divide-x text-sm`}
+        // className={`${primaryBgColor} ${primaryColor} lg:hidden grid lg: text-sm grid-flow-col justify-end divide-x`}
+        className={`${primaryBgColor} ${primaryColor} lg:hidden flex justify-end divide-x text-sm z-50`}
       >
         <MobileNavBar />
       </nav>

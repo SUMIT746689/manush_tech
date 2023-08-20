@@ -40,7 +40,7 @@ export default async function Home() {
   const carousel_image = school_info?.carousel_image.map(i => ({
     path: `${process.env.SERVER_HOST}/api/get_file/${i?.path?.replace(/\\/g, '/')}`
   }))
-  console.log(school_info);
+
   return (
     <div>
       <HomeContent

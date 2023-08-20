@@ -16,7 +16,7 @@ import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
   try {
-
+    console.log({context});
     const refresh_token: any = serverSideAuthentication(context);
     if (!refresh_token) return { redirect: { destination: '/auth/login/basic' } };
 

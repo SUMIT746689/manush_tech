@@ -22,7 +22,8 @@ async function put(req, res, refresh_token) {
 
         // console.log({ error })
 
-        console.log({ fields, files });
+        console.log(fields);
+        console.log(files);
         //  console.log(files.carousel_image);
 
         if (error) {
@@ -265,10 +266,7 @@ async function put(req, res, refresh_token) {
         if (fields?.youtube_link) {
             query['youtube_link'] = fields?.youtube_link
         }
-
-        if (fields?.latest_news) {
-            query['latest_news'] = fields?.latest_news?.map(i=>JSON.parse(i))  
-        }
+        let flag1 = false;
         console.log({ query });
         if (websiteUirow) {
             await prisma.websiteUi.update({
@@ -303,7 +301,6 @@ async function put(req, res, refresh_token) {
                             id: refresh_token?.school_id
                         }
                     },
-                    latest_news: query?.latest_news || []
                 }
             })
         }

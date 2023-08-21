@@ -1,10 +1,14 @@
 'use client';
+import { Grid } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { HiOutlineMail } from 'react-icons/hi';
 import { MdMessage } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
-const Item = ({ data }) => {
+const Item = ({ data, serverHost }) => {
+  const { t } = useTranslation();
   return (
     <div className="px-12 mt-8 max-w-3xl">
       <div className="p-4 border rounded-lg flex flex-col gap-8">
@@ -13,7 +17,29 @@ const Item = ({ data }) => {
           height={500}
           width={500}
           quality={100} src={`/${data.image}`} className=" object-contain" /> */}
-        <div>{data?.body}</div>
+
+        <Grid sx={{ mt: 1 }}>{t(`${data?.headLine}`)}</Grid>
+        <Link
+          
+          target="_blank"
+          href={`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`}
+        >
+          <Grid
+          sx={{
+            mt: 1,
+            p: 1,
+            border: 1,
+            borderRadius: 1,
+            borderColor: 'primary.main',
+            color: 'primary.main'
+          }}
+        >
+
+            {data?.title}
+
+          </Grid>
+        </Link>
+
       </div>
     </div>
   );
@@ -36,7 +62,7 @@ const itemData = [
   }
 ];
 
-function Notice({ notice }) {
+function Notice({ serverHost, notice }) {
   const [showBookNotice, setshowBookNotice] = useState(false);
   const [showNewNotice, setshowNewNotice] = useState(false);
 
@@ -56,14 +82,14 @@ function Notice({ notice }) {
         </div>
       </div> */}
       {
-        notice?.map(i => <SingleNotice data={i} />)
+        notice?.map(i => <SingleNotice serverHost={serverHost} data={i} />)
       }
 
 
     </div>
   );
 };
-const SingleNotice = ({ data }) => {
+const SingleNotice = ({ serverHost, data }) => {
   const [showNewNotice, setshowNewNotice] = useState(false);
   return (
     <div>
@@ -76,7 +102,7 @@ const SingleNotice = ({ data }) => {
       </button>
 
       <div className={`${showNewNotice ? ' max-h-[100vh]' : 'max-h-0'} overflow-hidden ease-in-out transition-all duration-1000`}>
-        <Item data={data} />
+        <Item data={data} serverHost={serverHost} />
       </div>
     </div>)
 }

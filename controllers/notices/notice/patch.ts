@@ -3,47 +3,67 @@ import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 import path from 'path';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
+import fsP from 'fs/promises';
 
 
 async function post(req, res, refresh_token) {
   try {
     const { id } = req.query;
-    console.log({id})
+    console.log({ id })
     const uploadFolderName = "notice";
-    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_API}/api/get_file/files/${uploadFolderName}/`;
 
-    await certificateTemplateFolder(uploadFolderName);
-
-    const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
+    const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
     const filterFiles = {
       photo: fileType,
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
 
-    console.log({error})
+    console.log({ error })
     if (error) throw new Error(error);
 
     const { photo } = files;
-    const { title, description } = fields;
+    const { title, headLine } = fields;
 
-    if (!photo && !title && !description) throw new Error(`no field found for update `)
-
-    const customFileName = Date.now().toString() + '_' + photo?.originalFilename;
-    const newFileName = path.join(process.cwd(), "files", uploadFolderName, customFileName);
+    let file_url = null;
 
     if (photo) {
-      // @ts-ignore
-      fs.rename(photo.filepath, newFileName, (err) => { console.log({ err }) })
+      const prevFile = await prisma.notice.findFirst({
+        where: {
+          id: Number(id)
+        }
+      })
+      if (prevFile) {
+        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, prevFile.file_url);
+        if (fs.existsSync(filePath)) {
+        
+          fs.unlink(filePath, (err) => {
+            if (err) console.log('prev File failed');
+            else console.log("prev File deleted !");
+          })
+        }
+      }
+
+      const photoNewName = Date.now().toString() + '_' + files.photo.originalFilename;
+      await fsP.rename(files.photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, photoNewName))
+        .then(() => {
+          file_url = path.join(uploadFolderName, photoNewName)
+
+        })
+        .catch(err => {
+          console.log("err__", err);
+          file_url = path.join(uploadFolderName, files.photo?.newFilename)
+        })
     }
+
 
     const data = {};
     if (title) data['title'] = title;
-    if (description) data['description'] = description;
-    if (photo) data['photo_url'] = fileUrl + customFileName;
+    if (headLine) data['headLine'] = headLine;
+    if (file_url) data['file_url'] = file_url;
 
     const response = await prisma.notice.update({
-      where: { id : Number(id)},
+      where: { id: Number(id) },
       data
     })
 

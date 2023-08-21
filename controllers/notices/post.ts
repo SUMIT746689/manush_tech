@@ -3,16 +3,13 @@ import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 import path from 'path';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
-
+import fsP from 'fs/promises'
 
 async function post(req, res, refresh_token) {
   try {
     const uploadFolderName = "notice";
-    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_API}/api/get_file/files/${uploadFolderName}/`;
-   
-    await certificateTemplateFolder(uploadFolderName);
-
-    const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
+  
+    const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
     const filterFiles = {
       photo: fileType,
     }
@@ -22,30 +19,32 @@ async function post(req, res, refresh_token) {
     if (error) throw new Error(error);
 
     const { photo } = files;
+    const { title, headLine } = fields;
 
-    const notFoundFiles = [];
+    if (!title || !headLine || !photo) throw new Error('required all field')
 
-    if (!photo) notFoundFiles.push('photo');
+    const photoNewName = Date.now().toString() + '_' + files.photo.originalFilename;
 
-    if (notFoundFiles.length > 0) throw new Error(`${notFoundFiles.join(', ')} file not found`)
-    
-    const customFileName =  Date.now().toString() + '_' + photo.originalFilename;
-    const newFileName = path.join(process.cwd(),"files", uploadFolderName,customFileName);
+    let file_url = '';
 
-    
-    // @ts-ignore
-    fs.rename(photo.filepath, newFileName, (err) => { console.log({ err }) })
-    
+    await fsP.rename(files.photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, photoNewName))
+      .then(() => {
+        file_url = path.join(uploadFolderName, photoNewName)
+
+      })
+      .catch(err => {
+        console.log("err__", err);
+        file_url = path.join(uploadFolderName, files.photo?.newFilename)
+      })
+
     //fields checks 
-    const { title, description } = fields;
-    if (!title || !description) throw new Error('required all field')
 
     const response = await prisma.notice.create({
       data: {
         title,
-        description,
-        photo_url: fileUrl + customFileName,
-        school_id : refresh_token.school_id
+        headLine,
+        file_url,
+        school_id: refresh_token.school_id
       }
     })
 

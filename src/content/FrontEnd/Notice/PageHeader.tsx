@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, Dialog, DialogContent, Avatar, Button } from '@mui/material';
+import { Grid, Dialog, DialogContent, Avatar, Button, TextField } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
@@ -19,6 +19,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
   const [dynamicContent, setDynamicContent] = useState([]);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     if (editData) setOpen(true);
@@ -29,6 +30,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
   };
 
   const handleCreateClassClose = () => {
+    setPhoto(null)
     setOpen(false);
     setEditData(null);
   };
@@ -39,13 +41,15 @@ function PageHeader({ editData, setEditData, reFetchData }) {
   ) => {
     try {
       const successResponse = (message) => {
-        showNotification('sms template' + message + ' successfully');
+        showNotification(message);
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
         reFetchData();
         handleCreateClassClose();
       };
+
+      console.log("_values___", _values);
 
       const formData = new FormData();
       for (const [key, value] of Object.entries(_values)) {
@@ -57,13 +61,14 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         const res = await axios.patch(`/api/notices/${editData.id}`, formData);
         // fetchData('')
         console.log({ res })
-        successResponse(' updated ');
+        successResponse('Notice updated !!');
       }
       else {
         const res = await axios.post(`/api/notices`, formData);
         console.log({ res })
-        successResponse('created');
+        successResponse('Notice created !!');
       }
+      setPhoto(null)
     }
     catch (err) {
       console.error(err);
@@ -97,8 +102,8 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         <Formik
           initialValues={{
             title: editData?.title || undefined,
-            description: editData?.description || undefined,
-            photo: '',
+            headLine: editData?.headLine || undefined,
+            photo: undefined,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -136,36 +141,57 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                       handleChange={handleChange}
                       handleBlur={handleBlur}
                     />
-
-                    <RichTextEditorWrapper
-                      value={values.description}
-                      handleChange={(newValue, editor) => {
-                        setFieldValue('description', newValue);
-                        // setText(editor.getContent({ format: 'text' }));
-                        editor.getContent({ format: 'text' });
-                      }}
+                    <TextFieldWrapper
+                      label="head Line"
+                      name="headLine"
+                      value={values.headLine}
+                      touched={touched.headLine}
+                      errors={errors.headLine}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
                     />
 
-                    <Grid sx={{ gap: 1 }}>
-
-                      <FileUploadFieldWrapper
-                        htmlFor="photo"
-                        label="Photo Image"
-                        name="photo"
-                        value={values.photo?.name || ''}
-
-                        handleChangeFile={(e) => { if (e.target?.files?.length) { setFieldValue("photo", e.target.files[0]) } }}
-                        handleRemoveFile={() => { setFieldValue("photo", undefined) }}
-                      />
-
-                      {editData?.photo_url
-                        &&
-                        <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}>
-                          {/* <Image src={editData?.background_url} width={100} height={100} alt="logo" /> */}
-                          <img src={editData?.photo_url} alt="photo" className=" h-fit w-20" />
-                        </Avatar>
-                      }
-                      {/* </Grid> */}
+                    <Grid sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Grid
+                        sx={{
+                          mt: 1,
+                          p: 1,
+                          border: 1,
+                          borderRadius: 1,
+                          borderColor: 'primary.main',
+                          color: 'primary.main'
+                        }}
+                      >
+                        <a
+                          style={{ width: '50px' }}
+                          target="_blank"
+                          href={photo || (
+                            editData?.file_url ?
+                              `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}`
+                              : '')}
+                        >
+                          {photo || (editData?.file_url ? `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}` : 'Not selected')}
+                        </a>
+                      </Grid>
+                      <Grid>
+                        <FileUploadFieldWrapper
+                          htmlFor="photo"
+                          label="Photo Image"
+                          name="photo"
+                          value={values.photo?.name || ''}
+                          accept='application/pdf'
+                          handleChangeFile={(e) => {
+                            if (e.target?.files?.length) {
+                              setPhoto(URL.createObjectURL(e.target.files[0]))
+                              setFieldValue("photo", e.target.files[0])
+                            }
+                          }}
+                          handleRemoveFile={() => {
+                            setPhoto(null)
+                            setFieldValue("photo", undefined)
+                          }}
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
                 </DialogContent>

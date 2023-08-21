@@ -15,7 +15,7 @@ const Results = ({ data, reFetchData }) => {
   console.log({ data });
 
   const { t }: { t: any } = useTranslation();
-  const [notice, setNotice] = useState([{ title: '', headLine: '', body: '' }]);
+  // const [notice, setNotice] = useState([{ title: '', headLine: '', body: undefined, link: undefined }]);
 
   const [header_image, setHeader_image] = useState(null)
   const [carousel_image, setCarousel_image] = useState(null)
@@ -25,21 +25,6 @@ const Results = ({ data, reFetchData }) => {
   const [principal_photo, setPrincipal_photo] = useState(null)
 
   const { showNotification } = useNotistick();
-  // useEffect(() => {
-  //   console.log("carousel_image__", typeof (carousel_image), carousel_image);
-
-  //   let cnt = []
-  //   for (const i in carousel_image) {
-  //     cnt.push(carousel_image[i])
-  //   }
-  //   console.log(cnt);
-  // }, [carousel_image])
-
-  useEffect(() => {
-    if (data) {
-      setNotice(data?.latest_news?.map(i => ({ title: i?.title, headLine: i?.headLine, body: i?.body })))
-    }
-  }, [data])
 
   const getValue = (carousel_image) => {
     let cnt = []
@@ -94,27 +79,23 @@ const Results = ({ data, reFetchData }) => {
             showNotification(message)
           };
 
-          console.log("_values", _values, notice);
+          console.log("_values", _values);
 
           const formData = new FormData();
 
           for (let i in _values) {
             if (i == 'carousel_image') {
               const temp = _values[i]
-              let nameList: any = []
               for (const j in temp) {
                 if (typeof (temp[j]) == 'object') {
-                  nameList.push({ name: temp[j].name })
                   formData.append('carousel_image', temp[j])
                 }
               }
             }
             else if (i == 'gallery') {
               const temp = _values[i]
-              let nameList: any = []
               for (const j in temp) {
                 if (typeof (temp[j]) == 'object') {
-                  nameList.push({ name: temp[j].name })
                   formData.append('gallery', temp[j])
                 }
               }
@@ -123,9 +104,6 @@ const Results = ({ data, reFetchData }) => {
               formData.append(`${i}`, _values[i]);
             }
           }
-          notice.forEach(element => {
-            formData.append(`latest_news[]`, JSON.stringify(element));
-          });
 
           axios.put('/api/front_end', formData)
             .then(res => {
@@ -594,70 +572,6 @@ const Results = ({ data, reFetchData }) => {
                   </Grid>
                 </Grid>
 
-                {notice.map((field, index) => (
-                  <Card sx={{ p: 2 }} >
-                    <Grid container gap={2} display={'grid'} gridTemplateColumns={'50% 50%'}>
-                      <TextField
-                        key={index}
-                        value={field?.title}
-                        onChange={(e) => {
-                          const updatedFields = [...notice];
-                          updatedFields[index]['title'] = e.target.value;
-                          setNotice(updatedFields);
-                        }}
-                        label="Notice Title"
-                        variant="outlined"
-                        margin="normal"
-                      />
-                      <Grid display={'grid'} justifyContent={'center'} alignContent={'center'}>
-                        <ButtonWrapper
-                          handleClick={() => {
-                            const temp = [...notice]
-                            temp.splice(index, 1)
-                            setNotice(temp)
-                          }}>
-                          Remove
-                        </ButtonWrapper>
-                      </Grid>
-                    </Grid>
-                    <TextField
-                      key={index}
-                      value={field?.headLine}
-                      onChange={(e) => {
-                        const updatedFields = [...notice];
-                        updatedFields[index]['headLine'] = e.target.value;
-                        setNotice(updatedFields);
-                      }}
-                      label="Notice head line"
-                      variant="outlined"
-                      margin="normal"
-                      fullWidth
-                    />
-                    <TextField
-                      key={index}
-                      value={field?.body}
-                      onChange={(e) => {
-                        const updatedFields = [...notice];
-                        updatedFields[index]['body'] = e.target.value;
-                        setNotice(updatedFields);
-                      }}
-                      label="Notice body"
-                      variant="outlined"
-                      margin="normal"
-                      maxRows={4}
-                      minRows={2}
-                      multiline
-                      fullWidth
-                    />
-                  </Card>
-
-                ))}
-
-                <Grid container display={'grid'} justifyContent={'center'}>
-                  <ButtonWrapper handleClick={() => setNotice([...notice, { title: '', headLine: '', body: '' }])}>
-                    Add notice
-                  </ButtonWrapper>
-                </Grid>
               </Grid>
 
               <Grid display={'flex'} justifyContent={'center'} paddingTop={4}>

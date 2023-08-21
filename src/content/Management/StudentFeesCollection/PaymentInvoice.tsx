@@ -90,7 +90,7 @@ function PaymentInvoice({ printFees, student }) {
                 <TableCell sx={{p:1}} align="right">Late Payment fine</TableCell>
                 <TableCell sx={{p:1}} align="right">Amount</TableCell>
                 <TableCell sx={{p:1}} align="right">Status</TableCell>
-                <TableCell sx={{p:1}} align="right">Due</TableCell>
+                <TableCell sx={{p:1}} align="right">Paid Amt.</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

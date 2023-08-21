@@ -40,8 +40,6 @@ const Packages = () => {
             reFetchData={reFetchData}
 
           />
-
-
         </Grid>
 
       </Grid>

@@ -513,7 +513,7 @@ const Results = ({ data, reFetchData }) => {
                 <Grid container gap={2} display={'grid'} gridTemplateColumns={'50% 50%'}>
 
                   {/* facebook_link */}
-                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                  <Grid item borderRadius='10px' marginBottom='10px'>
                     <TextField
                       id="outlined-basic"
                       label="Facebook page link"
@@ -529,7 +529,7 @@ const Results = ({ data, reFetchData }) => {
                     />
                   </Grid>
                   {/* twitter_link */}
-                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                  <Grid item borderRadius='10px' marginBottom='10px'>
                     <TextField
                       id="outlined-basic"
                       label="Twitter page link"
@@ -545,7 +545,7 @@ const Results = ({ data, reFetchData }) => {
                     />
                   </Grid>
                   {/* google_link */}
-                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                  <Grid item borderRadius='10px' marginBottom='10px'>
                     <TextField
                       id="outlined-basic"
                       label="Google++ profile link"
@@ -561,7 +561,7 @@ const Results = ({ data, reFetchData }) => {
                     />
                   </Grid>
                   {/* linkedin_link */}
-                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                  <Grid item borderRadius='10px' marginBottom='10px'>
                     <TextField
                       id="outlined-basic"
                       label="Linkedin profile link"
@@ -577,7 +577,7 @@ const Results = ({ data, reFetchData }) => {
                     />
                   </Grid>
                   {/* youtube_link */}
-                  <Grid  item borderRadius='10px' marginBottom='10px'>
+                  <Grid item borderRadius='10px' marginBottom='10px'>
                     <TextField
                       id="outlined-basic"
                       label="Youtube profile link"
@@ -654,14 +654,10 @@ const Results = ({ data, reFetchData }) => {
                 ))}
 
                 <Grid container display={'grid'} justifyContent={'center'}>
-
                   <ButtonWrapper handleClick={() => setNotice([...notice, { title: '', headLine: '', body: '' }])}>
                     Add notice
                   </ButtonWrapper>
                 </Grid>
-
-
-
               </Grid>
 
               <Grid display={'flex'} justifyContent={'center'} paddingTop={4}>

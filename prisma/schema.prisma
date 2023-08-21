@@ -584,7 +584,6 @@ model WebsiteUi {
   chairman_speech     String? @db.LongText
   principal_photo     String
   principal_speech    String? @db.LongText
-  latest_news         Json
   eiin_number         String
   gallery             Json?
   facebook_link       String?
@@ -810,12 +809,12 @@ model Transaction {
 }
 
 model Notice {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description Json
-  photo_url   String
-  school_id   Int
-  created_at  DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  title      String
+  headLine   String   @db.MediumText
+  file_url   String
+  school_id  Int
+  created_at DateTime @default(now())
 
   school School @relation(fields: [school_id], references: [id])
 
@@ -837,4 +836,9 @@ enum LeaveStatus {
   pending
   approved
   declined
+}
+
+model OnlineAdmission {
+  id      Int  @id @default(autoincrement())
+  student Json
 }

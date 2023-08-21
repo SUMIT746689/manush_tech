@@ -521,7 +521,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Users' && permissions?.findIndex(i => i.group == 'user') > -1) sub_menu();
       if (item.name === 'Package' && permissions?.findIndex(i => i.group == 'package') > -1) sub_menu();
       if (item.name === 'Front End' && permissions?.findIndex(i => i.group == 'front_end') > -1) sub_menu();
-      if (item.name === 'Notice' && permissions?.findIndex(i => i.group === 'notice') > -1) { console.log('sssss') };
+      if (item.name === 'Notice' && permissions?.findIndex(i => i.group === 'notice') > -1) sub_menu();
       if (item.name === 'Pending Package' && permissions?.findIndex(i => i.group == 'pending_package') > -1) sub_menu();
 
       if (item.name === 'Students Attendence' && permissions?.findIndex(i => i.value == 'create_student_attendence') > -1) sub_menu();

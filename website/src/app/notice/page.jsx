@@ -12,22 +12,32 @@ export default async function Home(props) {
 
 
 
-  const school_info = await prisma.websiteUi.findFirst({
+  // const school_info = await prisma.school.findFirst({
+  //   where: {
+  //     domain:  domain
+  //   },
+  //   select: {
+
+  //   }
+  // })
+  const notice = await prisma.notice.findMany({
     where: {
       school: {
         domain: domain
       }
     },
     select: {
-      latest_news: true
+      title: true,
+      headLine: true,
+      file_url: true
     }
   })
 
-  console.log(school_info);
+  console.log("notice__", notice);
 
   return (
     <div>
-      <Notice notice={school_info?.latest_news || []} />
+      <Notice serverHost={`${process.env.SERVER_HOST}`} notice={notice || []} />
     </div>
   )
 

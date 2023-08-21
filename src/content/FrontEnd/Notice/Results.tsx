@@ -255,11 +255,19 @@ const Results: FC<ResultsProps> = ({
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            {/* <Typography noWrap variant="h5"> */}
-                              {/* @ts-ignore */}
-                              <img src={notice.photo_url} className="w-fit h-10" alt="photo" />
-                              {/* <Image height={50} width={50} src={fee.background_url} /> */}
-                            {/* </Typography>  */}
+
+                            <a
+                              style={{ width: '50px' }}
+                              target="_blank"
+                              href={notice?.file_url ?
+                                `/api/get_file/${notice?.file_url?.replace(/\\/g, '/')}`
+                                : ''}
+                            >
+                              {notice?.file_url ?
+                                `/api/get_file/${notice?.file_url?.replace(/\\/g, '/')}`
+                                : ''}
+                            </a>
+
                           </TableCell>
 
                           <TableCell align="center">

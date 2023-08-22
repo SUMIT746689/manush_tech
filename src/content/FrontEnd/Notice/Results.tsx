@@ -17,6 +17,7 @@ import { TransitionProps } from '@mui/material/transitions';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import SearchInputWrapper from '@/components/SearchInput';
@@ -29,6 +30,7 @@ import Image from 'next/image';
 interface ResultsProps {
   sessions: Project[];
   setEditData: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -89,7 +91,7 @@ const applyPagination = (
 
 const Results: FC<ResultsProps> = ({
   sessions,
-  setEditData
+  setEditData,reFetchData
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -145,27 +147,30 @@ const Results: FC<ResultsProps> = ({
   const selectedAllschools = selectedItems.length === sessions.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-  const [deleteSchoolId, setDeleteSchoolId] = useState(null);
+  const [deleteEntry, setDeleteEntry] = useState(null);
 
-  const handleConfirmDelete = (id: string) => {
-    setDeleteSchoolId(id);
+  const handleConfirmDelete = (id: string, file_url: string) => {
+    setDeleteEntry({ id, file_url });
     setOpenConfirmDelete(true);
   };
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(false);
-    setDeleteSchoolId(null);
+    setDeleteEntry(null);
   };
 
 
   const handleDeleteCompleted = async () => {
     try {
-      const result = await axios.delete(`/api/notice/${deleteSchoolId}`);
+      const result = await axios.delete(`/api/notices/${deleteEntry.id}?file_url=${deleteEntry?.file_url}`);
       console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification('The fees has been deleted successfully');
+      showNotification('Notice has been deleted successfully');
+      reFetchData();
 
     } catch (err) {
+      console.log(err);
+      
       setOpenConfirmDelete(false);
       showNotification(err?.response?.data?.message, 'error');
     }
@@ -263,9 +268,7 @@ const Results: FC<ResultsProps> = ({
                                 `/api/get_file/${notice?.file_url?.replace(/\\/g, '/')}`
                                 : ''}
                             >
-                              {notice?.file_url ?
-                                `/api/get_file/${notice?.file_url?.replace(/\\/g, '/')}`
-                                : ''}
+                              {notice?.file_url || ''}
                             </a>
 
                           </TableCell>
@@ -280,16 +283,16 @@ const Results: FC<ResultsProps> = ({
                                   <LaunchTwoToneIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              {/* <Tooltip title={t('Delete')} arrow>
+                              <Tooltip title={t('Delete')} arrow>
                                 <IconButton
                                   onClick={() =>
-                                    handleConfirmDelete(fee.id)
+                                    handleConfirmDelete(notice.id, notice?.file_url)
                                   }
                                   color="primary"
                                 >
                                   <DeleteTwoToneIcon fontSize="small" />
                                 </IconButton>
-                              </Tooltip> */}
+                              </Tooltip>
                             </Typography>
                           </TableCell>
                         </TableRow>

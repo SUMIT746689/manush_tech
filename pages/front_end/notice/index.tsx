@@ -37,6 +37,7 @@ const Notice = () => {
           <Results
             sessions={notices?.data || []}
             setEditData={setEditData}
+            reFetchData={reFetchData}
           />
         </Grid>
         <Footer />

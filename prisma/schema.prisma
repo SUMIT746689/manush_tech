@@ -216,7 +216,7 @@ model Student {
   group_id                Int?
   academic_year_id        Int
   class_roll_no           String
-  class_registration_no   String
+  class_registration_no   String  @unique
   discount                Float
   student_photo           String?
   guardian_name           String?

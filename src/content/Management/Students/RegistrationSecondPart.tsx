@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -6,17 +6,13 @@ import {
   Grid,
   DialogActions,
   DialogContent,
-  Zoom,
   TextField,
   CircularProgress,
   Autocomplete,
   Button,
 } from '@mui/material';
-import axios from 'axios';
-import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import { registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
-import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 
@@ -418,7 +414,7 @@ function RegistrationSecondPart({
                         helperText={
                           touched.registration_no && errors.registration_no
                         }
-
+                        disabled
                         label={t('Registration number')}
                         name="registration_no"
                         onBlur={handleBlur}

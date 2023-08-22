@@ -415,7 +415,7 @@ const StudentPayment = ({
 
                           <TableCell>
                             <Typography noWrap variant="h5" sx={changeColor}>
-                              {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
+                              {(today <= last_date || project?.status === 'paid late') ? due : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
                             </Typography>
                           </TableCell>
 

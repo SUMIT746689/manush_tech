@@ -95,7 +95,7 @@ function DashboardReportsContent({ blockCount = null }) {
                 // @ts-ignore
                 user?.role?.title === "ADMIN" && <Button variant='contained' color='secondary'>
 
-                  <Link href={`http://${blockCount?.domain}`} color="primary" rel="noopener noreferrer" target="_blank">
+                  <Link href={`http://192.168.10.29:3001`} color="primary" rel="noopener noreferrer" >
                     {t('Front end link')}
                   </Link>
                 </Button>

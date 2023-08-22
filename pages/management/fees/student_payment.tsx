@@ -23,7 +23,7 @@ export async function getServerSideProps(context: any) {
   try {
     const refresh_token_varify: any = serverSideAuthentication(context)
     if (!refresh_token_varify) return { props: { student } };
-    console.log({refresh_token_varify})
+
 
     student = await prisma.student.findFirst({
       where: {
@@ -72,7 +72,6 @@ export async function getServerSideProps(context: any) {
       }
     });
 
-    console.log({student})
     // fees getting
     const student_fee = await prisma.studentFee.findMany({
       where: { student_id: student.id },

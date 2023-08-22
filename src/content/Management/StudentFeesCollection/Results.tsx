@@ -48,6 +48,9 @@ import useNotistick from '@/hooks/useNotistick';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { formatNumber } from '@/utils/numberFormat';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -199,7 +202,7 @@ const Results = ({
     setFilteredFees(filteredfeesdata);
     const paginatedschools = applyPagination(filteredfeesdata, page, limit);
 
-    console.log(paginatedschools, page, limit);
+    // console.log(paginatedschools, page, limit);
 
     setPaginatedSchool(paginatedschools);
   }, [sessions, filter, page])
@@ -214,7 +217,7 @@ const Results = ({
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
-  const [sections, setSections] = useState(null);
+  const [sections, setSections] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
@@ -239,6 +242,7 @@ const Results = ({
     setDeleteSchoolId(id);
     setOpenConfirmDelete(true);
   };
+
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
@@ -247,7 +251,6 @@ const Results = ({
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/sessions/${deleteSchoolId}`);
-      console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The sessions has been deleted successfully');
@@ -280,25 +283,38 @@ const Results = ({
   };
 
   const handlePaymentStatus = (fees) => {
-    let payment = { totalAmount: 0, paid: 0, remaining: 0 };
+    let payment = { paid: 0, remaining: 0 };
+    let due = 0;
 
     const filterPayment = fees.reduce((prev, curr) => {
-      prev.totalAmount += curr.amount;
-      if (curr.status === 'paid') prev.paid += curr.amount;
-      else prev.remaining += curr.amount;
+      const last_date = dayjs(curr.last_date).valueOf()
+      const today = curr.last_payment_date ? dayjs(curr.last_payment_date).valueOf() : 0;
+
+      if (curr?.status === 'paid' || curr?.status === 'paid late') {
+        due = 0
+      } else {
+        due = (curr?.amount + (curr.late_fee ? curr.late_fee : 0) - (curr.paidAmount ? curr.paidAmount : ((curr?.status == 'unpaid') ? 0 : curr?.amount)))
+        console.log(today, "  ", last_date);
+
+        if (today < last_date) {
+          due -= (curr.late_fee ? curr.late_fee : 0)
+        }
+      }
+
+      prev.paid += curr?.status == 'paid' ? curr.amount : curr.paidAmount || 0;
+
       return prev;
     }, payment);
 
     return (
       <TableRow>
-        <TableCell>Total : {filterPayment?.totalAmount}</TableCell>
-        <TableCell>Paid : {filterPayment?.paid}</TableCell>
-        <TableCell>Remaining : {filterPayment?.remaining}</TableCell>
+        <TableCell>Total : {formatNumber(filterPayment?.paid + due)}</TableCell>
+        <TableCell>Paid : {formatNumber(filterPayment?.paid)}</TableCell>
+        <TableCell>Remaining : {formatNumber(due)}</TableCell>
       </TableRow>
     );
   };
   const handleClassSelect = (event, newValue) => {
-    console.log(newValue);
     setSelectedClass(newValue);
     if (newValue) {
       const targetClassSections = classes.find((i) => i.id == newValue.id);
@@ -319,151 +335,123 @@ const Results = ({
         setSelectedSection(null);
       }
     }
+    else {
+      setSections([])
+      setStudents([])
+      setSelectedSection(null);
+      setSelectedStudent(null);
+    }
   };
   return (
     <>
       <Card
         sx={{
-          p: 1,
-          mb: 1,
-          width: '100%'
+          pt: 1, px: 1, mb: 1, width: '100%'
         }}
       >
-        <Grid container>
-          <Grid item xs={8} sm={6} md={3} p={1} sx={{ p: 1 }}>
-            <Autocomplete
-              id="tags-outlined"
-              options={classes?.map((i) => {
-                return {
-                  label: i.name,
-                  id: i.id,
-                  has_section: i.has_section
-                };
-              })}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  fullWidth
-                  {...params}
-                  label={t('Select class')}
-                  placeholder="Name"
-                />
-              )}
-              onChange={handleClassSelect}
-            />
-          </Grid>
+        <Grid container display={"grid"} gridTemplateColumns={{ sm: "1fr 1fr 1fr" }} columnGap={1}>
+          <AutoCompleteWrapper
+            options={classes?.map((i) => {
+              return {
+                label: i.name,
+                id: i.id,
+                has_section: i.has_section
+              };
+            })}
+            value={undefined}
+            label="Select Class"
+            placeholder="select a class"
+            handleChange={handleClassSelect}
+          />
 
-          {selectedClass && sections && selectedClass.has_section && (
-            <>
-              <Grid item xs={8} sm={6} md={3} p={1} sx={{ p: 1 }}>
-                <Autocomplete
-                  id="tags-outlined"
-                  options={sections}
-                  value={selectedSection}
-                  filterSelectedOptions
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="select section"
-                      placeholder="Name"
-                    />
-                  )}
-                  onChange={(e, v) => {
-                    setSelectedSection(v);
-                    setSelectedStudent(null);
-                  }}
-                />
+          <AutoCompleteWrapper
+            options={sections}
+            value={selectedSection}
+            label="select section"
+            placeholder="section"
+            handleChange={(e, v) => {
+              setSelectedSection(v);
+              setSelectedStudent(null);
+              setStudents(() => [])
+            }}
+          />
+
+          <AutoCompleteWrapper
+            value={selectedStudent}
+            options={students}
+            label="Select Roll"
+            placeholder={"select a roll"}
+            isOptionEqualToValue={(option: any, value: any) =>
+              option.id === value.id
+            }
+            getOptionLabel={(option) => option.class_roll_no}
+            // @ts-ignore
+            handleChange={(e: any, value: any) => { setSelectedStudent(value) }}
+          />
+        </Grid>
+      </Card >
+
+      {selectedStudent &&
+        <Card
+          sx={{
+            pt: 1, px: 1, mb: 1, width: '100%'
+          }}
+        >
+          <Grid container display="grid" gridTemplateColumns={{ sm: "1fr 1fr" }} >
+            <Grid container display="grid" gridTemplateColumns="1fr 1fr">
+              <Grid
+                container
+                item
+                // xs={4}
+                // sm={6}
+                // md={3}
+                direction="row"
+                justifyContent="space-between"
+                sx={{ p: 1 }}
+              >
+                {selectedStudent && (
+                  <>
+                    {selectedStudent?.student_photo ? (
+                      <img
+                        style={{ width: '50px' }}
+                        src={`/images/${selectedStudent.student_photo}`}
+                      />
+                    ) : (
+                      <img
+                        style={{ width: '50px', objectFit: 'contain' }}
+                        src={`/dumy_teacher.png`}
+                      />
+                    )}
+                  </>
+                )}
               </Grid>
-            </>
-          )}
-          {selectedClass && selectedSection && (
-            <>
-              <Grid item xs={8} sm={6} md={3}>
-                <Autocomplete
-                  sx={{ p: 1 }}
-                  fullWidth
-                  disablePortal
-                  value={selectedStudent}
-                  options={students}
-                  isOptionEqualToValue={(option: any, value: any) =>
-                    option.id === value.id
-                  }
-                  getOptionLabel={(option) => option.class_roll_no}
-                  renderInput={(params) => (
-                    <TextField
-                      fullWidth
-                      {...params}
-                      label="Select Student by roll"
-                    />
-                  )}
+              <Grid sx={{ p: 1 }}>
+                {
                   // @ts-ignore
-                  onChange={(e, value: any) => setSelectedStudent(value)}
-                />
+                  selectedStudent?.student_info && (
+                    <Grid direction={'column'} container>
+                      <span>
+                        Name:{' '}
+                        {[selectedStudent?.student_info?.first_name, selectedStudent?.student_info?.middle_name, selectedStudent?.student_info?.last_name].join(' ')}
+                      </span>
+                      <span>Id: {selectedStudent?.id}</span>
+                      <span>Roll: {selectedStudent?.class_roll_no}</span>
+                    </Grid>
+                  )
+                }
               </Grid>
-            </>
-          )}
+            </Grid>
 
-          <Grid container>
-            <Grid
-              container
-              item
-              xs={4}
-              sm={6}
-              md={3}
-              direction="row"
-              justifyContent="end"
-              sx={{ p: 1 }}
-            >
-              {selectedStudent && (
-                <>
-                  {selectedStudent?.student_photo ? (
-                    <img
-                      style={{ width: '50px' }}
-                      src={`/images/${selectedStudent.student_photo}`}
-                    />
-                  ) : (
-                    <img
-                      style={{ width: '50px', objectFit: 'contain' }}
-                      src={`/dumy_teacher.png`}
-                    />
-                  )}
-                </>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6} md={3} sx={{ p: 1 }}>
-              {
-                // @ts-ignore
-                selectedStudent?.student_info && (
-                  <Grid direction={'column'} container>
-                    <span>
-                      Name:{' '}
-                      {selectedStudent?.student_info?.first_name +
-                        ' ' +
-                        selectedStudent?.student_info?.middle_name +
-                        ' ' +
-                        selectedStudent?.student_info?.last_name}
-                    </span>
-                    <span>Id: {selectedStudent?.id}</span>
-                    <span>Roll: {selectedStudent?.class_roll_no}</span>
-                  </Grid>
-                )
-              }
-            </Grid>
             <Grid
               item
-              xs={12}
-              sm={6}
-              md={3}
               direction={'row'}
-              sx={{ p: 1, width: 80 }}
+              sx={{ p: 1, mx: 'auto' }}
             >
-              {/* @ts-ignore */}
               {sessions?.fees?.length > 0 && handlePaymentStatus(sessions.fees)}
             </Grid>
           </Grid>
-        </Grid>
-      </Card>
-
+        </Card>
+      }
       <Card sx={{ minHeight: 'calc(100vh - 405px) !important' }}>
         {selectedBulkActions && (
           <Box p={2}>
@@ -596,7 +584,7 @@ const Results = ({
                         key={project.id}
                         selected={isschoolselected}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell padding="checkbox" sx={{ p: 0.5 }}>
                           <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
@@ -605,14 +593,14 @@ const Results = ({
                             value={isschoolselected}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5">
                             {project?.title}
                           </Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5">
-                            {project?.amount.toFixed(1)}
+                            {formatNumber(project?.amount.toFixed(1))}
                           </Typography>
                         </TableCell>
 
@@ -624,7 +612,7 @@ const Results = ({
                               : // @ts-ignore
                               project?.status === 'partial paid'
                                 ? { color: 'blue' }
-                                : { color: 'red' }
+                                : { color: 'red' }, { p: 0.5 }
                           }
                         >
                           <Typography noWrap variant="h5">
@@ -633,13 +621,13 @@ const Results = ({
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5">
-                            {due}
+                            {formatNumber(due)}
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5">
                             {
                               project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
@@ -648,15 +636,16 @@ const Results = ({
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5" sx={changeColor}>
-                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
+                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${project?.amount + project?.late_fee.toFixed(1)}`}
                           </Typography>
                         </TableCell>
 
-                        <TableCell align="center">
+                        <TableCell align="center" sx={{ p: 0.5 }}>
                           <Typography noWrap>
                             <AmountCollection
+                              due={due}
                               project={project}
                               handleCollection={handleCollection}
                               student_id={selectedStudent?.id}
@@ -768,36 +757,40 @@ const Results = ({
   );
 };
 
-const AmountCollection = ({ project, student_id, handleCollection }) => {
+const AmountCollection = ({ due, project, student_id, handleCollection }) => {
   const { t }: { t: any } = useTranslation();
-  const [amount, setAmount] = useState(null);
+  const [amount, setAmount] = useState(due);
   const [payment_method, setPayment_method] = useState('Cash');
   const [transID, setTransID] = useState(null)
-
   return (
-    <Grid container sx={{
-      display: 'flex',
-      gap: 1,
-      justifyContent: 'center'
-    }}>
+    <Grid container
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: "1fr 1fr 1fr 1fr",
+        columnGap: 1,
+        justifyContent: 'center'
+      }}
+    >
       <Grid item sx={{
-        minWidth: '130px'
+        minWidth: '130px',
+        p: 1
       }}>
-        <Autocomplete
-
+        <AutoCompleteWrapper
+          label={t('pay via')}
+          placeholder={t('Select payment_method...')}
           // getOptionLabel={(option) => option.name}
           options={['Cash', 'Bkash', 'Nagad', 'Rocket', 'Upay', 'Trustpay', 'UCash', 'Card']}
           value={payment_method}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              fullWidth
-              variant="outlined"
-              label={t('pay via')}
-              placeholder={t('Select payment_method...')}
-            />
-          )}
-          onChange={(e, value) => {
+          // renderInput={(params) => (
+          //   <TextField
+          //     {...params}
+          //     fullWidth
+          //     variant="outlined"
+          //     label={t('pay via')}
+          //     placeholder={t('Select payment_method...')}
+          //   />
+          // )}
+          handleChange={(e, value) => {
             console.log(value);
             if (value == 'Cash') {
               setTransID(null)
@@ -809,44 +802,46 @@ const AmountCollection = ({ project, student_id, handleCollection }) => {
       </Grid>
       {
         payment_method && payment_method !== 'Cash' && <Grid item sx={{
-          minWidth: '130px'
+          minWidth: '130px',
+          p: 1
         }}>
-          <TextField
-            sx={{
-              width: '100px'
-            }}
-            variant="outlined"
-            value={transID}
-            required={payment_method !== 'Cash' ? true : false}
-            onChange={(e) => setTransID(e.target.value)}
+          <TextFieldWrapper
             label="trans ID"
-            type='text'
+            name=""
+            value={transID}
+            touched={undefined}
+            errors={undefined}
+            handleChange={(e) => setTransID(e.target.value)}
+            handleBlur={undefined}
+            required={payment_method !== 'Cash' ? true : false}
+          // type
           />
 
         </Grid>
       }
-      <Grid item>
-        <TextField
-          sx={{
-            width: '100px'
-          }}
-          variant="outlined"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+      <Grid item minWidth={120} p={1} >
+        <TextFieldWrapper
           label="Amount"
+          name=""
           type="number"
+          touched={undefined}
+          errors={undefined}
+          value={amount || ''}
+          handleChange={(e) => setAmount(e.target.value)}
+          handleBlur={undefined}
         />
       </Grid>
 
-      <Grid item>
+      <Grid item pt={0.8}>
         <Button
           variant="contained"
           disabled={amount && payment_method && Number(amount) > 0 && (payment_method !== 'Cash' && transID || payment_method == 'Cash' && !transID) ? false : true}
           onClick={() => {
             handleCollection(student_id, project.id, project, amount, payment_method, transID);
-            setPayment_method(null)
-            setAmount(null);
+            setPayment_method(null);
+            setAmount(() => null);
           }}
+          sx={{ borderRadius: 0.5 }}
         >
           Collect
         </Button>

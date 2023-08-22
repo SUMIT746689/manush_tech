@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, TextField } from '@mui/material';
 
 export const TextFieldWrapper = ({ label, name, value, type = "string", touched, errors, handleChange, handleBlur, required = false, disabled = false }) => {
   return (
@@ -43,7 +43,7 @@ export const UncontrolledTextFieldWrapper = ({ label, value, type = "string", di
         label={label}
         variant="outlined"
         type={type}
-       
+
         fullWidth
         placeholder={`${name} here...`}
         value={value}
@@ -103,7 +103,7 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
         label={label}
         variant="outlined"
         size='small'
-        
+
         name={name}
         value={value}
         sx={{
@@ -141,3 +141,16 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
   )
 }
 
+// export const NumberFieldWrapper = () => {
+
+//   return (
+//     <FormControl focused className="col " variant="outlined">
+//       <InputLabel className="mText">your label</InputLabel>
+//       <NumberFormat customInput={TextField}
+//         variant="outlined"
+//         thousandSeparator={true}
+//         onChange={handleChange}
+//         autoComplete="off" />
+//     </FormControl>
+//   )
+// }

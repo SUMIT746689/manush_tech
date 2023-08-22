@@ -133,10 +133,12 @@ const Results = ({
   setSelectedStudent,
   setPrintFees,
   filteredFees,
-  setFilteredFees
+  setFilteredFees,
+  setSelectedFees
 
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
+
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
@@ -147,6 +149,7 @@ const Results = ({
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const { user: { school: { currency } } = {} } = {} = useAuth();
 
   const handleStudentPaymentCollect = () => {
     if (selectedStudent) {
@@ -168,7 +171,6 @@ const Results = ({
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log({ sessions });
     setSelectedschools(
       // @ts-ignore
       event.target.checked ? sessions?.fees?.map((project) => project.id) : []
@@ -177,19 +179,19 @@ const Results = ({
 
   const handleSelectOneProject = (
     _event: ChangeEvent<HTMLInputElement>,
-    projectId: string
+    projectId: string,
+    project: any,
   ): void => {
     if (!selectedItems.includes(projectId)) {
+      setSelectedFees((prevSelected) => [...prevSelected, project]);
       setSelectedschools((prevSelected) => [...prevSelected, projectId]);
     } else {
-      setSelectedschools((prevSelected) =>
-        prevSelected.filter((id) => id !== projectId)
-      );
+      setSelectedFees((prevSelected) => prevSelected.filter(({ id }) => id !== projectId));
+      setSelectedschools((prevSelected) => prevSelected.filter((id) => id !== projectId));
     }
   };
 
   const handlePageChange = (_event: any, newPage: number): void => {
-
     setPage(newPage);
   };
 
@@ -201,16 +203,12 @@ const Results = ({
     const filteredfeesdata = applyFilters(sessions?.fees || [], filter);
     setFilteredFees(filteredfeesdata);
     const paginatedschools = applyPagination(filteredfeesdata, page, limit);
-
-    // console.log(paginatedschools, page, limit);
-
     setPaginatedSchool(paginatedschools);
   }, [sessions, filter, page])
 
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools =
-    // @ts-ignore
-    selectedItems.length > 0 && selectedItems.length < sessions?.fees?.length;
+  // @ts-ignore
+  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions?.fees?.length;
   // @ts-ignore
   const selectedAllschools = selectedItems.length === sessions?.fees?.length;
 
@@ -230,8 +228,6 @@ const Results = ({
           `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`
         )
         .then((res) => {
-          //  console.log("students__",res.data);
-
           setStudents(res.data);
         })
         .catch((err) => console.log(err));
@@ -270,7 +266,7 @@ const Results = ({
       transID: transID
     })
       .then((res) => {
-        console.log({ res });
+
         if (res.data.err) throw new Error(res.data.err);
         setPrintFees((prev) => [...prev, fee]);
         handleStudentPaymentCollect();
@@ -283,34 +279,28 @@ const Results = ({
   };
 
   const handlePaymentStatus = (fees) => {
-    let payment = { paid: 0, remaining: 0 };
-    let due = 0;
+    let payment = { paid: 0, remaining: 0, due: 0 };
 
     const filterPayment = fees.reduce((prev, curr) => {
       const last_date = dayjs(curr.last_date).valueOf()
       const today = curr.last_payment_date ? dayjs(curr.last_payment_date).valueOf() : 0;
 
-      if (curr?.status === 'paid' || curr?.status === 'paid late') {
-        due = 0
-      } else {
-        due = (curr?.amount + (curr.late_fee ? curr.late_fee : 0) - (curr.paidAmount ? curr.paidAmount : ((curr?.status == 'unpaid') ? 0 : curr?.amount)))
-        console.log(today, "  ", last_date);
-
-        if (today < last_date) {
-          due -= (curr.late_fee ? curr.late_fee : 0)
-        }
+      if (curr?.status !== 'paid' && curr?.status !== 'paid late') {
+        prev.due += (curr?.amount + (curr.late_fee ? curr.late_fee : 0) - (curr.paidAmount ? curr.paidAmount : ((curr?.status == 'unpaid') ? 0 : curr?.amount)));
+        if (today < last_date) prev.due -= (curr.late_fee ? curr.late_fee : 0);
       }
 
-      prev.paid += curr?.status == 'paid' ? curr.amount : curr.paidAmount || 0;
+      if (curr?.status === 'paid') prev.paid += curr.amount || 0;
+      else if (curr?.status === 'partial paid') prev.paid += curr.paidAmount;
 
       return prev;
     }, payment);
 
     return (
       <TableRow>
-        <TableCell>Total : {formatNumber(filterPayment?.paid + due)}</TableCell>
-        <TableCell>Paid : {formatNumber(filterPayment?.paid)}</TableCell>
-        <TableCell>Remaining : {formatNumber(due)}</TableCell>
+        <TableCell>Total : {formatNumber(filterPayment?.paid + filterPayment?.due)} {currency}</TableCell>
+        <TableCell>Paid : {formatNumber(filterPayment?.paid)} {currency}</TableCell>
+        <TableCell>Remaining : {formatNumber(filterPayment?.due)} {currency}</TableCell>
       </TableRow>
     );
   };
@@ -453,65 +443,60 @@ const Results = ({
         </Card>
       }
       <Card sx={{ minHeight: 'calc(100vh - 405px) !important' }}>
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
-        {!selectedBulkActions && (
-          <Box
-            p={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Grid  >
-              <FormControl sx={{ pr: 1 }} >
-                <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
-                <Select
-                  fullWidth
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  size="small"
-                  label="Filter By"
 
-                  sx={{
-                    [`& fieldset`]: {
-                      borderRadius: 0.6
-                    },
-                    px: '10px',
-                    minWidth: '50px'
-                  }}
+        <Box
+          p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Grid  >
+            <FormControl sx={{ pr: 1 }} >
+              <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
+              <Select
+                fullWidth
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                size="small"
+                label="Filter By"
 
-                  value={filter}
-                  onChange={(e: any) => {
-                    setFilter(e.target.value);
-                  }}
-                >
-                  <MenuItem value={'all'}>ALL</MenuItem>
-                  <MenuItem value={'paid'}>PAID</MenuItem>
-                  <MenuItem value={'partial paid'}>PARTIAL PAID</MenuItem>
-                  <MenuItem value={'unpaid'}>UNPAID</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Box>
-              <Typography component="span" variant="subtitle1">
-                {t('Showing')}:
-              </Typography>{' '}
-              <b>{paginatedschools.length}</b> <b>{t('fees')}</b>
-            </Box>
-            <TablePagination
-              component="div"
-              count={filteredFees.length}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleLimitChange}
-              page={page}
-              rowsPerPage={limit}
-              rowsPerPageOptions={[5, 10, 15]}
-            />
+                sx={{
+                  [`& fieldset`]: {
+                    borderRadius: 0.6
+                  },
+                  px: '10px',
+                  minWidth: '50px'
+                }}
+
+                value={filter}
+                onChange={(e: any) => {
+                  setFilter(e.target.value);
+                }}
+              >
+                <MenuItem value={'all'}>ALL</MenuItem>
+                <MenuItem value={'paid'}>PAID</MenuItem>
+                <MenuItem value={'partial paid'}>PARTIAL PAID</MenuItem>
+                <MenuItem value={'unpaid'}>UNPAID</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedschools.length}</b> <b>{t('fees')}</b>
           </Box>
-        )}
+          <TablePagination
+            component="div"
+            count={filteredFees.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
         <Divider />
 
         {paginatedschools.length === 0 ? (
@@ -570,7 +555,6 @@ const Results = ({
                     } else {
                       due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
                         (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
-                      console.log(today, "  ", last_date);
 
                       if (today < last_date) {
                         due -= (project.late_fee ? project.late_fee : 0)
@@ -588,7 +572,7 @@ const Results = ({
                           <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
-                              handleSelectOneProject(event, project.id)
+                              handleSelectOneProject(event, project.id, project)
                             }
                             value={isschoolselected}
                           />
@@ -638,7 +622,7 @@ const Results = ({
 
                         <TableCell sx={{ p: 0.5 }}>
                           <Typography noWrap variant="h5" sx={changeColor}>
-                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${project?.amount + project?.late_fee.toFixed(1)}`}
+                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(Number(project?.amount) + Number(project?.late_fee)).toFixed(2)}`}
                           </Typography>
                         </TableCell>
 
@@ -768,7 +752,7 @@ const AmountCollection = ({ due, project, student_id, handleCollection }) => {
         display: 'grid',
         gridTemplateColumns: "1fr 1fr 1fr 1fr",
         columnGap: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
       <Grid item sx={{

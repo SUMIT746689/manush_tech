@@ -45,6 +45,8 @@ import { useSnackbar } from 'notistack';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import dayjs from 'dayjs';
+import { formatNumber } from '@/utils/numberFormat';
+import { useAuth } from '@/hooks/useAuth';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -156,7 +158,7 @@ const Results: FC<ResultsProps> = ({
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-
+  const { user: { school: { currency } } = {} } = {} = useAuth();
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -222,7 +224,7 @@ const Results: FC<ResultsProps> = ({
 
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification(err?.response?.data?.message,'error');
+      showNotification(err?.response?.data?.message, 'error');
     }
   };
 
@@ -337,7 +339,7 @@ const Results: FC<ResultsProps> = ({
                       fee.id
                     );
                     console.log(fee);
-                    
+
                     return (
                       <TableRow
                         hover
@@ -368,7 +370,7 @@ const Results: FC<ResultsProps> = ({
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {fee.amount}
+                            {formatNumber(fee.amount)} {currency}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -385,7 +387,7 @@ const Results: FC<ResultsProps> = ({
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {fee?.late_fee?.toFixed(2)}
+                            {formatNumber(fee?.late_fee?.toFixed(2))} {currency}
                           </Typography>
                         </TableCell>
 
@@ -417,7 +419,7 @@ const Results: FC<ResultsProps> = ({
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
           </>
         )}
       </Card>

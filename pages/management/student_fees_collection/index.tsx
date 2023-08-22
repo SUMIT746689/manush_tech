@@ -1,25 +1,23 @@
 import Head from 'next/head';
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-
+import { useState, useEffect, useRef } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
-
 import Footer from 'src/components/Footer';
-
-import { Button, Card, Grid } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/StudentFeesCollection/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
 import { useReactToPrint } from 'react-to-print';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+
 function Managementschools() {
-  // const isMountedRef = useRefMounted();
   const [datas, setDatas] = useState<Project[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [students, setStudents] = useState<[object?]>([]);
   const [printFees, setPrintFees] = useState<[object?]>([]);
   const [filteredFees, setFilteredFees] = useState<any>([]);
+  const [selectedFees, setSelectedFees] = useState<any[]>([]);
 
   const { data, error } = useClientFetch('/api/student_payment_collect');
   const { data: classData, error: classError } = useClientFetch('/api/class');
@@ -28,43 +26,27 @@ function Managementschools() {
   }, [data, error]);
 
   const printPageRef = useRef();
+  const printSelectedPageRef = useRef();
   const printAllPageARef = useRef();
 
   const handlePrint = useReactToPrint({
     content: () => printPageRef.current
   });
+
+  const handlePrintSelected = useReactToPrint({
+    content: () => printSelectedPageRef.current
+  });
+
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
+
 
   return (
     <>
       <Head>
         <title>Student Fee Collection - Management</title>
       </Head>
-      {/* <PageTitleWrapper> */}
-      {/* @ts-ignore */}
-      {/* <PageHeader
-          studentData={
-            studentData?.length > 0
-              ? studentData?.map((i) => ({
-                  label: i?.student_info.first_name,
-                  value: i.id
-                }))
-              : []
-          }
-          feeData={
-            feeData?.success
-              ? feeData.data.map((fee) => ({
-                  label: fee.title,
-                  value: fee.id
-                }))
-              : []
-          }
-          editData={editData}
-          seteditData={setEditData}
-        /> */}
-      {/* </PageTitleWrapper> */}
 
       <Grid
         sx={{ px: 4, mt: 1 }}
@@ -84,47 +66,51 @@ function Managementschools() {
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
             setPrintFees={setPrintFees}
-            filteredFees={filteredFees} 
+            filteredFees={filteredFees}
             setFilteredFees={setFilteredFees}
+            setSelectedFees={setSelectedFees}
           />
         </Grid>
       </Grid>
       <Grid px={4} mt={1}>
-        <Card sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
-          <Button
-            onClick={() => setPrintFees([])}
-            sx={{ mr: 2 }}
-            variant="contained"
+        <Card sx={{ pt: 1, px: 1, display: 'grid', gridTemplateColumns: { xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, justifyContent: 'center', fontSize: 0.1, columnGap: 1 }}>
+          <ButtonWrapper
+            handleClick={() => setPrintFees([])}
             color="warning"
           >
             {'Reset'}
-          </Button>
-          <Button
+          </ButtonWrapper>
+
+          <ButtonWrapper
+            disabled={selectedFees.length === 0}
+            handleClick={handlePrintSelected}
+          >
+            {'Selceted Invoice Print'}
+          </ButtonWrapper>
+
+          <ButtonWrapper
+            sx={{
+              ':disabled': {
+                backgroundColor: 'silver'
+              }
+            }}
+            disabled={filteredFees.length === 0}
+            handleClick={handlePrintAll}
+          >
+            {'Print All'}
+          </ButtonWrapper>
+
+          <ButtonWrapper
             sx={{
               ':disabled': {
                 backgroundColor: 'silver'
               }
             }}
             disabled={printFees.length === 0}
-            onClick={handlePrint}
-            variant="contained"
+            handleClick={handlePrint}
           >
             {'Collect Invoice Print'}
-          </Button>
-
-          <Button
-            sx={{
-              ':disabled': {
-                backgroundColor: 'silver'
-              },
-              ml:2
-            }}
-            disabled={filteredFees.length === 0}
-            onClick={handlePrintAll}
-            variant="contained"
-          >
-            {'Print All'}
-          </Button>
+          </ButtonWrapper>
         </Card>
       </Grid>
       <Grid sx={{ display: 'none' }}>
@@ -132,6 +118,12 @@ function Managementschools() {
           <PaymentInvoice printFees={printFees} student={selectedStudent} />
           <PaymentInvoice printFees={printFees} student={selectedStudent} />
         </Grid>
+
+        <Grid ref={printSelectedPageRef}>
+          <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
+          <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
+        </Grid>
+
         <Grid ref={printAllPageARef}>
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
@@ -143,7 +135,7 @@ function Managementschools() {
 }
 
 Managementschools.getLayout = (page) => (
-  <Authenticated name="student_fee_collect">
+  <Authenticated name="collect_fee">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

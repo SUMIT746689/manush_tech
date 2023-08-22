@@ -1,3 +1,13 @@
+export interface School {
+  address: String;
+  currency: String;
+  domain: String;
+  email: String;
+  id: Number;
+  name: String;
+  phone: String;
+
+}
 export interface User {
   id: string;
   avatar: string;
@@ -13,4 +23,5 @@ export interface User {
   description: string;
   [key: string]: any;
   permissions?: [object];
+  school: School;
 }

@@ -69,11 +69,9 @@ function Header() {
         );
 
         if (storedAcademicYear) {
-          console.log('storedAcademicYear__', storedAcademicYear);
-
+         
           const temp = list.find((i) => i.id == storedAcademicYear.id);
-          console.log('temp__', temp);
-
+         
           if (temp) {
             setSelectedAcademicYear({ label: temp.label, id: temp.id });
           } else {

@@ -1,6 +1,6 @@
 import { Button, Grid } from "@mui/material"
 
-export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = false, children, sx = {} }) => {
+export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = false, children, sx = {}, ...params }) => {
 
   return (
     <Grid container sx={{ pb: 1, justifyContent: 'center' }}>
@@ -15,6 +15,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
           }
         }}
         onClick={handleClick}
+        {...params}
       >
         {children}
       </Button>

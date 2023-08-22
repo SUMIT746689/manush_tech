@@ -16,6 +16,7 @@ import { useReactToPrint } from 'react-to-print';
 import prisma from '@/lib/prisma_client';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import dayjs from 'dayjs';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 export async function getServerSideProps(context: any) {
   let student: any = null;
@@ -154,7 +155,6 @@ function ManagementStudentPayment({ data }) {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-  console.log({data})
   return (
     <>
       <Head>
@@ -174,52 +174,51 @@ function ManagementStudentPayment({ data }) {
             data={data}
             sessions={datas}
             setSessions={setDatas}
-            students={students}
+            // students={students}
             setStudents={setStudents}
             selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
+            // setSelectedStudent={setSelectedStudent}
             setPrintFees={setPrintFees}
-            filteredFees={filteredFees}
+            // filteredFees={filteredFees}
             setFilteredFees={setFilteredFees}
           />
         </Grid>
       </Grid>
       <Grid px={4} mt={1}>
-        <Card sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
-          <Button
-            onClick={() => setPrintFees([])}
-            sx={{ mr: 2 }}
+        <Card sx={{ pt: 1, px: 1, display: 'grid', justifyContent: 'center', columnGap: 1, gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr 1fr" } }}>
+          <ButtonWrapper
+            handleClick={() => setPrintFees([])}
             variant="contained"
             color="warning"
           >
             {'Reset'}
-          </Button>
-          <Button
+          </ButtonWrapper>
+
+          <ButtonWrapper
             sx={{
               ':disabled': {
                 backgroundColor: 'silver'
               }
             }}
             disabled={printFees.length === 0}
-            onClick={handlePrint}
+            handleClick={handlePrint}
             variant="contained"
           >
             {'Collect Invoice Print'}
-          </Button>
+          </ButtonWrapper>
 
-          <Button
+          <ButtonWrapper
             sx={{
               ':disabled': {
                 backgroundColor: 'silver'
-              },
-              ml: 2
+              }
             }}
             disabled={filteredFees.length === 0}
-            onClick={handlePrintAll}
+            handleClick={handlePrintAll}
             variant="contained"
           >
             {'Print All'}
-          </Button>
+          </ButtonWrapper>
         </Card>
       </Grid>
       <Grid sx={{ display: 'none' }}>

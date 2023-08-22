@@ -24,6 +24,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
+import { formatNumber } from '@/utils/numberFormat';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -100,12 +101,9 @@ const StudentPayment = ({
   data,
   sessions,
   setSessions,
-  students,
   setStudents,
   selectedStudent,
-  setSelectedStudent,
   setPrintFees,
-  filteredFees,
   setFilteredFees
 
 }) => {
@@ -141,10 +139,9 @@ const StudentPayment = ({
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log({ sessions });
     setSelectedschools(
       // @ts-ignore
-      event.target.checked ? sessions?.fees?.map((project) => project.id) : []
+      event.target.checked ? data?.fees?.map((project) => project.id) : []
     );
   };
 
@@ -180,12 +177,12 @@ const StudentPayment = ({
     setPaginatedSchool(paginatedschools);
   }, [data, filter, page])
 
-  const selectedBulkActions = selectedItems.length > 0;
+  const selectedBulkActions = selectedItems?.length > 0;
   const selectedSomeschools =
     // @ts-ignore
-    selectedItems.length > 0 && selectedItems.length < data?.fees?.length;
+    selectedItems?.length > 0 && selectedItems?.length < data?.fees?.length;
   // @ts-ignore
-  const selectedAllschools = selectedItems.length === data?.fees?.length;
+  const selectedAllschools = selectedItems?.length === data?.fees?.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -215,6 +212,7 @@ const StudentPayment = ({
     setDeleteSchoolId(id);
     setOpenConfirmDelete(true);
   };
+
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
@@ -282,12 +280,12 @@ const StudentPayment = ({
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 405px) !important' }}>
-        {selectedBulkActions && (
+        {/* {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />
           </Box>
-        )}
-
+        )} */}
+        
         <Divider />
 
         {
@@ -328,7 +326,7 @@ const StudentPayment = ({
                       <TableCell>{t('Last payment date')}</TableCell>
                       <TableCell>{t('Total payable amount')}</TableCell>
 
-                      <TableCell align="center">{t('Actions')}</TableCell>
+                      {/* <TableCell align="center">{t('Actions')}</TableCell> */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -377,7 +375,7 @@ const StudentPayment = ({
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {project?.amount.toFixed(1)}
+                              { formatNumber(project?.amount.toFixed(1))}
                             </Typography>
                           </TableCell>
 
@@ -400,7 +398,7 @@ const StudentPayment = ({
 
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {due}
+                              {formatNumber(due)}
                             </Typography>
                           </TableCell>
 
@@ -415,7 +413,7 @@ const StudentPayment = ({
 
                           <TableCell>
                             <Typography noWrap variant="h5" sx={changeColor}>
-                              {(today <= last_date || project?.status === 'paid late') ? due : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
+                              {(today <= last_date || project?.status === 'paid late') ? due : `${Number(project?.amount).toFixed(2)} + ${Number(project?.late_fee).toFixed(2)} = ${(project?.amount + project?.late_fee).toFixed(2)}`}
                             </Typography>
                           </TableCell>
 
@@ -426,7 +424,7 @@ const StudentPayment = ({
                                 handleCollection={handleCollection}
                                 student_id={selectedStudent?.id}
                               /> */}
-                              
+
                             </Typography>
                           </TableCell>
                         </TableRow>

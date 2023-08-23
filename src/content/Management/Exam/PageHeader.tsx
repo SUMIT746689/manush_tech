@@ -25,6 +25,9 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
 import { DateTimePicker } from '@mui/lab';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   const { t }: { t: any } = useTranslation();
@@ -183,9 +186,84 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   const handleErrorSnackbar = (err) => {
     showNotification(err?.response?.data?.message, 'error')
   }
+
+  const handleFormSubmit = async (
+    _values,
+    { resetForm, setErrors, setStatus, setSubmitting }
+  ) => {
+    try {
+      const successProcess = (message) => {
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        handleCreateProjectSuccess(message);
+        handleCreateProjectClose();
+      };
+
+      let subject_id_list = [];
+      for (const i of subject) {
+        subject_id_list.push({ id: i.id, mark: parseFloat(i.mark), exam_date: i.exam_date });
+      }
+      let query = {};
+      if (editExam) {
+        query = {
+          exam_id: _values.exam_id,
+          section_id: _values.section_id || editExam?.section_id,
+          title: _values.title,
+          class_id: _values.class_id || editExam?.section?.class?.id,
+          school_id: user.school_id,
+          academic_year_id: academicYear?.id,
+          subject_id_list: subject_id_list,
+          // final_percent: checked ? _values.final_percent || editExam?.final_percent : null,
+          final_percent: checked ? _values.final_percent || editExam?.final_percent : 0,
+        };
+      } else {
+        query = {
+          section_id: _values.section_id,
+          title: _values.title,
+          class_id: _values.class_id,
+          school_id: user.school_id,
+          academic_year_id: academicYear?.id,
+          subject_id_list: subject_id_list,
+          final_percent: checked ? _values?.final_percent : 0
+        };
+      }
+
+      if (editExam) {
+        axios
+          .put(`/api/exam`, query)
+          .then((res) => {
+            console.log(res);
+
+            successProcess(t(`${res?.data?.message ? res?.data?.message : 'A new Exam has been updated successfully'}`))
+            getExam()
+          })
+          .catch((err) => {
+            console.log(err)
+            handleErrorSnackbar(err)
+          });
+      } else {
+        const res = await axios.post('/api/exam', query);
+        if (res.data?.success) {
+          successProcess(t('A new Exam has been created successfully'))
+          getExam()
+        }
+        else {
+          throw new Error('created Exam failed');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification(err?.response?.data?.message, 'error')
+      setStatus({ success: false });
+      setErrors({ submit: err.message });
+      setSubmitting(false);
+    }
+  }
+
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
+      {/* <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography variant="h3" component="h3" gutterBottom>
             {t('Exams')}
@@ -206,7 +284,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             {t('Create new exam')}
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
+      <PageHeaderTitleWrapper
+        name={"Exam"}
+        handleCreateClassOpen={handleCreateProjectOpen}
+      />
       <Dialog
         fullWidth
         maxWidth="md"
@@ -225,6 +307,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             {t('Use this dialog window to add a new exam')}
           </Typography>
         </DialogTitle>
+
         <Formik
           initialValues={{
             exam_id: editExam ? editExam.id : undefined,
@@ -244,80 +327,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
             subject_id_list: Yup.array().required(t('Subject is required')),
           })}
 
-          onSubmit={async (
-            _values,
-            { resetForm, setErrors, setStatus, setSubmitting }
-          ) => {
-            try {
-              const successProcess = (message) => {
-                resetForm();
-                setStatus({ success: true });
-                setSubmitting(false);
-                handleCreateProjectSuccess(message);
-                handleCreateProjectClose();
-              };
-
-              let subject_id_list = [];
-              for (const i of subject) {
-                subject_id_list.push({ id: i.id, mark: parseFloat(i.mark),exam_date: i.exam_date });
-              }
-              let query = {};
-              if (editExam) {
-                query = {
-                  exam_id: _values.exam_id,
-                  section_id: _values.section_id || editExam?.section_id,
-                  title: _values.title,
-                  class_id: _values.class_id || editExam?.section?.class?.id,
-                  school_id: user.school_id,
-                  academic_year_id: academicYear?.id,
-                  subject_id_list: subject_id_list,
-                  // final_percent: checked ? _values.final_percent || editExam?.final_percent : null,
-                  final_percent: checked ? _values.final_percent || editExam?.final_percent : 0,
-                };
-              } else {
-                query = {
-                  section_id: _values.section_id,
-                  title: _values.title,
-                  class_id: _values.class_id,
-                  school_id: user.school_id,
-                  academic_year_id: academicYear?.id,
-                  subject_id_list: subject_id_list,
-                  final_percent: checked ? _values?.final_percent : 0
-                };
-              }
-              console.log("query__", query);
-
-              if (editExam) {
-                axios
-                  .put(`/api/exam`, query)
-                  .then((res) => {
-                    console.log(res);
-
-                    successProcess(t(`${res?.data?.message ? res?.data?.message : 'A new Exam has been updated successfully'}`))
-                    getExam()
-                  })
-                  .catch((err) => {
-                    console.log(err)
-                    handleErrorSnackbar(err)
-                  });
-              } else {
-                const res = await axios.post('/api/exam', query);
-                if (res.data?.success) {
-                  successProcess(t('A new Exam has been created successfully'))
-                  getExam()
-                }
-                else {
-                  throw new Error('created Exam failed');
-                }
-              }
-            } catch (err) {
-              console.error(err);
-              showNotification(err?.response?.data?.message, 'error')
-              setStatus({ success: false });
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
-          }}
+          onSubmit={handleFormSubmit}
         >
           {({
             errors,
@@ -340,7 +350,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                 >
                   <Grid container spacing={0}>
                     {/* Exam name */}
-                    <Grid
+                    {/* <Grid
                       item
                       xs={12}
                       sm={4}
@@ -359,6 +369,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         <b>{t('Exam Name')}:</b>
                       </Box>
                     </Grid>
+
                     <Grid
                       sx={{
                         mb: `${theme.spacing(3)}`
@@ -384,10 +395,39 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           }
                         }}
                       />
-                    </Grid>
+                    </Grid> */}
+                    <Grid container display="grid" gridTemplateColumns=" 1fr 1fr " columnGap={1}>
 
-                    {/* select class */}
-                    <Grid
+                      <TextFieldWrapper
+                        name="title"
+                        label="Exam Title"
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        errors={errors.title}
+                        touched={touched.title}
+                        value={values.title}
+                      />
+
+                      {/* select class */}
+
+                      <AutoCompleteWrapper
+                        error={Boolean(touched.title && errors.title)}
+                        helperText={touched.title && errors.title}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        minWidth="100%"
+                        name='class_id'
+                        label="Select Class"
+                        placeholder="Select class"
+                        options={classList}
+                        value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
+                        handleChange={(event, newValue) =>
+                          handleClassSelect(event, newValue, setFieldValue)
+                        }
+                      />
+
+
+                      {/* <Grid
                       item
                       xs={12}
                       sm={4}
@@ -405,48 +445,87 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                       >
                         <b>{t('Select class')}:</b>
                       </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Autocomplete
-                        disablePortal
-                        options={classList}
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                        xs={12}
+                        sm={8}
+                        md={9}
+                        justifyContent="flex-end"
+                        textAlign={{ sm: 'right' }}
+                      >
+                        <Autocomplete
+                          disablePortal
+                          options={classList}
 
-                        renderInput={(params) => (
-                          <TextField
-                            fullWidth
-                            error={Boolean(
-                              touched?.class_id &&
-                              errors?.class_id
-                            )}
-                            sx={{
-                              '& fieldset': {
-                                borderRadius: '3px'
+                          renderInput={(params) => (
+                            <TextField
+                              fullWidth
+                              error={Boolean(
+                                touched?.class_id &&
+                                errors?.class_id
+                              )}
+                              sx={{
+                                '& fieldset': {
+                                  borderRadius: '3px'
+                                }
+                              }}
+                              helperText={
+                                touched?.class_id &&
+                                errors?.class_id
+                              }
+                              name='class_id'
+                              {...params}
+                              label={t('Select class')}
+                            />
+                          )}
+                          value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
+                          onChange={(event, newValue) =>
+                            handleClassSelect(event, newValue, setFieldValue)
+                          }
+                        />
+                      </Grid> */}
+
+
+                      {/* {
+                        ((sections && editExam?.section?.class?.has_section) || (sections && selectedClass && selectedClass?.has_section)) ?
+
+                          <AutoCompleteWrapper
+                            error={Boolean(touched.title && errors.title)}
+                            helperText={touched.title && errors.title}
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            minWidth="100%"
+                            name='section_id'
+                            label="Select Section"
+                            placeholder="select section"
+                            options={sections}
+                            value={selectedSection || sections.find((i) => i.id == editExam?.section_id) || null}
+                            handleChange={(e, v) => {
+                              setSelectedSection(v);
+                              if (v) {
+                                setFieldValue('section_id', v.id);
+                              } else {
+                                setFieldValue('section_id', undefined);
                               }
                             }}
-                            helperText={
-                              touched?.class_id &&
-                              errors?.class_id
-                            }
-                            name='class_id'
-                            {...params}
-                            label={t('Select class')}
+
                           />
-                        )}
-                        value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
-                        onChange={(event, newValue) =>
-                          handleClassSelect(event, newValue, setFieldValue)
-                        }
-                      />
+                          :
+                          <EmptyAutoCompleteWrapper
+                            minWidth="100%"
+                            name='section_id'
+                            label="Select Section"
+                            placeholder="select section"
+                            options={[]}
+                            value={undefined}
+                          />
+
+                      } */}
+
                     </Grid>
 
                     {/* select section */}
@@ -487,9 +566,11 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                             options={sections}
                             value={selectedSection || sections?.find((i) => i.id == editExam?.section_id) || null}
                             filterSelectedOptions
+                            size='small'
                             renderInput={(params) => (
                               <TextField
                                 {...params}
+                                size="small"
                                 label="select section"
                                 placeholder="section Name"
                                 error={Boolean(
@@ -498,7 +579,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                 )}
                                 sx={{
                                   '& fieldset': {
-                                    borderRadius: '3px'
+                                    borderRadius: 0.5
                                   }
                                 }}
                                 helperText={
@@ -557,13 +638,14 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           >
                             <Autocomplete
                               multiple
-
+                              size="small"
                               options={subjectList}
                               value={subject}
                               filterSelectedOptions
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
+                                  size="small"
                                   label="filterSelectedOptions"
                                   placeholder="selecet multiple subject"
                                   error={Boolean(
@@ -589,18 +671,19 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                               }}
                             />
 
-                            <Grid                            
-                              item                            
+                            <Grid
+                              item
                               justifyContent="flex-end"
                               textAlign={{ sm: 'right', md: 'left' }}
                             >
                               {
                                 subject?.map((option, index) => (
                                   <Grid container sx={{
-                                    display:'grid',
-                                    gridTemplateColumns:'150px 250px',
+                                    display: 'grid',
+                                    gridTemplateColumns: '150px 250px',
                                     marginTop: '12px'
-                                  }}  gap={1}>
+                                  }} gap={1}
+                                  >
                                     <Grid item>
                                       <TextField
                                         sx={{
@@ -608,6 +691,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                             borderRadius: '3px'
                                           }
                                         }}
+                                        size='small'
                                         key={option.label}
                                         variant="outlined"
                                         label={`Input ${option.label} mark`}

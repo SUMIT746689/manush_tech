@@ -8,11 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { BasicPdfExport } from '@/components/Export/Pdf';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 
 const ExamResults = () => {
     const { t }: { t: any } = useTranslation();
@@ -50,6 +51,8 @@ const ExamResults = () => {
     const handleClassSelect = (e, value) => {
         setSelectedClass(value)
         setSelectedSection(null)
+        setselectedExam(null)
+        setExams(() => [])
         if (value) {
             const selectedClass = classes.find(i => i.id == value?.id);
             if (selectedClass) {
@@ -63,14 +66,15 @@ const ExamResults = () => {
     }
 
     const handleSectionSelect = (e, value) => {
+        setselectedExam(null)
+
         setSelectedSection(value)
     }
+
     const handleRoutineGenerate = () => {
         if (selectedSection) {
             axios.get(`/api/routine/exam?section_id=${selectedSection?.id}&school_id=${user?.school_id}&academic_year_id=${academicYear?.id}`)
                 .then(res => {
-                    console.log(selectedExam, res.data);
-
                     setRoutine(res.data.find(i => i.id == selectedExam.id))
                 })
                 .catch(err => console.log(err))
@@ -85,20 +89,17 @@ const ExamResults = () => {
                 </Grid>
                 <Grid>
                     {
-                        selectedClass && selectedClass.has_section
-                        &&
-                        <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
+                        (selectedClass && selectedClass.has_section)
+                            ?
+                            <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
+                            :
+                            <EmptyAutoCompleteWrapper label="Select section" placeholder="Select section..." value={undefined} options={[]} />
                     }
                 </Grid>
                 <Grid>
-                    {
-                        selectedSection
-                        &&
-                        <AutoCompleteWrapper label="Select Exam" placeholder="Select section..." value={selectedExam} options={exams} handleChange={(e, value) => {
-                            console.log(value);
-                            setselectedExam(value)
-                        }} />
-                    }
+
+                    <AutoCompleteWrapper label="Select Exam" placeholder="Select section..." value={selectedExam} options={exams} handleChange={(e, value) => setselectedExam(value)} />
+
                 </Grid>
                 <Grid>
                     {
@@ -124,7 +125,7 @@ const ExamResults = () => {
                                     variant="h4"
                                     fontWeight="normal"
                                     color="text.secondary"
-                                    align="center">Exam Title: {selectedExam.label}</Typography>
+                                    align="center">Exam Title: {selectedExam?.label}</Typography>
                                 <TableContainer sx={{ p: 1 }}  >
                                     <Table>
                                         <TableHead sx={{
@@ -216,22 +217,7 @@ const ExamResults = () => {
                                 </TableContainer>
                             </Grid>
                             :
-                            <Typography
-                                sx={{
-                                    py: 10,
-                                    px: 4,
-                                    height: ''
-                                }}
-                                variant="h3"
-                                fontWeight="normal"
-                                color="text.secondary"
-                                align="center"
-                            >
-                                {t(
-                                    "We couldn't find any result matching your search criteria"
-                                )}
-                            </Typography>
-
+                            <TableEmptyWrapper title="exam routine" />
                     }
 
 

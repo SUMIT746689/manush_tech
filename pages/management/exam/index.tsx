@@ -11,8 +11,6 @@ import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
 import { Grid } from '@mui/material';
 import Results from 'src/content/Management/Exam/Results';
-import { useClientFetch } from 'src/hooks/useClientFetch';
-import { AuthConsumer } from 'src/contexts/JWTAuthContext';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
@@ -21,7 +19,6 @@ function Managementschools() {
   // const isMountedRef = useRefMounted();
   const [exams, setExams] = useState([]);
   const [editExam, setEditExam] = useState(null);
-  const [singleExam, setSingleExam] = useState(null);
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);

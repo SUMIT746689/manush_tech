@@ -9,7 +9,7 @@ import QuickLinkCards from '../quick_link_card/quickLinkCard';
 function StudentDashboardReportsContent({ blockCount}) {
 
   const { student } = blockCount;
-  const name = [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' ');
+  const name = [student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(' ');
   const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class.name], ['Section', student.section.name]]
   const quickLinks = [
     { name: 'Exam', src: "exam.svg", href: "/management/exam" },

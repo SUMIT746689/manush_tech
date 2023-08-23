@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { BasicPdfExport } from '@/components/Export/Pdf';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 const StudentResults = ({data}) => {
   const { t }: { t: any } = useTranslation();
   const [routine, setRoutine] = useState(null);
@@ -96,8 +97,7 @@ const StudentResults = ({data}) => {
           else return 0;
         })
 
-        console.log("sorted__", timeSlot);
-
+       
         setSlotHeader(timeSlot)
         const day = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
         let sortedRoutineByDay = []
@@ -118,7 +118,7 @@ const StudentResults = ({data}) => {
 
   return (
     <>
-      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr min-content' }, gap: { sm: 1 } }}>
+      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr min-content' }, columnGap: 1 }}>
         <UncontrolledTextFieldWrapper label="Class" value={data.class} />
         <UncontrolledTextFieldWrapper label="Section" value={data.section} />
         
@@ -230,21 +230,7 @@ const StudentResults = ({data}) => {
               </Table>
             </TableContainer>
               :
-              <Typography
-                sx={{
-                  py: 10,
-                  px: 4,
-                  height: ''
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t(
-                  "We couldn't find any result matching your search criteria"
-                )}
-              </Typography>
+              <TableEmptyWrapper title="result"/>
           }
 
 

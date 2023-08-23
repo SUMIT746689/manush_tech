@@ -1,5 +1,6 @@
 import { Box, Grid, Table, TableBody, TableContainer, TableHead, TablePagination, Typography } from "@mui/material"
 import { useTranslation } from "next-i18next";
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 export const TableHeadWrapper = ({ title, total, count, rowsPerPage, page, onPageChange, onRowsPerPageChange, selectAllCheckbox = null, children = null }) => {
   const { t }: { t: any } = useTranslation();
@@ -73,7 +74,13 @@ export const TableEmptyWrapper = ({ title }) => {
       color="text.secondary"
       align="center"
     >
-      {t(`We couldn't find any ${title} matching your search criteria`)}
+      <span>
+        <SearchOffIcon sx={{ fontSize: 40 }} />
+        <br />
+        <br />
+        We couldn't find any <br></br> {title} matching your search criteria
+      </span>
+      {/* {t(`We couldn't find any ${title} matching your search criteria`)} */}
     </Typography>
   )
 }

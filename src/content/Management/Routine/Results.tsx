@@ -14,6 +14,9 @@ import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { BasicPdfExport } from '@/components/Export/Pdf';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
+
 const Results = () => {
   const { t }: { t: any } = useTranslation();
   const [routine, setRoutine] = useState(null);
@@ -47,6 +50,9 @@ const Results = () => {
         }
       }
     }
+    else {
+      setSections(() => [])
+    }
   }
 
   const TimeConverter = (start) => {
@@ -78,7 +84,7 @@ const Results = () => {
 
             let classSlot = [];
             const gotDay = uniqueDay.find(s => s == i.day);
-            console.log("got__", gotDay);
+
             if (!gotDay) {
               for (let j of res.data) {
                 if (i.day == j.day) {
@@ -126,7 +132,6 @@ const Results = () => {
             else return 0;
           })
 
-          console.log("sorted__", timeSlot);
 
           setSlotHeader(timeSlot)
           const day = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -148,23 +153,19 @@ const Results = () => {
   }
   return (
     <>
-      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
+      <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr min-content' }, columnGap: 1 }}>
         <Grid>
           <AutoCompleteWrapper value={selectedClass} label='Select Class' placeholder='Select class...' handleChange={handleClassSelect} options={classes?.map(i => ({ label: i.name, value: i.id, id: i.id, has_section: i.has_section }))} />
         </Grid>
         <Grid>
-          {
-            selectedClass && selectedClass.has_section
-            &&
+          {(selectedClass && selectedClass.has_section) ?
             <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
+            :
+            <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={undefined} options={[]} handleChange={handleSectionSelect} />
           }
         </Grid>
         <Grid>
-          {
-            selectedSection ? <ButtonWrapper handleClick={handleRoutineGenerate} >Find</ButtonWrapper>
-              :
-              <DisableButtonWrapper >Find</DisableButtonWrapper>
-          }
+          <ButtonWrapper disabled={!selectedSection} handleClick={handleRoutineGenerate} >Find</ButtonWrapper>
         </Grid>
         <Grid item className='w-full'>
           {routine && <BasicPdfExport ref={routineRef} />}
@@ -272,21 +273,7 @@ const Results = () => {
               </Table>
             </TableContainer>
               :
-              <Typography
-                sx={{
-                  py: 10,
-                  px: 4,
-                  height: ''
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t(
-                  "We couldn't find any result matching your search criteria"
-                )}
-              </Typography>
+              <TableEmptyWrapper title="result" />
 
           }
 

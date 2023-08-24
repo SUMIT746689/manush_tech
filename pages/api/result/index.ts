@@ -48,6 +48,12 @@ const index = async (req, res, refresh_token) => {
                                         admission_date: true,
                                         gender: true,
                                     }
+                                },
+                                group: {
+                                    select: {
+                                        id: true,
+                                        title: true
+                                    }
                                 }
                             }
                         },
@@ -133,24 +139,24 @@ const index = async (req, res, refresh_token) => {
 
                 const targetGrad = allGrad.find(i => i.lower_mark <= mark_obtained && i.upper_mark >= mark_obtained)
 
-                if(!targetGrad){
+                if (!targetGrad) {
                     throw new Error('Grade not found !')
                 }
 
                 if (uniqueStudentResult) {
 
                     const isExist = await prisma.studentResultDetails.findFirst({
-                        where:{
+                        where: {
                             exam_details_id,
                             student_result_id: uniqueStudentResult.id
                         }
                     })
-                    if(isExist){
+                    if (isExist) {
                         throw new Error('Result already inserted !!')
                     }
                     const allObtainedNumber = await prisma.studentResultDetails.findMany({
                         where: {
-                            
+
                             student_result_id: uniqueStudentResult.id
                         },
                         select: {

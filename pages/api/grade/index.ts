@@ -9,13 +9,18 @@ const index = async (req, res, refresh_token) => {
     const { lower_mark, upper_mark, point, grade, academic_year_id } = req.body;
     switch (method) {
       case 'GET':
+        const { } = req.query;
         const data = await prisma.gradingSystem.findMany({
           where: {
-            school_id: refresh_token.school_id
+            school_id: refresh_token.school_id,
+            academic_year_id: Number(req.query.academic_year_id)
+          },
+          orderBy: {
+            point: 'desc'
           }
         });
-        console.log("grade__",data);
-        
+        console.log("grade__", data);
+
         res.status(200).json(data);
         break;
       case 'POST':

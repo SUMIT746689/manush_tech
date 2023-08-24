@@ -237,7 +237,7 @@ async function seed() {
       present_address: 'Khilgaon, Dhaka-1219',
       joining_date: new Date(),
       resume: '',
-      school: { connect: { id: school.id } },
+      school_id:  school.id,
       department: { connect: { id: createDepartment.id } },
       user: {
         create: {
@@ -350,6 +350,18 @@ async function seed() {
       }
     }
   });
+
+  await prisma.gradingSystem.createMany({
+    data: [
+      { lower_mark: 0, upper_mark: 32, point: 0, grade: 'F', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 33, upper_mark: 39, point: 1, grade: 'D', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 40, upper_mark: 49, point: 2, grade: 'C', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 50, upper_mark: 59, point: 3, grade: 'B', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 60, upper_mark: 69, point: 3.5, grade: 'A-', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 70, upper_mark: 79, point: 4, grade: 'A', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 80, upper_mark: 100, point: 5, grade: 'A+', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+    ]
+  })
 
 
   // role

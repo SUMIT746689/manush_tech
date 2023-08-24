@@ -1,19 +1,20 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from '@/content/Management/Grade/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-
 import { Grid } from '@mui/material';
 import Results from '@/content/Management/Grade/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import { useAuth } from '@/hooks/useAuth';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 function Managementrooms() {
   const [grade, setGrade] = useState([]);
   const [editGrade, setEditGrade] = useState(null);
-  const { data, reFetchData, error } = useClientFetch('/api/grade');
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const { data, reFetchData, error } = useClientFetch(`/api/grade?academic_year_id=${academicYear?.id}`);
   const auth = useAuth();
 
   useEffect(() => {

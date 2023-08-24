@@ -361,7 +361,7 @@ function ManagementClasses() {
                 phone: i?.phone,
                 birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
 
-                photo: i?.student_photo ? `/files/${i?.student_photo}` : 'https://cdn4.iconfinder.com/data/icons/modern-education-and-knowledge-power-1/512/499_student_education_graduate_learning-512.png'
+                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : 'https://cdn4.iconfinder.com/data/icons/modern-education-and-knowledge-power-1/512/499_student_education_graduate_learning-512.png'
               };
               return <IdentityCard user={user} />;
             }

@@ -4,7 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Checkbox, Divider, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, selectClasses, useTheme } from '@mui/material';
+import { Autocomplete, Box, Button, Card, Checkbox, Chip, Divider, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, selectClasses, useTheme } from '@mui/material';
 import Results from 'src/content/Management/Result/Results';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,6 +17,10 @@ import Image from 'next/image';
 import ReactToPrint from 'react-to-print';
 import dayjs from 'dayjs';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { makeStyles } from '@mui/styles'
+
+
+
 const applyPagination = (array, page, limit) => {
     return array.slice(page * limit, page * limit + limit);
 };
@@ -31,13 +35,17 @@ const tableStyle: object = {
 const gradeTableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
-    minWidth: '40px',
+    fontSize: '11px',
+    fontWeight: 'bold',
+    // width: '5px',
     textAlign: 'center',
-    padding: '6px'
+    padding: '3px'
     // backgroundColor: '#cccccc'
 };
 
 function Managementschools() {
+
+
     const theme = useTheme();
     const { t }: { t: any } = useTranslation();
     const [result, setResult] = useState([]);
@@ -54,9 +62,9 @@ function Managementschools() {
     const [selectedExam, setSelectedExam] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [subjectList, setSubjectList] = useState(null)
+    const [grade, setGrade] = useState([])
+
     const paginatedResults = applyPagination(result, page, limit);
-
-
     const reportCardPrint = useRef()
 
     const selectedSomeUsers = selectedItems.length > 0 && selectedItems.length < result.length;
@@ -81,11 +89,9 @@ function Managementschools() {
         }
     };
     useEffect(() => {
-        axios
-            .get(`/api/class?school_id=${user?.school_id}`)
-            .then((res) => setClasses(res?.data))
-            .catch((err) => console.log(err));
+        axios.get(`/api/class?school_id=${user?.school_id}`).then((res) => setClasses(res?.data)).catch((err) => console.log(err));
     }, []);
+
 
     useEffect(() => {
         if (selectedSection && academicYear && user) {
@@ -101,6 +107,10 @@ function Managementschools() {
                     )
                 )
                 .catch((err) => console.log(err));
+            axios.get(`/api/grade?academic_year_id=${academicYear?.id}`)
+                .then(res => setGrade(res.data))
+                .catch(err => console.log(err));
+
             setSelectedExam(null);
         }
     }, [selectedSection, academicYear, user]);
@@ -215,7 +225,7 @@ function Managementschools() {
                                                 }}>{t('print')}</Button>
                                         )}
                                         // pageStyle="@page { size: A4; }"
-                                        pageStyle={`@page { size: A4; } .printable-item { page-break-after: always; }`}
+                                        pageStyle={`@page { size: landscape; } .printable-item { page-break-after: always; }`}
                                     />
                                 </Box>
                             </Grid>
@@ -281,7 +291,7 @@ function Managementschools() {
                                                     onChange={handleSelectAllUsers}
                                                 />
                                             </TableCell>
-                                            <TableCell>{t('class roll')}</TableCell>
+                                            <TableCell>{t('Class roll')}</TableCell>
                                             <TableCell>{t('Total marks obtained')}</TableCell>
                                             <TableCell>{t('GPA')}</TableCell>
                                             <TableCell>{t('Grade')}</TableCell>
@@ -326,270 +336,290 @@ function Managementschools() {
 
             {/* print report Card */}
             <Grid sx={{
-                display: 'none'
+                 display: 'none'
             }}>
                 <Grid ref={reportCardPrint}>
+                    {/* Your content here */}
                     {
                         selectedItems?.map(i => {
                             const resultDetailsLength = i?.result_details?.length
-                            return <Grid sx={{
-                                p: '15px',
-                                pageBreakAfter: 'always'
-                            }}>
-
-                                <Grid container sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    p: 2,
-                                    maxHeight: '200px'
-                                }}>
-                                    <Grid sx={{
-                                        // border:'1px solid red'
-                                        maxWidth: '200px'
-                                    }}>
-
-                                        <img src="/elitbuzz.png" alt='logo' />
-                                    </Grid>
-
-                                    <Grid sx={{
-                                        paddingRight: 10
-                                    }}>
-                                        <h1>{user?.school?.name}</h1>
-                                        <h6>{academicYear?.label}</h6>
-                                        <h5>{user?.school?.address}</h5>
-                                        <h5>{user?.school?.phone}</h5>
-                                        <h5>{user?.school?.email}</h5>
-                                    </Grid>
-                                </Grid>
-                                <Grid container sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    p: 2,
-                                }}>
-                                    <Grid sx={{
-                                        maxWidth: '85%',
-                                        maxHeight: 'auto'
-                                    }}>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th style={tableStyle}>Name</th>
-                                                    <th style={tableStyle}>{i?.student?.student_info?.first_name} {i?.student?.student_info?.middle_name} {i?.student?.student_info?.last_name}</th>
-                                                    <th style={tableStyle}>Registration no</th>
-                                                    <th style={tableStyle}>{i?.student?.class_registration_no} </th>
-                                                    <th style={tableStyle}>Roll no</th>
-                                                    <th style={tableStyle}>{i?.student?.class_roll_no} </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody style={{
-                                                overflowX: 'auto',
-                                                overflowY: 'auto'
-                                            }}>
-                                                <tr>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Father name</td>
-                                                    <td style={tableStyle}>{i?.student?.student_info?.father_name}</td>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Admission date</td>
-                                                    <td style={tableStyle}>{dayjs(i?.student?.student_info?.admission_date).format('YYYY-MM-DD')}</td>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Date of Birth</td>
-                                                    <td style={tableStyle}>{dayjs(i?.student?.student_info?.date_of_birth).format('YYYY-MM-DD')}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Mother name</td>
-                                                    <td style={tableStyle}>{i?.student?.student_info?.mother_name}</td>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Class</td>
-                                                    <td style={tableStyle}>{i?.student?.section?.class?.name}</td>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Gender</td>
-                                                    <td style={tableStyle}>{i?.student?.student_info?.gender}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </Grid>
-                                    <Grid sx={{
-                                        maxWidth: '80PX'
-                                    }}>
-                                        {/* <Image width={200} height={300} alt='student_photo' src={`/files/${i?.student?.student_photo}` || "/dumy_teacher.png"}/> */}
-                                        <img src={i?.student?.student_photo ? `/files/${i?.student?.student_photo}` : "/dumy_teacher.png"} alt='photo' />
-                                    </Grid>
-                                </Grid>
-
-                                <Grid item sx={{
+                            return (<>
+                                <Grid sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
                                     display: 'flex',
                                     justifyContent: 'center',
-                                    height: 'auto'
+                                    alignItems: 'center',
+                                    zIndex: 1,
+
                                 }}>
-                                    <Table sx={{
-                                        width: '97.5%',
-                                        p: 2
-                                    }}>
-                                        <thead>
-                                            <tr>
-                                                <th style={tableStyle}>Subject</th>
-                                                <th style={tableStyle}>Subject Obtain Marks</th>
-                                                <th style={tableStyle}>Subject Total Marks</th>
-                                                <th style={tableStyle}>Grade </th>
-                                                <th style={tableStyle}>point</th>
-                                                <th style={tableStyle}>Remark </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody style={{
-                                            overflowX: 'auto',
-                                            overflowY: 'auto'
-                                        }}>
-                                            {
-                                                subjectList?.map(j => {
-                                                    const found = i?.result_details?.find(a => a?.exam_details?.subject?.id == j.id)
-
-
-
-                                                    if (found) {
-                                                        return <tr>
-                                                            <td style={tableStyle}>{found?.exam_details?.subject?.name}</td>
-                                                            <td style={tableStyle}>{found?.mark_obtained}</td>
-                                                            <td style={tableStyle}>{found?.exam_details?.subject_total}</td>
-                                                            <td style={tableStyle}>{found?.grade?.grade}</td>
-                                                            <td style={tableStyle}>{found?.grade?.point}</td>
-                                                            <td style={tableStyle}>{found?.remark}</td>
-                                                        </tr>
-                                                    }
-                                                    else {
-                                                        return <tr>
-                                                            <td style={tableStyle}>not inserted</td>
-                                                            <td style={tableStyle}>not inserted</td>
-                                                            <td style={tableStyle}>{j?.subject_total}</td>
-                                                            <td style={tableStyle}>not inserted</td>
-                                                            <td style={tableStyle}>not inserted</td>
-                                                            <td style={tableStyle}></td>
-                                                        </tr>
-                                                    }
-                                                })
-                                            }
-
-                                        </tbody>
-                                    </Table>
+                                    <Image
+                                        src="/elitbuzz.png"
+                                        alt="Watermark"
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            zIndex: 1,
+                                            opacity: 0.2,
+                                            objectFit: 'contain'
+                                        }}
+                                        height={100}
+                                        width={100}
+                                    />
                                 </Grid>
-
                                 <Grid sx={{
-                                    p: 1,
-
-                                }}>
-                                    <Table sx={{
-                                        width: '40vh',
-                                        paddingLeft: 5
-                                    }}>
-                                        <thead>
-                                            <tr>
-                                                <th style={tableStyle}>GPA</th>
-                                                <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.calculated_point : 'not inserted'}</th>
-
-                                            </tr>
-                                            <tr>
-                                                <th style={tableStyle}>Grand Total marks</th>
-                                                <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.total_marks_obtained : 'not inserted'}</th>
-
-                                            </tr>
-                                            <tr>
-                                                <th style={tableStyle}>Result</th>
-                                                <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.calculated_grade : 'not inserted'}</th>
-
-                                            </tr>
-                                        </thead>
-
-                                    </Table>
-                                </Grid>
-
-                                <Grid container sx={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                                    zIndex: 2,
                                 }}>
                                     <Grid sx={{
-                                        px: 2
+                                        p: '15px',
+                                        pageBreakAfter: 'always'
                                     }}>
-                                        <Table>
-                                            <thead>
-                                                <tr>
-                                                    <td colSpan={2} style={{ ...tableStyle, fontWeight: 'bold' }}>Attendence</td>
 
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>No. of working days</td>
-                                                    <td style={tableStyle}>0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>No. of days attended</td>
-                                                    <td style={tableStyle}>0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ ...tableStyle, fontWeight: 'bold' }}>Attended percentage</td>
-                                                    <td style={tableStyle}>0.00%</td>
-                                                </tr>
-                                            </tbody>
-                                        </Table>
+                                        <Grid container sx={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '80% 20%',
+                                            pb: 2,
+                                        }}>
+                                            <Grid sx={{
+                                                display: 'grid',
+                                                gridTemplateColumns: '10% 90%',
+                                                alignItems: 'center',
+                                                px: '5%',
+                                                gap: 1
+                                            }}>
+                                                <Grid sx={{
+                                                    maxWidth: '80px'
+                                                }}>
+                                                    {/* <Image width={200} height={300} alt='student_photo' src={`/files/${i?.student?.student_photo}` || "/dumy_teacher.png"}/> */}
+                                                    <img src={i?.student?.student_photo ? `/files/${i?.student?.student_photo}` : "/dumy_teacher.png"} alt='photo' />
+                                                </Grid>
+
+                                                <Grid sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: 2
+                                                }}>
+                                                    <Grid sx={{
+                                                        display: 'flex',
+                                                        justifyContent:'center',
+                                                        gap: '5%'
+                                                    }}>
+                                                        <Grid sx={{
+                                                            maxWidth: '10em'
+                                                        }}>
+                                                            <img src="/elitbuzz.png" alt='logo' />
+                                                        </Grid>
+                                                        <Grid sx={{
+                                                            textAlign: 'center'
+                                                        }}>
+                                                            <Typography variant="h1" gutterBottom>
+                                                                {user?.school?.name}
+                                                            </Typography>
+                                                            <Typography variant="h5" gutterBottom>
+                                                                {user?.school?.address},{user?.school?.phone}
+                                                            </Typography>
+                                                            <Typography variant="h4" gutterBottom>
+                                                                {selectedExam?.label} (Academic) {academicYear?.label}
+                                                            </Typography>
+                                                            <Chip label='Report - Card' color='info' />
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid sx={{
+                                                        display: 'flex',
+                                                        justifyContent:'space-around',
+                                                        gap: 4,
+                                                    }}>
+                                                        <Grid>
+                                                            <Typography variant="h5" gutterBottom>
+                                                                Name: {i?.student?.student_info?.first_name} {i?.student?.student_info?.middle_name} {i?.student?.student_info?.last_name}
+                                                            </Typography>
+                                                            {
+                                                                i?.student?.group?.title && <Typography variant="h5" gutterBottom>Group: {i?.student?.group?.title}</Typography>
+                                                            }
+                                                        </Grid>
+                                                        <Grid>
+                                                            <Typography variant="h5" gutterBottom>Class: {i?.student?.section?.class?.name}</Typography>
+                                                            <Typography variant="h5" gutterBottom>Section: {i?.student?.section?.name}</Typography>
+                                                        </Grid>
+                                                        <Grid>
+                                                            <Typography variant="h5" gutterBottom>Class registration no: {i?.student?.class_registration_no}</Typography>
+                                                            <Typography variant="h5" gutterBottom>Class Roll no: {i?.student?.class_roll_no}</Typography>
+                                                            <Typography variant="h5" gutterBottom>Gender: {i?.student?.student_info?.gender}</Typography>
+                                                            <Typography variant="h5" gutterBottom>Date of birth: {dayjs(i?.student?.student_info?.date_of_birth).format('YYYY-MM-DD')}</Typography>
+                                                        </Grid>
+                                                    </Grid>
+
+                                                </Grid>
+
+                                            </Grid>
+
+                                            <Grid sx={{
+                                                height: 'auto',
+                                            }}>
+                                                <Table>
+                                                    <thead>
+                                                        <tr>
+                                                            <td colSpan={3} style={gradeTableStyle}>Grading Scale</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={gradeTableStyle}>Grade</td>
+                                                            <td style={gradeTableStyle}>Marks</td>
+                                                            <td style={gradeTableStyle}>Point</td>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {
+                                                            grade?.map(i => <tr>
+                                                                <td style={gradeTableStyle}>{i?.lower_mark} - {i?.upper_mark}</td>
+                                                                <td style={gradeTableStyle}>{i?.grade}</td>
+                                                                <td style={gradeTableStyle}>{i?.point}</td>
+                                                            </tr>)
+                                                        }
+
+
+                                                    </tbody>
+                                                </Table>
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Grid item sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            height: 'auto'
+                                        }}>
+                                            <Table sx={{
+                                                width: '97.5%',
+                                                p: 2
+                                            }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={tableStyle}>Subject</th>
+                                                        <th style={tableStyle}>Subject Obtain Marks</th>
+                                                        <th style={tableStyle}>Subject Total Marks</th>
+                                                        <th style={tableStyle}>Grade </th>
+                                                        <th style={tableStyle}>point</th>
+                                                        <th style={tableStyle}>Remark </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style={{
+                                                    overflowX: 'auto',
+                                                    overflowY: 'auto'
+                                                }}>
+                                                    {
+                                                        subjectList?.map(j => {
+                                                            const found = i?.result_details?.find(a => a?.exam_details?.subject?.id == j.id)
+
+
+
+                                                            if (found) {
+                                                                return <tr>
+                                                                    <td style={tableStyle}>{found?.exam_details?.subject?.name}</td>
+                                                                    <td style={tableStyle}>{found?.mark_obtained}</td>
+                                                                    <td style={tableStyle}>{found?.exam_details?.subject_total}</td>
+                                                                    <td style={tableStyle}>{found?.grade?.grade}</td>
+                                                                    <td style={tableStyle}>{found?.grade?.point}</td>
+                                                                    <td style={tableStyle}>{found?.remark}</td>
+                                                                </tr>
+                                                            }
+                                                            else {
+                                                                return <tr>
+                                                                    <td style={tableStyle}>not inserted</td>
+                                                                    <td style={tableStyle}>not inserted</td>
+                                                                    <td style={tableStyle}>{j?.subject_total}</td>
+                                                                    <td style={tableStyle}>not inserted</td>
+                                                                    <td style={tableStyle}>not inserted</td>
+                                                                    <td style={tableStyle}></td>
+                                                                </tr>
+                                                            }
+                                                        })
+                                                    }
+
+                                                </tbody>
+                                            </Table>
+                                        </Grid>
+
+                                        <Grid sx={{
+                                            p: 1,
+
+                                        }}>
+                                            <Table sx={{
+                                                width: '40vh',
+                                                paddingLeft: 5
+                                            }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={tableStyle}>GPA</th>
+                                                        <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.calculated_point : 'not inserted'}</th>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <th style={tableStyle}>Grand Total marks</th>
+                                                        <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.total_marks_obtained : 'not inserted'}</th>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <th style={tableStyle}>Result</th>
+                                                        <th style={tableStyle}>{subjectListLength === resultDetailsLength ? i?.calculated_grade : 'not inserted'}</th>
+
+                                                    </tr>
+                                                </thead>
+
+                                            </Table>
+                                        </Grid>
+
+                                        <Grid container sx={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                                        }}>
+                                            <Grid sx={{
+                                                px: 2
+                                            }}>
+                                                <Table>
+                                                    <thead>
+                                                        <tr>
+                                                            <td colSpan={2} style={{ ...tableStyle, fontWeight: 'bold' }}>Attendence</td>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style={{ ...tableStyle, fontWeight: 'bold' }}>No. of working days</td>
+                                                            <td style={tableStyle}>0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ ...tableStyle, fontWeight: 'bold' }}>No. of days attended</td>
+                                                            <td style={tableStyle}>0</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ ...tableStyle, fontWeight: 'bold' }}>Attended percentage</td>
+                                                            <td style={tableStyle}>0.00%</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </Table>
+                                            </Grid>
+
+                                        </Grid>
                                     </Grid>
-
-                                    <Grid sx={{
-                                        px: 2
-                                    }}>
-                                        <Table>
-                                            <thead>
-                                                <tr>
-                                                    <td colSpan={3} style={{ ...gradeTableStyle, fontWeight: 'bold' }}>Grading Scale</td>
-
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ ...gradeTableStyle, fontWeight: 'bold' }}>Grade</td>
-                                                    <td style={{ ...gradeTableStyle, fontWeight: 'bold' }}>Min percentage</td>
-                                                    <td style={{ ...gradeTableStyle, fontWeight: 'bold' }}>Max percentage</td>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>A+</td>
-                                                    <td style={gradeTableStyle}>80%</td>
-                                                    <td style={gradeTableStyle}>100%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>A</td>
-                                                    <td style={gradeTableStyle}>70%</td>
-                                                    <td style={gradeTableStyle}>79%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>A-</td>
-                                                    <td style={gradeTableStyle}>60%</td>
-                                                    <td style={gradeTableStyle}>69%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>B</td>
-                                                    <td style={gradeTableStyle}>50%</td>
-                                                    <td style={gradeTableStyle}>59%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>C</td>
-                                                    <td style={gradeTableStyle}>40%</td>
-                                                    <td style={gradeTableStyle}>49%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>D</td>
-                                                    <td style={gradeTableStyle}>33%</td>
-                                                    <td style={gradeTableStyle}>39%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={gradeTableStyle}>F</td>
-                                                    <td style={gradeTableStyle}>0%</td>
-                                                    <td style={gradeTableStyle}>32%</td>
-                                                </tr>
-
-                                            </tbody>
-                                        </Table>
-                                    </Grid>
-
                                 </Grid>
-                            </Grid>
+                            </>)
                         }
 
                         )
                     }
+
+
                 </Grid>
 
 

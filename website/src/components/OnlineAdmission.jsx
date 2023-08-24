@@ -13,7 +13,7 @@ import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { useTranslation } from 'react-i18next';
 
-const OnlineAdmission = ({ classes, academicYears, serverHost }) => {
+const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
     console.log("classes,academicYears__", classes, academicYears);
     const router = useRouter();
     const { t } = useTranslation();
@@ -96,6 +96,7 @@ const OnlineAdmission = ({ classes, academicYears, serverHost }) => {
                             <RegistrationThirdPart
                                 totalFormData={totalFormData}
                                 setTotalFormData={setTotalFormData}
+                                school_id={school_id}
                                 setActiveStep={setActiveStep}
                                 handleCreateClassClose={handleCreateClassClose}
                                 setUsersFlag={setClassesFlag}

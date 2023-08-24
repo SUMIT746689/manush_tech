@@ -369,6 +369,7 @@ function RegistrationFirstPart({
                           }
                         }}
                         fullWidth
+                        // @ts-ignore
                         helperText={touched.phone && errors.phone}
                         error={Boolean(touched.phone && errors.phone)}
                         label={t('Phone')}
@@ -376,7 +377,7 @@ function RegistrationFirstPart({
                         onBlur={handleBlur}
                         onChange={handleChange}
                         type="text"
-                        // required
+                        required
                         value={values.phone}
                         variant="outlined"
                       />

@@ -29,8 +29,8 @@ export default async function Admission() {
     const academicYear = await prisma.academicYear.findMany({
         where: { school: { domain: domain } }
     });
-
-    console.log(classes,academicYear);
+  
+    console.log(classes, academicYear);
     return (
         <div>
             <OnlineAdmission

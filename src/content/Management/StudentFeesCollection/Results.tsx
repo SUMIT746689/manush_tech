@@ -374,7 +374,7 @@ const Results = ({
             isOptionEqualToValue={(option: any, value: any) =>
               option.id === value.id
             }
-            getOptionLabel={(option) => option.class_roll_no}
+            getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
             // @ts-ignore
             handleChange={(e: any, value: any) => { setSelectedStudent(value) }}
           />

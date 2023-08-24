@@ -281,6 +281,7 @@ function RegistrationSecondPart({
                             }}
                             fullWidth
                             error={Boolean(touched.class_id && errors.class_id)}
+                            // @ts-ignore
                             helperText={touched.class_id && errors.class_id}
                             onBlur={handleBlur}
                             label={t('Select class')}
@@ -376,6 +377,7 @@ function RegistrationSecondPart({
                         }}
                         error={Boolean(touched.roll_no && errors.roll_no)}
                         fullWidth
+                        // @ts-ignore
                         helperText={touched.roll_no && errors.roll_no}
                         label={t('Roll number')}
                         name="roll_no"

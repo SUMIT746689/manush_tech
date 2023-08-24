@@ -1,5 +1,5 @@
 import { get } from "controllers/teachers/get";
-import { post } from "controllers/teachers/post";
+import post from "controllers/teachers/post";
 import { patch } from "controllers/teachers/patch";
 export const config = {
   api: {
@@ -32,4 +32,4 @@ const index = async (req, res) => {
 
 }
 
-export default index
+export default (index) 

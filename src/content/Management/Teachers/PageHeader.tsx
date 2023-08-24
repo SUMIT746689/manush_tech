@@ -985,6 +985,7 @@ function PageHeader({
                       <BoxUploadWrapper>
                         <TextField
                           type="file"
+                          accessKey='application/pdf'
                           error={Boolean(touched.resume && errors.resume)}
                           fullWidth
                           helperText={touched.resume && errors.resume}
@@ -1012,7 +1013,7 @@ function PageHeader({
                           >
                             <a
                               style={{ width: '50px' }}
-                              href={`/files/${editSchool.resume}`}
+                              href={`/api/get_file/${editSchool.resume}`}
                             >
                               {editSchool.resume}
                             </a>
@@ -1088,7 +1089,7 @@ function PageHeader({
                           >
                             <img
                               style={{ width: '50px' }}
-                              src={`/images/${editSchool.photo}`}
+                              src={`/api/get_file/${editSchool.photo}`}
                             />
                           </Grid>
                         </>

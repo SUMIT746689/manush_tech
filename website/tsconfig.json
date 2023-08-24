@@ -5,6 +5,11 @@
       "dom.iterable",
       "esnext"
     ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/public/*": ["./public/*"],
+        "react": [ "./node_modules/@types/react" ],
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,

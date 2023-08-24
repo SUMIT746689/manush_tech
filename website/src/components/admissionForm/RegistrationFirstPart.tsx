@@ -122,6 +122,7 @@ function RegistrationFirstPart({
                         }}
                         error={Boolean(touched.first_name && errors.first_name)}
                         fullWidth
+                        // @ts-ignore
                         helperText={touched.first_name && errors.first_name}
                         label={t('First name')}
                         name="first_name"
@@ -188,6 +189,7 @@ function RegistrationFirstPart({
                           touched.admission_no && errors.admission_no
                         )}
                         fullWidth
+                        // @ts-ignore
                         helperText={touched.admission_no && errors.admission_no}
                         label={t('Admission no')}
                         name="admission_no"
@@ -366,9 +368,9 @@ function RegistrationFirstPart({
                             borderRadius: '3px'
                           }
                         }}
-                        error={Boolean(touched.phone && errors.phone)}
                         fullWidth
                         helperText={touched.phone && errors.phone}
+                        error={Boolean(touched.phone && errors.phone)}
                         label={t('Phone')}
                         name="phone"
                         onBlur={handleBlur}

@@ -363,7 +363,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                                 alt="profile photo"
                                 width={20}
                                 height={20}
-                                src={`/files/${project.photo}`}
+                                src={`/api/get_file/${project?.photo?.replace(/\\/g, '/')}`}
                               />
                             ) : (
                               <Image

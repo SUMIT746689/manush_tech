@@ -62,8 +62,6 @@ function PageHeader({
   const { showNotification } = useNotistick();
   const theme = useTheme();
 
-
-
   useEffect(() => {
     if (editSchool) {
       console.log("editSchool__", editSchool);
@@ -1013,7 +1011,8 @@ function PageHeader({
                           >
                             <a
                               style={{ width: '50px' }}
-                              href={`/api/get_file/${editSchool.resume}`}
+                              href={`/api/get_file/${editSchool?.resume?.replace(/\\/g, '/')}`}
+                              target='_blank'
                             >
                               {editSchool.resume}
                             </a>
@@ -1089,7 +1088,7 @@ function PageHeader({
                           >
                             <img
                               style={{ width: '50px' }}
-                              src={`/api/get_file/${editSchool.photo}`}
+                              src={`/api/get_file/${editSchool?.photo?.replace(/\\/g, '/')}`}
                             />
                           </Grid>
                         </>

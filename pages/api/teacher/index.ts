@@ -1,6 +1,6 @@
 import { get } from "controllers/teachers/get";
 import post from "controllers/teachers/post";
-import { patch } from "controllers/teachers/patch";
+import patch from "controllers/teachers/patch";
 export const config = {
   api: {
     bodyParser: false,

@@ -1,23 +1,13 @@
-import { fileUpload, imageFolder, saveImage, validateField } from '@/utils/upload';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
+import { fileUpload } from '@/utils/upload';
 import bcrypt from 'bcrypt';
-import formidable from 'formidable';
 import fs from 'fs';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
-
-export const config = {
-  api: {
-    bodyParser: false
-  }
-};
 
 const patch = async (req, res) => {
   try {
-    const { teacher_id } = req.query;
+    const { teacher_id} = req.query;
 
     if (!teacher_id) throw new Error('Teacher ID must be provided');
 
@@ -35,6 +25,7 @@ const patch = async (req, res) => {
     if (error) throw new Error('Error')
 
     const { resume, photo } = files;
+console.log(files);
 
     const {
       username,
@@ -81,27 +72,20 @@ const patch = async (req, res) => {
 
     }
     if (resume) {
-      query['resume'] = {
-        resume: path.join(uploadFolderName, resume?.newFilename),
-      }
+      // deleteFiles(path.join(process.cwd(), `${process.env.FILESFOLDER}`, prev_resume))
+      query['resume'] =  path.join(uploadFolderName, resume?.newFilename)
+      
     }
     if (photo) {
-      temp['user_photo'] = {
-        user_photo: path.join(uploadFolderName, photo?.newFilename)
-      }
-      query['photo'] = {
-        photo: path.join(uploadFolderName, photo?.newFilename),
-      }
+      // deleteFiles(path.join(process.cwd(), `${process.env.FILESFOLDER}`, prev_photo))
+      temp['user_photo'] = path.join(uploadFolderName, photo?.newFilename)
+      
+      query['photo'] =  path.join(uploadFolderName, photo?.newFilename)
+      
     }
     query['user'] = {
       update: temp
     }
-    query['user'] = {
-      update: {
-        username: username,
-        password: encrypePassword
-      }
-    };
 
     try {
       const teacher = await prisma.teacher.update({
@@ -126,6 +110,8 @@ const patch = async (req, res) => {
       });
       return res.status(200).json({ teacher: teacher, success: true });
     } catch (err) {
+      console.log(err);
+      
       if (resume) deleteFiles(resume.filepath);
       if (photo) deleteFiles(photo.filepath);
       res.status(404).json({ error: err.message });

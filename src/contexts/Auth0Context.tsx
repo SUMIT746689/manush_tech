@@ -117,6 +117,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             type: 'INITIALIZE',
             payload: {
               isAuthenticated,
+              // @ts-ignore
               user: {
                 id: user.sub,
                 jobtitle: 'Lead Developer',
@@ -169,6 +170,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
       dispatch({
         type: 'LOGIN',
         payload: {
+          // @ts-ignore
           user: {
             id: user.sub,
             jobtitle: 'Lead Developer',

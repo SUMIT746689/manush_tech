@@ -10,9 +10,9 @@ export interface School {
 }
 export interface User {
   id: string;
+  name: string;
   avatar: string;
   email: string;
-  name: string;
   jobtitle: string;
   username: string;
   location: string;
@@ -23,5 +23,5 @@ export interface User {
   description: string;
   [key: string]: any;
   permissions?: [object];
-  school: School;
+  school?: School;
 }

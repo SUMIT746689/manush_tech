@@ -694,6 +694,7 @@ function HeaderNotifications() {
                   {t('Total sales performance for last week')}
                 </Typography>
               </Box>
+              {/* @ts-ignore */}
               <Chart
                 options={chartOptions}
                 series={chartData}

@@ -22,23 +22,25 @@ const ActivePackage = () => {
       </DialogTitle>
       <Grid display={'grid'} padding={3} borderTop={1} gap={1} sx={{borderColor:'lightGray'}}>
         <Typography noWrap variant="h5">
+          {/* @ts-ignore */}
           Name: {user?.school?.subscription[0]?.package?.title}
         </Typography>
         <Typography noWrap variant="h5">
-          Start Date: {user?.school?.subscription[0]?.start_date &&
-            dayjs(user?.school?.subscription[0]?.start_date).format('DD-MM-YYYY')}
+           {/* @ts-ignore */}
+          Start Date: {user?.school?.subscription[0]?.start_date && dayjs(user?.school?.subscription[0]?.start_date).format('DD-MM-YYYY')}
         </Typography>
         <Typography
           noWrap
           variant="h5"
           color={
+            // @ts-ignore
             user?.school?.subscription[0]?.end_date + 86400000 < new Date().getTime()
               ? 'red'
               : 'primary'
           }
         >
-          End Date: {user?.school?.subscription[0]?.end_date &&
-            dayjs(user?.school?.subscription[0]?.end_date).format('DD-MM-YYYY')}
+           {/* @ts-ignore */}
+          End Date: {user?.school?.subscription[0]?.end_date && dayjs(user?.school?.subscription[0]?.end_date).format('DD-MM-YYYY')}
         </Typography>
       </Grid>
     </Card>

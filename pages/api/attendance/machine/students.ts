@@ -105,18 +105,18 @@ const index = async (req, res) => {
 
                 //     }
                 // }
+                throw new Error('hey bro !!')
+                console.log("req.body___", req.body, typeof (req.body));
 
-                console.log("req.body___", req.body, typeof(req.body));
-
-                fs.appendFile('mynewfile.txt',(req.body),(err)=>{
-                    if(err) {
+                fs.appendFile('mynewfile.txt', (req.body), (err) => {
+                    if (err) {
                         console.log(err);
-                    }else{
+                    } else {
                         console.log('file written !');
                     }
                 });
 
-                res.status(200).json(req.body)
+                res.status(200).json({ message: 'ok' })
 
                 break;
             default:

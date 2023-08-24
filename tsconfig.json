@@ -3,7 +3,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/public/*": ["./public/*"]
+      "@/public/*": ["./public/*"],
+        "react": [ "./node_modules/@types/react" ],
     },
     "allowJs": true,
     "allowSyntheticDefaultImports": true,

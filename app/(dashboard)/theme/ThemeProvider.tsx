@@ -21,8 +21,11 @@ const ThemeProviderWrapper: FC = (props) => {
   };
 
   return (
+    // @ts-ignore
     <StylesProvider injectFirst>
+      {/*  @ts-ignore */}
       <ThemeContext.Provider value={setThemeName}>
+       {/* @ts-ignore */}
         <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
       </ThemeContext.Provider>
     </StylesProvider>

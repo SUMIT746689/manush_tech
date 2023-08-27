@@ -35,7 +35,7 @@ async function getData() {
 }
 async function page() {
   const data = await getData();
-  // console.log("data__", data);
+   console.log("data__", data);
 
   return (
     <div className=' container mx-auto'>
@@ -51,7 +51,7 @@ async function page() {
                 width={500}
                 quality={100}
                 className="w-full object-cover h-full"
-                src={i.photo ? `${process.env.SERVER_HOST}/files/${i?.photo}` : '/dummy.jpg'}
+                src={i.photo ? `${process.env.SERVER_HOST}/api/get_file/${i?.photo?.replace(/\\/g, '/')}` : '/dummy.jpg'}
                 loading="lazy"
                 alt={""}
               />

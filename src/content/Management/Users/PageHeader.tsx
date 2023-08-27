@@ -314,12 +314,16 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
                   <Grid item xs={12}>
                     <Grid container gap={2}>
-                      <Image src={user_photo ? user_photo : `/api/get_file/${editUser?.user_photo?.replace(/\\/g, '/')}`}
-                        height={150}
-                        width={150}
-                        alt='User photo'
-                        loading='lazy'
-                      />
+
+                      {
+                        (user_photo || editUser?.user_photo) && <Image src={user_photo ? user_photo : `/api/get_file/${editUser?.user_photo?.replace(/\\/g, '/')}`}
+                          height={150}
+                          width={150}
+                          alt='User photo'
+                          loading='lazy'
+                        />
+                      }
+
 
 
                       <FileUploadFieldWrapper

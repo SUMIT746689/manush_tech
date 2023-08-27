@@ -18,6 +18,7 @@ yarn-error.log*
 /.next
 .vscode
 AllFiles
+mynewfile.txt
 /public/images
 /public/files
 /public/certificate_templates

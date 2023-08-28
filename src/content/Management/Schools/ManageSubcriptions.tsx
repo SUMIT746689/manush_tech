@@ -21,10 +21,13 @@ import axios from 'axios';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import useNotistick from '@/hooks/useNotistick';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 function ManageSubcriptions({ open, setOpen, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
-  const { showNotification} = useNotistick();
+  const { showNotification } = useNotistick();
   const theme = useTheme();
   const { data: packages } = useClientFetch('/api/packages');
 
@@ -38,7 +41,7 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
   };
 
   const handleCreateProjectError = (message) => {
-    showNotification(message,'error');
+    showNotification(message, 'error');
     setOpen(false);
   };
 
@@ -137,78 +140,29 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                 }}
               >
                 <Grid container spacing={0}>
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('School Name')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      disabled
-                      error={Boolean(touched.name && errors.name)}
-                      fullWidth
-                      helperText={touched.name && errors.name}
-                      name="name"
-                      placeholder={t('School name here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.name}
-                      variant="outlined"
-                    />
-                  </Grid>
+
+                  <TextFieldWrapper
+                    errors={errors.name}
+                    touched={touched.name}
+                    name="name"
+                    label={t('School')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.name}
+                  />
 
                   <Grid
+                    // sx={{
+                    //   mb: `${theme.spacing(3)}`
+                    // }}
+                    display={"grid"}
+                    gap={2}
                     item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select Package')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
+                    width={"100%"}
                   >
                     <Autocomplete
                       disablePortal
+                      size='small'
                       value={
                         packages?.data?.find(
                           (pkg: any) => pkg.id === values.package_id
@@ -228,6 +182,11 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                       renderInput={(params) => (
                         <TextField
                           {...params}
+                          sx={{
+                            [`& fieldset`]: {
+                              borderRadius: 0.6,
+                            }
+                          }}
                           fullWidth
                           error={Boolean(
                             touched?.package_id && errors?.package_id
@@ -239,53 +198,21 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                       )}
                       // @ts-ignore
                       onChange={(e, value: any) => {
-                        console.log({ value });
                         setFieldValue('package_id', value?.id || 0);
                       }}
                     />
                   </Grid>
-
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    textAlign={{ sm: 'right' }}
-                  />
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <Button
-                      sx={{
-                        mr: 2
-                      }}
-                      type="submit"
-                      startIcon={
-                        isSubmitting ? <CircularProgress size="1rem" /> : null
-                      }
-                      disabled={Boolean(errors.submit) || isSubmitting}
-                      variant="contained"
-                      size="large"
-                    >
-                      {t('Add Subcription')}
-                    </Button>
-                    <Button
-                      color="secondary"
-                      size="large"
-                      variant="outlined"
-                      onClick={handleCreateProjectClose}
-                    >
-                      {t('Cancel')}
-                    </Button>
-                  </Grid>
                 </Grid>
               </DialogContent>
+
+              <DialogActionWrapper
+                handleCreateClassClose={handleCreateProjectClose}
+                errors={errors}
+                editData={undefined}
+                title="Subscription"
+                titleFront="Add "
+                isSubmitting={isSubmitting}
+              />
             </form>
           )}
         </Formik>

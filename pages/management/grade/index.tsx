@@ -25,7 +25,7 @@ function Managementrooms() {
   return (
     <>
       <Head>
-        <title>Gradeing system - Management</title>
+        <title>Grading system - Management</title>
       </Head>
       <PageTitleWrapper>
         <PageHeader

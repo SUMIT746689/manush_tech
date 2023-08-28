@@ -206,12 +206,10 @@ const Results: FC<ResultsProps> = ({
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
-
+  
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/school/${deleteSchoolId}`);
-      console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The schools has been deleted successfully')
@@ -226,16 +224,19 @@ const Results: FC<ResultsProps> = ({
       <Card
         sx={{
           p: 1,
-          mb: 3
+          mb: 2
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
                 sx={{
-                  m: 0
+                  m: 0,
+                  borderRadius:0.6,
                 }}
+                size='small'
+
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

@@ -17,6 +17,7 @@ function Managementschools() {
   const [editSchool, setEditSchool] = useState(null);
   const { data: schools, reFetchData, error } = useClientFetch('/api/school');
   const [openSubscriptionModal, setOpenopenSubscriptionModal] = useState(false);
+  
   return (
     <>
       <Head>

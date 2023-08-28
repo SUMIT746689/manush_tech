@@ -18,6 +18,10 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 function PageHeader({
   editSubject,
@@ -79,33 +83,14 @@ function PageHeader({
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Subject Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the app users can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t(editSubject ? 'Edit Subject' : 'Create Subject')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        handleCreateClassOpen={handleCreateClassOpen}
+        name="Subject"
+      />
+
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -156,65 +141,37 @@ function PageHeader({
                     p: 3
                   }}
                 >
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.name && errors.name)}
-                        fullWidth
-                        helperText={touched.name && errors.name}
-                        label={t('Subject name')}
-                        name="name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.name}
-                        variant="outlined"
-                      />
-                    </Grid>
+                  <Grid container spacing={1}>
 
-                    <Grid item xs={12}>
-                      <Autocomplete
-                        disablePortal
-                        value={
-                          classList.find(
-                            (cls) => cls.value === values.class_id
-                          ) || null
-                        }
-                        options={classList}
-                        renderInput={(params) => (
-                          <TextField
-                            fullWidth
-                            {...params}
-                            label={t('Select class')}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(event, value) =>
-                          setFieldValue('class_id', value?.value || null)
-                        }
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      errors={errors.name}
+                      touched={touched.name}
+                      label={t('Subject name')}
+                      name="name"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.name}
+                    />
+
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      value={classList.find((cls) => cls.value === values.class_id) || null}
+                      options={classList}
+                      label="Class"
+                      placeholder={"select class..."}
+                      // @ts-ignore
+                      handleChange={(event, value) => setFieldValue('class_id', value?.value || null)}
+                    />
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    // @ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(editSubject ? 'Edit Subject' : 'Add New Subject')}
-                  </Button>
-                </DialogActions>
+                <DialogActionWrapper
+                  title={"Subject"}
+                  editData={editSubject}
+                  errors={errors}
+                  handleCreateClassClose={handleCreateClassClose}
+                  isSubmitting={isSubmitting}
+
+                />
               </form>
             );
           }}

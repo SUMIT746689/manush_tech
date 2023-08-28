@@ -2,24 +2,14 @@ import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
-
-import {
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  Zoom,
-  Typography,
-  TextField,
-  CircularProgress,
-  Autocomplete,
-  Button
-} from '@mui/material';
+import { Grid, Dialog, DialogTitle, DialogActions, DialogContent, Typography, TextField, CircularProgress, Autocomplete, Button } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
-import { useSnackbar } from 'notistack';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 
 function PageHeader({ editSection: editGroup, setEditSection, reFetchData }) {
@@ -67,34 +57,14 @@ function PageHeader({ editSection: editGroup, setEditSection, reFetchData }) {
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Group Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the Group can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t(editGroup ? 'Edit Group' : 'Create Group')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name="Group"
+        handleCreateClassOpen={handleCreateClassOpen}
+      />
 
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -185,84 +155,61 @@ function PageHeader({ editSection: editGroup, setEditSection, reFetchData }) {
                     p: 3
                   }}
                 >
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} lg={7}>
-                      <Grid container spacing={3}>
 
-                        {/* group title */}
-                        <Grid item xs={12}>
-                          <TextField
-                            error={Boolean(
-                              touched.title && errors.title
-                            )}
-                            fullWidth
-                            helperText={
-                              touched.title && errors.title
-                            }
-                            label={t('Group name')}
-                            name="title"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.title}
-                            variant="outlined"
-                          />
-                        </Grid>
-                        {/* select Class */}
-                        <Grid item xs={12} md={6}>
-                          <Autocomplete
-                            disableClearable
-                            disablePortal
-                            value={
-                              classes.find(cls => cls.value === values.class_id) || null
-                            }
-                            options={classes}
-                            renderInput={(params) => (
-                              <TextField
-                                error={Boolean(
-                                  touched?.class_id && errors?.class_id
-                                )}
-                                fullWidth
-                                helperText={touched?.class_id && errors?.class_id}
-                                name="class_id"
-                                {...params}
-                                label={t('Select Class')}
+                  <Grid item >
 
-                              />
-                            )}
-                            // @ts-ignore
-                            onChange={(event, value) => {
-                              if (value) {
-                                setFieldValue('class_id', value?.value)
-                              }
-                            }}
-                          />
-                        </Grid>
+                    {/* group title */}
+                    <TextFieldWrapper
+                      errors={errors.title}
+                      touched={touched.title}
+                      label={t('Group Title')}
+                      name="title"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.title}
+                    />
+                    <Grid p={0.5}></Grid>
+                    {/* select Class */}
+                    <AutoCompleteWrapper
+                      label="Class"
+                      placeholder="select class name..."
+                      minWidth="100%"
+                      disableClearable
+                      disablePortal
+                      value={classes.find(cls => cls.value === values.class_id) || null}
+                      options={classes}
+                      renderInput={(params) => (
+                        <TextField
+                          error={Boolean(
+                            touched?.class_id && errors?.class_id
+                          )}
+                          fullWidth
+                          helperText={touched?.class_id && errors?.class_id}
+                          name="class_id"
+                          {...params}
+                          label={t('Select Class')}
 
-                      </Grid>
-                    </Grid>
+                        />
+                      )}
+                      // @ts-ignore
+                      handleChange={(event, value) => {
+                        if (value) {
+                          setFieldValue('class_id', value?.value)
+                        }
+                      }}
+                    />
+
                   </Grid>
+
                 </DialogContent>
 
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    // @ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(editGroup ? 'Edit Group' : 'Add new Group')}
-                  </Button>
-                </DialogActions>
+                <DialogActionWrapper
+                  title="Group"
+                  handleCreateClassClose={handleCreateClassClose}
+                  editData={editGroup}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                />
               </form>
             );
           }}

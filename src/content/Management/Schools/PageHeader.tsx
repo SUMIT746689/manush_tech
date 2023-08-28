@@ -4,28 +4,22 @@ import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import 'react-quill/dist/quill.snow.css';
 
-import {
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-  Typography,
-  TextField,
-  CircularProgress,
-  Autocomplete,
-  Button,
-  useTheme
-} from '@mui/material';
-import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
+import { Grid, Dialog, DialogTitle, DialogContent, Typography, TextField, CircularProgress, Autocomplete, useTheme } from '@mui/material';
 import axios from 'axios';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { currency_list } from '@/static_data/currency_list';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import Image from 'next/image';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [logo, setLogo] = useState(null)
+
   const theme = useTheme();
   const { showNotification } = useNotistick();
   const handleCreateProjectOpen = () => {
@@ -33,14 +27,13 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
   };
 
   const handleCreateProjectClose = () => {
+    setLogo(null);
     setEditSchool(null);
     setOpen(false);
   };
 
   useEffect(() => {
     if (editSchool) {
-      console.log("editSchool__", editSchool);
-
       handleCreateProjectOpen();
     }
   }, [editSchool]);
@@ -85,31 +78,13 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
   };
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Schools')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t('These are your active schools')}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateProjectOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create new schools')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name="School"
+        handleCreateClassOpen={handleCreateProjectOpen}
+      />
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="sm"
         open={open}
         onClose={handleCreateProjectClose}
       >
@@ -136,6 +111,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
+            logo: editSchool?.logo || '',
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -187,198 +163,54 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                 }}
               >
                 <Grid container spacing={0}>
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('School Name')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      error={Boolean(touched.name && errors.name)}
-                      fullWidth
-                      helperText={touched.name && errors.name}
-                      name="name"
-                      placeholder={t('School name here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.name}
-                      variant="outlined"
-                    />
-                  </Grid>
+
+                  <TextFieldWrapper
+                    errors={errors.name}
+                    touched={touched.name}
+                    label="School Name"
+                    name="name"
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.name}
+                  />
+
+                  <TextFieldWrapper
+                    errors={errors.phone}
+                    touched={touched.phone}
+                    name="phone"
+                    label={t('Phone Number')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.phone}
+                  />
+
+                  <TextFieldWrapper
+                    errors={errors.email}
+                    touched={touched.email}
+                    name="email"
+                    label={t('Email')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.email}
+                  />
+
+                  <TextFieldWrapper
+                    errors={errors.address}
+                    touched={touched.address}
+                    name="address"
+                    label={t('School Eddress')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.address}
+                  />
 
                   <Grid
                     item
-                    xs={12}
-                    sm={4}
-                    md={3}
+                    width={'100%'}
                     justifyContent="flex-end"
                     textAlign={{ sm: 'right' }}
                   >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Phone Number')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      error={Boolean(touched.phone && errors.phone)}
-                      fullWidth
-                      helperText={touched.phone && errors.phone}
-                      name="phone"
-                      placeholder={t('Phone number here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.phone}
-                      variant="outlined"
-                    />
-                  </Grid>
 
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Email')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      error={Boolean(touched.email && errors.email)}
-                      fullWidth
-                      helperText={touched.email && errors.email}
-                      name="email"
-                      placeholder={t('School email here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.email}
-                      variant="outlined"
-                    />
-                  </Grid>
-
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Address')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      error={Boolean(touched.address && errors.address)}
-                      fullWidth
-                      helperText={touched.address && errors.address}
-                      name="address"
-                      placeholder={t('School Eddress here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.address}
-                      variant="outlined"
-                    />
-                  </Grid>
-
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select Admin')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
                     {/* <AdminSelect
                       setFieldValue={setFieldValue}
                       oldSelectedAdminID={values.admin_id}
@@ -391,33 +223,13 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
 
                   <Grid
                     item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select Currency')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
+                    width="100%"
+                    my={1}
                   >
                     <Autocomplete
+                      size='small'
+                      id="tags-outlined"
+
                       disablePortal
                       value={
                         currency_list.find(
@@ -433,6 +245,11 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                       }
                       renderInput={(params) => (
                         <TextField
+                          sx={{
+                            [`& fieldset`]: {
+                              borderRadius: 0.6,
+                            }
+                          }}
                           {...params}
                           fullWidth
                           error={Boolean(touched?.currency && errors?.currency)}
@@ -449,87 +266,54 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                   </Grid>
 
 
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('School Domain')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(1)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <TextField
-                      error={Boolean(touched.domain && errors.domain)}
-                      fullWidth
-                      helperText={touched.domain && errors.domain}
-                      name="domain"
-                      placeholder={t('School domain here...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.domain}
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    textAlign={{ sm: 'right' }}
+                  <TextFieldWrapper
+                    errors={errors.domain}
+                    touched={touched.domain}
+                    name="domain"
+                    label={t('School domain ')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.domain}
                   />
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                  >
-                    <Button
-                      sx={{
-                        mr: 2
-                      }}
-                      type="submit"
-                      startIcon={
-                        isSubmitting ? <CircularProgress size="1rem" /> : null
+
+
+                  <FileUploadFieldWrapper
+                    htmlFor="Logo"
+                    label="Logo"
+                    name="logo"
+                    value={values?.logo?.name || values?.logo || ''}
+                    handleChangeFile={(e) => {
+                      if (e.target.files?.length) {
+                        const photoUrl = URL.createObjectURL(e.target.files[0]);
+                        setLogo(photoUrl)
+                        setFieldValue('logo', e.target.files[0])
                       }
-                      disabled={Boolean(errors.submit) || isSubmitting}
-                      variant="contained"
-                      size="large"
-                    >
-                      {t(editSchool ? 'Edit school' : 'Create School')}
-                    </Button>
-                    <Button
-                      color="secondary"
-                      size="large"
-                      variant="outlined"
-                      onClick={handleCreateProjectClose}
-                    >
-                      {t('Cancel')}
-                    </Button>
-                  </Grid>
+                    }}
+                    handleRemoveFile={(e) => {
+                      setLogo(null)
+                      setFieldValue('logo', undefined)
+                    }}
+                  />
+
+
+                  {
+                    (logo || editSchool?.logo) &&
+                    <Image src={logo ? logo : `/api/get_file/${editSchool?.logo?.replace(/\\/g, '/')}`}
+                      height={150}
+                      width={150}
+                      alt='User photo'
+                      loading='lazy'
+                    />
+                  }
                 </Grid>
               </DialogContent>
+              <DialogActionWrapper
+                handleCreateClassClose={handleCreateProjectClose}
+                errors={errors}
+                editData={editSchool}
+                title={"School"}
+                isSubmitting={isSubmitting}
+              />
             </form>
           )}
         </Formik>
@@ -588,13 +372,23 @@ const SelectAdmin = ({ setFieldValue, oldSelectedAdminID }) => {
 
   return (
     <Autocomplete
+      size="small"
       multiple
       id="multiple-limit-tags"
       options={options}
       value={selectedOption}
       onChange={(e, v) => handleSelect(v)}
       onInputChange={(e, v) => setSearchToken(v)}
-      renderInput={(params) => <TextField {...params} label="Select admin" />}
+      renderInput={(params) => <TextField
+        sx={{
+          [`& fieldset`]: {
+            borderRadius: 0.6,
+          }
+        }}
+        {...params}
+        label="Select admin"
+      />
+      }
     />
   );
 };

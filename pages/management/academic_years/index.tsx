@@ -1,21 +1,14 @@
 import Head from 'next/head';
-
-import { useState, useEffect, useCallback } from 'react';
-
+import { useState, useEffect } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
-
 import PageHeader from 'src/content/Management/AcademicYears/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-
 import { Grid } from '@mui/material';
-// import { useRefMounted } from 'src/hooks/useRefMounted';
 import type { Project } from 'src/models/project';
-// import { schoolsApi } from 'src/mocks/schools';
 import Results from 'src/content/Management/AcademicYears/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
-import { DataSaverOnRounded } from '@mui/icons-material';
 function Managementschools() {
   // const isMountedRef = useRefMounted();
   const [datas, setDatas] = useState<Project[]>([]);

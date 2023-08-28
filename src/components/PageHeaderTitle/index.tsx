@@ -2,7 +2,7 @@ import { Button, Grid, Typography } from "@mui/material"
 import { useTranslation } from "next-i18next";
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 
-export const PageHeaderTitleWrapper = ({ name, handleCreateClassOpen }) => {
+export const PageHeaderTitleWrapper = ({ name, handleCreateClassOpen, actionButton = undefined }) => {
   const { t }: { t: any } = useTranslation();
   return (
     <Grid container justifyContent="space-between" alignItems="center">
@@ -14,16 +14,21 @@ export const PageHeaderTitleWrapper = ({ name, handleCreateClassOpen }) => {
           {t(`All aspects of ${name} can be managed from this page`)}
         </Typography>
       </Grid>
-      <Grid item >
-        <Button
-          sx={{ mt: { xs: 2, sm: 0 },borderRadius:0.6, textTransform:"capitalize"}}
-          onClick={handleCreateClassOpen}
-          variant="contained"
-          startIcon={<AddTwoToneIcon fontSize="small" />}
-        >
-          {t('Create ' + name)}
-        </Button>
-      </Grid>
+      {
+        actionButton ?
+          actionButton
+          :
+          <Grid item >
+            <Button
+              sx={{ mt: { xs: 2, sm: 0 }, borderRadius: 0.6, textTransform: "capitalize" }}
+              onClick={handleCreateClassOpen}
+              variant="contained"
+              startIcon={<AddTwoToneIcon fontSize="small" />}
+            >
+              {t('Create ' + name)}
+            </Button>
+          </Grid>
+      }
     </Grid>
   )
 }

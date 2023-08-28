@@ -21,7 +21,7 @@ function Managementrooms() {
     if (data) setGrade(data);
   }, [data, error]);
 
-  const create_grade = auth?.user?.permissions?.find((i:any) => i?.value == 'create_grade')
+  const create_grade = auth?.user?.permissions?.find((i: any) => i?.value == 'create_grade')
   return (
     <>
       <Head>
@@ -29,13 +29,10 @@ function Managementrooms() {
       </Head>
       <PageTitleWrapper>
         <PageHeader
-          contentPermission={{
-            create_grade
-          }}
+          contentPermission={{ create_grade }}
           editGrade={editGrade}
           setEditGrade={setEditGrade}
           reFetchData={reFetchData}
-
         />
       </PageTitleWrapper>
 

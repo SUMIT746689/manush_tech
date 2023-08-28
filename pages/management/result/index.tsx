@@ -93,18 +93,18 @@ function Managementschools() {
       .catch((err) => console.log(err));
   };
   useEffect(() => {
-    console.log('selectClasses__', selectClasses);
     if (selectClasses && selectClasses.has_section) {
       setSelectedSection(null);
     }
     setSelectedExam(null);
     setSelectedExamSubject(null);
   }, [selectClasses]);
+
   useEffect(() => {
     setSelectedExamSubject(null);
   }, [selectedExam]);
+
   useEffect(() => {
-    console.log('changed__', selectedSection);
     setSelectedStudent(null);
     setSelectedExam(null);
   }, [selectedSection]);
@@ -114,62 +114,51 @@ function Managementschools() {
       <Head>
         <title>Result - Management</title>
       </Head>
-      <Card sx={{ minHeight: '78vh' }}>
-        <PageTitleWrapper>
-          <PageHeader
-            classes={classes}
-            selectClasses={selectClasses}
-            setSelectClasses={setSelectClasses}
-            editExam={editExam}
-            setEditExam={setEditExam}
-            selectedSection={selectedSection}
-            setSelectedSection={setSelectedSection}
-            setStudentList={setStudentList}
-            setExams={setExams}
-            setSections={setSections}
-            sections={sections}
-            studentList={studentList}
-            exams={exams}
-            examSubjectList={examSubjectList}
-            setExamSubjectList={setExamSubjectList}
-            setSelectedExam={setSelectedExam}
-            selectedExam={selectedExam}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-            selectedExamSubject={selectedExamSubject}
-            setSelectedExamSubject={setSelectedExamSubject}
-          />
-        </PageTitleWrapper>
+      <PageTitleWrapper>
+        <PageHeader
+          classes={classes}
+          selectClasses={selectClasses}
+          setSelectClasses={setSelectClasses}
+          editExam={editExam}
+          setEditExam={setEditExam}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+          setStudentList={setStudentList}
+          setExams={setExams}
+          setSections={setSections}
+          sections={sections}
+          studentList={studentList}
+          exams={exams}
+          examSubjectList={examSubjectList}
+          setExamSubjectList={setExamSubjectList}
+          setSelectedExam={setSelectedExam}
+          selectedExam={selectedExam}
+          selectedStudent={selectedStudent}
+          setSelectedStudent={setSelectedStudent}
+          selectedExamSubject={selectedExamSubject}
+          setSelectedExamSubject={setSelectedExamSubject}
+        />
+      </PageTitleWrapper>
 
-        <Grid
-          sx={{ px: 4 }}
-          container
-          direction="row"
-          justifyContent="center"
-          alignItems="stretch"
-          spacing={3}
-        >
-          <Grid item xs={12}>
-            <Results
-              result={result ? result?.sections_result : []}
-              classes={classes}
-              selectClasses={selectClasses}
-              setSelectClasses={setSelectClasses}
-              selectedSection={selectedSection}
-              setSelectedSection={setSelectedSection}
-              setSections={setSections}
-              sections={sections}
-              exams={exams}
-              setSelectedExam={setSelectedExam}
-              selectedExam={selectedExam}
-              handleSearchResult={handleSearchResult}
-              academicYear={academicYear}
-              academicYearList={academicYearList}
-              pdf={false}
-            />
-          </Grid>
-        </Grid>
-      </Card>
+      <Grid sx={{ minHeight: "calc(100vh - 330px )" }}>
+        <Results
+          result={result ? result?.sections_result : []}
+          classes={classes}
+          selectClasses={selectClasses}
+          setSelectClasses={setSelectClasses}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+          setSections={setSections}
+          sections={sections}
+          exams={exams}
+          setSelectedExam={setSelectedExam}
+          selectedExam={selectedExam}
+          handleSearchResult={handleSearchResult}
+          academicYear={academicYear}
+          academicYearList={academicYearList}
+          pdf={false}
+        />
+      </Grid>
       <Footer />
     </>
   );

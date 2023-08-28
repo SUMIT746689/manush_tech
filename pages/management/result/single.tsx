@@ -10,8 +10,8 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
-import prisma from '@/lib/prisma_client';
-import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 
 function Managementschools() {
 
@@ -36,13 +36,9 @@ function Managementschools() {
 
     const [selectedExamPercentageOptions, setSelectedExamPercentageOptions] = useState([]);
 
-
-
     const handleInputChange = (event, index) => {
         const newOptions = [...selectedExamPercentageOptions];
         newOptions[index].percentage = event.target.value;
-        console.log("newOptions__", newOptions);
-
         setSelectedExamPercentageOptions(newOptions);
     };
 
@@ -80,8 +76,6 @@ function Managementschools() {
                 .then(res => {
                     setResult(res.data)
                     setFinalResult(null)
-                    console.log(res.data);
-
                 })
                 .catch(err => console.log(err))
         }
@@ -89,7 +83,6 @@ function Managementschools() {
 
     const handleClassSelect = (event, newValue) => {
 
-        console.log(newValue);
         setSelectedClass(newValue)
         if (newValue) {
             const targetClassSections = classes.find(i => i.id == newValue.id)
@@ -111,20 +104,15 @@ function Managementschools() {
     }
 
     const handleFinalResultGenerate = () => {
-
-
-        console.log("selectedExamPercentageOptions___", selectedExamPercentageOptions, "   ", selectedStudent);
-
         axios.get(`/api/result/${selectedStudent?.id}/final-result?section_id=${selectedSection?.id}`)
             .then(res => {
                 setResult(null)
                 setFinalResult(res.data)
-
-
             }).catch((err) => {
                 console.log(err);
             })
     }
+
     return (
 
         <>
@@ -141,194 +129,125 @@ function Managementschools() {
                         {t('These are your Results')}
                     </Typography>
                 </Grid>
-
-                <Grid sx={{ px: 4, my: 1 }}
-                    container
-                    direction="row"
-                    justifyContent="left"
-                    alignItems="stretch"
-                    spacing={4}>
-                    {/* select class */}
-
-                    <Grid
-
-                        sx={{
-                            mb: `${theme.spacing(3)}`
-                        }}
-                        item
-                        xs={12} sm={6} md={2}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                    >
-                        <Autocomplete
-                            id="tags-outlined"
-                            options={classes?.map(i => {
-                                return {
-                                    label: i.name,
-                                    id: i.id,
-                                    has_section: i.has_section
-                                }
-                            })}
-                            filterSelectedOptions
-                            renderInput={(params) => (
-                                <TextField
-                                    fullWidth
-                                    {...params}
-                                    label={t('Select class')}
-                                    placeholder="Name"
-                                />
-                            )}
-                            onChange={handleClassSelect}
-                        />
-
-                    </Grid>
-
-                    {
-                        selectedClass && sections && selectedClass.has_section && <>
-
-                            <Grid
-                                sx={{
-                                    mb: `${theme.spacing(3)}`
-                                }}
-                                item
-                                xs={12} sm={6} md={2}
-                                justifyContent="flex-end"
-                                textAlign={{ sm: 'right' }}
-                            >
-                                <Autocomplete
-                                    id="tags-outlined"
-                                    options={sections}
-                                    value={selectedSection}
-                                    filterSelectedOptions
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="select section"
-                                            placeholder="Name"
-                                        />
-                                    )}
-                                    onChange={(e, v) => {
-                                        setSelectedSection(v)
-                                        setSelectedStudent(null);
-                                        setSelectedExam(null)
-
-                                    }}
-                                />
-
-                            </Grid>
-                        </>
-                    }
-                    {
-                        selectedClass && selectedSection && exams && <>
-
-                            <Grid
-                                sx={{
-                                    mb: `${theme.spacing(3)}`
-                                }}
-                                item
-                                xs={12} sm={6} md={2}
-                                justifyContent="flex-end"
-                                textAlign={{ sm: 'right' }}
-                            >
-                                <Autocomplete
-                                    id="tags-outlined"
-                                    options={studentList}
-                                    value={selectedStudent}
-                                    filterSelectedOptions
-                                    renderInput={(params) => (
-                                        <TextField
-
-                                            {...params}
-                                            label="select student"
-                                            placeholder="Roll number"
-                                        />
-                                    )}
-                                    onChange={(e, v) => setSelectedStudent(v)}
-                                />
-
-                            </Grid>
-                        </>
-                    }
-                    {
-                        selectedClass && selectedSection && studentList && <>
-
-                            <Grid
-                                sx={{
-                                    mb: `${theme.spacing(3)}`
-                                }}
-                                item
-                                xs={12} sm={6} md={3}
-                                justifyContent="flex-end"
-                                textAlign={{ sm: 'right' }}
-                            >
-                                <Autocomplete
-                                    id="tags-outlined"
-                                    options={exams}
-                                    value={selectedExam}
-                                    filterSelectedOptions
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="select exam"
-                                            placeholder="Name"
-                                        />
-                                    )}
-                                    onChange={(e, v) => {
-                                        setSelectedExam(v)
-                                        if (!v) {
-                                            setResult(null)
-                                        }
-
-                                    }}
-                                />
-
-                            </Grid>
-                            {
-                                selectedExam && <Grid
-                                    sx={{
-                                        mb: `${theme.spacing(3)}`
-                                    }}
-                                    item
-                                    xs={12} sm={6} md={2}
-                                    justifyContent="flex-end"
-                                    textAlign={{ sm: 'right' }}
-                                >
-                                    <Button variant='contained' onClick={handleSearchResult}>Find single exam result</Button>
-
-                                </Grid>
-                            }
-
-
-
-                        </>
-                    }
-
-
-                    {
-                        selectedSection && selectedStudent && !selectedExam && <Grid
-                            sx={{
-                                mb: `${theme.spacing(3)}`
-                            }}
-                            item
-                            xs={12} sm={6} md={2}
-                            justifyContent="flex-end"
-                            textAlign={{ sm: 'right' }}
-                        >
-                            <Button variant='contained' onClick={handleFinalResultGenerate} >Generate Final result</Button>
-
-                        </Grid>
-                    }
-
-
-                </Grid>
-
-
-
-
-
-
             </PageTitleWrapper>
 
+
+            <Card sx={{ pt: 1, px: 1 }} >
+
+                {/* select class */}
+                <AutoCompleteWrapper
+                    minWidth="100%"
+                    label={t('Select class')}
+                    placeholder="select a class..."
+                    value={undefined}
+                    options={classes?.map(i => {
+                        return {
+                            label: i.name,
+                            id: i.id,
+                            has_section: i.has_section
+                        }
+                    })}
+                    filterSelectedOptions
+                    handleChange={handleClassSelect}
+                />
+
+                {/* select section */}
+                {
+                    (selectedClass && sections && selectedClass.has_section) ? <>
+
+                        <AutoCompleteWrapper
+                            label="Select Section"
+                            placeholder="select a section name..."
+                            options={sections}
+                            value={selectedSection}
+                            filterSelectedOptions
+                            handleChange={(e, v) => {
+                                setSelectedSection(v)
+                                setSelectedStudent(null);
+                                setSelectedExam(null)
+                            }}
+                        />
+
+                    </>
+                        :
+                        <EmptyAutoCompleteWrapper
+                            label="Select Section"
+                            placeholder="select a section..."
+                            options={[]}
+                            value={undefined}
+                        />
+                }
+
+                {
+                    (selectedClass && selectedSection && exams) ? <>
+
+                        <AutoCompleteWrapper
+                            label="Select Student Roll"
+                            placeholder="select a student roll..."
+                            options={studentList}
+                            value={selectedStudent}
+                            filterSelectedOptions
+                            handleChange={(e, v) => setSelectedStudent(v)}
+                        />
+                    </>
+                        :
+                        <EmptyAutoCompleteWrapper
+                            label="Select Student Roll"
+                            placeholder="select a student roll..."
+                            options={[]}
+                            value={undefined}
+                        />
+                }
+                {
+                    (selectedClass && selectedSection && studentList) ? <>
+
+                        <AutoCompleteWrapper
+                            label="Select Exam"
+                            placeholder="select a exam..."
+                            options={exams}
+                            value={selectedExam}
+                            filterSelectedOptions
+                            handleChange={(e, v) => {
+                                setSelectedExam(v)
+                                if (!v) setResult(null)
+                            }}
+                        />
+                        {
+                            selectedExam && <Grid
+                                sx={{
+                                    mb: `${theme.spacing(3)}`
+                                }}
+                                item
+                                xs={12} sm={6} md={2}
+                                justifyContent="flex-end"
+                                textAlign={{ sm: 'right' }}
+                            >
+                                <Button variant='contained' onClick={handleSearchResult}>Find single exam result</Button>
+
+                            </Grid>
+                        }
+                    </>
+                        :
+                        <EmptyAutoCompleteWrapper
+                            label="Select Exam"
+                            placeholder="select a exam..."
+                            options={[]}
+                            value={undefined}
+                        />
+                }
+
+
+                {
+                    (selectedSection && selectedStudent && !selectedExam) ?
+                        <ButtonWrapper variant='contained' handleClick={handleFinalResultGenerate} >Generate Final result</ButtonWrapper>
+                        :
+                        <DisableButtonWrapper >Generate Final result</DisableButtonWrapper>
+                }
+
+            </Card>
+
+
+            <br />
             <Card sx={{ minHeight: 'calc(100vh - 465px) !important' }}>
                 <Grid
                     sx={{ px: 4 }}

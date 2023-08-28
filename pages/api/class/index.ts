@@ -1,31 +1,17 @@
+import prisma from '@/lib/prisma_client';
 import { PrismaClient } from '@prisma/client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
-
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
   try {
     const { method } = req;
 
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
-
-    const user = await prisma.user.findFirst({
-      where: { id: refresh_token.id }
-    });
 
     switch (method) {
       case 'GET':
-
-        if (!user) {
-          return res.status(400).json({ message: 'user not found!' })
-        }
         const classes = await prisma.class.findMany({
           where: {
-            school_id: user.school_id
+            school_id: refresh_token.school_id
           },
           include: {
             sections: {
@@ -46,7 +32,7 @@ const index = async (req, res) => {
         const isExists = await prisma.class.findFirst({
           where: {
             name,
-            school_id: user.school_id
+            school_id: refresh_token.school_id
           }
         })
         if (isExists) {
@@ -56,7 +42,7 @@ const index = async (req, res) => {
           data: {
             name,
             code: req.body.code,
-            school_id: user.school_id
+            school_id: refresh_token.school_id
             // has_section: true,
           }
         });
@@ -81,4 +67,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(index);

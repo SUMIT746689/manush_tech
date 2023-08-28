@@ -211,14 +211,13 @@ model StudentInformation {
 }
 
 model Student {
-  id                      Int     @id @default(autoincrement())
+  id                      Int                @id @default(autoincrement())
   student_information_id  Int
   section_id              Int
   group_id                Int?
   academic_year_id        Int
   class_roll_no           String
-  class_registration_no   String  @unique
-  discount                Float
+  class_registration_no   String             @unique
   student_photo           String?
   guardian_name           String?
   guardian_phone          String?
@@ -226,11 +225,11 @@ model Student {
   guardian_photo          String?
   relation_with_guardian  String?
   student_present_address String?
-
-  academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
-  student_info  StudentInformation @relation(fields: [student_information_id], references: [id])
-  section       Section            @relation(fields: [section_id], references: [id])
-  group         Group?             @relation(fields: [group_id], references: [id])
+  academic_year           AcademicYear       @relation(fields: [academic_year_id], references: [id])
+  student_info            StudentInformation @relation(fields: [student_information_id], references: [id])
+  section                 Section            @relation(fields: [section_id], references: [id])
+  group                   Group?             @relation(fields: [group_id], references: [id])
+  discount                Discount[]         @relation("DiscountToStudent")
 
   fees        StudentFee[]
   attendances Attendance[]
@@ -367,6 +366,7 @@ model Fee {
   class         Class        @relation(fields: [class_id], references: [id])
   school        School       @relation(fields: [school_id], references: [id])
   student_fees  StudentFee[]
+  Discount      Discount[]
 
   @@map("fees")
 }
@@ -842,4 +842,18 @@ enum LeaveStatus {
 model OnlineAdmission {
   id      Int  @id @default(autoincrement())
   student Json
+}
+
+model Discount {
+  id      Int          @id @default(autoincrement())
+  fee_id  Int
+  type    DiscountType
+  amt     Float
+  fee     Fee          @relation(fields: [fee_id], references: [id])
+  student Student[]    @relation("DiscountToStudent")
+}
+
+enum DiscountType {
+  percent
+  flat
 }

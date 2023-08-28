@@ -1,21 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import prisma from '@/lib/prisma_client';
+import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
-
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
   try {
     const { method } = req;
 
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
-
-    const user = await prisma.user.findFirst({
-      where: { id: refresh_token.id }
-    });
     const { id } = req.query;
 
     switch (method) {
@@ -23,7 +12,7 @@ const index = async (req, res) => {
         const { with_students } = req.query;
 
         const query = {};
-        query['where'] = { id: parseInt(id), school_id: user.school_id };
+        query['where'] = { id: parseInt(id), school_id: refresh_token.school_id };
 
         if (with_students === 'true') {
           query['select'] = {
@@ -71,4 +60,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(index);

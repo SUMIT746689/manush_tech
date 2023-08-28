@@ -110,7 +110,7 @@ function PageHeader({
             _for: editData?.for || undefined,
             academic_year_id: editData?.academic_year_id || academicYear?.id || undefined,
             class_id: editData?.class_id || undefined,
-            late_fee: editData?.late_fee || undefined,
+            late_fee: editData?.late_fee || 0,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -146,7 +146,7 @@ function PageHeader({
                 handleCreateUserSuccess();
                 reFetchData();
               };
-              _values['last_date'] = new Date(_values.last_date).setHours(23,59,0,0);
+              _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
               // dayjs(_values.last_date).format('YYYY-MM-DD')
 
 
@@ -157,6 +157,7 @@ function PageHeader({
                 );
                 successResponse('updated');
               } else {
+                _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
                 const res = await axios.post(`/api/fee`, _values);
                 successResponse('created');
               }

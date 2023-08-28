@@ -376,9 +376,9 @@ async function seed() {
     ]
   })
   try {
-    await fsp.readdir(path.join(process.cwd(), `/AllFiles`));
+    await fsp.readdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`));
   } catch (error) {
-    await fsp.mkdir(path.join(process.cwd(), `/AllFiles`));
+    await fsp.mkdir(path.join(process.cwd(), `${process.env.FILESFOLDER}`));
   }
 }
 

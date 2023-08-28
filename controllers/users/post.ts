@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export const post = async (req, res) => {
   try {
-    const uploadFolderName = "usersPhoto";
+    const uploadFolderName = "userPhoto";
 
     const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
     const filterFiles = {

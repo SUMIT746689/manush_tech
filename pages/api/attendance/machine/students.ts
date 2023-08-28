@@ -105,7 +105,7 @@ const index = async (req, res) => {
 
                 //     }
                 // }
-                throw new Error('hey bro !!')
+               
                 console.log("req.body___", req.body, typeof (req.body));
 
                 fs.appendFile('mynewfile.txt', (req.body), (err) => {

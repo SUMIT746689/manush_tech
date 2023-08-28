@@ -111,7 +111,7 @@ const menuItems: MenuItems[] = [
             icon: CalendarMonthIcon
           },
           {
-            name: 'Gradeing system',
+            name: 'Grading system',
             link: '/management/grade',
             icon: GradeIcon
           },

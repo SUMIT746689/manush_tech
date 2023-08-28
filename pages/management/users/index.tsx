@@ -13,7 +13,6 @@ function ManagementUsers() {
 
   const { data: users, reFetchData } = useClientFetch('/api/user')
   const [editUser, setEditUser] = useState(null);
-  console.log({ editUser });
 
   return (
     <>

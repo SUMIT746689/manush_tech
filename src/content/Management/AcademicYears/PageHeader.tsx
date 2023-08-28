@@ -19,6 +19,9 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { TextFieldWrapper } from '@/components/TextFields';
 
 
 function PageHeader({ editData, seteditData, reFetchData }) {
@@ -56,33 +59,14 @@ function PageHeader({ editData, seteditData, reFetchData }) {
   };
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Academic Years Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the app academic years can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create Academic Year')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name="Academic Year"
+        handleCreateClassOpen={handleCreateClassOpen}
+      />
+
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -140,7 +124,7 @@ function PageHeader({ editData, seteditData, reFetchData }) {
               setSubmitting(false);
 
               // showNotification(err.message,'error')
-              showNotification(err?.response?.data?.message,'error')
+              showNotification(err?.response?.data?.message, 'error')
             }
           }}
         >
@@ -162,74 +146,27 @@ function PageHeader({ editData, seteditData, reFetchData }) {
                   }}
                 >
                   <Grid container spacing={3}>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Title')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        error={Boolean(touched?.title && errors?.title)}
-                        fullWidth
-                        helperText={touched?.title && errors?.title}
-                        name="title"
-                        placeholder={t(`title here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.title}
-                        variant="outlined"
-                      />
-                    </Grid>
+
+                    <TextFieldWrapper
+                      name="title"
+                      errors={errors?.title}
+                      touched={touched?.title}
+                      label={t(`Title`)}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values?.title}
+                    />
+
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    //@ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(
-                      `${
-                        editData
-                          ? 'Edit Academic Year'
-                          : 'Add new Academic Year'
-                      }`
-                    )}
-                  </Button>
-                </DialogActions>
+
+                <DialogActionWrapper
+                  title="Academic Year"
+                  handleCreateClassClose={handleCreateClassClose}
+                  editData={editData}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                />
               </form>
             );
           }}

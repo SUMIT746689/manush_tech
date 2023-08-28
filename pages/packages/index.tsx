@@ -8,13 +8,11 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Project } from '@/models/project';
 import { Grid } from '@mui/material';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useState } from 'react';
 
 const Packages = () => {
-  const [datas, setDatas] = useState<Project[]>([]);
-  const [editData, setEditData] = useState<Project>(null);
 
+  const [editData, setEditData] = useState<Project>(null);
   const { data, reFetchData, error } = useClientFetch('/api/packages');
   
   return (

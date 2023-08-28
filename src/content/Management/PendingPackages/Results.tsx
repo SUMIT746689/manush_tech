@@ -209,15 +209,15 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
 
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/packages/${deleteSchoolId}`);
-      console.log({ result });
+  
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification ('The package has been deleted successfully');
+
     } catch (err) {
       setOpenConfirmDelete(false);
       showNotification ('The fees falied to delete ','error');
@@ -226,11 +226,10 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
 
   const handleAccept = async (value, status: string) => {
     const { package_id, school_id, id } = value;
-    console.log({ value })
+    
     const result = await axios.patch(`/api/subscriptions/package_request`, { id, package_id, school_id, status, });
     if (result.data.success) {
       reFetchData();
-
     }
 
   }
@@ -240,16 +239,17 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
       <Card
         sx={{
           p: 1,
-          mb: 2
+          my: 2
         }}
       >
         <Grid container>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
                 sx={{
                   m: 0
                 }}
+                size="small"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

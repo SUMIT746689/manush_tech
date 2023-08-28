@@ -25,6 +25,10 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -175,45 +179,26 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
       target: { value }
     } = event;
     // @ts-ignore
-    setPersonName((groups:any) =>{
+    setPersonName((groups: any) => {
       // const find = groups.find(group => group.value === value.value);
       // if(!find) return ([...groups,...value])
       // return groups
       return value
     })
-      // On autofill we get a stringified value.
-      // typeof value === 'string' ? value.split(',') : value))
+    // On autofill we get a stringified value.
+    // typeof value === 'string' ? value.split(',') : value))
   };
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Section Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the sections can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t(editSection ? 'Edit Section' : 'Create Section')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name="Section"
+        handleCreateClassOpen={handleCreateClassOpen}
+      />
+
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -262,64 +247,55 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                     p: 3
                   }}
                 >
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.name && errors.name)}
-                        fullWidth
-                        helperText={touched.name && errors.name}
-                        label={t('Section name')}
-                        name="name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.name}
-                        variant="outlined"
-                      />
-                    </Grid>
+                  <Grid container >
 
-                    <Grid item xs={12} md={6}>
-                      <Autocomplete
-                        disablePortal
-                        value={
-                          classes.find(
-                            (cls) => cls.value === values.class_id
-                          ) || null
-                        }
-                        options={classes}
-                        renderInput={(params) => (
-                          <TextField
-                            fullWidth
-                            {...params}
-                            label={t('Select class')}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(event, value) => {
-                          setFieldValue('class_id', value?.value || null);
-                          setFieldValue('group_id', null);
-                          if (value) {
-                            getSelectedClassGroup(value.value);
-                          } else {
-                            setSelectedClassGroup(null);
-                          }
-                        }}
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      errors={errors.name}
+                      touched={touched.name}
+                      label={t('Section name')}
+                      name="name"
+                      value={values.name}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                    />
+
+
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      label="Class"
+                      placeholder="select a class..."
+                      value={classes.find((cls) => cls.value === values.class_id) || null}
+                      options={classes}
+                      // @ts-ignore
+                      handleChange={(event, value) => {
+                        setFieldValue('class_id', value?.value || null);
+                        setFieldValue('group_id', null);
+                        if (value) getSelectedClassGroup(value.value);
+                        else setSelectedClassGroup(null);
+                      }}
+                    />
+
 
                     {selectedClassGroup && (
-                      <Grid item xs={12} md={6}>
+                      <Grid item xs={12} pb={1}>
                         <FormControl
                           variant="outlined"
                           style={{ width: '100%' }}
-                          // size="small"
+                        // size="small"
                         >
-                          <InputLabel id="test-select-label">
+                          <InputLabel size='small' id="test-select-label" >
                             Select Groups
                           </InputLabel>
                           <Select
+                            sx={{
+                              [`& fieldset`]: {
+                                borderRadius: 0.6,
+                              }
+                            }}
                             labelId="test-select-label"
                             id="test-select"
                             fullWidth
+                            size='small'
                             // size="small"
                             label="Select Groups"
                             multiple
@@ -328,6 +304,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                             variant="outlined"
                             renderValue={(selected) => (
                               <Box
+
                                 sx={{
                                   display: 'flex',
                                   flexWrap: 'wrap',
@@ -343,9 +320,10 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                           >
                             {selectedClassGroup?.map((group) => (
                               <MenuItem
+
                                 key={group.value}
                                 value={group}
-                                // style={getStyles(selectedClassGroup, personName, theme)}
+                              // style={getStyles(selectedClassGroup, personName, theme)}
                               >
                                 {group?.label}
                               </MenuItem>
@@ -355,84 +333,23 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                       </Grid>
                     )}
 
-                    {/* {selectedClassGroup && (
-                      <Grid item xs={12} md={6}>
-                        {' '}
-                        <Autocomplete
-                          disablePortal
-                          value={
-                            selectedClassGroup.find(
-                              (grp) => grp.value === values.group_id
-                            ) || null
-                          }
-                          options={selectedClassGroup}
-                          renderInput={(params) => (
-                            <TextField
-                              fullWidth
-                              {...params}
-                              label={t('Select Group')}
-                            />
-                          )}
-                          // @ts-ignore
-                          onChange={(event, value) => {
-                            if (value) {
-                              setFieldValue('group_id', value.value);
-                            } else {
-                              setFieldValue('group_id', null);
-                            }
-                          }}
-                        />
-                      </Grid>
-                    )} */}
-
-                    <Grid item xs={12} md={6}>
-                      <Autocomplete
-                        disablePortal
-                        value={
-                          teachers.find(
-                            (teacher) =>
-                              teacher.value === values.class_teacher_id
-                          ) || null
-                        }
-                        options={teachers}
-                        renderInput={(params) => (
-                          <TextField
-                            fullWidth
-                            {...params}
-                            label={t('Select class teacher')}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(event, value) =>
-                          setFieldValue(
-                            'class_teacher_id',
-                            value?.value || null
-                          )
-                        }
-                      />
-                    </Grid>
+                    <AutoCompleteWrapper
+                      minWidth={"100%"}
+                      label="Class Teacher"
+                      placeholder="select a class teacher..."
+                      value={teachers.find((teacher) => teacher.value === values.class_teacher_id) || null}
+                      options={teachers}
+                      handleChange={(event, value) => setFieldValue('class_teacher_id', value?.value || null)}
+                    />
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    // @ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(editSection ? 'Edit Section' : 'Add new section')}
-                  </Button>
-                </DialogActions>
+               <DialogActionWrapper
+                title="Section"
+                handleCreateClassClose={handleCreateClassClose}
+                errors={errors}
+                editData={editSection}
+                isSubmitting={isSubmitting}
+               />
               </form>
             );
           }}

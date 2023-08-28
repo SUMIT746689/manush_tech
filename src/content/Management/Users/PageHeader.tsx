@@ -19,8 +19,9 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { FileUploadFieldWrapper } from '@/components/TextFields';
+import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
@@ -46,7 +47,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   const userPrermissionRoles = permissons.filter((role) =>
     available_permissions?.includes(role.value)
   );
-  console.log({ userPrermissionRoles });
 
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -72,7 +72,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   const handleFormSubmit = async (_values, formValue) => {
     const { resetForm, setErrors, setStatus, setSubmitting } = formValue
     try {
-      console.log("_values___", _values);
 
       const formData = new FormData();
       for (const i in _values) {
@@ -85,7 +84,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
 
       }
-      console.log("formData__", formData);
 
       if (editUser)
         axios.patch(`/api/user/${editUser.id}`, formData).then(() => {
@@ -108,42 +106,21 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       console.error(err);
       showNotification('There was an error, try again later', 'error');
       setStatus({ success: false });
-      4 -
-        // @ts-ignore
-        setErrors({ submit: err.message });
+      // @ts-ignore
+      setErrors({ submit: err.message });
       setSubmitting(false);
     }
   }
 
   const temp = userPrermissionRoles.find(i => i.role == editUser?.user_role?.title);
-  console.log("temp___", temp);
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Users Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the app users can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateUserOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create user')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name={"User"}
+        handleCreateClassOpen={handleCreateUserOpen}
+      />
+
       <Dialog
         fullWidth
         maxWidth="sm"
@@ -223,71 +200,59 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                   p: 3
                 }}
               >
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <TextField
-                      error={Boolean(touched.username && errors.username)}
-                      fullWidth
-                      helperText={touched.username && errors.username}
-                      label={t('Username')}
-                      name="username"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.username}
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      error={Boolean(touched.password && errors.password)}
-                      fullWidth
-                      helperText={touched.password && errors.password}
-                      label={t('Password')}
-                      name="password"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      type="password"
-                      value={values.password}
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      error={Boolean(
-                        touched.confirm_password && errors.confirm_password
-                      )}
-                      fullWidth
-                      helperText={
-                        touched.confirm_password && errors.confirm_password
-                      }
-                      label={t('Confirm password')}
-                      name="confirm_password"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      type="password"
-                      value={values.confirm_password}
-                      variant="outlined"
-                    />
-                  </Grid>
+                <Grid container spacing={1}>
+
+                  <TextFieldWrapper
+                    touched={touched.username}
+                    errors={errors.username}
+                    label={t('Username')}
+                    name="username"
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.username}
+                  />
+
+                  <TextFieldWrapper
+                    touched={touched.password}
+                    errors={errors.password}
+                    label={t('Password')}
+                    name="password"
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    type="password"
+                    value={values.password}
+                  />
+
+                  <TextFieldWrapper
+                    errors={errors.confirm_password}
+                    touched={touched.confirm_password}
+                    label={t('Confirm password')}
+                    name="confirm_password"
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    type="password"
+                    value={values.confirm_password}
+                  />
+
                   {
-                    !editUser && <Grid item xs={12} md={6}>
+                    !editUser && <Grid item width={"100%"} mb={1}>
                       <Autocomplete
                         disablePortal
-                        value={
-                          userPrermissionRoles.find(
-                            // @ts-ignore
-                            (permRole) => permRole.value === values?.role?.permission
-                          ) || null
-                        }
+                        size='small'
+                        // @ts-ignore
+                        value={userPrermissionRoles.find((permRole) => permRole.value === values?.role?.permission) || null}
                         options={userPrermissionRoles}
-                        isOptionEqualToValue={(option: any, value: any) =>
-                          option.value === value.value
-                        }
+                        isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
                         getOptionLabel={(option) => option?.label}
                         renderInput={(params) => (
                           <TextField
                             {...params}
                             fullWidth
+                            sx={{
+                              [`& fieldset`]: {
+                                borderRadius: 0.6,
+                              }
+                            }}
                             name="role"
                             label={t('User role')}
                             error={Boolean(
@@ -299,52 +264,46 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                           />
                         )}
                         // @ts-ignore
-                        onChange={(event, value: any) => {
-                          console.log({ value });
-                          setFieldValue('role',
-                            {
-                              role_title: value?.role,
-                              permission: value?.value
-                            }
-                            || '');
-                        }}
+                        onChange={(event, value: any) => { setFieldValue('role', { role_title: value?.role, permission: value?.value } || ''); }}
                       />
                     </Grid>
                   }
 
-                  <Grid item xs={12}>
-                    <Grid container gap={2}>
+                  <Grid item xs={12} >
+
+                    <FileUploadFieldWrapper
+                      htmlFor="user photo"
+                      label="Select user photo"
+                      name="user_photo"
+                      value={values?.user_photo?.name || values?.user_photo || ''}
+                      handleChangeFile={(e) => {
+                        if (e.target.files?.length) {
+                          const photoUrl = URL.createObjectURL(e.target.files[0]);
+                          setUser_photo(photoUrl)
+                          setFieldValue('user_photo', e.target.files[0])
+                        }
+                      }}
+                      handleRemoveFile={(e) => {
+                        setUser_photo(null)
+                        setFieldValue('user_photo', undefined)
+                      }}
+                    />
+
+
+                    {
+                      (user_photo || editUser?.user_photo) &&
                       <Image src={user_photo ? user_photo : `/api/get_file/${editUser?.user_photo?.replace(/\\/g, '/')}`}
                         height={150}
                         width={150}
                         alt='User photo'
                         loading='lazy'
                       />
-
-
-                      <FileUploadFieldWrapper
-                        htmlFor="user photo"
-                        label="Select user photo"
-                        name="user_photo"
-                        value={values?.user_photo?.name || values?.user_photo || ''}
-                        handleChangeFile={(e) => {
-                          if (e.target.files?.length) {
-                            const photoUrl = URL.createObjectURL(e.target.files[0]);
-                            setUser_photo(photoUrl)
-                            setFieldValue('user_photo', e.target.files[0])
-                          }
-
-                        }}
-                        handleRemoveFile={(e) => {
-                          setUser_photo(null)
-                          setFieldValue('user_photo', undefined)
-                        }}
-                      />
-                    </Grid>
+                    }
 
                   </Grid>
                 </Grid>
               </DialogContent>
+
               <DialogActions
                 sx={{
                   p: 3

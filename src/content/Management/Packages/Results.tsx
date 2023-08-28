@@ -229,11 +229,12 @@ const Results: FC<ResultsProps> = ({
       >
         <Grid container>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
                 sx={{
                   m: 0
                 }}
+                size='small'
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

@@ -88,7 +88,7 @@ export const DialogTitleWrapper = ({ editData, name }) => {
   </DialogTitle>
 }
 
-export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, isSubmitting, title }) => {
+export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, isSubmitting, title, titleFront = null }) => {
   const { t }: { t: any } = useTranslation();
 
   return (<DialogActions
@@ -108,7 +108,7 @@ export const DialogActionWrapper = ({ handleCreateClassClose, errors, editData, 
       disabled={Boolean(errors.submit) || isSubmitting}
       variant="contained"
     >
-      {t(`${editData ? 'Update' : 'Create'} ${title}`)}
+      {t(`${editData ? 'Update' : titleFront || `Create`} ${title}`)}
     </Button>
   </DialogActions>
   )

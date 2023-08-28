@@ -1,14 +1,11 @@
 import { Authenticated } from '@/components/Authenticated';
 import Footer from '@/components/Footer';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
 import Results from '@/content/Management/PendingPackages/Results';
-import PageHeader from '@/content/Management/Packages/PageHeader';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Project } from '@/models/project';
 import { Grid } from '@mui/material';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useState } from 'react';
 
 const Packages = () => {

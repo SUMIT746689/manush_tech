@@ -234,7 +234,6 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
     console.log({err,response});
   }
 
-  console.log({paginatedUsers})
   return (
     <>
       <Dialog

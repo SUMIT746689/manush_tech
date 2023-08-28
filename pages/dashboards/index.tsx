@@ -4,19 +4,17 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 
 import DashboardReportsContent from 'src/content/DashboardPages/reports';
-import { SSRHTTPClient } from 'repositories/base';
 import prisma from '@/lib/prisma_client';
-import { access_token_varify, refresh_token_varify } from 'utilities_api/jwtVerify';
 import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
 import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 import dayjs from 'dayjs';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
   try {
-    console.log({context});
+
     const refresh_token: any = serverSideAuthentication(context);
     if (!refresh_token) return { redirect: { destination: '/auth/login/basic' } };
 
@@ -146,9 +144,9 @@ export async function getServerSideProps(context: any) {
 
 function DashboardReports({ blockCount }) {
 
-  useEffect(() => {
+  // useEffect(() => {
     // router.reload()
-  }, [])
+  // }, [])
 
   switch (blockCount?.role) {
     case 'teacher':

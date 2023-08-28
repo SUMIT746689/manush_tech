@@ -17,6 +17,9 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { TextFieldWrapper } from '@/components/TextFields';
 
 function PageHeader({ editClass, setEditClass, reFetchData }) {
   const { t }: { t: any } = useTranslation();
@@ -88,33 +91,15 @@ function PageHeader({ editClass, setEditClass, reFetchData }) {
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Classes Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the class can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create class')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        handleCreateClassOpen={handleCreateClassOpen}
+        name="Class"
+      />
+
+
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -164,56 +149,38 @@ function PageHeader({ editClass, setEditClass, reFetchData }) {
                   }}
                 >
                   <Grid container spacing={1}>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.name && errors.name)}
-                        fullWidth
-                        helperText={touched.name && errors.name}
-                        label={t('Class name')}
-                        name="name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.code && errors.code)}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.code && errors.code}
-                        label={t('class code')}
-                        name="code"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.code}
-                        variant="outlined"
-                      />
-                    </Grid>
+
+
+                    <TextFieldWrapper
+                      errors={errors.name}
+                      touched={touched.name}
+                      label={t('Class name')}
+                      name="name"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.name}
+                    />
+
+                    <TextFieldWrapper
+                      errors={errors.code}
+                      touched={touched.code}
+                      label={t('Class code')}
+                      name="code"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.code}
+                    />
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    //@ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(editClass ? 'Edit Class' : 'Add new class')}
-                  </Button>
-                </DialogActions>
+
+                <DialogActionWrapper
+                  handleCreateClassClose={handleCreateClassClose}
+                  errors={errors}
+                  editData={editClass}
+                  title="Class"
+                  isSubmitting={isSubmitting}
+                />
+               
               </form>
             );
           }}

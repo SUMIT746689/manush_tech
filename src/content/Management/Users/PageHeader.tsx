@@ -38,8 +38,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     { label: 'Accountant', role: 'ACCOUNTANT', value: 'create_accountant' },
     { label: 'Librarian', role: 'LIBRARIAN', value: 'create_librarian' },
     { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' },
-    { label: 'Student', role: 'STUDENT', value: 'create_student' },
-    { label: 'Teacher', role: 'TEACHER', value: 'create_teacher' }
   ];
   const available_permissions = user?.permissions?.map(
     (permission) => permission.value

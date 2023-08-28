@@ -15,20 +15,24 @@ const index = async (req, res, refresh_token) => {
                             school_id: refresh_token.school_id,
                             academic_year_id: Number(academic_year_id)
                         },
+                    },
+                    include: {
+                        fee: true
                     }
                 })
                 res.status(200).json(discount)
                 break;
             case 'POST':
-                const { fee_id, type, amt } = req.body;
+                const { fee_id, type, amt,title } = req.body;
                 await prisma.discount.create({
                     data: {
+                        title,
                         fee: {
                             connect: {
                                 id: Number(fee_id)
                             }
                         },
-                        type: type,
+                        type,
                         amt: Number(amt),
                     }
                 })

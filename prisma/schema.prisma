@@ -846,6 +846,7 @@ model OnlineAdmission {
 
 model Discount {
   id      Int          @id @default(autoincrement())
+  title   String
   fee_id  Int
   type    DiscountType
   amt     Float

@@ -179,6 +179,11 @@ const menuItems: MenuItems[] = [
         icon: AccessibilityIcon
       },
       {
+        name: 'Discount',
+        link: '/management/discount',
+        icon: AccessibilityIcon
+      },
+      {
         name: 'Rooms',
         link: '/management/rooms',
         icon: RoomPreferencesIcon

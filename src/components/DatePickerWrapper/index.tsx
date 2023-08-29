@@ -1,7 +1,6 @@
 
 import { Grid, TextField } from '@mui/material';
 import { DatePicker, MobileDatePicker } from '@mui/lab';
-import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEndDate }) {
@@ -54,7 +53,6 @@ export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEn
 }
 
 export const DatePickerWrapper = ({ label, date, handleChange }) => {
-  console.log({ date })
   return (
     <Grid item pb={1}>
       <DatePicker

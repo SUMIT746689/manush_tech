@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from 'src/content/Management/Departments/PageHeader';
@@ -13,7 +13,7 @@ function ManagementDepartments() {
   const [datas, setDatas] = useState([]);
   const [editData, setEditData] = useState(null);
 
-  const { data,reFetchData, error } = useClientFetch('/api/departments');
+  const { data, reFetchData, error } = useClientFetch('/api/departments');
 
   useEffect(() => {
     if (data?.success) setDatas(data.data);

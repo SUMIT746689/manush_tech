@@ -41,14 +41,10 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
     }
     return (
         <Grid gap={2} sx={{
-            // display: 'flex',
-            // justifyContent: 'flex-start',
-            // // minWidth: '450px',
-            // flexWrap: 'wrap',
-            display:'grid',
-            gridTemplateColumns:{
-                xs:'1fr',
-                sm:'1fr 1fr'
+            display: 'grid',
+            gridTemplateColumns: {
+                xs: '1fr',
+                sm: '1fr 1fr'
             }
         }}  >
 
@@ -104,30 +100,6 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
 
                         }}>
 
-                            {/* <Autocomplete
-                                sx={{
-                                    m: 0
-                                }}
-                                limitTags={2}
-                                // getOptionLabel={(option) => option.id}
-                                options={classes.map(i => {
-                                    return {
-                                        label: i.name,
-                                        id: i.id,
-                                        has_section: i.has_section
-                                    }
-                                })}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        fullWidth
-                                        variant="outlined"
-                                        label={t('Select class')}
-                                        placeholder={t('Class...')}
-                                    />
-                                )}
-                                onChange={handleClassSelect}
-                            /> */}
                             <AutoCompleteWrapper
                                 label='Select class'
                                 placeholder='select a class...'
@@ -149,27 +121,7 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
                 selectedClass?.has_section && sections && (flag ? true : selectedDate) &&
                 <Grid item sx={{
                     minWidth: '200px',
-
                 }}>
-                    {/* <Autocomplete
-                                fullWidth
-                                sx={{
-                                    mr: 10
-                                }}
-                                limitTags={2}
-                                options={sections}
-                                value={selectedSection}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        fullWidth
-                                        variant="outlined"
-                                        label={t('Sections')}
-                                        placeholder={t('Select section...')}
-                                    />
-                                )}
-                                onChange={(e, value) => setSelectedSection(value)}
-                            /> */}
                     <AutoCompleteWrapper
                         label='Select Section'
                         placeholder='select a section...'
@@ -301,8 +253,7 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, s
 
     const handleUpdateApi = (e, remarkValue) => {
         const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : examFlag ? new Date('0') : '';
-        console.log({ remark });
-
+    
         const value = {
             status: e,
         }
@@ -331,7 +282,6 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, s
                 })
                 .catch(err => console.log(err))
         }
-
     }
 
     return (
@@ -376,8 +326,6 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, s
                         }}
                         onBlur={(e) => {
                             if (attendenceValue && remarkValue !== '') {
-                                console.log(attendenceValue, remarkValue);
-
                                 handleUpdateApi(attendenceValue, remarkValue)
                                 setRemarkValue(null)
                             }

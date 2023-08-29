@@ -48,27 +48,26 @@ export const get = async (req, res) => {
       }
     });
 
+    console.log("all_fees__", all_fees);
 
     const fees = all_fees.section.class.fees.map((fee) => {
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
 
-      // const isAlreadyAvaliable = await prisma.studentFee.aggregate({
-      //   where: {
-      //     student_id,
-      //     fee_id,
-      //   },
-      //   _sum: {
-      //     collected_amount: true,
-
-      //   },
-
-      // })
-
-
       // console.log("fee", fee);
-      console.log("findStudentFee__", findStudentFee);
+      // console.log("findStudentFee__", findStudentFee);
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
+        // console.log("findStudentFee__",findStudentFee);
+
+        const discount = all_fees?.discount?.filter(i => i.fee_id == fee.id);
+        console.log("discount1__", discount);
+
+        const totalDiscount = discount.reduce((a, c) => {
+          if (c.type == 'percent') return a + (c.amt * fee.amount) / 100
+          else return a + c.amt
+        }, 0)
+        const feeAmount = fee.amount - totalDiscount
+        fee['amount'] = feeAmount
         const paidAmount = findStudentFee.reduce((a, c) => a + c.collected_amount, 0)
 
         const last_date = dayjs(fee.last_date).valueOf()
@@ -76,14 +75,14 @@ export const get = async (req, res) => {
         const late_fee = fee.late_fee ? fee.late_fee : 0;
 
 
-        if (last_trnsation_date > last_date && fee.amount == paidAmount) {
+        if (last_trnsation_date > last_date && feeAmount == paidAmount) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'Fine unpaid', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
-        else if (last_trnsation_date > last_date && paidAmount >= fee.amount + late_fee) {
+        else if (last_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid late', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
 
-        else if (last_date >= last_trnsation_date && fee.amount == paidAmount) {
+        else if (last_date >= last_trnsation_date && feeAmount == paidAmount) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid', collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
         else {

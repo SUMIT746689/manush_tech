@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const post = async (req, res, refresh_token) => {
   try {
-    const { student_id, fee_id, payment_method, collected_by_user,transID }: any = req.body;
+    const { student_id, fee_id, payment_method, collected_by_user, transID }: any = req.body;
     const collected_amount = parseFloat(req.body.collected_amount);
 
     if (!student_id || !fee_id || !collected_amount)
@@ -14,6 +14,27 @@ export const post = async (req, res, refresh_token) => {
     const fee = await prisma.fee.findFirst({
       where: { id: fee_id }
     });
+
+
+    const AllDiscount = await prisma.student.findFirst({
+      where: {
+        id: student_id,
+      },
+      select: {
+        discount: true
+      }
+    })
+    const discount = AllDiscount?.discount?.filter(i => i.fee_id == fee_id);
+    console.log("discount1__", discount);
+
+    const totalDiscount = discount.reduce((a, c) => {
+      if (c.type == 'percent') return a + (c.amt * fee.amount) / 100
+      else return a + c.amt
+    }, 0)
+    console.log(fee.amount, "totalDiscount___", totalDiscount);
+
+    const feeAmount = fee.amount - totalDiscount;
+
     const isAlreadyAvaliable = await prisma.studentFee.aggregate({
       where: {
         student_id,
@@ -52,10 +73,10 @@ export const post = async (req, res, refresh_token) => {
 
     if (last_trnsation_date > last_date) {
 
-      if (totalPaidAmount === fee.amount + late_fee) throw new Error('Already Paid in Late');
+      if (totalPaidAmount === feeAmount + late_fee) throw new Error('Already Paid in Late');
 
-      else if (totalPaidAmount < fee.amount + late_fee) {
-        if (collected_amount + totalPaidAmount > fee.amount + late_fee) throw new Error(`Only pay ${fee.amount + late_fee - totalPaidAmount} !`)
+      else if (totalPaidAmount < feeAmount + late_fee) {
+        if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)
         else {
           const temp = await prisma.studentFee.create({
             data
@@ -78,8 +99,8 @@ export const post = async (req, res, refresh_token) => {
       }
     }
     else {
-      if (totalPaidAmount === fee.amount) throw new Error('Already Paid !')
-      else if (totalPaidAmount + collected_amount > fee.amount) throw new Error(`you paid ${totalPaidAmount},now pay ${fee.amount - totalPaidAmount} amount !`)
+      if (totalPaidAmount === feeAmount) throw new Error('Already Paid !')
+      else if (totalPaidAmount + collected_amount > feeAmount) throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`)
       else {
         const temp = await prisma.studentFee.create({
           data

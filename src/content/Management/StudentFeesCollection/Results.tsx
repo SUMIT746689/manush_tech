@@ -84,23 +84,6 @@ const ButtonError = styled(Button)(
     `
 );
 
-interface ResultsProps {
-  classes: any;
-  sessions: Project[];
-  setSessions: Function;
-  students: [object?];
-  setStudents: Function;
-  selectedStudent: any | null;
-  setSelectedStudent: Function;
-  setPrintFees: Function;
-  filteredFees: any
-  setFilteredFees: Function
-}
-
-interface Filters {
-  status?: ProjectStatus;
-}
-
 const Transition = forwardRef(function Transition(
   props: TransitionProps & { children: ReactElement<any, any> },
   ref: Ref<unknown>
@@ -108,16 +91,6 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-const applyFilters = (sessions, filter) => {
-  return sessions.filter((project) => {
-    let matches = true;
-
-    if (filter === 'all') return matches;
-    else if (filter) if (project.status !== filter) matches = false;
-
-    return matches;
-  });
-};
 
 const applyPagination = (sessions, page, limit) => {
   return sessions.slice(page * limit, page * limit + limit);
@@ -200,9 +173,7 @@ const Results = ({
   };
   // @ts-ignore
   useEffect(() => {
-    const filteredfeesdata = applyFilters(sessions?.fees || [], filter);
-    setFilteredFees(filteredfeesdata);
-    const paginatedschools = applyPagination(filteredfeesdata, page, limit);
+    const paginatedschools = applyPagination(sessions?.fees || [], page, limit);
     setPaginatedSchool(paginatedschools);
   }, [sessions, filter, page])
 

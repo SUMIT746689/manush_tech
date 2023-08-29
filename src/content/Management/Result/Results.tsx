@@ -27,6 +27,8 @@ import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/Auto
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { CA } from 'country-flag-icons/react/3x2';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 
 const DialogWrapper = styled(Dialog)(
@@ -558,7 +560,7 @@ function Row(props) {
   const [sections, setSections] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const theme = useTheme();
-  const { showNotification } = useNotistick()
+  const { showNotification } = useNotistick();
 
   const handleClassSelect = (event, newValue, setFieldValue) => {
 
@@ -587,11 +589,40 @@ function Row(props) {
     }
   }
 
+  const handleSubmit = async (
+    _values,
+    { resetForm, setErrors, setStatus, setSubmitting }
+  ) => {
+    try {
+      const successProcess = () => {
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        setOpen(false)
+      };
+     
+      _values['student_information_id'] = row.student.student_information?.id;
+      
+      if(!row.student.student_information?.id) throw new Error("failed to get student information id")
+      
+      const res = await axios.post(`/api/student/${row.student.student_information_id}/upgradeStudent`, _values)
+
+      showNotification(res.data.message)
+      successProcess();
+    } catch (err) {
+
+      showNotification(err?.response?.data?.message, 'error');
+      setStatus({ success: false });
+      setErrors({ submit: err.message });
+      setSubmitting(false);
+    }
+  }
+
   return (
     <>
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="sm"
         open={open}
         onClose={() => setOpen(false)}
       >
@@ -601,10 +632,10 @@ function Row(props) {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t(`upgrade class`)}
+            {t(`Upgrade Class`)}
           </Typography>
           <Typography variant="subtitle2">
-            {t('Use this dialog window to Result mark entry')}
+            {t('Use this dialog window to upgrade a student to a new class')}
           </Typography>
         </DialogTitle>
         <Formik
@@ -625,32 +656,7 @@ function Row(props) {
             discount: Yup.number().required(t('discount is required')).nullable(false),
 
           })}
-          onSubmit={async (
-            _values,
-            { resetForm, setErrors, setStatus, setSubmitting }
-          ) => {
-            try {
-              const successProcess = () => {
-                resetForm();
-                setStatus({ success: true });
-                setSubmitting(false);
-                setOpen(false)
-              };
-
-              _values['student_information_id'] = row.student.student_information_id;
-
-              const res = await axios.post(`/api/student/${row.student.student_information_id}/upgradeStudent`, _values)
-
-              showNotification(res.data.message)
-              successProcess();
-            } catch (err) {
-
-              showNotification(err?.response?.data?.message, 'error');
-              setStatus({ success: false });
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
-          }}
+          onSubmit={handleSubmit}
         >
           {({
             errors,
@@ -672,347 +678,113 @@ function Row(props) {
                 <Grid container spacing={0}>
 
                   {/* select new academic year */}
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select new academic year')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Autocomplete
-                      options={academicYearList.filter(i => i.id !== academicYear.id).map(i => i)}
-                      value={
-                        academicYearList.find(
-                          (aca) => aca.id === values.academic_year_id
-                        ) || null
-                      }
-                      filterSelectedOptions
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Select new academic year"
-                          placeholder="new academic year"
-                          error={Boolean(touched.academic_year_id && errors.academic_year_id)}
-                          helperText={touched.academic_year_id && errors.academic_year_id}
-                          name="academic_year_id"
-                        />
-                      )}
-                      onChange={(e, v) => setFieldValue('academic_year_id', v ? v.id : undefined)}
-                    />
-
-                  </Grid>
+                 
+                  <AutoCompleteWrapper
+                    minWidth="100%"
+                    required={true}
+                    label="Select new academic year"
+                    placeholder="select a new academic year..."
+                    errors={errors.academic_year_id}
+                    filterSelectedOptions
+                    touched={errors.academic_year_id}
+                    options={academicYearList.filter(i => i.id !== academicYear.id).map(i => i)}
+                    value={academicYearList.find((aca) => aca.id === values.academic_year_id) || null}
+                    handleChange={(e, v) => setFieldValue('academic_year_id', v ? v.id : undefined)}
+                  />
                   {/* Select class */}
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select class')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
 
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12}
-                    sm={8}
-                    md={9}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Autocomplete
-                      options={classes?.filter(i => i.id !== selectClasses.id)?.map(i => {
-                        return {
-                          label: i.name,
-                          id: i.id,
-                          has_section: i.has_section
-                        }
-                      })}
-                      value={selectedUpgradeClass}
-                      filterSelectedOptions
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Select Class"
-                          placeholder="Class"
-                          name="class_id"
-                          required
+                  <AutoCompleteWrapper
+                    label="Select Class"
+                    placeholder="select a class..."
+                    minWidth="100%"
+                    options={classes?.filter(i => i.id !== selectClasses.id)?.map(i => {
+                      return {
+                        label: i.name,
+                        id: i.id,
+                        has_section: i.has_section
+                      }
+                    })}
+                    value={selectedUpgradeClass}
+                    filterSelectedOptions
+                    handleChange={(e, v) => handleClassSelect(e, v, setFieldValue)}
+                  />
 
-                        />
-                      )}
-                      onChange={(e, v) => handleClassSelect(e, v, setFieldValue)}
-                    />
-
-                  </Grid>
                   {/* Select section */}
                   {
-                    selectedUpgradeClass && selectedUpgradeClass.has_section && sections && <>
-                      <Grid
-                        item
-                        xs={12}
-                        sm={4}
-                        md={3}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                      >
-                        <Box
-                          pr={3}
-                          sx={{
-                            pt: `${theme.spacing(2)}`,
-                            pb: { xs: 1, md: 0 }
-                          }}
-                          alignSelf="center"
-                        >
-                          <b>{t('Select section')}:</b>
-                        </Box>
-                      </Grid>
-                      <Grid
-                        sx={{
-                          mb: `${theme.spacing(3)}`
-                        }}
-                        item
-                        xs={12} sm={6} md={3}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                      >
-                        <Autocomplete
-                          id="tags-outlined"
-                          options={sections}
-                          value={selectedSection}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Select section"
-                              placeholder="Favorites"
-                              error={Boolean(touched.section_id && errors.section_id)}
-                              helperText={touched.section_id && errors.section_id}
-                              name="section_id"
-                              required
-                            />
-                          )}
-                          onChange={(e, v) => {
-                            setSelectedSection(v)
-                            setFieldValue('section_id', v ? v.id : undefined)
-                          }}
-                        />
+                    (selectedUpgradeClass && selectedUpgradeClass.has_section && sections) ? <>
 
-                      </Grid>
+                      <AutoCompleteWrapper
+                        minWidth="100%"
+                        label="Select Section"
+                        placeholder="select a section..."
+                        options={sections}
+                        value={selectedSection}
+                        filterSelectedOptions
+                        handleChange={(e, v) => {
+                          setSelectedSection(v)
+                          setFieldValue('section_id', v ? v.id : undefined)
+                        }}
+                      />
                     </>
+                      :
+                      <EmptyAutoCompleteWrapper
+                        minWidth="100%"
+                        label="Select Section"
+                        placeholder="select a section..."
+                        options={[]}
+                        value={undefined}
+                      />
                   }
                   {/* class roll */}
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Select class roll')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12} sm={6} md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <TextField
-                      error={Boolean(touched.class_roll_no && errors.class_roll_no)}
-                      helperText={touched.class_roll_no && errors.class_roll_no}
-                      name="class_roll_no"
-                      placeholder={t('class roll...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.class_roll_no}
-                      variant="outlined"
-                    />
 
-                  </Grid>
+                  <TextFieldWrapper
+                    errors={errors.class_roll_no}
+                    touched={touched.class_roll_no}
+                    name="class_roll_no"
+                    label={t('New Roll No')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.class_roll_no}
+                  />
+
                   {/* class_registration_no */}
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Class registration no')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
 
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                    xs={12} sm={6} md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <TextField
-                      error={Boolean(touched.class_registration_no && errors.class_registration_no)}
+                  <TextFieldWrapper
+                    errors={errors.class_registration_no}
+                    touched={touched.class_registration_no}
+                    name="class_registration_no"
+                    label={t('Class Registration')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.class_registration_no}
+                  />
 
-                      helperText={touched.class_registration_no && errors.class_registration_no}
-                      name="class_registration_no"
-                      placeholder={t('class registration no...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.class_registration_no}
-                      variant="outlined"
-                    />
-
-                  </Grid>
                   {/* discount */}
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <Box
-                      pr={3}
-                      sx={{
-                        pt: `${theme.spacing(2)}`,
-                        pb: { xs: 1, md: 0 }
-                      }}
-                      alignSelf="center"
-                    >
-                      <b>{t('Discount')}:</b>
-                    </Box>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    md={2}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                  >
-                    <TextField
-                      error={Boolean(touched.discount && errors.discount)}
 
-                      helperText={touched.discount && errors.discount}
-                      name="discount"
-                      placeholder={t('discount...')}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.discount}
-                      variant="outlined"
-                      type='number'
-                    />
-
-                  </Grid>
+                  <TextFieldWrapper
+                    errors={errors.discount}
+                    touched={touched.discount}
+                    name="discount"
+                    label={t('Discount')}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    value={values.discount}
+                    type='number'
+                  />
 
                 </Grid>
-
-                <Grid
-                  xs={12}
-                  sm={4}
-                  md={3}
-                  textAlign={{ sm: 'right' }}
-                  sx={{
-                    marginTop: '40px'
-                  }}
-
-                />
-                <Grid
-                  sx={{
-                    mb: `${theme.spacing(3)}`
-                  }}
-                  item
-
-                  container
-                  direction="row"
-                  justifyContent="flex-end"
-                  alignItems="flex-end"
-                >
-                  <Button
-                    sx={{
-                      mr: 2
-                    }}
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                    size="large"
-                  >
-                    {t('Upgrade class')}
-                  </Button>
-                  <Button
-                    color="secondary"
-                    size="large"
-                    variant="outlined"
-                    onClick={() => setOpen(false)}
-                  >
-                    {t('Cancel')}
-                  </Button>
-                </Grid>
-
 
               </DialogContent>
+
+              <DialogActionWrapper
+                titleFront="Upgrade"
+                title="Class"
+                errors={errors}
+                editData={undefined}
+                handleCreateClassClose={() => setOpen(false)}
+                isSubmitting={isSubmitting}
+
+              />
             </form>
           )}
         </Formik>
@@ -1043,7 +815,7 @@ function Row(props) {
         {
           !selectedBulkActions && !pdf && <TableCell >
             {/* {row?.student?.id} */}
-            <Button variant='contained' onClick={() => setOpen(true)}>upgrade</Button>
+            <ButtonWrapper handleClick={() => setOpen(true)}>upgrade</ButtonWrapper>
           </TableCell>
         }
 

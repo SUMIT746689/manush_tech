@@ -12,6 +12,7 @@ import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 
 function Managementschools() {
 
@@ -132,7 +133,7 @@ function Managementschools() {
             </PageTitleWrapper>
 
 
-            <Card sx={{ pt: 1, px: 1 }} >
+            <Card sx={{ maxWidth: 1000, mx: 'auto', display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr 1fr" }, columnGap: 1, pt: 1, px: 1, mb: 1 }} >
 
                 {/* select class */}
                 <AutoCompleteWrapper
@@ -212,20 +213,7 @@ function Managementschools() {
                                 if (!v) setResult(null)
                             }}
                         />
-                        {
-                            selectedExam && <Grid
-                                sx={{
-                                    mb: `${theme.spacing(3)}`
-                                }}
-                                item
-                                xs={12} sm={6} md={2}
-                                justifyContent="flex-end"
-                                textAlign={{ sm: 'right' }}
-                            >
-                                <Button variant='contained' onClick={handleSearchResult}>Find single exam result</Button>
 
-                            </Grid>
-                        }
                     </>
                         :
                         <EmptyAutoCompleteWrapper
@@ -236,6 +224,15 @@ function Managementschools() {
                         />
                 }
 
+                {
+                    (selectedClass && selectedSection && studentList && selectedExam)
+                        ?
+
+                        <ButtonWrapper handleClick={handleSearchResult}>Find single exam result</ButtonWrapper>
+
+                        :
+                        <DisableButtonWrapper>Find single exam result </DisableButtonWrapper>
+                }
 
                 {
                     (selectedSection && selectedStudent && !selectedExam) ?
@@ -246,8 +243,6 @@ function Managementschools() {
 
             </Card>
 
-
-            <br />
             <Card sx={{ minHeight: 'calc(100vh - 465px) !important' }}>
                 <Grid
                     sx={{ px: 4 }}
@@ -270,7 +265,6 @@ function Managementschools() {
                                     justifyContent="center"
                                 >
                                     <h1>Exam Title: {result?.exam?.title}</h1>
-
                                     <h2 >Student name : {result?.student?.student_info?.first_name} {result?.student?.student_info?.middle_name} {result?.student?.student_info?.last_name}</h2>
                                     <h2>Class : {result?.student?.section?.class?.name}</h2>
                                     <h2>Section : {result?.student?.section?.name}</h2>
@@ -330,7 +324,7 @@ function Managementschools() {
                                 <h2 className=' text-center font-bold'>Total mark: {finalResult?.termWiseTotalMark?.reduce(
                                     (accumulator, currentValue) => accumulator + currentValue?.calculatedTotalMark, 0
                                 ).toFixed(2)}</h2>
-
+                                ,
                                 {
                                     finalResult?.termWiseTotalMark?.map(i => <>
                                         <Box sx={{ fontWeight: 'bold' }}>
@@ -374,6 +368,10 @@ function Managementschools() {
 
 
                             </>
+                        }
+
+                        {
+                            (!result || !finalResult) && <TableEmptyWrapper title="" />
                         }
                     </Grid>
                 </Grid>

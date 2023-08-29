@@ -108,7 +108,7 @@ function Managementschools() {
     setSelectedStudent(null);
     setSelectedExam(null);
   }, [selectedSection]);
-
+  console.log({result})
   return (
     <>
       <Head>

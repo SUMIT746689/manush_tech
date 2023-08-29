@@ -97,7 +97,7 @@ function rowContent(_index, row, setSectionAttendence) {
           minWidth: column.width,
           padding: 3,
           margin: 'auto',
-          textAlign:'center'
+          textAlign: 'center'
         }}
       >
 
@@ -180,7 +180,7 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
       flexDirection: 'row',
       flexWrap: 'nowrap',
       // border:'1px solid red',
-      justifyContent:'center'
+      justifyContent: 'center'
     }}>
       {/* <Switch checked={value} onChange={handleUpdate} /> */}
       <RadioGroup
@@ -201,9 +201,9 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
       </RadioGroup>
 
       <TextField
-      sx={{
-        minWidth:'150px'
-      }}
+        sx={{
+          minWidth: '150px'
+        }}
         size='small'
         variant="outlined"
         value={remarkValue}
@@ -368,19 +368,25 @@ const Results = () => {
       >
         <Grid item sx={{
           minWidth: '200px',
-
         }}>
           <MobileDatePicker
             label="Select Date"
             inputFormat='dd/MM/yyyy'
-
             value={selectedDate}
             onChange={(newValue) => {
               setSelectedDate(newValue);
             }}
-            renderInput={(params) => <TextField size='small' fullWidth {...params} />}
+            renderInput={(params) => <TextField
+              size='small'
+              sx={{
+                [`& fieldset`]: {
+                  borderRadius: 0.6,
+                }
+              }}
+              fullWidth
+              {...params}
+            />}
           />
-
         </Grid>
 
 

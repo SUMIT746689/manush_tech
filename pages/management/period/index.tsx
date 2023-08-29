@@ -4,7 +4,7 @@ import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from 'src/content/Management/Period/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Card, DialogTitle, Grid, Typography } from '@mui/material';
+import { DialogTitle, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 function PeriodManagement() {
   const { t }: { t: any } = useTranslation();
@@ -13,11 +13,11 @@ function PeriodManagement() {
       <Head>
         <title>Period - Management</title>
       </Head>
-      <PageTitleWrapper >
+      {/* <PageTitleWrapper >
         <DialogTitle
           sx={{
             px: 3,
-            py:0
+            py: 0
           }}
         >
           <Typography variant="h4" gutterBottom>
@@ -27,7 +27,7 @@ function PeriodManagement() {
             {t('Fill in the fields below to create and add a new period')}
           </Typography>
         </DialogTitle>
-      </PageTitleWrapper>
+      </PageTitleWrapper> */}
 
       <Grid sx={{ minHeight: 'calc(100vh - 315px)' }}>
         <PageHeader />

@@ -41,6 +41,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -193,7 +194,6 @@ const Results: FC<ResultsProps> = ({
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
 
   const handleDeleteCompleted = async () => {
     try {
@@ -218,8 +218,9 @@ const Results: FC<ResultsProps> = ({
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
+                size='small'
                 sx={{
                   m: 0
                 }}
@@ -241,112 +242,97 @@ const Results: FC<ResultsProps> = ({
         </Grid>
       </Card>
 
-        <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
-          {selectedBulkActions && (
-            <Box p={2}>
-              <BulkActions />
+      <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius:0.6 }}>
+        {selectedBulkActions && (
+          <Box p={2}>
+            <BulkActions />
+          </Box>
+        )}
+        {!selectedBulkActions && (
+          <Box
+            p={2}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Box>
+              <Typography component="span" variant="subtitle1">
+                {t('Showing')}:
+              </Typography>{' '}
+              <b>{paginatedDepartments.length}</b> <b>{t('departments')}</b>
             </Box>
-          )}
-          {!selectedBulkActions && (
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Box>
-                <Typography component="span" variant="subtitle1">
-                  {t('Showing')}:
-                </Typography>{' '}
-                <b>{paginatedDepartments.length}</b> <b>{t('departments')}</b>
-              </Box>
-              <TablePagination
-                component="div"
-                count={filteredschools.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
-          )}
-          <Divider />
+            <TablePagination
+              component="div"
+              count={filteredschools.length}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleLimitChange}
+              page={page}
+              rowsPerPage={limit}
+              rowsPerPageOptions={[5, 10, 15]}
+            />
+          </Box>
+        )}
+        <Divider />
 
-          {paginatedDepartments.length === 0 ? (
-            <>
-              <Typography
-                sx={{
-                  py: 10,
-                  p: 4
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t(
-                  "We couldn't find any holidays matching your search criteria"
-                )}
-              </Typography>
-            </>
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align="center">{t('Title')}</TableCell>
+        {paginatedDepartments.length === 0 ? (
+          <TableEmptyWrapper title="department" />
+        ) : (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">{t('Title')}</TableCell>
 
-                      <TableCell align="center">{t('Actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paginatedDepartments.map((department) => {
-                      const isschoolselected = selectedItems.includes(
-                        department.id
-                      );
-                      return (
-                        <TableRow
-                          hover
-                          key={department?.id}
-                          selected={isschoolselected}
-                        >
-                          <TableCell align="center">
-                            <Typography noWrap variant="h5">
-                              {department?.title}
-                            </Typography>
-                          </TableCell>
+                    <TableCell align="center">{t('Actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedDepartments.map((department) => {
+                    const isschoolselected = selectedItems.includes(
+                      department.id
+                    );
+                    return (
+                      <TableRow
+                        hover
+                        key={department?.id}
+                        selected={isschoolselected}
+                      >
+                        <TableCell align="center">
+                          <Typography noWrap variant="h5">
+                            {department?.title}
+                          </Typography>
+                        </TableCell>
 
-                          <TableCell align="center">
-                            <Typography noWrap>
-                              <Tooltip title={t('Edit')} arrow>
-                                <IconButton
-                                  onClick={() => setEditData(department)}
-                                  color="primary"
-                                >
-                                  <LaunchTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('Delete')} arrow>
-                                <IconButton
-                                  onClick={() =>
-                                    handleConfirmDelete(department.id)
-                                  }
-                                  color="primary"
-                                >
-                                  <DeleteTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              {/* <Box p={2}>
+                        <TableCell align="center">
+                          <Typography noWrap>
+                            <Tooltip title={t('Edit')} arrow>
+                              <IconButton
+                                onClick={() => setEditData(department)}
+                                color="primary"
+                              >
+                                <LaunchTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('Delete')} arrow>
+                              <IconButton
+                                onClick={() =>
+                                  handleConfirmDelete(department.id)
+                                }
+                                color="primary"
+                              >
+                                <DeleteTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {/* <Box p={2}>
                 <TablePagination
                   component="div"
                   count={filteredschools.length}
@@ -357,10 +343,10 @@ const Results: FC<ResultsProps> = ({
                   rowsPerPageOptions={[5, 10, 15]}
                 />
               </Box> */}
-            </>
-          )}
-        </Card>
-      
+          </>
+        )}
+      </Card>
+
 
       <DialogWrapper
         open={openConfirmDelete}

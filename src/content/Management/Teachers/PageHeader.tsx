@@ -29,6 +29,8 @@ import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DatePicker } from '@mui/lab';
 import dayjs from 'dayjs';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 const BoxUploadWrapper = styled(Box)(
   ({ theme }) => `
@@ -92,14 +94,10 @@ function PageHeader({
     setSubmitting
   ) => {
     try {
-      console.log({ _values });
-      // _values.resume.forEach(v=>console.log({v}));
       const resume: any = [];
       Array.prototype.forEach.call(_values.resume, function (file) {
         resume.push(file);
       });
-      // console.log({ resume });
-      // console.log({ res: _values.resume[0] });
       const formData = new FormData();
       formData.append('first_name', _values.first_name);
       formData.append('middle_name', _values.middle_name);
@@ -165,30 +163,15 @@ function PageHeader({
       setSubmitting(false);
     }
   };
+
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Teachers')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t('These are your teachers')}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateProjectOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create new teacher')}
-          </Button>
-        </Grid>
-      </Grid>
+
+      <PageHeaderTitleWrapper
+        name="Teacher"
+        handleCreateClassOpen={handleCreateProjectOpen}
+      />
+
       <Dialog
         fullWidth
         maxWidth="md"
@@ -221,12 +204,9 @@ function PageHeader({
             date_of_birth: editSchool?.date_of_birth || '',
             present_address: editSchool?.present_address || '',
             permanent_address: editSchool?.permanent_address || '',
-
             department_id: editSchool?.department_id,
             national_id: editSchool?.national_id || '',
-
             email: editSchool?.email || '',
-
             resume: editSchool?.resume || '',
             photo: '',
             submit: null
@@ -714,12 +694,12 @@ function PageHeader({
                       <DatePicker
                         label="provide birth date"
                         value={values.date_of_birth}
-                        onChange={(n) =>{
+                        onChange={(n) => {
                           const value = dayjs(n);
-                          if(n){
+                          if (n) {
                             setFieldValue('date_of_birth', value)
                           }
-                          
+
                         }}
                         renderInput={(params) => (
                           <TextField
@@ -1049,7 +1029,7 @@ function PageHeader({
                     </Grid>
                     <Grid
                       sx={{
-                        mb: `${theme.spacing(3)}`
+                        mb: `${theme.spacing(1)}`
                       }}
                       item
                     >
@@ -1096,41 +1076,19 @@ function PageHeader({
                     </Grid>
                   </Grid>
 
-                  <Grid item />
-                  <Grid
-                    sx={{
-                      mb: `${theme.spacing(3)}`
-                    }}
-                    item
-                  >
-                    <Button
-                      sx={{
-                        mr: 2
-                      }}
-                      type="submit"
-                      startIcon={
-                        isSubmitting ? <CircularProgress size="1rem" /> : null
-                      }
-                      disabled={Boolean(errors.submit) || isSubmitting}
-                      variant="contained"
-                      size="large"
-                    >
-                      {editSchool ? t('Edit Teacher') : t('Create Teacher')}
-                    </Button>
-                    <Button
-                      color="secondary"
-                      size="large"
-                      variant="outlined"
-                      onClick={handleCreateProjectClose}
-                    >
-                      {t('Cancel')}
-                    </Button>
-                  </Grid>
                 </Grid>
               </DialogContent>
+              <DialogActionWrapper
+                title="Teacher"
+                errors={errors}
+                editData={editSchool}
+                handleCreateClassClose={handleCreateProjectClose}
+                isSubmitting={isSubmitting}
+              />
             </form>
           )}
         </Formik>
+
       </Dialog>
     </>
   );

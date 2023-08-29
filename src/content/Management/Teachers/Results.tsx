@@ -42,6 +42,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import Image from 'next/image';
 import useNotistick from '@/hooks/useNotistick';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -193,7 +194,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
   const handleDeleteCompleted = async () => {
     try {
       const result: any = await axios.delete(`/api/teacher/${deleteSchoolId}`);
-      console.log({ result });
       if (!result.data?.success) throw new Error('unsuccessful delete');
       setTeachers((teachers: any) =>
         teachers.filter((teacher) => teacher.id !== result.id)
@@ -207,7 +207,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
   };
 
   const handleEdit = (data: object) => {
-    console.log({ data });
     setEditSchool(data);
   };
 
@@ -221,8 +220,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
+                size='small'
                 sx={{
                   m: 0
                 }}
@@ -246,7 +246,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
 
 
       <Card
-        sx={{ minHeight: 'calc(100vh - 438px) !important' }}
+        sx={{ minHeight: 'calc(100vh - 412px) !important' }}
       >
         {selectedBulkActions && (
           <Box p={2}>
@@ -257,22 +257,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
         <Divider />
 
         {paginatedschools.length === 0 ? (
-          <>
-            <Typography
-              sx={{
-                py: 10,
-                p: 4
-              }}
-              variant="h3"
-              fontWeight="normal"
-              color="text.secondary"
-              align="center"
-            >
-              {t(
-                "We couldn't find any teacher matching your search criteria"
-              )}
-            </Typography>
-          </>
+          <TableEmptyWrapper
+            title="Teacher"
+          />
         ) : (
           <>
             <Box p={2}>

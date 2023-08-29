@@ -43,6 +43,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -187,7 +188,7 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-  console.log({ rooms });
+
   const filteredschools = applyFilters(rooms, query, filters);
   const paginatedschools = applyPagination(filteredschools, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
@@ -207,19 +208,17 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
 
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/rooms/${deleteSchoolId}`);
-      console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The rooms has been deleted successfully');
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification('The school falied to delete ','error');
+      showNotification('The school falied to delete ', 'error');
     }
   };
 
@@ -228,13 +227,14 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
       <Card
         sx={{
           p: 1,
-          mb: 3
+          mb: 2
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={0}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.6}>
               <TextField
+                size='small'
                 sx={{
                   m: 0
                 }}
@@ -255,7 +255,8 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
           </Grid>
         </Grid>
       </Card>
-      <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
+
+      <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.6 }}>
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />
@@ -288,22 +289,9 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
         <Divider />
 
         {paginatedschools.length === 0 ? (
-          <>
-            <Typography
-              sx={{
-                py: 10,
-                px: 4
-              }}
-              variant="h3"
-              fontWeight="normal"
-              color="text.secondary"
-              align="center"
-            >
-              {t(
-                "We couldn't find any rooms matching your search criteria"
-              )}
-            </Typography>
-          </>
+          <TableEmptyWrapper
+            title="room"
+          />
         ) : (
           <>
             <TableContainer>
@@ -378,7 +366,6 @@ const Results: FC<ResultsProps> = ({ rooms, setEditRooms }) => {
           </>
         )}
       </Card>
-
 
       <DialogWrapper
         open={openConfirmDelete}

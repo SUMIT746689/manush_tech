@@ -253,10 +253,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                             }}
                             name="role"
                             label={t('User role')}
-                            error={Boolean(
-                              touched.role && errors.role
-                            )}
-
+                            error={Boolean(touched.role && errors.role)}
                             helperText={touched.role && errors.role}
                             onBlur={handleBlur}
                           />

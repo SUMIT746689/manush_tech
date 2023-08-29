@@ -28,6 +28,8 @@ import {
   Dialog,
   styled,
   TablePagination,
+  Grid,
+  Switch,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -38,6 +40,9 @@ import BulkActions from './BulkActions';
 import useNotistick from '@/hooks/useNotistick';
 import NextLink from 'next/link';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import DiscountIcon from '@mui/icons-material/Discount';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 import axios from 'axios';
 
 const DialogWrapper = styled(Dialog)(
@@ -132,7 +137,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users,refetch }) => {
+const Results = ({ users, refetch, discount }) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -144,6 +149,10 @@ const Results = ({ users,refetch }) => {
   const [filters, setFilters] = useState<Filters>({
     role: null
   });
+
+  const [discountModal, setDiscountModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -187,7 +196,7 @@ const Results = ({ users,refetch }) => {
 
   const handleDeleteCompleted = () => {
     console.log(openConfirmDelete);
-    
+
     axios.delete(`/api/student/${openConfirmDelete}`)
       .then(res => {
         setOpenConfirmDelete(null);
@@ -205,6 +214,42 @@ const Results = ({ users,refetch }) => {
 
   return (
     <>
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={discountModal}
+        onClose={() => {
+          refetch()
+          setDiscountModal(false);
+        }}
+        sx={{ paddingX: { xs: 3, md: 0 } }}
+      >
+        <Grid item container flexDirection={'column'} sx={{ p: 4 }}>
+          <Grid display="flex" alignItems="center" sx={{ mb: { xs: 2, md: 4 } }} >
+            <Avatar
+              sx={{
+                mr: 1
+              }}
+              src={selectedStudent?.avatar}
+            />
+            <Box>
+
+              <Typography fontSize={20} fontWeight={'bold'}>{selectedStudent?.username}</Typography>
+
+            </Box>
+          </Grid>
+
+          <Grid item container display={'grid'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 1, sm: 2 } }}>
+            {discount?.map((i: any) => (
+              <SinglePermission
+                key={i.id}
+                selectedUser={selectedStudent}
+                singleDiscount={i}
+              />
+            ))}
+          </Grid>
+        </Grid>
+      </Dialog>
       <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
 
         {selectedBulkActions && (
@@ -320,12 +365,36 @@ const Results = ({ users,refetch }) => {
 
                         {/*  </Typography>*/}
                         {/*</TableCell>*/}
-                        <TableCell align={'center'}>
+                        <TableCell align={'center'} sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'auto auto auto auto'
+                        }}>
+                          <Tooltip title={t('View Profile')} arrow>
+                            <IconButton
+                              color="primary"
+
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
                           <Tooltip title={t('Edit')} arrow>
                             <IconButton
                               color="primary"
                             >
                               <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title={t('Discount')} arrow>
+                            <IconButton
+                              color="primary"
+                              onClick={() => {
+                                setSelectedStudent(i)
+                                setDiscountModal(true)
+                              }}
+                            >
+                              <DiscountIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
 
@@ -405,6 +474,56 @@ const Results = ({ users,refetch }) => {
         </Box>
       </DialogWrapper>
     </>
+  );
+};
+
+const SinglePermission = ({   singleDiscount, selectedUser }) => {
+
+  const [checked, setChecked] = useState(
+    selectedUser && selectedUser?.discount?.length > 0
+      ? selectedUser?.discount.find((j) => j.id == singleDiscount.id)
+        ? true
+        : false
+      : false
+  );
+
+  const handlePermissionUpdate = (e) => {
+    if (checked) {
+      axios
+        .put(`/api/discount/detach`, {
+          discount_id: singleDiscount.id,
+          student_id: selectedUser.id
+        })
+        .then(() => {
+          setChecked(false);
+          
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      axios
+        .put(`/api/discount/attach`, {
+          discount_id: singleDiscount.id,
+          student_id: selectedUser.id
+        })
+        .then(() => {
+          setChecked(true);
+          
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  return (
+    <Box display={'flex'} justifyContent="space-between" p={1} borderRadius={0.4} sx={{ backgroundColor: 'lightGray', ":hover": { backgroundColor: 'darkGray' } }} key={singleDiscount.id}>
+      <Typography sx={{ my: 'auto', textTransform: 'capitalize', fontSize: { xs: 10, md: 15 } }}>
+        {singleDiscount?.label}
+      </Typography>
+      <Switch sx={{ my: 'auto' }} checked={checked} onChange={handlePermissionUpdate} />
+    </Box>
   );
 };
 

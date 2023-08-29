@@ -1,17 +1,11 @@
-import { PrismaClient } from '@prisma/client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import prisma from "@/lib/prisma_client";
 
-const prisma = new PrismaClient();
-
-export default async function get(req: any, res: any) {
+export default async function get(req: any, res: any, refresh_token) {
   try {
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
 
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token || !refresh_token.school_id) throw new Error('invalid user');
+    if (!refresh_token.school_id) throw new Error('invalid user');
     const where = {
-      school_id: refresh_token.school_id, 
+      school_id: refresh_token.school_id,
     }
     if (req.query.academic_year_id) {
       where['academic_year_id'] = parseInt(req.query.academic_year_id)

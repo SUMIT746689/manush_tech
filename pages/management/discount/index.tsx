@@ -11,12 +11,12 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 function ManagementClasses() {
-  const [editSection, setEditSection] = useState(null);
+  const [editDiscount, setEditDiscount] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-
   const { data: discount, reFetchData } = useClientFetch(`/api/discount?academic_year_id=${academicYear?.id}`);
+  const { data: fees } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
 
-  console.log("discount__", discount);
+  console.log({editDiscount});
 
   return (
     <>
@@ -25,9 +25,13 @@ function ManagementClasses() {
       </Head>
       <PageTitleWrapper>
         <PageHeader
-          editSection={editSection}
-          setEditSection={setEditSection}
+          editDiscount={editDiscount}
+          setEditDiscount={setEditDiscount}
           reFetchData={reFetchData}
+          fees={fees?.data?.map(i => ({
+            label: `${i?.title} (${i?.class?.name})`,
+            value: i.id
+          })) || []}
         />
       </PageTitleWrapper>
 
@@ -40,7 +44,7 @@ function ManagementClasses() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results setEditSection={setEditSection} users={discount || []} />
+          <Results setEditDiscount={setEditDiscount} discount={discount || []} />
         </Grid>
       </Grid>
       <Footer />

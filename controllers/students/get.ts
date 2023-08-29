@@ -72,7 +72,8 @@ async function get(req, res, refresh_token) {
 
         },
         guardian_phone: true,
-        class_roll_no: true
+        class_roll_no: true,
+        
       }
     });
 

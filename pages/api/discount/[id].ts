@@ -5,47 +5,63 @@ import { authenticate } from "middleware/authenticate";
 const id = async (req, res, refresh_token) => {
     try {
         const { method } = req;
-        const { id, academic_year_id } = req.query;
+
+        const id = Number(req.query.id)
+        const academic_year_id = Number(req.query.academic_year_id)
+        const school_id = Number(refresh_token.school_id)
 
         switch (method) {
             case 'GET':
                 const discount = await prisma.discount.findFirst({
                     where: {
-                        id: Number(id)
+                        id: (id)
                     }
                 })
                 res.status(200).json(discount)
                 break;
 
             case 'PATCH':
-                const { fee_id, type, amount } = req.body;
+                const { fee_id, type, amt } = req.body;
                 const data: any = {}
                 if (fee_id) {
-                    data['fee'] = fee_id
+                    data['fee_id'] = fee_id
 
                 }
                 if (type) {
                     data['type'] = type
                 }
-                if (amount) {
-                    data['amt'] = amount
+                if (amt) {
+                    data['amt'] = amt
                 }
+                console.log(Number(id), Number(academic_year_id), Number(refresh_token.school_id));
 
+                const temp = await prisma.fee.findFirst({
+                    where: {
+                        id: fee_id,
+                        academic_year_id: academic_year_id,
+                        school_id: school_id
+                    }
+                })
+                if (!temp) throw new Error('Bad request !')
 
-                await prisma.$queryRaw`
-                    UPDATE Discount 
-                    JOIN fees on fees.id = Discount.fee_id
-                    SET
-                        ${data?.fee_id ? Prisma.sql`fee=${data?.fee_id}` : Prisma.empty},
-                        ${data?.amt ? Prisma.sql`amt=${data?.amt}` : Prisma.empty},
-                        ${data?.type ? Prisma.sql`type=${data?.type}` : Prisma.empty},
-                    
-                    WHERE
-                        Discount.id = ${id} 
-                        and fees.academic_year_id = ${Number(academic_year_id)} 
-                        and fees.school_id = ${refresh_token.school_id}`
+                await prisma.discount.update({
+                    where: {
+                        id: id
+                    },
+                    data
+                })
 
-                res.status(200).json({ message: 'Discount updated !!' })
+                // await prisma.$queryRaw`
+                //     UPDATE Discount 
+                //     JOIN fees on fees.id = Discount.fee_id
+                //     SET
+                //         ${data?.fee_id ? Prisma.sql`fee=${data?.fee_id},` : Prisma.empty}
+                //         ${data?.amt ? Prisma.sql`amt=${data?.amt},` : Prisma.empty}
+                //         ${data?.type ? Prisma.sql`type=${data?.type},` : Prisma.empty}
+
+                //     WHERE Discount.id = ${id} and fees.academic_year_id = ${academic_year_id} and fees.school_id = ${school_id}`
+
+                res.status(200).json({ success: true, message: 'Discount updated !!' })
 
                 break;
 

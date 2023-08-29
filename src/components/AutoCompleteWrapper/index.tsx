@@ -1,7 +1,7 @@
 import { customBorder } from "@/utils/mui_style"
 import { Autocomplete, Grid, TextField } from "@mui/material"
 
-export const AutoCompleteWrapper = ({ minWidth = null, options, value, handleChange, label, placeholder, required = false, ...params }) => {
+export const AutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
 
   return (
     <Grid item pb={1} sx={
@@ -23,10 +23,10 @@ export const AutoCompleteWrapper = ({ minWidth = null, options, value, handleCha
           <TextField
             size="small"
             fullWidth
+            required={required}
             {...rnParams}
             label={label}
             placeholder={placeholder}
-            required={required}
           />
         )}
         onChange={handleChange}

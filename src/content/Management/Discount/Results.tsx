@@ -131,7 +131,7 @@ const applyPagination = (users, page, limit) => {
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
+const Results = ({ setEditDiscount,discount }) => {
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -147,22 +147,6 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
     setQuery(event.target.value);
   };
 
-  const handleSelectAllUsers = (event: ChangeEvent<HTMLInputElement>): void => {
-    setSelectedUsers(event.target.checked ? users.map((user) => user.id) : []);
-  };
-
-  const handleSelectOneUser = (
-    _event: ChangeEvent<HTMLInputElement>,
-    userId: string
-  ): void => {
-    if (!selectedItems.includes(userId)) {
-      setSelectedUsers((prevSelected) => [...prevSelected, userId]);
-    } else {
-      setSelectedUsers((prevSelected) =>
-        prevSelected.filter((id) => id !== userId)
-      );
-    }
-  };
 
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
@@ -172,12 +156,12 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredClasses = applyFilters(users, query, filters);
+  const filteredClasses = applyFilters(discount, query, filters);
   const paginatedClasses = applyPagination(filteredClasses, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
   const selectedSomeUsers =
-    selectedItems.length > 0 && selectedItems.length < users.length;
-  const selectedAllUsers = selectedItems.length === users.length;
+    selectedItems.length > 0 && selectedItems.length < discount.length;
+  const selectedAllUsers = selectedItems.length === discount.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
 
@@ -196,7 +180,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
   return (
     <>
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-        <Box p={2}>
+        {/* <Box p={2}>
           {!selectedBulkActions && (
             <TextField
               sx={{
@@ -221,7 +205,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
           {selectedBulkActions && <BulkActions />}
         </Box>
 
-        <Divider />
+        <Divider /> */}
 
         {paginatedClasses.length === 0 ? (
           <>
@@ -245,9 +229,10 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell >{t('Title')}</TableCell>
-                    <TableCell >{t('Type')}</TableCell>
                     <TableCell >{t('Fee')}</TableCell>
+                    <TableCell >{t('Class')}</TableCell>
                     <TableCell >{t('Amount')}</TableCell>
+                    <TableCell >{t('Type')}</TableCell>
                     <TableCell align="center">{t('Action')}</TableCell>
 
                   </TableRow>
@@ -260,9 +245,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                         <TableCell>
                           <Typography variant="h5">{i?.title}</Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">{i?.type}</Typography>
-                        </TableCell>
+
                         <TableCell>
                           <Typography variant="h5">
                             {i?.fee?.title}
@@ -270,8 +253,16 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                         </TableCell>
                         <TableCell>
                           <Typography variant="h5">
+                            {i?.fee?.class?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="h5">
                             {i?.amt?.toFixed(2)}
                           </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="h5">{i?.type}</Typography>
                         </TableCell>
 
                         <TableCell align="center">
@@ -279,7 +270,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 color="primary"
-                                onClick={() => setEditSection(i)}
+                                onClick={() => setEditDiscount(i)}
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
                               </IconButton>

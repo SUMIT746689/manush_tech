@@ -4,26 +4,52 @@ import { authenticate } from 'middleware/authenticate';
 const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
-        const { academic_year_id } = req.query;
-
-
+        const academic_year_id = Number(req.query.academic_year_id);
+        const { class_id } = req.query
         switch (method) {
             case 'GET':
+                const query = {}
+                if (class_id) {
+                    query['class_id'] = Number(class_id)
+                }
                 const discount = await prisma.discount.findMany({
                     where: {
                         fee: {
                             school_id: refresh_token.school_id,
-                            academic_year_id: Number(academic_year_id)
+                            academic_year_id: academic_year_id,
+                            ...query
                         },
                     },
                     include: {
-                        fee: true
+                        fee: {
+                            select: {
+                                class: {
+                                    select: {
+                                        id: true,
+                                        name: true
+                                    }
+                                },
+                                title: true
+                            }
+                        },
+
                     }
                 })
                 res.status(200).json(discount)
                 break;
             case 'POST':
-                const { fee_id, type, amt,title } = req.body;
+                const { fee_id, type, amt, title } = req.body;
+
+                const temp = await prisma.fee.findFirst({
+                    where: {
+                        id: fee_id,
+                        academic_year_id: academic_year_id,
+                        school_id: refresh_token?.school_id
+                    }
+                })
+
+                if (!temp) throw new Error('Bad request !')
+
                 await prisma.discount.create({
                     data: {
                         title,

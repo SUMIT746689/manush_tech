@@ -1,35 +1,6 @@
-import {
-  ChangeEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef
-} from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Avatar,
-  Box,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  styled
-} from '@mui/material';
+import { Avatar, Box, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, Table, TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField, Button, Typography, Dialog, styled } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
@@ -193,8 +164,6 @@ const Results = ({
   const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < exams.length;
   const selectedAllschools = selectedItems.length === exams.length;
 
-
-
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
@@ -217,7 +186,6 @@ const Results = ({
   };
 
   const handleEdit = (data: object) => {
-    console.log({ data });
     setEditExam(data)
   };
 
@@ -231,11 +199,10 @@ const Results = ({
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
-                sx={{
-                  m: 0
-                }}
+                sx={{ m: 0 }}
+                size='small'
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

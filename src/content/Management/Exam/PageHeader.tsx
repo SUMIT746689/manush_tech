@@ -28,6 +28,7 @@ import { DateTimePicker } from '@mui/lab';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   const { t }: { t: any } = useTranslation();
@@ -291,7 +292,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
       />
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="sm"
         open={open}
         onClose={handleCreateProjectClose}
       >
@@ -350,66 +351,20 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                 >
                   <Grid container spacing={0}>
                     {/* Exam name */}
-                    {/* <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Exam Name')}:</b>
-                      </Box>
-                    </Grid>
 
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        error={Boolean(touched.title && errors.title)}
-                        fullWidth
-                        helperText={touched.title && errors.title}
-                        name="title"
-                        placeholder={t('Exam title here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.title}
-                        variant="outlined"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                      />
-                    </Grid> */}
+                    <TextFieldWrapper
+                      name="title"
+                      label="Exam Title"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      errors={errors.title}
+                      touched={touched.title}
+                      value={values.title}
+                    />
+
                     <Grid container display="grid" gridTemplateColumns=" 1fr 1fr " columnGap={1}>
 
-                      <TextFieldWrapper
-                        name="title"
-                        label="Exam Title"
-                        handleBlur={handleBlur}
-                        handleChange={handleChange}
-                        errors={errors.title}
-                        touched={touched.title}
-                        value={values.title}
-                      />
-
                       {/* select class */}
-
                       <AutoCompleteWrapper
                         error={Boolean(touched.title && errors.title)}
                         helperText={touched.title && errors.title}
@@ -421,218 +376,80 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         placeholder="Select class"
                         options={classList}
                         value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
-                        handleChange={(event, newValue) =>
-                          handleClassSelect(event, newValue, setFieldValue)
-                        }
+                        handleChange={(event, newValue) => handleClassSelect(event, newValue, setFieldValue)}
                       />
 
 
-                      {/* <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Select class')}:</b>
-                      </Box>
-                      </Grid>
-                      <Grid
-                        sx={{
-                          mb: `${theme.spacing(3)}`
-                        }}
-                        item
-                        xs={12}
-                        sm={8}
-                        md={9}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                      >
-                        <Autocomplete
-                          disablePortal
-                          options={classList}
+                      {/* select section */}
+                      {((sections && editExam?.section?.class?.has_section) || (sections && selectedClass && selectedClass?.has_section)) ?
+                        <>
 
-                          renderInput={(params) => (
-                            <TextField
-                              fullWidth
-                              error={Boolean(
-                                touched?.class_id &&
-                                errors?.class_id
+                          <Grid
+                            item
+                            justifyContent="flex-end"
+                            textAlign={{ sm: 'right' }}
+                          >
+                            <Autocomplete
+                              id="tags-outlined"
+                              options={sections}
+                              value={selectedSection || sections?.find((i) => i.id == editExam?.section_id) || null}
+                              filterSelectedOptions
+                              size='small'
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  size="small"
+                                  label="Section"
+                                  placeholder="section a name ..."
+                                  error={Boolean(
+                                    touched?.section_id &&
+                                    errors?.section_id
+                                  )}
+                                  sx={{
+                                    '& fieldset': {
+                                      borderRadius: 0.5
+                                    }
+                                  }}
+                                  helperText={
+                                    touched?.section_id &&
+                                    errors?.section_id
+                                  }
+                                  required
+                                  onBlur={handleBlur}
+                                  name='section_id'
+                                />
                               )}
-                              sx={{
-                                '& fieldset': {
-                                  borderRadius: '3px'
+                              onChange={(e, v) => {
+                                setSelectedSection(v)
+                                if (v) {
+                                  setFieldValue('section_id', v.id);
+                                } else {
+                                  setFieldValue('section_id', undefined);
                                 }
                               }}
-                              helperText={
-                                touched?.class_id &&
-                                errors?.class_id
-                              }
-                              name='class_id'
-                              {...params}
-                              label={t('Select class')}
                             />
-                          )}
-                          value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
-                          onChange={(event, newValue) =>
-                            handleClassSelect(event, newValue, setFieldValue)
-                          }
+                          </Grid>
+                        </>
+                        :
+                        <EmptyAutoCompleteWrapper
+                          options={[]}
+                          value={undefined}
+                          label="Section"
+                          placeholder="select a section ..."
                         />
-                      </Grid> */}
-
-
-                      {/* {
-                        ((sections && editExam?.section?.class?.has_section) || (sections && selectedClass && selectedClass?.has_section)) ?
-
-                          <AutoCompleteWrapper
-                            error={Boolean(touched.title && errors.title)}
-                            helperText={touched.title && errors.title}
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            minWidth="100%"
-                            name='section_id'
-                            label="Select Section"
-                            placeholder="select section"
-                            options={sections}
-                            value={selectedSection || sections.find((i) => i.id == editExam?.section_id) || null}
-                            handleChange={(e, v) => {
-                              setSelectedSection(v);
-                              if (v) {
-                                setFieldValue('section_id', v.id);
-                              } else {
-                                setFieldValue('section_id', undefined);
-                              }
-                            }}
-
-                          />
-                          :
-                          <EmptyAutoCompleteWrapper
-                            minWidth="100%"
-                            name='section_id'
-                            label="Select Section"
-                            placeholder="select section"
-                            options={[]}
-                            value={undefined}
-                          />
-
-                      } */}
-
+                      }
                     </Grid>
 
-                    {/* select section */}
-                    {((sections && editExam?.section?.class?.has_section) || (sections && selectedClass && selectedClass?.has_section)) && (
-                      <>
-                        <Grid
-                          item
-                          xs={12}
-                          sm={4}
-                          md={3}
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
-                        >
-                          <Box
-                            pr={3}
-                            sx={{
-                              pt: `${theme.spacing(2)}`,
-                              pb: { xs: 1, md: 0 }
-                            }}
-                            alignSelf="center"
-                          >
-                            <b>{t('Select section')}:</b>
-                          </Box>
-                        </Grid>
-                        <Grid
-                          sx={{
-                            mb: `${theme.spacing(3)}`
-                          }}
-                          item
-                          xs={12}
-                          sm={8}
-                          md={9}
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
-                        >
-                          <Autocomplete
-                            id="tags-outlined"
-                            options={sections}
-                            value={selectedSection || sections?.find((i) => i.id == editExam?.section_id) || null}
-                            filterSelectedOptions
-                            size='small'
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                size="small"
-                                label="select section"
-                                placeholder="section Name"
-                                error={Boolean(
-                                  touched?.section_id &&
-                                  errors?.section_id
-                                )}
-                                sx={{
-                                  '& fieldset': {
-                                    borderRadius: 0.5
-                                  }
-                                }}
-                                helperText={
-                                  touched?.section_id &&
-                                  errors?.section_id
-                                }
-                                required
-                                onBlur={handleBlur}
-                                name='section_id'
-                              />
-                            )}
-                            onChange={(e, v) => {
-                              setSelectedSection(v)
-                              if (v) {
-                                setFieldValue('section_id', v.id);
-                              } else {
-                                setFieldValue('section_id', undefined);
-                              }
-                            }}
-                          />
-                        </Grid>
-                      </>
-                    )}
+
                     {
                       subjectList && (
                         <>
                           <Grid
-                            item
-                            xs={12}
-                            sm={4}
-                            md={3}
-                            justifyContent="flex-end"
-                            textAlign={{ sm: 'right' }}
-                          >
-                            <Box
-                              pr={3}
-                              sx={{
-                                pt: `${theme.spacing(2)}`,
-                                pb: { xs: 1, md: 0 }
-                              }}
-                              alignSelf="center"
-                            >
-                              <b>{t('select subjects')}:</b>
-                            </Box>
-                          </Grid>
-                          <Grid
                             sx={{
-                              mb: `${theme.spacing(3)}`
+                              mb: `${theme.spacing(1)}`
                             }}
                             item
-                            xs={12}
-                            sm={8}
-                            md={9}
+                            width="100%"
                             justifyContent="flex-end"
                             textAlign={{ sm: 'right' }}
                           >
@@ -665,7 +482,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                 />
                               )}
                               onChange={(e, v) => {
-                                console.log(v);
                                 setSubject(v);
                                 setFieldValue('subject_id_list', v);
                               }}
@@ -748,21 +564,16 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                       <>
                         <Grid
                           item
-                          xs={12}
-                          sm={4}
-                          md={3}
                           justifyContent="flex-end"
                           textAlign={{ sm: 'right' }}
+                          m={1}
                         >
                           <Box
-                            pr={3}
-                            sx={{
-                              pt: `${theme.spacing(2)}`,
-                              pb: { xs: 1, md: 0 }
-                            }}
+                            pl={0}
                             alignSelf="center"
                           >
                             <Checkbox
+                              sx={{p:0}}
                               checked={checked}
                               onChange={(event) => {
                                 console.log(event.target.checked);
@@ -774,13 +585,12 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           </Box>
                         </Grid>
                         <Grid
-                          sx={{
-                            mb: `${theme.spacing(3)}`
-                          }}
+
                           item
                           xs={12}
                           sm={8}
                           md={9}
+                          pt={1.25}
                         >
                           Will this exam add to the final grade?
                         </Grid>
@@ -788,97 +598,30 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                     }
                     {
                       checked && <>
-                        <Grid
-                          item
-                          xs={12}
-                          sm={4}
-                          md={3}
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
-                        >
-                          <Box
-                            pr={3}
-                            sx={{
-                              pt: `${theme.spacing(2)}`,
-                              pb: { xs: 1, md: 0 }
-                            }}
-                            alignSelf="center"
-                          >
-
-                          </Box>
-
-                        </Grid>
-                        <Grid sx={{
-                          mb: `${theme.spacing(3)}`
-                        }}
-                          item
-                          xs={12}
-                          sm={8}
-                          md={9}>
-                          <TextField
-                            error={Boolean(touched.final_percent && errors.final_percent)}
-                            fullWidth
-                            helperText={touched.final_percent && errors.final_percent}
-                            name="final_percent"
-                            placeholder={t('Input percentage that count in the final...')}
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            type='number'
-                            value={values.final_percent}
-                            variant="outlined"
-                            sx={{
-                              '& fieldset': {
-                                borderRadius: '3px'
-                              }
-                            }}
-                          />
-                        </Grid>
+                        <TextFieldWrapper
+                          errors={errors.final_percent}
+                          touched={touched.final_percent}
+                          name="final_percent"
+                          label=" final count number in percent (100%) example: 50"
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          type='number'
+                          value={values.final_percent}
+                         />
                       </>
                     }
 
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      textAlign={{ sm: 'right' }}
-                    />
 
-
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <Button
-                        sx={{
-                          mr: 2
-                        }}
-                        type="submit"
-                        startIcon={
-                          isSubmitting ? <CircularProgress size="1rem" /> : null
-                        }
-                        disabled={Boolean(errors.submit) || isSubmitting}
-                        variant="contained"
-                        size="large"
-                      >
-                        {editExam ? t('Edit Exams') : t('Create Exams')}
-                      </Button>
-                      <Button
-                        color="secondary"
-                        size="large"
-                        variant="outlined"
-                        onClick={handleCreateProjectClose}
-                      >
-                        {t('Cancel')}
-                      </Button>
-                    </Grid>
                   </Grid>
                 </DialogContent>
+
+                <DialogActionWrapper
+                  title="Exam"
+                  editData={editExam}
+                  errors={errors}
+                  handleCreateClassClose={handleCreateProjectClose}
+                  isSubmitting={isSubmitting}
+                />
               </form>
             )
           }}

@@ -237,7 +237,12 @@ async function seed() {
       present_address: 'Khilgaon, Dhaka-1219',
       joining_date: new Date(),
       resume: '',
-      school_id:  school.id,
+      // school_id:  school.id,
+      school:{
+        connect:{
+          id:school.id
+        }
+      },
       department: { connect: { id: createDepartment.id } },
       user: {
         create: {

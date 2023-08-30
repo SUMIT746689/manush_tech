@@ -109,7 +109,6 @@ function RegistrationSecondPart({
           academic_year_id: undefined,
           roll_no: undefined,
           registration_no: registration_no_generate(),
-          discount: 0,
           student_photo: null,
           student_present_address: '',
           student_permanent_address: '',
@@ -417,27 +416,7 @@ function RegistrationSecondPart({
                       />
                     </Grid>
 
-                    {/* discount */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(touched.discount && errors.discount)}
-                        fullWidth
-                        helperText={touched.discount && errors.discount}
-                        label={t('Discount')}
-                        name="discount"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="number"
-                        value={values.discount}
-                        variant="outlined"
-                      />
-                    </Grid>
+                
 
                     {/* previous_school */}
                     <Grid item xs={12} md={6}>

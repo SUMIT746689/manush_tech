@@ -46,7 +46,7 @@ async function page() {
           data?.map(i => (
             <div key={i.id} className="shadow-md p-4 flex justify-between flex-col">
 
-              <Image
+              <img
                 height={500}
                 width={500}
                 quality={100}

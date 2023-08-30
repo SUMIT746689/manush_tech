@@ -124,7 +124,6 @@ const patchHandle = async (req, res, authenticate_user) => {
                     class_roll_no: fields?.roll_no,
                     // academic_year_id: 1,
                     class_registration_no: fields?.registration_no,
-                    discount: parseFloat(fields?.discount),
                     //@ts-ignore
                     student_photo: filePathQuery?.student_photo_path,
                     guardian_name: fields?.guardian_name,

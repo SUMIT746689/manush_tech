@@ -18,7 +18,7 @@ const GalleryContent = ({ gallery }) => {
                 {
                     gallery?.map(i =>
                         <div className='p-2 shadow-md'>
-                            <Image
+                            <img
                                 height={500}
                                 width={500}
                                 quality={100}

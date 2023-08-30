@@ -338,7 +338,6 @@ async function seed() {
     data: {
       class_roll_no: '01',
       class_registration_no: '654312',
-      discount: parseFloat(0),
       section: {
         connect: { id: createSection.id }
       },

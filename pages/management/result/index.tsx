@@ -58,7 +58,7 @@ function Managementschools() {
           setStudentList(
             res.data?.map((i) => {
               return {
-                label: i.class_roll_no,
+                label: `${i.class_registration_no} (${i?.student_info?.first_name})`,
                 id: i.id
               };
             })

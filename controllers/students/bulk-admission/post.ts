@@ -294,7 +294,6 @@ const handlePost = async (req, res, refresh_token) => {
                         class_roll_no: i?.roll_no?.toString(),
 
                         class_registration_no: i?.registration_no?.toString(),
-                        discount: Number(i?.discount) || 0,
                         student_photo: '',
                         guardian_name: i?.guardian_name,
                         guardian_phone: i?.guardian_phone?.toString(),

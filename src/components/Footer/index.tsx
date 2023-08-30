@@ -32,11 +32,11 @@ function Footer() {
           >
             Crafted by{' '}
             <Link
-              href="https://elitbuzz-bd.com/"
+              href="https://mram.com.bd/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Elitbuzz-Bd.com
+              MRAM Technologies Ltd
             </Link>
           </Typography>
         </Box>

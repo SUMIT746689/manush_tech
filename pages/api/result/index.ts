@@ -109,7 +109,8 @@ const index = async (req, res, refresh_token) => {
                 exam_id
                 exam_details_id
                 mark_obtained
-                
+                subject_total
+                academic_year_id
                 */
                 const exam_id = parseInt(req.body.exam_id);
                 const student_id = parseInt(req.body.student_id)

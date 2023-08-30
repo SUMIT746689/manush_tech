@@ -152,7 +152,6 @@ const postHandle = async (req, res, authenticate_user) => {
         data: {
           class_roll_no: fields?.roll_no,
           class_registration_no: fields?.registration_no,
-          discount: parseFloat(fields?.discount),
           // @ts-ignore
           student_photo: filePathQuery?.student_photo_path,
           guardian_name: fields?.guardian_name,

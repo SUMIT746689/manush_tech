@@ -9,9 +9,10 @@ import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
-import { TextFieldWrapper, UncontrolledTextFieldWrapper } from '@/components/TextFields';
+import { FileUploadFieldWrapper, TextFieldWrapper, UncontrolledTextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 
 function PageHeader({ editExam, setEditExam, classes, selectClasses,
@@ -23,25 +24,30 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
 }): any {
 
   const { t }: { t: any } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [openSingle, setOpenSingle] = useState(false);
+  const [openSubjectBulk, setOpenSubjectBulk] = useState(false);
   const { showNotification } = useNotistick();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
 
   const theme = useTheme();
 
 
-  const handleCreateProjectOpen = () => {
-    setOpen(true);
+  const handleSingleOpen = () => {
+    setOpenSingle(true);
   };
 
   const handleCreateProjectClose = () => {
-    setOpen(false);
+    setOpenSingle(false);
     setEditExam(null);
   };
 
-  const handleCreateProjectSuccess = () => {
-    showNotification('A new project has been created successfully');
-    setOpen(false);
+  const handleSubjectBulkClose = () => {
+    setOpenSubjectBulk(false);
+  };
+
+  const handleCreateProjectSuccess = (msg) => {
+    showNotification(msg);
+    setOpenSingle(false);
   };
 
   const handleErrorSnackbar = (err) => {
@@ -94,7 +100,7 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
-        handleCreateProjectSuccess();
+        handleCreateProjectSuccess('A new result has been created successfully');
         setSelectedSection(null);
         setStudentList(null);
         setExams(null)
@@ -137,18 +143,98 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
       setSubmitting(false);
     }
   }
+  const handleSubjectBulkSubmit = async (
+    _values,
+    { resetForm, setErrors, setStatus, setSubmitting }
+  ) => {
+    try {
+      const successProcess = () => {
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        setSelectedSection(null);
+        setStudentList(null);
+        setExams(null)
+        handleCreateProjectClose();
+
+
+      };
+
+      if (!_values.bulkExamMark) {
+        throw new Error('Bulk Exam Mark excel file is required');
+      }
+
+      const formDate = new FormData();
+      formDate.append('exam_id', _values.exam_id)
+      formDate.append('exam_details_id', _values.exam_details_id)
+      formDate.append('academic_year_id', academicYear.id)
+      formDate.append('bulkExamMark', _values.bulkExamMark)
+
+      const res = await axios.post('/api/result/subjectwise-bulk', formDate);
+
+      if (res.data?.success) {
+        successProcess();
+        handleCreateProjectSuccess(res.data?.message);
+      }
+      else {
+        // @ts-ignore
+        throw new Error(`${res?.response?.data?.message}`);
+      }
+
+
+    } catch (err) {
+      showNotification(err?.response?.data?.message, 'error');
+      console.error("errrrrrrrrr__", err?.response?.data?.message);
+      setStatus({ success: false });
+      setErrors({ submit: err.message });
+      setSubmitting(false);
+    }
+  }
 
   return (
     <>
       <PageHeaderTitleWrapper
         name="Result Mark Entry"
-        handleCreateClassOpen={handleCreateProjectOpen}
-      />
+        handleCreateClassOpen={undefined}
+        actionButton={
 
+          <Grid display={'grid'} columnGap={3} gridTemplateColumns={{ xs: '1fr 1fr', sm: '1fr 1fr 1fr' }} py={2}>
+            <Grid>
+
+              <ButtonWrapper
+                handleClick={handleSingleOpen}
+                startIcon={<AddTwoToneIcon fontSize="small" />}
+              >
+                {t('Single Result Entry')}
+              </ButtonWrapper>
+            </Grid>
+            <Grid>
+
+              <ButtonWrapper
+                handleClick={() => setOpenSubjectBulk(true)}
+                startIcon={<AddTwoToneIcon fontSize="small" />}
+              >
+                {t('Subject wise Bulk Result Entry')}
+              </ButtonWrapper>
+            </Grid>
+            {/* <Grid>
+
+              <ButtonWrapper
+                handleClick={handleSingleOpen}
+                startIcon={<AddTwoToneIcon fontSize="small" />}
+              >
+                {t('Full term bulk Entry')}
+              </ButtonWrapper>
+            </Grid> */}
+
+          </Grid>
+        }
+      />
+      {/* Single Result Entry */}
       <Dialog
         fullWidth
         maxWidth="sm"
-        open={open}
+        open={openSingle}
         onClose={handleCreateProjectClose}
       >
         <DialogTitle
@@ -157,7 +243,7 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t(`${editExam ? 'Edit Result mark entry' : 'Result mark entry'}`)}
+            {t(`${editExam ? 'Edit Result mark entry' : 'Single Result entry'}`)}
           </Typography>
           <Typography variant="subtitle2">
             {t('Use this dialog window to Result mark entry')}
@@ -242,67 +328,6 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
 
                   {
                     studentList ? <>
-                      {/* <Grid
-                        item
-                        xs={12}
-                        sm={4}
-                        md={3}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                      >
-                        <Box
-                          pr={3}
-                          sx={{
-                            pt: `${theme.spacing(2)}`,
-                            pb: { xs: 1, md: 0 }
-                          }}
-                          alignSelf="center"
-                        >
-                          <b>{t('Select student by roll number')}:</b>
-                        </Box>
-                      </Grid>
-                      <Grid
-                        sx={{
-                          mb: `${theme.spacing(3)}`
-                        }}
-                        item
-                        xs={12}
-                        sm={8}
-                        md={9}
-                        justifyContent="flex-end"
-                        textAlign={{ sm: 'right' }}
-                      >
-                        <Autocomplete
-                          id="tags-outlined"
-                          options={studentList}
-                          value={selectedStudent}
-                          filterSelectedOptions
-                          renderInput={(params) => (
-                            <TextField
-                              error={Boolean(
-                                touched?.student_id && errors?.student_id
-                              )}
-                              helperText={
-                                touched?.student_id && errors?.student_id
-                              }
-                              {...params}
-                              label="select student"
-                              placeholder="Favorites"
-                              name='student_id'
-                            />
-                          )}
-                          onChange={(e, v) => {
-
-                            setSelectedStudent(v)
-                            if (v) {
-                              setFieldValue("student_id", v.id)
-                            }
-
-                          }}
-                        />
-
-                      </Grid> */}
-
                       <AutoCompleteWrapper
                         minWidth="100%"
                         label="Select Student By Roll"
@@ -416,6 +441,197 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
           )}
         </Formik>
       </Dialog>
+
+      {/* Subject wise Bulk Result Entry */}
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={openSubjectBulk}
+        onClose={handleSubjectBulkClose}
+      >
+        <DialogTitle
+          sx={{
+            p: 3
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {t(`${editExam ? 'Edit Result mark entry' : 'Single Result entry'}`)}
+          </Typography>
+          <Typography variant="subtitle2">
+            {t('Use this dialog window to Result mark entry')}
+          </Typography>
+        </DialogTitle>
+        <Formik
+          initialValues={{
+            exam_id: undefined,
+            exam_details_id: undefined,
+            bulkExamMark: null,
+            submit: null
+          }}
+          validationSchema={Yup.object().shape({
+            exam_id: Yup.number().required(t('The exam field is required')).nullable(false),
+            exam_details_id: Yup.number().required(t('The exam subject field is required')).nullable(false),
+            // bulkExamMark: Yup.object().required(t('Bulk Exam Mark excel file is required')).nullable(false),
+          })}
+          onSubmit={handleSubjectBulkSubmit}
+        >
+          {({
+            errors,
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            isSubmitting,
+            touched,
+            values,
+            setFieldValue
+          }) => {
+            console.log({ errors });
+            console.log({ values });
+
+            return (
+              <form onSubmit={handleSubmit}>
+                <DialogContent
+                  dividers
+                  sx={{
+                    p: 3
+                  }}
+                >
+                  <Grid container spacing={0}>
+
+                    {/* select class */}
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      label={t('Select class')}
+                      placeholder="select a class ..."
+                      options={classes?.map(i => ({
+                        label: i.name,
+                        id: i.id,
+                        has_section: i.has_section
+                      })
+                      )}
+                      value={selectClasses}
+                      filterSelectedOptions
+
+                      handleChange={handleClassSelect}
+                    />
+
+                    {
+                      // select section
+                      sections ?
+                        <AutoCompleteWrapper
+                          minWidth="100%"
+                          label="Section"
+                          placeholder="select a section..."
+                          value={selectedSection}
+                          options={sections}
+                          filterSelectedOptions
+                          handleChange={(e, v) => setSelectedSection(v)}
+                        />
+                        :
+                        <EmptyAutoCompleteWrapper
+                          minWidth="100%"
+                          label="Section"
+                          placeholder="select a section..."
+                          options={[]}
+                          value={undefined}
+                        />
+                    }
+
+                    {/* exam select */}
+                    {
+                      exams ? <>
+
+                        <AutoCompleteWrapper
+                          label="Select Exam"
+                          placeholder="select a exam..."
+                          minWidth="100%"
+                          value={selectedExam}
+                          options={exams}
+                          filterSelectedOptions
+                          handleChange={(e, v) => handleExamSelect(e, v, setFieldValue, setSelectedExam)}
+                        />
+                      </>
+                        :
+                        <EmptyAutoCompleteWrapper
+                          label="Select Exam"
+                          placeholder="select a exam..."
+                          minWidth="100%"
+                          value={undefined}
+                          options={[]}
+                        />
+                    }
+                    {
+                      examSubjectList ? <>
+
+                        <AutoCompleteWrapper
+                          minWidth="100%"
+                          label="Select Exam subject"
+                          placeholder="select exam subject..."
+                          options={examSubjectList}
+                          value={selectedExamSubject}
+                          filterSelectedOptions
+                          handleChange={(e, v) => {
+                            setSelectedExamSubject(v)
+                            if (v) {
+                              setFieldValue("exam_details_id", v.id)
+                            } else {
+                              setFieldValue("exam_details_id", undefined)
+                            }
+                          }}
+                        />
+
+                      </>
+                        :
+                        <>
+                          <EmptyAutoCompleteWrapper
+                            minWidth="100%"
+                            label="Select Exam subject"
+                            placeholder="select exam subject..."
+                            options={[]}
+                            value={undefined}
+                          />
+
+                        </>
+                    }
+                    {
+                      selectedExamSubject && <>
+
+                        <FileUploadFieldWrapper
+                          htmlFor="bulkExamMark"
+                          label="select Excel file"
+                          name="bulkExamMark"
+                          accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+                          value={values?.bulkExamMark?.name || ''}
+                          handleChangeFile={(e) => {
+                            console.log(e.target.files[0]);
+
+                            if (e.target?.files?.length && e.target.files[0].type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+                              setFieldValue('bulkExamMark', e.target.files[0])
+                            }
+                          }}
+                          handleRemoveFile={(e) => { setFieldValue('bulkExamMark', null) }}
+                        />
+                      </>
+                    }
+
+                  </Grid>
+                </DialogContent>
+
+                <DialogActionWrapper
+                  title="Result Mark Entry"
+                  titleFront="Submit"
+                  errors={errors}
+                  editData={editExam}
+                  handleCreateClassClose={handleSubjectBulkClose}
+                  isSubmitting={isSubmitting}
+                />
+              </form>
+            )
+          }}
+        </Formik>
+      </Dialog>
+
+
     </>
   );
 }

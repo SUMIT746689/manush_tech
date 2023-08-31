@@ -234,6 +234,14 @@ const handlePost = async (req, res, refresh_token) => {
                 allStudents.push(student)
             }
         }
+
+        const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
+            where: {
+              school_id: refresh_token?.school_id,
+              is_active: true
+            }
+          })
+          
         let faildedSmS = [], successSmS = []
         for (const i of allStudents) {
             await prisma.$transaction(async (transaction) => {
@@ -338,7 +346,7 @@ const handlePost = async (req, res, refresh_token) => {
                 });
 
                 try {
-                    const sms_res = await axios.post(`https://880sms.com/smsapi?api_key=${process.env.API_KEY}&type=text&contacts=${i?.phone}&senderid=${process.env.SENDER_ID}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
+                    const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${i?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
                     if (sms_res.data == 1015) {
                         faildedSmS.push(student.id)
                     }

@@ -30,180 +30,203 @@ const index = async (req, res, refresh_token) => {
         const { method } = req;
 
         switch (method) {
-        
+
             case 'POST':
                 /*
                 input
                 ------
-                student_id
                 exam_id
                 exam_details_id
-                mark_obtained
+                subject_id
                 academic_year_id
                 */
 
-                // const { fields, files }: any = await gettingFile(req);
+                const { fields, files }: any = await gettingFile(req);
 
-                // const exam_id = parseInt(fields.exam_id);
-                // const exam_details_id = parseInt(fields.exam_details_id)
-                // const academic_year_id = parseInt(fields.academic_year_id)
-                // const section_id = parseInt(fields.section_id)
+                const exam_id = parseInt(fields.exam_id);
+                const exam_details_id = parseInt(fields.exam_details_id)
+                const academic_year_id = parseInt(fields.academic_year_id)
 
 
-                // const f = Object.entries(files)[0][1];
-                // //@ts-ignore
-                // const workbook = await readFile(f.filepath);
-        
-                // const sheetName = workbook.SheetNames[0];
-                // const worksheet = workbook.Sheets[sheetName];
-        
-                // let allStudents = []
-                // const range = utils.decode_range(worksheet['!ref']);
-        
-                // // console.log("total row__", range.e.r);
-        
+                const f = Object.entries(files)[0][1];
+                //@ts-ignore
+                const workbook = await readFile(f.filepath);
+
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+
+                const prevInserted = []
+                const range = utils.decode_range(worksheet['!ref']);
+
+                // console.log("total row__", range.e.r);
+
                 // const requestedStudentAdmissionCount = range.e.r;
-        
-                // const schoolPackage = await prisma.subscription.findFirst({
-                //     where: {
-                //         school_id: parseInt(refresh_token?.school_id),
-                //         is_active: true
-                //     },
-                //     select: {
-                //         package: {
-                //             select: {
-                //                 student_count: true
-                //             }
-                //         }
-                //     }
-                // })
-                // const admittedStudentCount = await prisma.studentInformation.count({
-                //     where: {
-                //         school_id: parseInt(refresh_token?.school_id)
-                //     }
-                // })
-        
-                // if (requestedStudentAdmissionCount + admittedStudentCount > schoolPackage?.package?.student_count) {
-                //     return res.status(406).json({ message: 'Your package maximum students capacity has already been filled, please update your package !' });
-                // }
 
-                // const uniqueStudentResult = await prisma.studentResult.findFirst({
-                //     where: {
-                //         exam_id,
+                const sectionStudentResult = await prisma.studentResult.findMany({
+                    where: {
+                        exam_id,
+                    }
+                })
+
+                const allGrad = await prisma.gradingSystem.findMany({
+                    where: {
+                        school_id: refresh_token.school_id,
+                        academic_year_id: academic_year_id,
+                    },
+                    orderBy: {
+                        point: 'desc'
+                    }
+                })
+
+                const exam_details = await prisma.examDetails.findFirst({
+                    where: {
+                        id: exam_details_id,
+                        exam_id,
+                    }
+                })
+
+
+                for (let row = range.s.r; row <= range.e.r; row++) {
+
+                    let student: any = {};
+
+                    if (row !== 0) {
+
+                        for (let col = range.s.c; col <= range.e.c; col++) {
+
+                            const columnLetter = utils.encode_col(col);
+
+                            const key = worksheet[`${columnLetter}1`].v
+                            const value = worksheet[`${columnLetter}${row + 1}`]?.v ? worksheet[`${columnLetter}${row + 1}`].v : null
+
+                            if (key == 'class_registration_no' && !value || key == 'mark_obtained' && !value) {
+                                return res.status(404).json({ message: `${row + 1} number row ${key} value missing !!` });
+                            }
+
+                            student[key] = (key == 'class_registration_no') ? value.toString() : value
+
+
+                        }
+
+                        const mark_obtained = Number(((parseFloat(student.mark_obtained) / exam_details.subject_total) * 100).toFixed(2));
+
+
+                        console.log("uniqueStudentResult____", sectionStudentResult);
+
+                        const targetGrad = allGrad.find(i => i.lower_mark <= mark_obtained && i.upper_mark >= mark_obtained)
+
+                        if (!targetGrad) {
+                            throw new Error('Grade not found !')
+                        }
+
+                        const singleStudent = await prisma.student.findFirst({
+                            where: {
+                                class_registration_no: student?.class_registration_no
+                            },
+                            select: {
+                                id: true
+                            }
+                        })
+
+                        const resultHistory = sectionStudentResult.find(ic => ic.student_id == singleStudent.id)
+
+                        if (resultHistory) {
+
+                            const isExist = await prisma.studentResultDetails.findFirst({
+                                where: {
+                                    exam_details_id,
+                                    student_result_id: resultHistory.id
+                                }
+                            })
+                            if (isExist) {
+                                prevInserted.push({ class_registration_no: student?.class_registration_no })
+                            }
+                            else {
+                                const allObtainedNumber = await prisma.studentResultDetails.findMany({
+                                    where: {
+
+                                        student_result_id: resultHistory.id
+                                    },
+                                    select: {
+                                        mark_obtained: true,
+                                        grade: {
+                                            select: {
+                                                point: true
+                                            }
+                                        },
+                                    }
+                                })
+
+                                await prisma.studentResultDetails.create({
+                                    data: {
+                                        student_result_id: resultHistory.id,
+                                        exam_details_id,
+                                        mark_obtained,
+                                        grade_id: targetGrad.id
+                                    }
+                                })
+
+                                let totalObtainedNumber = 0, totalObtainPoint = 0, size = allObtainedNumber.length;
+
+                                for (let i = 0; i < size; i++) {
+                                    console.log(allObtainedNumber[i]);
+
+                                    totalObtainedNumber += allObtainedNumber[i].mark_obtained;
+                                    totalObtainPoint += allObtainedNumber[i].grade.point;
+                                    if (i == size - 1) {
+                                        totalObtainPoint = (totalObtainPoint + targetGrad.point) / (i + 2)
+                                    }
+                                }
+                                const averageGrad = allGrad.find(i => totalObtainPoint >= i.point)
+                                // console.log("totalObtainedNumber__", totalObtainedNumber);
+
+                                await prisma.studentResult.update({
+                                    where: {
+                                        id: resultHistory.id
+                                    },
+                                    data: {
+                                        total_marks_obtained: totalObtainedNumber + mark_obtained,
+                                        calculated_point: totalObtainPoint,
+                                        calculated_grade: averageGrad.grade
+
+                                    }
+                                })
+                            }
+
+                        }
+                        else {
+
+                            await prisma.studentResultDetails.create({
+                                data: {
+                                    exam_details: {
+                                        connect: {
+                                            id: exam_details_id
+                                        }
+                                    },
+                                    mark_obtained: student.mark_obtained,
+                                    grade: {
+                                        connect: {
+                                            id: targetGrad.id
+                                        }
+                                    },
+                                    result: {
+                                        create: {
+                                            student_id: singleStudent.id,
+                                            exam_id,
+                                            total_marks_obtained: mark_obtained,
+                                            calculated_point: targetGrad.point,
+                                            calculated_grade: targetGrad.grade
+                                        }
+                                    },
+
+                                }
+                            })
+                        }
+
+                    }
+                }
             
-                //     }
-                // })
-                // const allGrad = await prisma.gradingSystem.findMany({
-                //     where: {
-                //         school_id: refresh_token.school_id,
-                //         academic_year_id: academic_year_id,
-                //     },
-                //     orderBy: {
-                //         point: 'desc'
-                //     }
-                // })
-                // const mark_obtained = Number(((parseFloat(req.body.mark_obtained) / subject_total) * 100).toFixed(2));
-
-
-                // console.log("uniqueStudentResult____", uniqueStudentResult);
-
-                // const targetGrad = allGrad.find(i => i.lower_mark <= mark_obtained && i.upper_mark >= mark_obtained)
-
-                // if (!targetGrad) {
-                //     throw new Error('Grade not found !')
-                // }
-
-                // if (uniqueStudentResult) {
-
-                //     const isExist = await prisma.studentResultDetails.findFirst({
-                //         where: {
-                //             exam_details_id,
-                //             student_result_id: uniqueStudentResult.id
-                //         }
-                //     })
-                //     if (isExist) {
-                //         throw new Error('Result already inserted !!')
-                //     }
-                //     const allObtainedNumber = await prisma.studentResultDetails.findMany({
-                //         where: {
-
-                //             student_result_id: uniqueStudentResult.id
-                //         },
-                //         select: {
-                //             mark_obtained: true,
-                //             grade: {
-                //                 select: {
-                //                     point: true
-                //                 }
-                //             },
-                //         }
-                //     })
-
-                //     await prisma.studentResultDetails.create({
-                //         data: {
-                //             student_result_id: uniqueStudentResult.id,
-                //             exam_details_id,
-                //             mark_obtained,
-                //             grade_id: targetGrad.id
-                //         }
-                //     })
-
-                //     let totalObtainedNumber = 0, totalObtainPoint = 0, size = allObtainedNumber.length;
-                //     for (let i = 0; i < size; i++) {
-                //         console.log(allObtainedNumber[i]);
-
-                //         totalObtainedNumber += allObtainedNumber[i].mark_obtained;
-                //         totalObtainPoint += allObtainedNumber[i].grade.point;
-                //         if (i == size - 1) {
-                //             totalObtainPoint = (totalObtainPoint + targetGrad.point) / (i + 2)
-                //         }
-                //     }
-                //     const averageGrad = allGrad.find(i => totalObtainPoint >= i.point)
-                //     // console.log("totalObtainedNumber__", totalObtainedNumber);
-
-                //     await prisma.studentResult.update({
-                //         where: {
-                //             id: uniqueStudentResult.id
-                //         },
-                //         data: {
-                //             total_marks_obtained: totalObtainedNumber + mark_obtained,
-                //             calculated_point: totalObtainPoint,
-                //             calculated_grade: averageGrad.grade
-
-                //         }
-                //     })
-
-                // }
-                // else {
-
-                //     await prisma.studentResultDetails.create({
-                //         data: {
-                //             exam_details: {
-                //                 connect: {
-                //                     id: parseInt(req.body.exam_details_id)
-                //                 }
-                //             },
-                //             mark_obtained: parseFloat(req.body.mark_obtained),
-                //             grade: {
-                //                 connect: {
-                //                     id: targetGrad.id
-                //                 }
-                //             },
-                //             result: {
-                //                 create: {
-                //                     student_id,
-                //                     exam_id,
-                //                     total_marks_obtained: mark_obtained,
-                //                     calculated_point: targetGrad.point,
-                //                     calculated_grade: targetGrad.grade
-                //                 }
-                //             },
-
-                //         }
-                //     })
-                // }
-
-                res.status(200).json({ success: true, message: "Student result details inserted!" })
+                res.status(200).json({ success: true, message: `${prevInserted.length ? 'Some result result inserted !' : 'Student result details inserted!'}`, prevInserted })
                 break;
 
             default:

@@ -22,7 +22,7 @@ function Footer({ facebook_link, twitter_link, youtube_link, google_link, linked
         className={`${primaryBgColor} ${primaryColor} py-4 px-20 grid md:grid-cols-2 justify-between`}
       >
         <div className=" relative top-4 mb-4 text-center md:text-left">
-          ©Copyright© 2023 Elitbuzz Technologies Limited . All Rights Reserved.
+          ©Copyright© 2023 MRAM Technologies Ltd . All Rights Reserved.
         </div>
         <div className=" text-2xl flex gap-2 pt-3 md:pt-0 justify-center md:justify-end">
           <Link href={facebook_link} target='_blank'><FaFacebookF className={footerIconClass} /></Link>

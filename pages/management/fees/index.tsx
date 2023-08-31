@@ -65,7 +65,7 @@ function ManagementFees() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 2 }}
         container
         direction="row"
         justifyContent="center"

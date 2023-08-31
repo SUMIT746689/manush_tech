@@ -14,8 +14,8 @@ import useNotistick from '@/hooks/useNotistick';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 
 import { MobileDatePicker } from '@mui/lab';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 
 
@@ -353,7 +353,7 @@ const Results = () => {
       <Card
         sx={{
           p: 1,
-          pb: selectedDate ? 0 : 1,
+          pb: 0,
           mb: 2,
           maxWidth: 1200,
           display: 'grid',
@@ -363,7 +363,7 @@ const Results = () => {
             sm: '2fr 2fr'
           },
           mx: 'auto',
-          gap: 2,
+          columnGap: 2,
         }}
       >
         <Grid item sx={{
@@ -379,6 +379,7 @@ const Results = () => {
             renderInput={(params) => <TextField
               size='small'
               sx={{
+                mb:1,
                 [`& fieldset`]: {
                   borderRadius: 0.6,
                 }
@@ -399,35 +400,44 @@ const Results = () => {
         />
 
 
+        {/* <Grid item  > */}
+          {
+            selectedSection ?
+              <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
+              :
+              <DisableButtonWrapper >Find</DisableButtonWrapper>
+          }
+        {/* </Grid> */}
         {
-          selectedSection &&
-          <Grid item  >
-            <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
-          </Grid>
-        }
-        {
-          students && students.length > 0 &&
-          <Grid >
-            <AutoCompleteWrapper
-              minWidth={200}
-              options={allAttandenceOptions}
-              value={selectedForAll}
-              handleChange={(e, value: any) => {
-                if (value) {
-                  if (value.id !== 'notTaken') {
-                    setSelectedForAll(value)
-                  }
-                  else {
-                    setSelectedForAll(null)
-                  }
+          students && students.length > 0 ?
+            <Grid >
+              <AutoCompleteWrapper
+                minWidth={200}
+                options={allAttandenceOptions}
+                value={selectedForAll}
+                handleChange={(e, value: any) => {
+                  if (value) {
+                    if (value.id !== 'notTaken') {
+                      setSelectedForAll(value)
+                    }
+                    else {
+                      setSelectedForAll(null)
+                    }
 
-                }
-              }}
+                  }
+                }}
+                label={'Select For Everyone'}
+                placeholder={'Everyone...'}
+
+              />
+            </Grid>
+            :
+            <EmptyAutoCompleteWrapper
               label={'Select For Everyone'}
               placeholder={'Everyone...'}
-
+              options={[]}
+              value={undefined}
             />
-          </Grid>
         }
       </Card>
 
@@ -440,14 +450,12 @@ const Results = () => {
             fixedHeaderContent={fixedHeaderContent}
             itemContent={(_index, row) => rowContent(_index, row, setSectionAttendence)}
           />
-
-
         </Paper>
       </Grid>
-      <Grid container justifyContent="flex-end" pt={1}>
-        <Button onClick={handleSubmit} variant='contained' >
+      <Grid item justifyContent="flex-end" pt={1}>
+        <ButtonWrapper handleClick={handleSubmit} >
           submit
-        </Button>
+        </ButtonWrapper>
       </Grid>
     </Grid>
   );

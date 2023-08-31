@@ -47,6 +47,7 @@ import useNotistick from '@/hooks/useNotistick';
 import dayjs from 'dayjs';
 import { formatNumber } from '@/utils/numberFormat';
 import { useAuth } from '@/hooks/useAuth';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -212,12 +213,10 @@ const Results: FC<ResultsProps> = ({
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
 
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/fees/${deleteSchoolId}`);
-      console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The fees has been deleted successfully');
@@ -238,8 +237,9 @@ const Results: FC<ResultsProps> = ({
       >
         <Grid container>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
+                size='small'
                 sx={{
                   m: 0
                 }}
@@ -294,114 +294,101 @@ const Results: FC<ResultsProps> = ({
         <Divider />
 
         {paginatedFees.length === 0 ? (
-          <>
-            <Typography
-              sx={{
-                py: 10
-              }}
-              variant="h3"
-              fontWeight="normal"
-              color="text.secondary"
-              align="center"
-            >
-              {t(
-                "We couldn't find any fees matching your search criteria"
-              )}
-            </Typography>
-          </>
-        ) : (
-          <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">
-                      {/* <Checkbox
+          <TableEmptyWrapper title="fees" />
+        )
+          :
+          (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        {/* <Checkbox
                         checked={selectedAllschools}
                         indeterminate={selectedSomeschools}
                         onChange={handleSelectAllschools}
                       /> */}
-                      <TableCell align="center">{t('ID')}</TableCell>
-                    </TableCell>
-                    <TableCell>{t('Title')}</TableCell>
-                    <TableCell>{t('Fee for')}</TableCell>
-                    <TableCell>{t('Amount')}</TableCell>
-                    <TableCell>{t('Class')}</TableCell>
-                    <TableCell>{t('Last date')}</TableCell>
-                    <TableCell>{t('Last fee Fine')}</TableCell>
+                        <TableCell align="center">{t('ID')}</TableCell>
+                      </TableCell>
+                      <TableCell>{t('Title')}</TableCell>
+                      <TableCell>{t('Fee for')}</TableCell>
+                      <TableCell>{t('Amount')}</TableCell>
+                      <TableCell>{t('Class')}</TableCell>
+                      <TableCell>{t('Last date')}</TableCell>
+                      <TableCell>{t('Last fee Fine')}</TableCell>
 
-                    <TableCell align="center">{t('Actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedFees.map((fee) => {
-                    const isschoolselected = selectedItems.includes(
-                      fee.id
-                    );
-                    console.log(fee);
+                      <TableCell align="center">{t('Actions')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedFees.map((fee) => {
+                      const isschoolselected = selectedItems.includes(
+                        fee.id
+                      );
 
-                    return (
-                      <TableRow
-                        hover
-                        key={fee.id}
-                        selected={isschoolselected}
-                      >
-                        <TableCell padding="checkbox">
-                          {/* <Checkbox
+                      return (
+                        <TableRow
+                          hover
+                          key={fee.id}
+                          selected={isschoolselected}
+                        >
+                          <TableCell padding="checkbox">
+                            {/* <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
                               handleSelectOneProject(event, fee.id)
                             }
                             value={isschoolselected}
                           /> */}
-                          <Typography noWrap align="center" variant="h5">
-                            {fee.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {fee.title}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {fee?.for}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {formatNumber(fee.amount)} {currency}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {fee.class?.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5" sx={{
-                            color: 'green'
-                          }}>
-                            {dayjs(fee?.last_date).format('YYYY-MM-DD , HH:mm')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {formatNumber(fee?.late_fee?.toFixed(2))} {currency}
-                          </Typography>
-                        </TableCell>
+                            <Typography noWrap align="center" variant="h5">
+                              {fee.id}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5">
+                              {fee.title}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5">
+                              {fee?.for}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5">
+                              {formatNumber(fee.amount)} {currency}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5">
+                              {fee.class?.name}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5" sx={{
+                              color: 'green'
+                            }}>
+                              {dayjs(fee?.last_date).format('YYYY-MM-DD , HH:mm')}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography noWrap variant="h5">
+                              {formatNumber(fee?.late_fee?.toFixed(2))} {currency}
+                            </Typography>
+                          </TableCell>
 
-                        <TableCell align="center">
-                          <Typography noWrap>
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                onClick={() => setEditData(fee)}
-                                color="primary"
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            {/* <Tooltip title={t('Delete')} arrow>
+                          <TableCell align="center">
+                            <Typography noWrap>
+                              <Tooltip title={t('Edit')} arrow>
+                                <IconButton
+                                  onClick={() => setEditData(fee)}
+                                  color="primary"
+                                >
+                                  <LaunchTwoToneIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              {/* <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
                                   handleConfirmDelete(fee.id)
@@ -411,17 +398,17 @@ const Results: FC<ResultsProps> = ({
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>
                             </Tooltip> */}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-          </>
-        )}
+            </>
+          )}
       </Card>
 
 

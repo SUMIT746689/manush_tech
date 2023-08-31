@@ -1,69 +1,18 @@
-import {
-  FC,
-  ChangeEvent,
-  MouseEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef
-} from 'react';
+import { FC, ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Avatar,
-  Autocomplete,
-  Box,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  AvatarGroup,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  ToggleButton,
-  ToggleButtonGroup,
-  LinearProgress,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  FormControl,
-  Select,
-  InputLabel,
-  Zoom,
-  CardMedia,
-  lighten,
-  styled
-} from '@mui/material';
-import Link from 'src/components/Link';
-
+import { Avatar, Box, Card, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, Table, TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField, Button, Typography, Dialog, styled } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
-import clsx from 'clsx';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
-import Label from 'src/components/Label';
 import BulkActions from './BulkActions';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
-import GridViewTwoToneIcon from '@mui/icons-material/GridViewTwoTone';
-import TableRowsTwoToneIcon from '@mui/icons-material/TableRowsTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import { useSnackbar } from 'notistack';
-import { formatDistance, format } from 'date-fns';
-import Text from 'src/components/Text';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
+import { TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -231,7 +180,6 @@ const Results: FC<ResultsProps> = ({
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/datas/${deleteSchoolId}`);
-      console.log({ result });
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The datas has been deleted successfully')
@@ -249,10 +197,11 @@ const Results: FC<ResultsProps> = ({
           mb: 3
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0.5}>
               <TextField
+                size='small'
                 sx={{
                   m: 0
                 }}
@@ -308,29 +257,14 @@ const Results: FC<ResultsProps> = ({
         <Divider />
 
         {paginatedHolidays.length === 0 ? (
-          <>
-            <Typography
-              sx={{
-                py: 10,
-                p: 4
-              }}
-              variant="h3"
-              fontWeight="normal"
-              color="text.secondary"
-              align="center"
-            >
-              {t(
-                "We couldn't find any holidays matching your search criteria"
-              )}
-            </Typography>
-          </>
+         <TableEmptyWrapper title="holidays" />
         ) : (
           <>
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    
+
                     <TableCell align="center">{t('Title')}</TableCell>
                     <TableCell align="center">{t('Date')}</TableCell>
 
@@ -348,7 +282,7 @@ const Results: FC<ResultsProps> = ({
                         key={holiday.id}
                         selected={isschoolselected}
                       >
-                        
+
                         <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {holiday.title}

@@ -239,7 +239,7 @@ function EmailPage() {
         <Formik
           initialValues={{
             campaign_name: undefined,
-            subject:undefined,
+            subject: undefined,
             template_id: undefined,
             body: undefined,
             recipient_type: undefined,
@@ -331,7 +331,7 @@ function EmailPage() {
                   </Grid>
                 </DialogContent>
 
-                <DialogActions sx={{ p: 3 }}>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
                   <Button
                     type="submit"
                     startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}

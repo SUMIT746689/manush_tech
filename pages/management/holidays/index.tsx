@@ -1,18 +1,12 @@
 import Head from 'next/head';
-
-import { useState, useEffect, useCallback } from 'react';
-
+import { useState, useEffect } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
-
 import PageHeader from 'src/content/Management/Holidays/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-
 import { Grid } from '@mui/material';
-// import { useRefMounted } from 'src/hooks/useRefMounted';
 import type { Project } from 'src/models/project';
-// import { schoolsApi } from 'src/mocks/schools';
 import Results from 'src/content/Management/Holidays/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import { useAuth } from '@/hooks/useAuth';
@@ -52,12 +46,12 @@ function Managementschools() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 2 }}
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        spacing={3}
+        spacing={1}
       >
         <Grid item xs={12}>
           <Results datas={datas} setEditData={setEditData} />

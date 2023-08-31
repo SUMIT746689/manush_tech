@@ -1,30 +1,26 @@
 import Head from 'next/head';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid } from '@mui/material';
-import Results from 'src/content/Management/Attendence/Results';
-import { useClientFetch } from 'src/hooks/useClientFetch';
 import {
-  Autocomplete, Box, Card, Checkbox, Divider, Table, TableBody, TableCell, TableHead, TableContainer,
-  TableRow, TextField, Typography, Button, useTheme, CircularProgress, Paper, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
+  Autocomplete, Box, Card, Divider, Table, TableBody, TableCell, TableHead, TableContainer,
+  TableRow, TextField, Button, Paper, FormControl, RadioGroup, FormControlLabel, Radio,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { forwardRef, Fragment, useContext } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
-
 import dayjs, { Dayjs } from 'dayjs';
 import { TableVirtuoso } from 'react-virtuoso';
-
 import useNotistick from '@/hooks/useNotistick';
-import { ClassAndSectionSelect } from '@/components/Attendence';
-import PropTypes from 'prop-types';
-import {  MobileDatePicker } from '@mui/lab';
+import { MobileDatePicker } from '@mui/lab';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 
 
 const columns = [
@@ -141,7 +137,6 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, u
 
   const handleUpdateApi = (e, remarkValue) => {
     const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
-    console.log({ remark });
 
     axios.patch(`/api/attendance/employee?school_id=${user?.school_id}&user_id=${user_id}&date=${date}&status=${e}`, { remark: remarkValue })
       .then(() => {
@@ -187,8 +182,6 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, u
             }}
             onBlur={(e) => {
               if (attendenceValue && remarkValue.trim().length > 0) {
-                console.log(attendenceValue, remarkValue);
-
                 handleUpdateApi(attendenceValue, remarkValue)
                 setRemarkValue(null)
               }
@@ -256,7 +249,6 @@ function Attendence() {
 
       axios.get(`/api/attendance/employee?school_id=${user?.school_id}&role_id=${selectedRole?.id}&date=${date}`)
         .then(response => {
-          console.log("AttendenceHistory__", response.data);
 
           const temp = targetRoleEmployees?.map(i => {
             let attendance;
@@ -277,16 +269,24 @@ function Attendence() {
               remark: remark
             }
           })
-          console.log("student attende__", temp);
-
           setStudents(temp);
-
-
         }).catch(err => {
           console.log(err)
           // showNotification(err.message, 'error')
           showNotification(err?.response?.data?.message, 'error')
         })
+    }
+  }
+
+  const handleChangeEveryone = (e, value: any) => {
+    if (value && value.id !== 'notTaken') {
+      const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
+      axios.post(`/api/attendance/employee?school_id=${user?.school_id}&role_id=${selectedRole?.id}&date=${date}&status=${value.id}`)
+        .then(() => {
+          setattendenceValue(value.id)
+          handleAttendenceFind()
+        })
+        .catch(err => console.log(err))
     }
   }
   return (
@@ -299,7 +299,7 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 2 }}
         container
         direction="row"
         justifyContent="center"
@@ -309,122 +309,74 @@ function Attendence() {
         <Grid item xs={12}>
 
           <>
-            <Card
-              sx={{
-                p: 1,
-                mb: 3
-              }}
-            >
-              <Grid container spacing={{ xs: 2, md: 3 }} >
-                <Grid item xs={6} sm={4} md={3} >
-                  <Box p={1}>
-                    {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
+            <Card sx={{ p: 1, pb: 0, mb: 1, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr" }, columnGap: 1, maxWidth: 900, mx: 'auto' }}>
+              <MobileDatePicker
+                label="Select Date"
+                inputFormat='dd/MM/yyyy'
+                value={selectedDate}
+                onChange={(newValue) => setSelectedDate(newValue)}
+                renderInput={(params) => <TextField
+                  size='small'
+                  sx={{
+                    minWidth: "100%",
+                    [`& fieldset`]: {
+                      borderRadius: 0.6,
+                    },
+                    mb: 1,
+                  }}
+                  fullWidth {...params} />}
+              />
 
-                      <MobileDatePicker
-                        label="Select Date"
-                        inputFormat='dd/MM/yyyy'
-                        value={selectedDate}
-                        onChange={(newValue) => {
-                          console.log(newValue);
-
-                          setSelectedDate(newValue);
-                        }}
-                        renderInput={(params) => <TextField fullWidth {...params} />}
-                      />
-                    {/* </LocalizationProvider> */}
-                  </Box>
-                </Grid>
-
-                {
-                  selectedDate && <Grid item xs={6} sm={4} md={3} >
-                    <Box p={1}>
-                      <Autocomplete
-                        sx={{
-                          m: 0
-                        }}
-                        limitTags={2}
-                        // getOptionLabel={(option) => option.id}
-                        options={roleList.map(i => {
-                          return {
-                            label: i.title,
-                            id: i.id,
-                          }
-                        })}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            fullWidth
-                            variant="outlined"
-                            label={t('Select Role')}
-                            placeholder={t('Role...')}
-                          />
-                        )}
-                        onChange={(e, v) => setSelectedRole(v ? v : null)}
-                      />
-                    </Box>
-                  </Grid>
-                }
+              {
+                selectedDate ?
+                  <AutoCompleteWrapper
+                    minWidth="100%"
+                    label={t('Select Role')}
+                    placeholder={t('Role...')}
+                    limitTags={2}
+                    // getOptionLabel={(option) => option.id}
+                    options={roleList.map(i => {
+                      return {
+                        label: i.title,
+                        id: i.id,
+                      }
+                    })}
+                    value={undefined}
+                    handleChange={(e, v) => setSelectedRole(v ? v : null)}
+                  />
+                  :
+                  <EmptyAutoCompleteWrapper
+                    label={t('Select Role')}
+                    placeholder={t('Role...')}
+                    options={[]}
+                    value={undefined}
+                  />
+              }
 
 
-                {
-                  selectedRole && <Grid item xs={6} sm={4} md={1} >
-                    <Box p={1}>
-                      <Button variant="contained" size='medium'
-                        onClick={() => handleAttendenceFind()}>Find</Button>
-                    </Box>
-                  </Grid>
-                }
-
-              </Grid>
+              {
+                selectedRole ?
+                  <ButtonWrapper handleClick={() => handleAttendenceFind()}>Find</ButtonWrapper>
+                  :
+                  <DisableButtonWrapper>Find</DisableButtonWrapper>
+              }
             </Card>
 
-
-            <Divider />
-            <Grid container spacing={0} sx={{ minHeight: 'calc(100vh - 450px) !important' }} justifyContent={'flex-end'} >
+            <Grid container spacing={0} sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.2 }} justifyContent={'flex-end'} >
               <Paper style={{ height: 400, width: '100%' }}>
 
                 {
-                  students && students.length > 0 && <Grid sx={{
-                    display: 'flex',
-                    justifyContent: 'end',
-                  }}>
-                    <Autocomplete
-                      fullWidth
-                      size='medium'
-                      sx={{
-                        maxWidth: '300px',
-                        paddingTop: 2
-
-                      }}
-                      limitTags={2}
-                      // getOptionLabel={(option) => option.id}
+                  students && students.length > 0
+                  &&
+                  <Grid item sx={{ width: '100%', display: 'flex', justifyContent: "end", p: 1 }}>
+                    <AutoCompleteWrapper
+                      minWidth={{ xs: "100%", sm: "200px" }}
+                      label={t('Select For Everyone')}
+                      placeholder={t('Everyone...')}
                       options={allAttandenceOptions}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          variant="outlined"
-                          label={t('Select For Everyone')}
-                          placeholder={t('Everyone...')}
-                        />
-                      )}
-                      onChange={(e, value: any) => {
-                        if (value && value.id !== 'notTaken') {
-                          const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
-                          axios.post(`/api/attendance/employee?school_id=${user?.school_id}&role_id=${selectedRole?.id}&date=${date}&status=${value.id}`)
-                            .then(() => {
-                              // setStudents((init) => init.map(i => {
-                              //   const data = {...i}
-                              //   data['attendence']=e
-                              //   return data;
-                              // }))
-                              setattendenceValue(value.id)
-                              handleAttendenceFind()
-                            })
-                            .catch(err => console.log(err))
-
-                        }
-                      }}
+                      // value={attendenceValue}
+                      value={undefined}
+                      handleChange={handleChangeEveryone}
                     />
                   </Grid>
                 }
@@ -446,7 +398,8 @@ function Attendence() {
 
 
         </Grid>
-      </Grid>
+      </Grid >
+
       <Footer />
     </>
   );

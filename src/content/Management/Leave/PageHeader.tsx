@@ -19,7 +19,8 @@ import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
 import { MobileDatePicker } from '@mui/lab';
-import { DialogWrapper } from '@/components/DialogWrapper';
+import { DialogActionWrapper, DialogWrapper } from '@/components/DialogWrapper';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 
 
 function PageHeader({ reFetchData }) {
@@ -42,15 +43,15 @@ function PageHeader({ reFetchData }) {
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
-      
+
       axios.post(`/api/leave`, _values)
-      .then(() => {
-        resetForm();
-        setStatus({ success: true });
-        setSubmitting(false);
-        reFetchData();
-        handleCreateClassClose();
-      });
+        .then(() => {
+          resetForm();
+          setStatus({ success: true });
+          setSubmitting(false);
+          reFetchData();
+          handleCreateClassClose();
+        });
     } catch (err) {
       console.error(err);
       showNotification('There was an error, try again later', 'error');
@@ -63,30 +64,11 @@ function PageHeader({ reFetchData }) {
 
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Leave Section')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the leave can be managed from this page'
-            )}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateClassOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Apply leave')}
-          </Button>
-        </Grid>
-      </Grid>
+      <PageHeaderTitleWrapper
+        name="Leave Application "
+        handleCreateClassOpen={handleCreateClassOpen}
+      />
+
       <Dialog
         fullWidth
         maxWidth="sm"
@@ -213,26 +195,15 @@ function PageHeader({ reFetchData }) {
                     </Grid>
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    //@ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t('Submit')}
-                  </Button>
-                </DialogActions>
+                <DialogActionWrapper
+                  titleFront="+"
+                  title="Submit"
+                  editData={undefined}
+                  errors={errors}
+                  handleCreateClassClose={handleCreateClassClose}
+                  isSubmitting={isSubmitting}
+                />
+
               </form>
             );
           }}

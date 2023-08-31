@@ -1,12 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  Card,
-  Grid,
-  Divider,
-  TextField,
-  Button
-} from '@mui/material';
+import { Autocomplete, Box, Card, Grid, Divider, TextField, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -17,7 +9,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import useNotistick from '@/hooks/useNotistick';
 
-const tableStyle :  object = {
+const tableStyle: object = {
   border: '1px solid black',
   borderCollapse: 'collapse',
   minWidth: '70px',
@@ -33,6 +25,8 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import ReactToPrint from 'react-to-print';
 import { MobileDatePicker } from '@mui/lab';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 function Attendence() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -54,11 +48,6 @@ function Attendence() {
       .then((res) => setClasses(res.data))
       .catch((err) => console.log(err));
   }, []);
-
-  useEffect(() => {
-    console.log("flag__", targetsectionStudents, students);
-
-  }, [targetsectionStudents, students])
 
   const handleClassSelect = (e, value) => {
     setSelectedClass(value);
@@ -126,7 +115,6 @@ function Attendence() {
             remark: i.remark
           });
         }
-        console.log('montAttendence__', montAttendence);
         setStudents(montAttendence);
 
       }
@@ -145,7 +133,7 @@ function Attendence() {
         <title>Students Attendence</title>
       </Head>
       <PageTitleWrapper>
-        <PageHeader title={'Students Attendence'}/>
+        <PageHeader title={'Students Attendence'} />
       </PageTitleWrapper>
 
       <Grid
@@ -164,102 +152,137 @@ function Attendence() {
             }}
           >
             <Grid container spacing={{ xs: 2, md: 3 }}>
-              <Grid item xs={6} sm={4} md={3}>
-                <Box p={1}>
-                 
-                    <MobileDatePicker
-                      label="Select Date"
-                      views={['year', 'month']}
-                      value={selectedDate}
-                      onChange={(newValue) => {
-                        if (newValue) {
-                          console.log(
-                            newValue,
-                            dayjs(newValue).format('YYYY-MM-DD')
-                          );
+              <Grid item >
 
-                          setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
-                        } else {
-                          setSelectedDate(null);
-                        }
-                      }}
-                      renderInput={(params) => (
-                        <TextField fullWidth {...params} />
-                      )}
-                    />
-            
-                </Box>
-              </Grid>
-
-              {selectedDate && (
-                <Grid item xs={6} sm={4} md={3}>
-                  <Box p={1}>
-                    <Autocomplete
-                      sx={{
-                        m: 0
-                      }}
-                      limitTags={2}
-                      // getOptionLabel={(option) => option.id}
-                      options={classes.map((i) => {
-                        return {
-                          label: i.name,
-                          id: i.id,
-                          has_section: i.has_section
-                        };
-                      })}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          variant="outlined"
-                          label={t('Select class')}
-                          placeholder={t('Class...')}
-                        />
-                      )}
-                      onChange={handleClassSelect}
-                    />
-                  </Box>
-                </Grid>
-              )}
-
-              {selectedClass?.has_section && sections && selectedDate && (
-
-                <Grid item xs={6} sm={4} md={2}>
-                  <Box p={1}>
-                    <Autocomplete
+                <MobileDatePicker
+                  label="Select Date"
+                  views={['year', 'month']}
+                  value={selectedDate}
+                  onChange={(newValue) => {
+                    if (newValue) {
+                      setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
+                    } else {
+                      setSelectedDate(null);
+                    }
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size='small'
                       fullWidth
                       sx={{
-                        mr: 10
+                        [`& fieldset`]: {
+                          borderRadius: 0.6,
+                        }
                       }}
-                      limitTags={2}
-                      options={sections}
-                      value={selectedSection}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          variant="outlined"
-                          label={t('Sections')}
-                          placeholder={t('Select section...')}
-                        />
-                      )}
-                      onChange={(e, value) => setSelectedSection(value)}
                     />
-                  </Box>
-                </Grid>
+                  )}
+                />
 
-              )}
-              {user && selectedSection && academicYear && (
+              </Grid>
+
+              {selectedDate ? (
+                <>
+                  {/* <Autocomplete
+                    sx={{
+                      m: 0
+                    }}
+                    limitTags={2}
+                    // getOptionLabel={(option) => option.id}
+                    options={classes.map((i) => {
+                      return {
+                        label: i.name,
+                        id: i.id,
+                        has_section: i.has_section
+                      };
+                    })}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                        label={t('Select class')}
+                        placeholder={t('Class...')}
+                      />
+                    )}
+                    onChange={handleClassSelect}
+                  /> */}
+                  <AutoCompleteWrapper
+                    minWidth="100%"
+                    label={t('Select class')}
+                    placeholder={t('Class...')}
+                    options={classes.map((i) => ({
+                      label: i.name,
+                      id: i.id,
+                      has_section: i.has_section
+                    }))
+                    }
+                    value={undefined}
+                    handleChange={handleClassSelect}
+                  />
+                </>
+              )
+                :
+                <EmptyAutoCompleteWrapper
+                  minWidth="100%"
+                  label={t('Select Class')}
+                  placeholder={t('Class...')}
+                  options={[]}
+                  value={undefined}
+                />
+              }
+
+              {(selectedClass?.has_section && sections && selectedDate) ? (
+                <>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <Box p={1}>
+                      <Autocomplete
+                        fullWidth
+                        sx={{
+                          mr: 10
+                        }}
+                        limitTags={2}
+                        options={sections}
+                        value={selectedSection}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            variant="outlined"
+                            label={t('Sections')}
+                            placeholder={t('Select section...')}
+                          />
+                        )}
+                        onChange={(e, value) => setSelectedSection(value)}
+                      />
+                    </Box>
+                  </Grid>
+                  <AutoCompleteWrapper
+                    label={t('Sections')}
+                    placeholder={t('Select section...')}
+                    options={sections}
+                    value={selectedSection}
+                    handleChange={(e, value) => setSelectedSection(value)}
+
+                  />
+                </>
+              )
+                :
+                <EmptyAutoCompleteWrapper
+                  label={t('Sections')}
+                  placeholder={t('Select section...')}
+                  options={[]}
+                  value={undefined}
+                />
+              }
+              {(user && selectedSection && academicYear) ? (
                 <>
                   <Grid item >
-
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleReportGenerate()}
+                    <ButtonWrapper
+                      handleClick={() => handleReportGenerate()}
                     >
                       Generate
-                    </Button>
+                    </ButtonWrapper>
 
                   </Grid>
                   {
@@ -270,19 +293,23 @@ function Attendence() {
                         content={() => attendenceRef.current}
                         // pageStyle={`{ size: 2.5in 4in }`}
                         trigger={() => (
-                          <Button variant="contained" 
-                          startIcon={<LocalPrintshopIcon/>}
-                          size='small'>
+                          <ButtonWrapper
+                            startIcon={<LocalPrintshopIcon />}
+                            size='small'
+                            handleClick={undefined}
+                          >
                             Print
-                          </Button>
+                          </ButtonWrapper>
                         )}
                       />
 
                     </Grid>
                   }
                 </>
-
-              )}
+              )
+                :
+                <DisableButtonWrapper>Generate</DisableButtonWrapper>
+              }
 
             </Grid>
           </Card>
@@ -299,7 +326,7 @@ function Attendence() {
           >
             {
               targetsectionStudents && students && <div ref={attendenceRef}>
-                 
+
                 <table style={tableStyle}>
                   <thead>
                     <tr>
@@ -319,7 +346,6 @@ function Attendence() {
                       return (
                         <tr>
                           {students?.map((j) => {
-                            //  console.log(i.student_id," YY ",j.student_id)
                             if (j.student_id_list) {
                               const found = j.student_id_list.find(
                                 (st) => st.student_id == i.student_id
@@ -405,8 +431,8 @@ function Attendence() {
             }
 
           </Grid>
-        </Grid>
-      </Grid>
+        </Grid >
+      </Grid >
       <Footer />
     </>
   );

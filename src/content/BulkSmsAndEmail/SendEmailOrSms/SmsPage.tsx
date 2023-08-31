@@ -9,6 +9,7 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 
 const DynamicSelectTemplate = () => {
@@ -16,12 +17,10 @@ const DynamicSelectTemplate = () => {
   const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }: any = useFormikContext()
 
 
-  console.log({ sms_datas });
   const select_template_value = sms_datas?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
   select_template_value.unshift({ value: 0, title: 'Select' })
 
   const handleTemplateSelect = (e) => {
-    console.log({ e: e.target.value })
     if (e.target.value <= 0) return;
     const findSelectedTemplate = sms_datas.find(data => data.id === e.target.value)
     if (!findSelectedTemplate) return;
@@ -75,7 +74,6 @@ const TypeClass = () => {
   };
 
   const handleSectionSelect = (e) => {
-    console.log({ e: e.target.value })
     // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
     // if (!findSelectedTemplate) return;
     setFieldValue("section_id", e.target.value)
@@ -96,16 +94,13 @@ const TypeGroup = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  console.log({ roles, values });
 
   useEffect(() => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
-    console.log({ customize_select_roleList });
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
   }, [roles])
 
   const handleRoleSelect = (e) => {
-    console.log({ e: e.target.value })
     // if (e.target.value <= 0) return;
     // const findSelectedTemplate = roles.find(data => data.id === e.target.value)
     // if (!findSelectedTemplate) return;
@@ -135,7 +130,6 @@ const TypeIndividual = () => {
 
   const handleRoleSelect = async (e) => {
     const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${e.target.value}`, 'get', {});
-    console.log({ err, res });
 
     if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, title: user.username })));
     setFieldValue("name", []);
@@ -151,11 +145,9 @@ const TypeIndividual = () => {
   };
 
   const handleNameSelect = (e) => {
-    console.log({ e: e.target.value })
     // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
     // if (!findSelectedTemplate) return;
     setFieldValue("name", e.target.value)
-
     // setFieldValue("body", findSelectedTemplate.body)
     // handleBlur("body")
   };
@@ -174,15 +166,10 @@ const DynamicTypeSelect = () => {
   // const { data: sms_datas } = useClientDataFetch("/api/")
   // const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue } = useFormikContext()
   const { values, setFieldValue }: any = useFormikContext()
-  console.log({ 'values__': values })
+
   const types = [{ value: "SELECT", title: "SELECT" }, { value: "CLASS", title: "CLASS" }, { value: "GROUP", title: "GROUP" }, { value: 'INDIVIDUAL', title: "INDIVIDUAL" }]
 
-  // console.log({ sms_datas });
-  // const select_template_value = sms_datas?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-  // select_template_value.unshift({ value: 0, title: 'Select' })
-
   const handleTypeChange = (e) => {
-    console.log({ e: e.target.value });
     setFieldValue("recipient_type", e.target.value)
     setFieldValue("class_id", undefined)
     setFieldValue("section_id", [])
@@ -203,10 +190,7 @@ function PageHeader() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
-  const handleFormSubmit = async (
-    _values,
-    { resetForm, setErrors, setStatus, setSubmitting }
-  ) => {
+  const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
       const successResponse = (message) => {
         showNotification('send sms ' + message + ' successfully');
@@ -217,7 +201,6 @@ function PageHeader() {
       };
 
       const { data } = await axios.post(`/api/sent_sms`, _values);
-      console.log({ data })
       successResponse('created');
 
     } catch (err) {
@@ -232,7 +215,7 @@ function PageHeader() {
 
   return (
     <>
-      <Card sx={{ mt: 1 }}>
+      <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
@@ -272,14 +255,10 @@ function PageHeader() {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
-            console.log({ errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
-                  // dividers
-                  sx={{
-                    p: 3
-                  }}
+                  sx={{ p: 3 }}
                 >
                   <Grid container>
 
@@ -320,17 +299,32 @@ function PageHeader() {
                   </Grid>
                 </DialogContent>
 
-                <DialogActions sx={{ p: 3 }}>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
                   <Button
                     type="submit"
+                    sx={{ borderRadius: 0.5 }}
+                    // handleClick={undefined}
+                    variant="contained"
                     startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
                     //@ts-ignore
                     disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
                   >
                     {t(`${'Send Sms'}`)}
                   </Button>
                 </DialogActions>
+
+                {/* <DialogActions sx={{ p: 3, pt: 0, width: "100%", display: "flex", flexDirection: "column", justifyContent: "end" }}>
+                  <ButtonWrapper
+                    sx={{ maxWidth: 250 }}
+                    type="submit"
+                    handleClick={undefined}
+                    startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
+                    //@ts-ignore
+                    disabled={Boolean(errors.submit) || isSubmitting}
+                  >
+                    {t(`${'Send Sms'}`)}
+                  </ButtonWrapper>
+                </DialogActions> */}
               </form>
             );
           }}

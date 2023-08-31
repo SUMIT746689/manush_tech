@@ -14,8 +14,8 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 import { TableVirtuoso } from 'react-virtuoso';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 
 const allAttandenceOptions = [
   { label: 'Not Taken', id: 'notTaken' },
@@ -91,7 +91,7 @@ function rowContent(_index, row, setSectionAttendence) {
       {columns.map((column) => (
         <TableCell
           key={column.dataKey}
-          // align={'center'}
+        // align={'center'}
 
         >
           {column.dataKey == 'attendence' ?
@@ -115,7 +115,7 @@ function rowContent(_index, row, setSectionAttendence) {
 const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence }) => {
   const [attendenceValue, setAttendenceValue] = useState(attendence);
   const [remarkValue, setRemarkValue] = useState(remark);
-  const { showNotification } = useNotistick()
+
   useEffect(() => {
     setAttendenceValue(attendence)
   }, [attendence])
@@ -138,9 +138,6 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
   }
 
   const handleUpdateApi = (e) => {
-
-    console.log("remarkValue__", remarkValue);
-
     setSectionAttendence(prev => {
 
       const temp = {
@@ -151,25 +148,18 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
         temp['remark'] = remarkValue
       }
       const isExistIndex = prev.findIndex(i => i?.student_id == student_id)
-      console.log("isExistIndex__", isExistIndex);
 
       if (isExistIndex < 0) {
         return [...prev, temp]
       }
       else {
         prev[isExistIndex] = temp
-        console.log("prev__", prev);
 
         return [...prev]
 
       }
 
     })
-    // axios.patch(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}&student_id=${student_id}&status=${e}${remarkValue ? `&remark=${remarkValue}` : ''}`)
-    //   .then(() => {
-    //     setAttendenceValue(e)
-    //   })
-    //   .catch(err => console.log(err))
   }
 
 
@@ -208,22 +198,13 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
 
             }}
             onBlur={(e) => {
-              if (attendenceValue && remarkValue !== '') {
-                //  console.log(attendenceValue, remarkValue);
-
-
-                handleUpdateApi(attendenceValue)
-                // setRemarkValue(null)
-              }
+              if (attendenceValue && remarkValue !== '') handleUpdateApi(attendenceValue)
             }}
             label="Remarks"
             type='text'
           />
         </RadioGroup>
       </FormControl>
-
-
-
     </>
   );
 };
@@ -236,7 +217,7 @@ function Attendence() {
   // const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedExam, setSelectedExam] = useState(null);
-  const [attendenceValue, setattendenceValue] = useState({ label: 'Not Taken', id: 'notTaken' })
+  // const [attendenceValue, setattendenceValue] = useState({ label: 'Not Taken', id: 'notTaken' })
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { user } = useAuth()
   const [examlist, setExamlist] = useState(null)
@@ -249,11 +230,6 @@ function Attendence() {
       .then(res => setClasses(res.data))
       .catch(err => console.log(err))
   }, [])
-
-  useEffect(() => {
-    console.log("students__", students);
-
-  }, [students])
 
 
   useEffect(() => {
@@ -291,7 +267,6 @@ function Attendence() {
 
       axios.get(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&exam_id=${selectedExam?.id}`)
         .then(response => {
-          console.log("AttendenceHistory__", response.data);
 
           const temp = targetsectionStudents?.map(i => {
             let attendance;
@@ -313,8 +288,6 @@ function Attendence() {
               remark: remark
             }
           })
-          console.log("student attende__", temp);
-
           setStudents(temp);
 
 
@@ -371,7 +344,7 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-       sx={{ px:4, minHeight: 'calc(100vh - 305px) !important' }}
+        sx={{ px: 4, minHeight: 'calc(100vh - 305px) !important' }}
         container
         direction="row"
         justifyContent="center"
@@ -382,7 +355,7 @@ function Attendence() {
           <Card
             sx={{
               p: 1,
-              pb: 1,
+              pb: 0,
               mb: 2,
               maxWidth: 1200,
               display: 'grid',
@@ -392,12 +365,11 @@ function Attendence() {
                 sm: '2fr 2fr'
               },
               mx: 'auto',
-              gap: 2,
+              columnGap: 2,
             }}
           >
 
             <Grid item  >
-
               <ClassAndSectionSelect
                 flag={true}
                 classes={classes}
@@ -408,62 +380,62 @@ function Attendence() {
 
             </Grid>
             {
-              examlist && <Grid item  >
-
+              examlist ?
+                //  <Grid item  >
                 <AutoCompleteWrapper
                   options={examlist}
                   value={selectedExam}
                   handleChange={(e, value) => setSelectedExam(value)}
                   label={'Select Exams'}
                   placeholder={'Exam...'}
-
-
                 />
-              </Grid>
+                :
+                <EmptyAutoCompleteWrapper
+                  options={examlist}
+                  value={selectedExam}
+                  handleChange={(e, value) => setSelectedExam(value)}
+                  label={'Select Exams'}
+                  placeholder={'Exam...'}
+                />
+              // {/* </Grid> */}
             }
 
             {
-              selectedSection && selectedExam && <Grid item >
-
+              selectedSection && selectedExam ?
                 <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
-
-              </Grid>
+                :
+                <DisableButtonWrapper>Find</DisableButtonWrapper>
             }
             {
-              students && students.length > 0 &&
-              <Grid >
+              students && students.length > 0 ?
+
                 <AutoCompleteWrapper
                   minWidth={200}
                   options={allAttandenceOptions}
                   value={selectedForAll}
                   handleChange={(e, value: any) => {
                     if (value) {
-                      if (value.id !== 'notTaken') {
-                        setSelectedForAll(value)
-                      }
-                      else {
-                        setSelectedForAll(null)
-                      }
-
+                      if (value.id !== 'notTaken') setSelectedForAll(value)
+                      else setSelectedForAll(null)
                     }
-
                   }}
                   label={'Select For Everyone'}
                   placeholder={'Everyone...'}
-
+                />
+                :
+                <EmptyAutoCompleteWrapper
+                  label={'Select For Everyone'}
+                  placeholder={'Everyone...'}
+                  value={undefined}
+                  options={[]}
 
                 />
-              </Grid>
+
             }
-
-
-
           </Card>
 
-          <Divider />
-
           <Grid container spacing={0} justifyContent={'flex-end'} >
-            <Paper style={{ height: 400, width: '100%' }}>
+            <Paper style={{ height: 400, width: '100%'}}>
 
               <TableVirtuoso
                 data={students || []}
@@ -476,9 +448,9 @@ function Attendence() {
           </Grid>
 
           <Grid container justifyContent="flex-end" pt={1} >
-            <Button onClick={handleSubmit} variant='contained' >
+            <ButtonWrapper handleClick={handleSubmit} >
               submit
-            </Button>
+            </ButtonWrapper>
           </Grid>
         </Grid>
       </Grid>

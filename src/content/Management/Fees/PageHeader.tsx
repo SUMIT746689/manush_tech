@@ -23,16 +23,13 @@ import { MobileDatePicker } from '@mui/lab';
 import useNotistick from '@/hooks/useNotistick';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/components/AutoCompleteWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 
-function PageHeader({
-  name,
-  editData,
-  seteditData,
-  academicYearsData,
-  classData,
-  reFetchData
-}) {
+function PageHeader({ name, editData, seteditData, academicYearsData, classData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
@@ -57,9 +54,46 @@ function PageHeader({
     setOpen(false);
   };
 
+  const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
+    try {
+      const successResponse = (message) => {
+        showNotification('fees ' + message + ' successfully');
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        handleCreateUserSuccess();
+        reFetchData();
+      };
+      _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
+      _values['late_fee'] = parseFloat(_values.late_fee)
+     
+      // dayjs(_values.last_date).format('YYYY-MM-DD')
+
+      if (editData) {
+        const res = await axios.patch(`/api/fee/${editData.id}`,_values);
+        successResponse('updated');
+      } else {
+        _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
+        const res = await axios.post(`/api/fee`, _values);
+        successResponse('created');
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification(err?.response?.data?.message, 'error')
+      setStatus({ success: false });
+      //@ts-ignore
+      setErrors({ submit: err.message });
+      setSubmitting(false);
+    }
+  }
+
   return (
     <>
-      <Grid container justifyContent="space-between" alignItems="center">
+      <PageHeaderTitleWrapper
+        name="Fees Management"
+        handleCreateClassOpen={handleCreateClassOpen}
+      />
+      {/* <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography variant="h3" component="h3" gutterBottom>
             {t('Fees Management')}
@@ -82,16 +116,16 @@ function PageHeader({
             {t('Create fees')}
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth="xs"
         open={open}
         onClose={handleCreateClassClose}
       >
         <DialogTitle
           sx={{
-            p: 3
+            px: 1
           }}
         >
           <Typography variant="h4" gutterBottom>
@@ -130,57 +164,10 @@ function PageHeader({
             class_id: Yup.number()
               .min(1)
               .required(t('class filed field is required'))
-            // class_teacher_id: Yup.number().positive().integer()
-            // .required(t('The class teacher field is required'))
           })}
-          onSubmit={async (
-            _values,
-            { resetForm, setErrors, setStatus, setSubmitting }
-          ) => {
-            try {
-              const successResponse = (message) => {
-                showNotification('fees ' + message + ' successfully');
-                resetForm();
-                setStatus({ success: true });
-                setSubmitting(false);
-                handleCreateUserSuccess();
-                reFetchData();
-              };
-              _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
-              // dayjs(_values.last_date).format('YYYY-MM-DD')
-
-
-              if (editData) {
-                const res = await axios.patch(
-                  `/api/fee/${editData.id}`,
-                  _values
-                );
-                successResponse('updated');
-              } else {
-                _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
-                const res = await axios.post(`/api/fee`, _values);
-                successResponse('created');
-              }
-            } catch (err) {
-              console.error(err);
-              showNotification(err?.response?.data?.message, 'error')
-              setStatus({ success: false });
-              //@ts-ignore
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
-          }}
+          onSubmit={handleSubmit}
         >
-          {({
-            errors,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            isSubmitting,
-            touched,
-            values,
-            setFieldValue
-          }) => {
+          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -191,306 +178,101 @@ function PageHeader({
                 >
                   <Grid container>
                     {/* title  */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Title')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        error={Boolean(touched?.title && errors?.title)}
-                        fullWidth
-                        helperText={touched?.title && errors?.title}
-                        name="title"
-                        placeholder={t(`${name} title here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.title}
-                        variant="outlined"
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      errors={errors?.title}
+                      touched={touched?.title}
+                      name="title"
+                      label="Title"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values?.title}
+                    />
 
                     {/* fee's for which month */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Fee for')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        error={Boolean(touched?._for && errors?._for)}
-                        fullWidth
-                        helperText={touched?._for && errors?._for}
-                        name="_for"
-                        placeholder={t(`${name} fee for here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?._for}
-                        variant="outlined"
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      name="_for"
+                      label="Fee For"
+                      errors={errors?._for}
+                      touched={touched?._for}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values?._for}
+                    />
 
                     {/* Class */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Class')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <Autocomplete
-                        disablePortal
-                        value={
-                          classData.find(
-                            (cls) => cls.value === values.class_id
-                          ) || null
-                        }
-                        options={classData}
-                        isOptionEqualToValue={(option: any, value: any) =>
-                          option.value === value.value
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            error={Boolean(
-                              touched?.class_id && errors?.class_id
-                            )}
-                            fullWidth
-                            helperText={touched?.class_id && errors?.class_id}
-                            name="class_id"
-                            {...params}
-                            label={t('Select Class')}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(e, value: any) => {
-                          console.log({ value });
-                          setFieldValue('class_id', value?.value || 0);
-                        }}
-                      />
-                    </Grid>
+
+                    <AutoCompleteWrapperWithoutRenderInput
+                      minWidth="100%"
+                      label="Select Class"
+                      placeholder="select a class..."
+                      value={classData.find((cls) => cls.value === values.class_id) || null}
+                      options={classData}
+                      isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
+                      name="class_id"
+                      error={errors?.class_id}
+                      touched={touched?.class_id}
+                      // @ts-ignore
+                      handleChange={(e, value: any) => setFieldValue('class_id', value?.value || 0)}
+                    />
 
                     {/* Amount */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Amount')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        type="number"
-                        error={Boolean(touched?.amount && errors?.amount)}
-                        fullWidth
-                        helperText={touched?.amount && errors?.amount}
-                        name="amount"
-                        placeholder={t(`${name} amount here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.amount}
-                        variant="outlined"
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors?.amount}
+                      touched={touched?.amount}
+                      name="amount"
+                      label="Amount"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values?.amount}
+                    />
+
                     {/* Last Date */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Last Date')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <MobileDatePicker
-                        label="Last Date"
-                        inputFormat='dd/MM/yyyy'
-                        value={values?.last_date}
-                        onChange={(value) => {
-                          console.log({ value });
-                          setFieldValue('last_date', value);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            error={Boolean(
-                              touched?.last_date && errors?.last_date
-                            )}
-                            fullWidth
-                            defaultValue={''}
-                            helperText={touched?.last_date && errors?.last_date}
-                            {...params}
-                          />
-                        )}
-                      />
-                    </Grid>
+                    <MobileDatePicker
+                      label="Last Date"
+                      inputFormat='dd/MM/yyyy'
+                      value={values?.last_date}
+                      onChange={(value) => setFieldValue('last_date', value)}
+                      renderInput={(params) => (
+                        <TextField
+                          size='small'
+                          sx={{
+                            [`& fieldset`]: {
+                              borderRadius: 0.6,
+                            },
+                            mb: 1
+                          }}
+                          {...params}
+                          name="last_date"
+                          error={Boolean(errors?.last_date && touched?.last_date)}
+                          fullWidth
+                          defaultValue={''}
+                          helperText={touched?.last_date && errors?.last_date}
+                        />
+                      )}
+                    />
+
                     {/* late_fee */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      md={3}
-                      justifyContent="flex-end"
-                      textAlign={{ sm: 'right' }}
-                    >
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('late Fee Fine')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                      item
-                      xs={12}
-                      sm={8}
-                      md={9}
-                    >
-                      <TextField
-                        type="number"
-                        error={Boolean(touched?.late_fee && errors?.late_fee)}
-                        fullWidth
-                        helperText={touched?.late_fee && errors?.late_fee}
-                        name="late_fee"
-                        placeholder={t(`Late fee fine here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.late_fee}
-                        variant="outlined"
-                      />
-                    </Grid>
+                    <TextFieldWrapper
+                      type='number'
+                      errors={errors?.late_fee}
+                      touched={touched?.late_fee}
+                      name="late_fee"
+                      label={t(`Late Fee`)}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values?.late_fee}
+                    />
 
                   </Grid>
                 </DialogContent>
-                <DialogActions
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
-                    //@ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                    variant="contained"
-                  >
-                    {t(`${editData ? 'Edit Fees' : 'Add new Fees'}`)}
-                  </Button>
-                </DialogActions>
+                <DialogActionWrapper
+                  title="Fees"
+                  errors={errors}
+                  editData={editData}
+                  handleCreateClassClose={handleCreateClassClose}
+                  isSubmitting={isSubmitting}
+                />
               </form>
             );
           }}

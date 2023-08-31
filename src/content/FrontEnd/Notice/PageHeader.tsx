@@ -1,18 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, Dialog, DialogContent, Avatar, Button, TextField } from '@mui/material';
+import { Grid, Dialog, DialogContent } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
-import { FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
-import { DropDownSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
-import { RichTextEditorWrapper } from '@/components/RichTextEditorWrapper';
-import Image from 'next/image';
+import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
 import { fetchData } from '@/utils/post';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 function PageHeader({ editData, setEditData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
@@ -49,11 +45,8 @@ function PageHeader({ editData, setEditData, reFetchData }) {
         handleCreateClassClose();
       };
 
-      console.log("_values___", _values);
-
       const formData = new FormData();
       for (const [key, value] of Object.entries(_values)) {
-        console.log(`${key}: ${value}`);
         // @ts-ignore
         formData.append(key, value);
       }
@@ -65,7 +58,6 @@ function PageHeader({ editData, setEditData, reFetchData }) {
       }
       else {
         const res = await axios.post(`/api/notices`, formData);
-        console.log({ res })
         successResponse('Notice created !!');
       }
       setPhoto(null)
@@ -152,27 +144,6 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                     />
 
                     <Grid sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <Grid
-                        sx={{
-                          mt: 1,
-                          p: 1,
-                          border: 1,
-                          borderRadius: 1,
-                          borderColor: 'primary.main',
-                          color: 'primary.main'
-                        }}
-                      >
-                        <a
-                          style={{ width: '50px' }}
-                          target="_blank"
-                          href={photo || (
-                            editData?.file_url ?
-                              `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}`
-                              : '')}
-                        >
-                          {photo || (editData?.file_url ? `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}` : 'Not selected')}
-                        </a>
-                      </Grid>
                       <Grid>
                         <FileUploadFieldWrapper
                           htmlFor="photo"
@@ -192,6 +163,29 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                           }}
                         />
                       </Grid>
+                      {
+                        (photo || editData?.file_url) &&
+                        <Grid
+                          sx={{
+                            p: 1,
+                            border: 1,
+                            borderRadius: 1,
+                            borderColor: 'primary.main',
+                            color: 'primary.main'
+                          }}
+                        >
+                          <a
+                            style={{ width: '50px' }}
+                            target="_blank"
+                            href={photo || (
+                              editData?.file_url ?
+                                `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}`
+                                : '')}
+                          >
+                            {photo || (editData?.file_url ? `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}` : 'Not selected')}
+                          </a>
+                        </Grid>
+                      }
                     </Grid>
                   </Grid>
                 </DialogContent>

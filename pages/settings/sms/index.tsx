@@ -1,18 +1,21 @@
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
-import {  Formik } from 'formik';
-import { Button, Card, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
+import { Formik } from 'formik';
+import { Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import * as Yup from 'yup';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { DialogTitleWrapper } from '@/components/DialogWrapper';
+import Footer from '@/components/Footer';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 
 const SMSSettings = () => {
   const { t }: { t: any } = useTranslation();
   const { data, reFetchData } = useClientFetch('/api/sms_gateways?is_active=true');
-  console.log({ data });
 
   const { showNotification } = useNotistick();
 
@@ -34,10 +37,7 @@ const SMSSettings = () => {
           sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
           sender_id: Yup.string().max(255).required(t('The sender_id field is required')),
         })}
-        onSubmit={async (
-          _values,
-          { resetForm, setErrors, setStatus, setSubmitting }
-        ) => {
+        onSubmit={async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
           try {
             const successResponse = (message) => {
               resetForm();
@@ -75,102 +75,99 @@ const SMSSettings = () => {
           }
         }}
       >
-        {({
-          errors,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          touched,
-          values,
-          setFieldValue
-        }) => {
+        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
 
           return (
-            <Grid container
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              height={'70vh'}
-            >
-              <form onSubmit={handleSubmit}>
-                <Card sx={{
-                  width: '400px',
-                  boxShadow: 'black',
+            <>
+              <Grid container
+                display="flex"
+                alignContent="center"
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                height={'calc(100vh - 213px)'}
+              >
+                <form onSubmit={handleSubmit}>
+                  <Card sx={{
+                    width: '400px',
+                    boxShadow: 'black',
+                  }} >
+                    <Grid container direction={'column'} alignItems={'center'} gap={1} marginTop={3}>
+                      <DialogTitle sx={{ p: 3, borderBottom: 1, borderColor: "lightgray" }} >
+                        <Typography variant="h4" gutterBottom>
+                          Sms Gateway
+                        </Typography>
+                        <Typography variant="subtitle2">
+                          {t(`Fill in the fields below to add or update sms gateway `)}
+                        </Typography>
+                      </DialogTitle>
 
-                }} >
-                  <Grid container direction={'column'} alignItems={'center'} gap={2} marginTop={6}>
+                      <DialogContent sx={{ minWidth: '100%', display: "grid", gap: 2 }} >
+                        <Grid />
+                        {/* sms_gateway */}
+                        <TextFieldWrapper
+                          label="Sms Gateway"
+                          errors={errors?.sms_gateway}
+                          touched={touched?.sms_gateway}
+                          name="sms_gateway"
+                          // ={t(`sms_gateway here...`)}
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values?.sms_gateway}
+                        />
 
-                    {/* sms_gateway */}
+                        {/* sms_api_key */}
+                        <TextFieldWrapper
+                          label="Sms Api Key"
+                          errors={errors?.sms_api_key}
+                          touched={touched?.sms_api_key}
+                          name="sms_api_key"
+                          // placeholder={t(`sms_api_key here...`)}
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values?.sms_api_key}
 
-                    <Grid item borderRadius='10px' marginBottom='10px'>
+                        />
 
-                      <TextField
-                        label="sms_gateway"
-                        error={Boolean(touched?.sms_gateway && errors?.sms_gateway)}
-                        helperText={touched?.sms_gateway && errors?.sms_gateway}
-                        name="sms_gateway"
-                        placeholder={t(`sms_gateway here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.sms_gateway}
-                        variant="outlined"
+                        {/* sender_id */}
+                        <TextFieldWrapper
+                          label="Sender Id"
+                          errors={errors?.sender_id}
+                          touched={touched?.sender_id}
+                          name="sender_id"
+                          //  placeholder={t(`sender_id here...`)}
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values?.sender_id}
+                        />
+                      </DialogContent>
 
-                      />
+                      <DialogActions sx={{
+                        width: '100%',
+                        justifyContent: 'center',
+                        borderTop: '1px solid lightgray',
+                        px:3,
+                        pt:3
+                      }}>
+                        <ButtonWrapper
+                          handleClick={undefined}
+                          type="submit"
+                          startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
+                          //@ts-ignore
+                          disabled={Boolean(errors.submit) || isSubmitting}
+                          variant="contained"
+                        >
+                          {t('Submit')}
+                        </ButtonWrapper>
+                      </DialogActions>
+
                     </Grid>
 
-                    {/* sms_api_key */}
-                    <Grid item borderRadius='10px' marginBottom='10px'>
-                      <TextField
-                        label="sms_api_key"
-                        error={Boolean(touched?.sms_api_key && errors?.sms_api_key)}
-
-                        helperText={touched?.sms_api_key && errors?.sms_api_key}
-                        name="sms_api_key"
-                        placeholder={t(`sms_api_key here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.sms_api_key}
-                        variant="outlined"
-
-                      />
-                    </Grid>
-                    {/* sender_id */}
-                    <Grid item borderRadius='10px' marginBottom='10px'>
-                      <TextField
-                        label="sender_id"
-                        error={Boolean(touched?.sender_id && errors?.sender_id)}
-
-                        helperText={touched?.sender_id && errors?.sender_id}
-                        name="sender_id"
-                        placeholder={t(`sender_id here...`)}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values?.sender_id}
-                        variant="outlined"
-
-                      />
-                    </Grid>
-
-                    <DialogActions sx={{
-                      justifyContent: 'center'
-                    }}>
-                      <Button
-                        type="submit"
-                        startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
-                        //@ts-ignore
-                        disabled={Boolean(errors.submit) || isSubmitting}
-                        variant="contained"
-                      >
-                        {t('Submit')}
-                      </Button>
-                    </DialogActions>
-
-                  </Grid>
-
-                </Card >
-              </form>
-            </Grid>
+                  </Card >
+                </form>
+              </Grid>
+              <Footer />
+            </>
           );
         }}
       </Formik >

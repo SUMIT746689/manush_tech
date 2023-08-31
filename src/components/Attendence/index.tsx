@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import React, { Fragment, forwardRef, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TableVirtuoso } from 'react-virtuoso';
-import { AutoCompleteWrapper } from '../AutoCompleteWrapper';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '../AutoCompleteWrapper';
 
 export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, setSelectedSection, flag }) => {
     const { t }: { t: any } = useTranslation();
@@ -40,7 +40,7 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
 
     }
     return (
-        <Grid gap={2} sx={{
+        <Grid columnGap={2} sx={{
             display: 'grid',
             gridTemplateColumns: {
                 xs: '1fr',
@@ -80,7 +80,8 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
                                 onChange={handleClassSelect}
                             /> */}
                         <AutoCompleteWrapper
-                            label='Select class'
+                            minWidth="100%"
+                            label='Select Class'
                             placeholder='select a class...'
                             options={classes.map(i => {
                                 return {
@@ -94,14 +95,14 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
                         />
                     </Grid>
                     :
-                    (selectedDate &&
+                    (selectedDate ?
                         <Grid item sx={{
                             minWidth: '200px',
-
                         }}>
 
                             <AutoCompleteWrapper
-                                label='Select class'
+                                minWidth="100%"
+                                label='Select Class'
                                 placeholder='select a class...'
                                 options={classes.map(i => {
                                     return {
@@ -114,23 +115,39 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, 
                                 handleChange={handleClassSelect}
                             />
 
-                        </Grid>)
+                        </Grid>
+                        :
+                        <EmptyAutoCompleteWrapper
+                            minWidth="200px"
+                            label='Select Class'
+                            placeholder='select a class...'
+                            options={[]}
+                            value={undefined}
+                        />
+                    )
             }
 
             {
-                selectedClass?.has_section && sections && (flag ? true : selectedDate) &&
-                <Grid item sx={{
-                    minWidth: '200px',
-                }}>
-                    <AutoCompleteWrapper
+                selectedClass?.has_section && sections && (flag ? true : selectedDate) ?
+                    <Grid item sx={{
+                        minWidth: '200px',
+                    }}>
+                        <AutoCompleteWrapper
+                            label='Select Section'
+                            placeholder='select a section...'
+                            options={sections}
+                            value={selectedSection}
+                            handleChange={(e, value) => setSelectedSection(value)}
+                        />
+                    </Grid>
+                    :
+                    <EmptyAutoCompleteWrapper
+                        minWidth="200px"
                         label='Select Section'
                         placeholder='select a section...'
-                        options={sections}
-                        value={selectedSection}
-                        handleChange={(e, value) => setSelectedSection(value)}
+                        options={[]}
+                        value={undefined}
                     />
-                </Grid>
-
             }
 
         </Grid>
@@ -253,7 +270,7 @@ const AttendenceSwitch = ({ attendence, remark, selectedSection, selectedDate, s
 
     const handleUpdateApi = (e, remarkValue) => {
         const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : examFlag ? new Date('0') : '';
-    
+
         const value = {
             status: e,
         }

@@ -58,6 +58,12 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
     <Grid item container pb={1}>
       <TextField
         id="outlined-basic"
+        size='small'
+        sx={{
+          [`& fieldset`]: {
+            borderRadius: 0.6,
+          }
+        }}
         label={label}
         value={value}
         variant="outlined"

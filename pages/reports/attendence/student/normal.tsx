@@ -145,173 +145,114 @@ function Attendence() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Card
-            sx={{
-              p: 1,
-              mb: 3
-            }}
-          >
-            <Grid container spacing={{ xs: 2, md: 3 }}>
-              <Grid item >
+          <Card sx={{ p: 1, pb: 0, mb: 3, display:"grid", gridTemplateColumns:{sm:"1fr 1fr 1fr",md:"1fr 1fr 1fr 1fr 1fr"}, columnGap:1 }}>
 
-                <MobileDatePicker
-                  label="Select Date"
-                  views={['year', 'month']}
-                  value={selectedDate}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
-                    } else {
-                      setSelectedDate(null);
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size='small'
-                      fullWidth
-                      sx={{
-                        [`& fieldset`]: {
-                          borderRadius: 0.6,
-                        }
-                      }}
-                    />
-                  )}
-                />
-
-              </Grid>
-
-              {selectedDate ? (
-                <>
-                  {/* <Autocomplete
+            <Grid item width="100%" 
+            // sx={{gridColumnStart:1,gridColumnEnd:3}} 
+            pb={1} >
+              <MobileDatePicker
+                label="Select Date"
+                views={['year', 'month']}
+                value={selectedDate}
+                onChange={(newValue) => {
+                  if (newValue) setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
+                  else setSelectedDate(null);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    size='small'
+                    fullWidth
                     sx={{
-                      m: 0
+                      [`& fieldset`]: {
+                        borderRadius: 0.6,
+                      }
                     }}
-                    limitTags={2}
-                    // getOptionLabel={(option) => option.id}
-                    options={classes.map((i) => {
-                      return {
-                        label: i.name,
-                        id: i.id,
-                        has_section: i.has_section
-                      };
-                    })}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        label={t('Select class')}
-                        placeholder={t('Class...')}
-                      />
-                    )}
-                    onChange={handleClassSelect}
-                  /> */}
-                  <AutoCompleteWrapper
-                    minWidth="100%"
-                    label={t('Select class')}
-                    placeholder={t('Class...')}
-                    options={classes.map((i) => ({
-                      label: i.name,
-                      id: i.id,
-                      has_section: i.has_section
-                    }))
-                    }
-                    value={undefined}
-                    handleChange={handleClassSelect}
                   />
-                </>
-              )
-                :
-                <EmptyAutoCompleteWrapper
+                )}
+              />
+            </Grid>
+
+            {selectedDate ? (
+              <>
+                <AutoCompleteWrapper
                   minWidth="100%"
-                  label={t('Select Class')}
+                  label={t('Select class')}
                   placeholder={t('Class...')}
-                  options={[]}
+                  options={classes.map((i) => ({
+                    label: i.name,
+                    id: i.id,
+                    has_section: i.has_section
+                  }))
+                  }
                   value={undefined}
+                  handleChange={handleClassSelect}
                 />
-              }
+              </>
+            )
+              :
+              <EmptyAutoCompleteWrapper
+                minWidth="100%"
+                label={t('Select Class')}
+                placeholder={t('Class...')}
+                options={[]}
+                value={undefined}
+              />
+            }
 
-              {(selectedClass?.has_section && sections && selectedDate) ? (
-                <>
-                  <Grid item xs={6} sm={4} md={2}>
-                    <Box p={1}>
-                      <Autocomplete
-                        fullWidth
-                        sx={{
-                          mr: 10
-                        }}
-                        limitTags={2}
-                        options={sections}
-                        value={selectedSection}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            fullWidth
-                            variant="outlined"
-                            label={t('Sections')}
-                            placeholder={t('Select section...')}
-                          />
-                        )}
-                        onChange={(e, value) => setSelectedSection(value)}
-                      />
-                    </Box>
-                  </Grid>
-                  <AutoCompleteWrapper
-                    label={t('Sections')}
-                    placeholder={t('Select section...')}
-                    options={sections}
-                    value={selectedSection}
-                    handleChange={(e, value) => setSelectedSection(value)}
-
-                  />
-                </>
-              )
-                :
-                <EmptyAutoCompleteWrapper
+            {(selectedClass?.has_section && sections && selectedDate) ? (
+              <>
+                <AutoCompleteWrapper
+                  minWidth="100%"
                   label={t('Sections')}
                   placeholder={t('Select section...')}
-                  options={[]}
-                  value={undefined}
+                  options={sections}
+                  value={selectedSection}
+                  handleChange={(e, value) => setSelectedSection(value)}
+
                 />
-              }
-              {(user && selectedSection && academicYear) ? (
-                <>
-                  <Grid item >
-                    <ButtonWrapper
-                      handleClick={() => handleReportGenerate()}
-                    >
-                      Generate
-                    </ButtonWrapper>
+              </>
+            )
+              :
+              <EmptyAutoCompleteWrapper
+                minWidth="100%"
+                label={t('Sections')}
+                placeholder={t('Select section...')}
+                options={[]}
+                value={undefined}
+              />
+            }
 
-                  </Grid>
-                  {
-                    students &&
-                    <Grid item >
+            {(user && selectedSection && academicYear) ? (
+              <ButtonWrapper
+                handleClick={() => handleReportGenerate()}
+              >
+                Generate
+              </ButtonWrapper>
 
-                      <ReactToPrint
-                        content={() => attendenceRef.current}
-                        // pageStyle={`{ size: 2.5in 4in }`}
-                        trigger={() => (
-                          <ButtonWrapper
-                            startIcon={<LocalPrintshopIcon />}
-                            size='small'
-                            handleClick={undefined}
-                          >
-                            Print
-                          </ButtonWrapper>
-                        )}
-                      />
+            )
+              :
+              <DisableButtonWrapper>Generate</DisableButtonWrapper>
+            }
 
-                    </Grid>
-                  }
-                </>
-              )
-                :
-                <DisableButtonWrapper>Generate</DisableButtonWrapper>
-              }
+            {(user && selectedSection && academicYear && students) ?
+              <ReactToPrint
+                content={() => attendenceRef.current}
+                // pageStyle={`{ size: 2.5in 4in }`}
+                trigger={() => (
+                  <ButtonWrapper
+                    startIcon={<LocalPrintshopIcon />}
+                    size='small'
+                    handleClick={undefined}
+                  >
+                    Print
+                  </ButtonWrapper>
+                )}
+              />
+              :
+              <DisableButtonWrapper>Print</DisableButtonWrapper>
+            }
 
-            </Grid>
           </Card>
           <Divider />
           <Grid

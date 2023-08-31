@@ -14,7 +14,6 @@ import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/Auto
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 
-
 function PageHeader({ editExam, setEditExam, classes, selectClasses,
   setSelectClasses, setSelectedSection,
   setStudentList, setExams, setSections, sections, studentList,
@@ -199,6 +198,19 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
         actionButton={
 
           <Grid display={'grid'} columnGap={3} gridTemplateColumns={{ xs: '1fr 1fr', sm: '1fr 1fr 1fr' }} py={2}>
+
+            <Grid item>
+              <ButtonWrapper
+                handleClick={undefined}
+                size='small'
+                variant="contained"
+                href={`/bulkExamMark.xlsx`}
+              >
+                Download Subject wise Bulk Excel format
+
+              </ButtonWrapper>
+            </Grid>
+
             <Grid>
 
               <ButtonWrapper
@@ -217,6 +229,8 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
                 {t('Subject wise Bulk Result Entry')}
               </ButtonWrapper>
             </Grid>
+
+
             {/* <Grid>
 
               <ButtonWrapper

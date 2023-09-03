@@ -53,7 +53,7 @@ function ManagementClasses() {
 }
 
 ManagementClasses.getLayout = (page) => (
-  <Authenticated name="section">
+  <Authenticated name="discount">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

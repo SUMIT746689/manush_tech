@@ -41,10 +41,10 @@ const Results = ({ data, reFetchData }) => {
         header_image: data ? data?.header_image : undefined,
         carousel_image: undefined,
 
-        history_photo: data?.history_photo || '',
+        history_photo: data?.history_photo || undefined,
         school_history: data?.school_history || '',
 
-        chairman_photo: data?.chairman_photo || '',
+        chairman_photo: data?.chairman_photo || undefined,
         chairman_speech: data?.chairman_speech || '',
 
         principal_photo: data?.principal_photo || '',
@@ -213,7 +213,7 @@ const Results = ({ data, reFetchData }) => {
                         </Grid>) : data?.carousel_image?.map(i =>
                           <Grid  >
                             <Image
-                              src={`/api/get_file/${i.path.replace(/\\/g, '/')}`}
+                              src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
                               height={120}
                               width={120}
                               alt='Carousel Image'
@@ -274,7 +274,7 @@ const Results = ({ data, reFetchData }) => {
                         </Grid>) : data?.gallery?.map(i =>
                           <Grid  >
                             <Image
-                              src={`/api/get_file/${i.path.replace(/\\/g, '/')}`}
+                              src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
                               height={120}
                               width={120}
                               alt='gallery'

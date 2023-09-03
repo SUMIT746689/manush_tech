@@ -22,8 +22,9 @@ async function put(req, res, refresh_token) {
 
         // console.log({ error })
 
-        console.log(fields);
-        console.log(files);
+        // console.log(fields);
+        // console.log(files);
+        
         //  console.log(files.carousel_image);
 
         if (error) {
@@ -56,7 +57,7 @@ async function put(req, res, refresh_token) {
             if (websiteUirow) {
                 const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.header_image);
                 if (fs.existsSync(filePath)) {
-                    console.log("header_image__");
+                    console.log("header_image__",filePath);
                     fs.unlink(filePath, (err) => {
                         if (err) console.log('photo deletion failed');
                         else console.log("photo deleted");
@@ -171,6 +172,8 @@ async function put(req, res, refresh_token) {
                 if (websiteUirow && !flag) {
                     // @ts-ignore 
                     for (const l of websiteUirow.carousel_image) {
+                        console.log("ttttttttttttt");
+                        
                         const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l.path);
                         console.log("filePath__", filePath);
 
@@ -278,35 +281,40 @@ async function put(req, res, refresh_token) {
 
         }
         else {
+            const tempData = {
+                header_image: query?.header_image || '*',
+                carousel_image: Array.isArray(query?.carousel_image) ? query?.carousel_image : [],
+                school_history: query?.school_history || '',
+                history_photo: query?.history_photo || '*',
+                history_description: '',
+                chairman_photo: query?.chairman_photo || '*',
+                chairman_speech: query?.chairman_speech || '',
+                principal_photo: query?.principal_photo || '*',
+                principal_speech: query?.principal_speech || '',
+                eiin_number: query?.eiin_number || '',
+                facebook_link: query?.facebook_link || '',
+                youtube_link: query?.youtube_link || '',
+                twitter_link: query?.twitter_link || '',
+                google_link: query?.google_link || '',
+                linkedin_link: query?.linkedin_link || '',
+                gallery: Array.isArray(query?.gallery) ? query?.gallery : [],
+                school: {
+                    connect: {
+                        id: refresh_token?.school_id
+                    }
+                },
+            }
+            console.log({tempData});
+            
             await prisma.websiteUi.create({
-                data: {
-                    header_image: query?.header_image || '',
-                    carousel_image: Array.isArray(query?.carousel_image) ? query?.carousel_image : [query?.carousel_image] || [],
-                    school_history: query?.school_history || '',
-                    history_photo: query?.history_photo || '',
-                    history_description: '',
-                    chairman_photo: query?.chairman_photo || '',
-                    chairman_speech: query?.chairman_speech || '',
-                    principal_photo: query?.principal_photo || '',
-                    principal_speech: query?.principal_speech || '',
-                    eiin_number: query?.eiin_number || '',
-                    facebook_link: query?.facebook_link || '',
-                    youtube_link: query?.youtube_link || '',
-                    twitter_link: query?.twitter_link || '',
-                    google_link: query?.google_link || '',
-                    linkedin_link: query?.linkedin_link || '',
-                    gallery: Array.isArray(query?.gallery) ? query?.gallery : [query?.gallery] || [],
-                    school: {
-                        connect: {
-                            id: refresh_token?.school_id
-                        }
-                    },
-                }
+                data: tempData
             })
         }
 
         res.status(200).json({ message: 'frontend information updated !' });
     } catch (error) {
+        console.log("error__",error);
+        
         for (const i in files) {
             fs.unlinkSync(files[i].filepath)
         }

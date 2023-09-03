@@ -409,9 +409,6 @@ function ManagementClasses() {
           )}
         </Grid>
       </div>
-      <Grid>
-
-      </Grid>
       <Footer />
     </>
   );

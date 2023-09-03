@@ -175,8 +175,20 @@ const menuItems: MenuItems[] = [
       },
       {
         name: 'Students',
-        link: '/management/students',
-        icon: AccessibilityIcon
+        icon: AccessibilityIcon,
+        items: [
+          {
+            name: 'Manage Student',
+            link: '/management/students',
+            icon: RecordVoiceOverIcon
+          },
+          {
+            name: 'Online admission',
+            link: '/management/students/online-admission',
+            icon: RecordVoiceOverIcon
+          },
+
+        ]
       },
       {
         name: 'Discount',
@@ -214,7 +226,7 @@ const menuItems: MenuItems[] = [
           },
           {
             name: 'Student Exam Attendence',
-            value:'show_student_exam_attendence',
+            value: 'show_student_exam_attendence',
             link: '/management/attendence/show_student_attendence',
             icon: GroupIcon
           }

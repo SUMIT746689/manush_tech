@@ -24,6 +24,8 @@ export const post = async (req, res, refresh_token) => {
         discount: true
       }
     })
+    console.log("AllDiscount__",AllDiscount);
+    
     const discount = AllDiscount?.discount?.filter(i => i.fee_id == fee_id);
     console.log("discount1__", discount);
 

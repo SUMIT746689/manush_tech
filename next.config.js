@@ -51,5 +51,19 @@ export const images = {
       port: '3000',
       // pathname: '/account123/**',
     },
+    {
+      protocol: 'http',
+      hostname: '192.168.10.96',
+      port: '3001',
+    }
   ],
-} 
+}
+
+export const  rewrites = async() => {
+  return [
+    {
+      source: '/api/onlineAdmission',
+      destination: 'http://192.168.10.96:3001/:path*',
+    },
+  ]
+}

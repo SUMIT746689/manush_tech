@@ -125,28 +125,28 @@ const index = async (req, res) => {
                 //                         "punch": 255
                 // },
 
-                const data = req.body.map(i => ({
-                    sms_shoot_id: 'ecwc',
-                    user_id: i.userID,
-                    submission_time: i.timestamp,
-                    status: i.status,
-                    route_id: 1,
-                    sender_id: 1,
-                    coverage_id: 1,
-                    contacts: '0186786',
-                    pushed_via: 'wrgve',
-                    charges_per_sms: 0.25,
-                    total_count: 4,
-                    sms_type: 'masking',
-                    sms_text: 'eqfretrh rwgvebttrynt',
-                    is_black_list: 2,
-                    fail_count: 3,
-                    priority: 4
+                // const data = req.body.map(i => ({
+                //     sms_shoot_id: 'ecwc',
+                //     user_id: i.userID,
+                //     submission_time: i.timestamp,
+                //     status: i.status,
+                //     route_id: 1,
+                //     sender_id: 1,
+                //     coverage_id: 1,
+                //     contacts: '0186786',
+                //     pushed_via: 'wrgve',
+                //     charges_per_sms: 0.25,
+                //     total_count: 4,
+                //     sms_type: 'masking',
+                //     sms_text: 'eqfretrh rwgvebttrynt',
+                //     is_black_list: 2,
+                //     fail_count: 3,
+                //     priority: 4
 
-                }))
-                await prisma.tbl_queued_sms.createMany({
-                    data
-                })
+                // }))
+                // await prisma.tbl_queued_sms.createMany({
+                //     data
+                // })
 
 
                 res.status(200).json({ statusCode: '0000', message: 'success' })

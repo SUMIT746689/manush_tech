@@ -2,7 +2,7 @@ import PageHeader from 'src/content/Dashboards/Reports/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
-import {Button, Grid} from '@mui/material';
+import { Button, Grid } from '@mui/material';
 
 import Block1 from 'src/content/Blocks/Statistics/Block3';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
 function DashboardReportsContent({ blockCount = null }) {
- 
+
   const [dbBtN, setDbBtN] = useState(false)
   const { user } = useAuth();
   const { showNotification } = useNotistick()
@@ -53,7 +53,7 @@ function DashboardReportsContent({ blockCount = null }) {
 
 
   const handleDBbackup = () => {
-    axios.post('/api/db_backup')
+    axios.get('/api/db_backup')
       .then(res => {
         showNotification(`${res?.data?.message}`)
         setDbBtN(true)
@@ -77,16 +77,20 @@ function DashboardReportsContent({ blockCount = null }) {
                 // @ts-ignore
                 user?.role?.title === "ADMIN" && <Button variant='contained' color='secondary'>
 
-                  <Link href={`http://${blockCount?.domain}`} color="primary" rel="noopener noreferrer" >
+                  <Link href={`http://${blockCount?.domain}`} target='_blank' color="primary" rel="noopener noreferrer" >
                     {t('Front end link')}
                   </Link>
                 </Button>
               }
               {
                 // @ts-ignore
-                user?.role?.title === "SUPER_ADMIN" && <Button disabled={dbBtN} onClick={handleDBbackup} variant='contained'  sx={{borderRadius:0.5}} >
-                  Database backup
-                </Button>
+                user?.role?.title === "SUPER_ADMIN" && <Link href='/api/db_backup' target='_blank' style={{
+                  color: 'blue'
+                }} rel="noopener noreferrer">
+                  <Button color='primary' variant='contained'>
+                    All Backup
+                  </Button>
+                </Link>
               }
             </Grid>
           </Grid>

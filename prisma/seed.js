@@ -120,6 +120,7 @@ async function seed() {
       { name: 'create leave', value: 'create_leave', group: 'leave' },
       { name: 'view holiday', value: 'view_holiday', group: 'holiday' },
       { name: 'create notice', value: 'create_notice', group: 'notice' },
+      { name: 'create discount', value: 'create_discount', group: 'discount' },
     ]
   });
 

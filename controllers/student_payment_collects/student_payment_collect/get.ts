@@ -48,13 +48,13 @@ export const get = async (req, res) => {
       }
     });
 
-    console.log("all_fees__", all_fees);
+    console.log("all_fees__", all_fees.section.class.fees);
 
     const fees = all_fees.section.class.fees.map((fee) => {
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
 
       // console.log("fee", fee);
-      // console.log("findStudentFee__", findStudentFee);
+       console.log("findStudentFee__", findStudentFee);
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
         // console.log("findStudentFee__",findStudentFee);
@@ -96,7 +96,19 @@ export const get = async (req, res) => {
         }
 
       }
-      else return ({ ...fee, status: 'unpaid' })
+      else {
+        const discount = all_fees?.discount?.filter(i => i.fee_id == fee.id);
+        console.log("discount1__", discount);
+
+        const totalDiscount = discount.reduce((a, c) => {
+          if (c.type == 'percent') return a + (c.amt * fee.amount) / 100
+          else return a + c.amt
+        }, 0)
+        const feeAmount = fee.amount - totalDiscount
+        fee['amount'] = feeAmount
+        return ({ ...fee, status: 'unpaid' })
+      }
+       
     })
     const data = {
       ...all_fees.student_info,

@@ -376,6 +376,27 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+    else if (item.name === 'Students') {
+      if (permissions.findIndex(i => i.group == 'student') > -1) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
 
     else if (item.name === 'Fees') {
       if (permissionVerify(permissions, ['create_fee', 'show_fee', 'collect_fee', 'student_fee_payment', 'student_fee_payment_history'])) ev.push(
@@ -451,6 +472,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Students' ||
       item.name === 'Sessions' ||
       item.name === 'Period' ||
+      item.name === 'Discount' ||
 
       item.name === 'Classes' ||
 
@@ -507,6 +529,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Students' && permissions?.findIndex(i => i.group == 'student') > -1) sub_menu();
       if (item.name === 'Sessions' && permissions?.findIndex(i => i.group == 'session') > -1) sub_menu();
       if (item.name === 'Period' && permissions?.findIndex(i => i.group == 'period') > -1) sub_menu();
+      if (item.name === 'Discount' && permissions?.findIndex(i => i.group == 'discount') > -1) sub_menu();
 
       // if (item.name === 'Routine' && permissions?.findIndex(i => i.group == 'routine') > -1) sub_menu();
 

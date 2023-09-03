@@ -1,0 +1,31 @@
+-- CreateTable
+CREATE TABLE `tbl_queued_sms` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sms_shoot_id` VARCHAR(191) NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `campaign_id` INTEGER NULL,
+    `user_name` VARCHAR(191) NULL,
+    `route_id` INTEGER NOT NULL,
+    `route_name` VARCHAR(191) NULL,
+    `sender_id` INTEGER NOT NULL,
+    `sender_name` VARCHAR(191) NULL,
+    `coverage_id` INTEGER NOT NULL,
+    `coverage_network_name` VARCHAR(191) NULL,
+    `contacts` LONGTEXT NOT NULL,
+    `pushed_via` VARCHAR(191) NOT NULL,
+    `charges_per_sms` DOUBLE NOT NULL DEFAULT 0,
+    `number_of_sms_parts` INTEGER NOT NULL DEFAULT 1,
+    `total_count` INTEGER NOT NULL,
+    `sms_type` VARCHAR(191) NOT NULL,
+    `sms_text` TEXT NOT NULL,
+    `submission_time` DATETIME(3) NULL,
+    `is_dlr_requested` INTEGER NOT NULL DEFAULT 0,
+    `status` INTEGER NOT NULL DEFAULT 0,
+    `sms_gateway_status` VARCHAR(191) NULL,
+    `is_black_list` INTEGER NOT NULL DEFAULT 0,
+    `fail_count` INTEGER NOT NULL DEFAULT 0,
+    `priority` INTEGER NOT NULL DEFAULT 5,
+
+    UNIQUE INDEX `tbl_queued_sms_id_status_key`(`id`, `status`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

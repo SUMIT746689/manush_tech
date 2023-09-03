@@ -140,8 +140,8 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users, refetch, discount }) => {
-
+const Results = () => {
+  const [users, setUsers] = useState([])
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -155,6 +155,15 @@ const Results = ({ users, refetch, discount }) => {
 
   const [discountModal, setDiscountModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+
+
+  const refetch = () => {
+    // axios.get('')
+  }
+
+  // useEffect(() => {
+  //   refetch()
+  // }, [])
 
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
@@ -218,16 +227,9 @@ const Results = ({ users, refetch, discount }) => {
   return (
     <>
       <Head>
-        <title>Students - Management</title>
+        <title>Online admission - Management</title>
       </Head>
-      <Grid
-        sx={{ px: 4 }}
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+     
         <Dialog
           fullWidth
           maxWidth="md"
@@ -254,7 +256,7 @@ const Results = ({ users, refetch, discount }) => {
             </Grid>
           </Grid>
         </Dialog>
-        <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
+        <Card sx={{ minHeight: 'calc(100vh - 215px)' }}>
 
 
           {!selectedBulkActions && (
@@ -268,7 +270,7 @@ const Results = ({ users, refetch, discount }) => {
                 <Typography component="span" variant="subtitle1">
                   {t('Showing')}:
                 </Typography>{' '}
-                <b>{paginatedClasses.length}</b> <b>{t('students')}</b>
+                <b>{paginatedClasses.length}</b> <b>{t('Admission request')}</b>
               </Box>
               <TablePagination
                 component="div"
@@ -294,7 +296,7 @@ const Results = ({ users, refetch, discount }) => {
                 color="text.secondary"
                 align="center"
               >
-                {t("We couldn't find any students matching your search criteria")}
+                {t("We couldn't find any Admission request")}
               </Typography>
             </>
           ) : (
@@ -402,7 +404,6 @@ const Results = ({ users, refetch, discount }) => {
             </>
           )}
         </Card>
-      </Grid>
 
       <Footer />
 

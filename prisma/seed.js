@@ -1,3 +1,4 @@
+import { registration_no_generate } from '@/utils/utilitY-functions';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import fsp from 'fs/promises';
@@ -342,7 +343,7 @@ async function seed() {
   await prisma.student.create({
     data: {
       class_roll_no: '01',
-      class_registration_no: '654312',
+      class_registration_no: registration_no_generate(),
       section: {
         connect: { id: createSection.id }
       },

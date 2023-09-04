@@ -1,11 +1,10 @@
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
-import formidable from 'formidable';
-import { imageFolder, fileUpload, fileRename } from '@/utils/upload';
+import {  fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import fsP from "fs/promises";
-import { json } from 'node:stream/consumers';
+
 async function put(req, res, refresh_token) {
     const uploadFolderName = "frontendPhoto";
 
@@ -18,19 +17,13 @@ async function put(req, res, refresh_token) {
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
+
+    const allFiles = []
     try {
-
-        // console.log({ error })
-
-        // console.log(fields);
-        // console.log(files);
-        
-        //  console.log(files.carousel_image);
 
         if (error) {
             throw new Error('something wrong !')
         }
-
 
         const websiteUirow = await prisma.websiteUi.findFirst({
             where: {
@@ -46,18 +39,22 @@ async function put(req, res, refresh_token) {
 
             await fsP.rename(files.header_image.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, header_imageNewName))
                 .then(() => {
-                    query['header_image'] = path.join(uploadFolderName, header_imageNewName)
+                    const temp = path.join(uploadFolderName, header_imageNewName)
+                    allFiles.push(temp)
+                    query['header_image'] = temp
 
                 })
                 .catch(err => {
                     console.log('not rename');
                     console.log("error____", err);
-                    query['header_image'] = path.join(uploadFolderName, files.header_image?.newFilename)
+                    const temp = path.join(uploadFolderName, files.header_image?.newFilename)
+                    allFiles.push(temp)
+                    query['header_image'] = temp
                 })
             if (websiteUirow) {
                 const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.header_image);
                 if (fs.existsSync(filePath)) {
-                    console.log("header_image__",filePath);
+                    console.log("header_image__", filePath);
                     fs.unlink(filePath, (err) => {
                         if (err) console.log('photo deletion failed');
                         else console.log("photo deleted");
@@ -70,13 +67,16 @@ async function put(req, res, refresh_token) {
             const history_photoNewName = Date.now().toString() + '_' + files.history_photo.originalFilename;
             await fsP.rename(files.history_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, history_photoNewName))
                 .then(() => {
-                    query['history_photo'] = path.join(uploadFolderName, history_photoNewName)
+                    const temp = path.join(uploadFolderName, history_photoNewName)
+                    allFiles.push(temp)
+                    query['history_photo'] = temp
 
                 })
                 .catch(err => {
                     console.log("err__", err);
-
-                    query['history_photo'] = path.join(uploadFolderName, files.history_photo?.newFilename)
+                    const temp = path.join(uploadFolderName, files.history_photo?.newFilename)
+                    allFiles.push(temp)
+                    query['history_photo'] = temp
                 })
 
             if (websiteUirow) {
@@ -96,12 +96,16 @@ async function put(req, res, refresh_token) {
 
             await fsP.rename(files.chairman_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, chairman_photoNewName))
                 .then(() => {
-                    query['chairman_photo'] = path.join(uploadFolderName, chairman_photoNewName)
+                    const temp = path.join(uploadFolderName, chairman_photoNewName)
+                    allFiles.push(temp)
+                    query['chairman_photo'] = temp
 
                 })
                 .catch(err => {
                     console.log("err__", err);
-                    query['chairman_photo'] = path.join(uploadFolderName, files.chairman_photo?.newFilename)
+                    const temp = path.join(uploadFolderName, files.chairman_photo?.newFilename)
+                    allFiles.push(temp)
+                    query['chairman_photo'] = temp
                 })
             if (websiteUirow) {
                 const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.chairman_photo);
@@ -120,12 +124,16 @@ async function put(req, res, refresh_token) {
 
             await fsP.rename(files.principal_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, principal_photoNewName))
                 .then(() => {
-                    query['principal_photo'] = path.join(uploadFolderName, principal_photoNewName)
+                    const temp = path.join(uploadFolderName, principal_photoNewName)
+                    allFiles.push(temp)
+                    query['principal_photo'] = temp
 
                 })
                 .catch(err => {
                     console.log("err__", err);
-                    query['principal_photo'] = path.join(uploadFolderName, files.principal_photo?.newFilename)
+                    const temp = path.join(uploadFolderName, files.principal_photo?.newFilename)
+                    allFiles.push(temp)
+                    query['principal_photo'] = temp
                 })
             if (websiteUirow) {
                 const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, websiteUirow.principal_photo);
@@ -153,18 +161,22 @@ async function put(req, res, refresh_token) {
 
                 await fsP.rename(i.filepath, newFilePath)
                     .then(() => {
+                        const temp = path.join(uploadFolderName, newName)
+                        allFiles.push(temp)
                         carousel_imageList.push({
                             number: index,
                             originalFilename: i.originalFilename,
-                            path: path.join(uploadFolderName, newName)
+                            path: temp
                         })
 
                     })
                     .catch(err => {
+                        const temp = path.join(uploadFolderName, i.newFilename)
+                        allFiles.push(temp)
                         carousel_imageList.push({
                             number: index,
                             originalFilename: i.originalFilename,
-                            path: path.join(uploadFolderName, i.newFilename)
+                            path: temp
                         })
 
                     })
@@ -173,17 +185,18 @@ async function put(req, res, refresh_token) {
                     // @ts-ignore 
                     for (const l of websiteUirow.carousel_image) {
                         console.log("ttttttttttttt");
-                        
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l.path);
-                        console.log("filePath__", filePath);
+                        if (l?.path) {
+                            const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l?.path);
+                            console.log("filePath__", filePath);
 
-                        if (fs.existsSync(filePath)) {
-                            console.log(`${l.number}`);
+                            if (fs.existsSync(filePath)) {
+                                console.log(`${l.number}`);
 
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
+                                fs.unlink(filePath, (err) => {
+                                    if (err) console.log('photo deletion failed');
+                                    else console.log("photo deleted");
+                                })
+                            }
                         }
                     }
                     flag = true;
@@ -205,18 +218,22 @@ async function put(req, res, refresh_token) {
 
                 await fsP.rename(i.filepath, newFilePath)
                     .then(() => {
+                        const filePath = path.join(uploadFolderName, newName)
+                        allFiles.push(filePath)
                         gallery_imageList.push({
                             number: index,
                             originalFilename: i.originalFilename,
-                            path: path.join(uploadFolderName, newName)
+                            path: filePath
                         })
 
                     })
                     .catch(err => {
+                        const filePath = path.join(uploadFolderName, i.newFilename)
+                        allFiles.push(filePath)
                         gallery_imageList.push({
                             number: index,
                             originalFilename: i.originalFilename,
-                            path: path.join(uploadFolderName, i.newFilename)
+                            path: filePath
                         })
 
                     })
@@ -224,16 +241,18 @@ async function put(req, res, refresh_token) {
                 if (websiteUirow && !flag) {
                     // @ts-ignore 
                     for (const l of websiteUirow.gallery) {
-                        const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l.path);
-                        console.log("filePath__", filePath);
+                        if (l?.path) {
+                            const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, l?.path);
+                            console.log("filePath__", filePath);
 
-                        if (fs.existsSync(filePath)) {
-                            console.log(`${l.number}`);
+                            if (fs.existsSync(filePath)) {
+                                console.log(`${l.number}`);
 
-                            fs.unlink(filePath, (err) => {
-                                if (err) console.log('photo deletion failed');
-                                else console.log("photo deleted");
-                            })
+                                fs.unlink(filePath, (err) => {
+                                    if (err) console.log('photo deletion failed');
+                                    else console.log("photo deleted");
+                                })
+                            }
                         }
                     }
                     flag = true;
@@ -269,7 +288,6 @@ async function put(req, res, refresh_token) {
         if (fields?.youtube_link) {
             query['youtube_link'] = fields?.youtube_link
         }
-        let flag1 = false;
         console.log({ query });
         if (websiteUirow) {
             await prisma.websiteUi.update({
@@ -304,19 +322,21 @@ async function put(req, res, refresh_token) {
                     }
                 },
             }
-            console.log({tempData});
-            
+            console.log({ tempData });
+
             await prisma.websiteUi.create({
                 data: tempData
             })
         }
 
-        res.status(200).json({ message: 'frontend information updated !' });
+        res.status(200).json({ message: 'Frontend information updated !' });
     } catch (error) {
-        console.log("error__",error);
-        
-        for (const i in files) {
-            fs.unlinkSync(files[i].filepath)
+        console.log("error__", error);
+        for (const i of allFiles) {
+            const filePath = path.join(process.cwd(),i)
+            if(fs.existsSync(filePath)){
+                fs.unlinkSync(filePath)
+            }
         }
         res.status(404).json({ Error: error.message });
     }

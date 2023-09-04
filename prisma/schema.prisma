@@ -74,6 +74,7 @@ model School {
   Notice              Notice[]
   EmailTemplate       EmailTemplate[]
   SentEmail           SentEmail[]
+  OnlineAdmission     OnlineAdmission[]
 
   // routines Routine[]
   @@map("schools")
@@ -840,8 +841,10 @@ enum LeaveStatus {
 }
 
 model OnlineAdmission {
-  id      Int  @id @default(autoincrement())
-  student Json
+  id        Int    @id @default(autoincrement())
+  student   Json
+  school_id Int
+  school    School @relation(fields: [school_id], references: [id])
 }
 
 model Discount {
@@ -860,31 +863,31 @@ enum DiscountType {
 }
 
 model tbl_queued_sms {
-  id                    Int       @id @default(autoincrement())
-  sms_shoot_id          String // school_id-user_id-dateTime
-  user_id               Int
+  id                  Int       @id @default(autoincrement())
+  sms_shoot_id        String // school_id-user_id-dateTime
+  user_id             Int
   //0campaign_id           Int?
-  user_name             String?
+  user_name           String?
   //route_id              Int
   //route_name            String?
   //sender_id             Int
-  sender_name           String?
+  sender_name         String?
   //coverage_id           Int
   //coverage_network_name String?
-  contacts              String    @db.LongText
-  pushed_via            String
+  contacts            String    @db.LongText
+  pushed_via          String
   //charges_per_sms       Float     @default(0)
-  number_of_sms_parts   Int       @default(1)
-  total_count           Int
-  sms_type              String
-  sms_text              String    @db.Text
-  submission_time       DateTime?
+  number_of_sms_parts Int       @default(1)
+  total_count         Int
+  sms_type            String
+  sms_text            String    @db.Text
+  submission_time     DateTime?
   //is_dlr_requested      Int       @default(0)
-  status                Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
-  sms_gateway_status    String?
+  status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
+  sms_gateway_status  String?
   //is_black_list         Int       @default(0)
-  fail_count            Int       @default(0)
-  priority              Int       @default(5) // 1-> highest
-  
+  fail_count          Int       @default(0)
+  priority            Int       @default(5) // 1-> highest
+
   @@unique([id, status])
 }

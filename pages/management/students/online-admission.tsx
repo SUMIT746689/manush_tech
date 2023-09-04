@@ -158,7 +158,7 @@ const Results = () => {
 
 
   const refetch = () => {
-    // axios.get('')
+     axios.get('/api/onlineAdmission')
   }
 
   // useEffect(() => {

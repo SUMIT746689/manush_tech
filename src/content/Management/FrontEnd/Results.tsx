@@ -161,15 +161,18 @@ const Results = ({ data, reFetchData }) => {
 
                 {/* header_image */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
-                  <Grid item>
-                    <Image src={header_image ? header_image : `/api/get_file/${data?.header_image.replace(/\\/g, '/')}`}
-                      height={150}
-                      width={150}
-                      alt='Header image'
-                      loading='lazy'
-                    />
+                  {
+                    (data?.header_image || header_image) && <Grid item>
+                      <Image src={header_image ? header_image : `/api/get_file/${data?.header_image.replace(/\\/g, '/')}`}
+                        height={150}
+                        width={150}
+                        alt='Header image'
+                        loading='lazy'
+                      />
 
-                  </Grid>
+                    </Grid>
+                  }
+
                   <Grid item sx={{
                     pt: '25px'
                   }}>
@@ -210,9 +213,11 @@ const Results = ({ data, reFetchData }) => {
                             objectFit='cover'
                           />
 
-                        </Grid>) : data?.carousel_image?.map(i =>
-                          <Grid  >
-                            <Image
+                        </Grid>
+                      ) : data?.carousel_image?.map(i =>
+                        <Grid >
+                          {
+                            i?.path && <Image
                               src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
                               height={120}
                               width={120}
@@ -220,8 +225,9 @@ const Results = ({ data, reFetchData }) => {
                               loading='lazy'
                               objectFit='cover'
                             />
+                          }
 
-                          </Grid>)
+                        </Grid>)
                     }
                   </Grid>
 
@@ -273,14 +279,16 @@ const Results = ({ data, reFetchData }) => {
 
                         </Grid>) : data?.gallery?.map(i =>
                           <Grid  >
-                            <Image
-                              src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
-                              height={120}
-                              width={120}
-                              alt='gallery'
-                              loading='lazy'
-                              objectFit='cover'
-                            />
+                            {
+                              i?.path && <Image
+                                src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
+                                height={120}
+                                width={120}
+                                alt='gallery'
+                                loading='lazy'
+                                objectFit='cover'
+                              />
+                            }
 
                           </Grid>)
                     }
@@ -339,16 +347,19 @@ const Results = ({ data, reFetchData }) => {
 
                 {/* history_photo */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
-                  <Grid item>
-                    <Image
-                      height={200}
-                      width={200}
-                      alt='History photo'
-                      src={history_photo ? history_photo : `/api/get_file/${data?.history_photo?.replace(/\\/g, '/')}`}
-                      loading='lazy'
-                    />
+                  {
+                    data?.history_photo && <Grid item>
+                      <Image
+                        height={200}
+                        width={200}
+                        alt='History photo'
+                        src={history_photo ? history_photo : `/api/get_file/${data?.history_photo?.replace(/\\/g, '/')}`}
+                        loading='lazy'
+                      />
 
-                  </Grid>
+                    </Grid>
+                  }
+
                   <Grid item sx={{
                     pt: '25px'
                   }}>
@@ -375,16 +386,19 @@ const Results = ({ data, reFetchData }) => {
                 </Grid>
                 {/* chairman_photo */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
-                  <Grid item>
-                    <Image
-                      height={200}
-                      width={200}
-                      alt='Chairman photo'
-                      src={chairman_photo ? chairman_photo : `/api/get_file/${data?.chairman_photo?.replace(/\\/g, '/')}`}
-                      loading='lazy'
-                    />
+                  {
+                    data?.chairman_photo && <Grid item>
+                      <Image
+                        height={200}
+                        width={200}
+                        alt='Chairman photo'
+                        src={chairman_photo ? chairman_photo : `/api/get_file/${data?.chairman_photo?.replace(/\\/g, '/')}`}
+                        loading='lazy'
+                      />
 
-                  </Grid>
+                    </Grid>
+                  }
+
                   <Grid item sx={{
                     pt: '25px'
                   }}>
@@ -433,16 +447,19 @@ const Results = ({ data, reFetchData }) => {
 
                 {/* principal_photo */}
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
-                  <Grid item>
-                    <Image
-                      height={200}
-                      width={200}
-                      alt='Principal photo'
-                      src={principal_photo ? principal_photo : `/api/get_file/${data?.principal_photo?.replace(/\\/g, '/')}`}
-                      loading='lazy'
-                    />
+                  {
+                    data?.principal_photo && <Grid item>
+                      <Image
+                        height={200}
+                        width={200}
+                        alt='Principal photo'
+                        src={principal_photo ? principal_photo : `/api/get_file/${data?.principal_photo?.replace(/\\/g, '/')}`}
+                        loading='lazy'
+                      />
 
-                  </Grid>
+                    </Grid>
+                  }
+
                   <Grid item sx={{
                     pt: '25px'
                   }}>

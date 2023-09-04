@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { readFile, utils } from "xlsx";
 import dayjs from 'dayjs';
 import { authenticate } from 'middleware/authenticate';
-import { registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
+import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import axios from 'axios';
 
 export const config = {
@@ -92,14 +92,13 @@ const handlePost = async (req, res, refresh_token) => {
 
                     const key = worksheet[`${columnLetter}1`].v
                     const value = worksheet[`${columnLetter}${row + 1}`]?.v ?
-                        (key == 'section_id' ||
-                            key == 'academic_year_id' || key == 'class_id') ?
+                        (key == 'section_id' || key == 'academic_year_id' || key == 'class_id') ?
                             Number(worksheet[`${columnLetter}${row + 1}`].v) :
                             worksheet[`${columnLetter}${row + 1}`].v : null
                     if (
                         key == 'first_name' && !value ||
                         // key == 'section_id' && !value ||
-                        key == 'academic_year_id' && !value ||
+                        // key == 'academic_year_id' && !value ||
                         // key == 'password' && !value ||
                         key == 'admission_date' && !value ||
                         key == 'date_of_birth' && !value ||
@@ -109,21 +108,24 @@ const handlePost = async (req, res, refresh_token) => {
                         return res.status(404).json({ message: `${row + 1} number row ${key} value missing !!` });
                     } else {
                         let calculatedValue = value;
+
                         if (key == 'registration_no' && !value) {
                             calculatedValue = registration_no_generate()
                         }
-                        else if (key == 'password') {
-                            const uniquePassword = (!value || value == '') ? unique_password_generate() : value;
-                            student['mainPassword'] = uniquePassword
-                            const hashPassword = await bcrypt.hash(
-                                uniquePassword,
+                        else if (key == 'first_name') {
+                            const userName = generateUsername(value);
+                            student['username'] = userName
+                            student['password'] = await bcrypt.hash(
+                                userName,
                                 Number(process.env.SALTROUNDS)
-                            );
-                            calculatedValue = hashPassword
+                            )
                         }
                         else if (key == 'admission_date' || key == 'date_of_birth') {
+                            console.log("value__",value);
+                            
                             if (dayjs(value).isValid()) {
                                 calculatedValue = new Date(value)
+                                console.log("calculatedValue___",calculatedValue);
                             } else {
                                 return res.status(404).json({ message: `${row + 1} number row ${key} Date invalid !!` });
                             }
@@ -161,7 +163,8 @@ const handlePost = async (req, res, refresh_token) => {
                 })
                 if (!classValidity) {
                     return res.status(400).json({ message: `${row + 1} th row, class is not exist !` })
-                } else {
+                }
+                else {
                     student.class_id = classValidity.id
                 }
                 //@ts-ignore
@@ -195,7 +198,8 @@ const handlePost = async (req, res, refresh_token) => {
                 })
                 if (!sectionValidity) {
                     return res.status(400).json({ message: `${row + 1} th row, section is not exist !` })
-                } else {
+                }
+                else {
                     student.section_id = sectionValidity.id
                 }
 
@@ -227,9 +231,11 @@ const handlePost = async (req, res, refresh_token) => {
                 })
                 if (!academicYearValidity) {
                     return res.status(400).json({ message: `${row + 1} th row, academic year does not exist !` })
-                } else {
+                }
+                else {
                     student.academic_year_id = academicYearValidity.id
                 }
+                console.log("student__", student);
 
                 allStudents.push(student)
             }
@@ -237,11 +243,11 @@ const handlePost = async (req, res, refresh_token) => {
 
         const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
             where: {
-              school_id: refresh_token?.school_id,
-              is_active: true
+                school_id: refresh_token?.school_id,
+                is_active: true
             }
-          })
-          
+        })
+
         let faildedSmS = [], successSmS = []
         for (const i of allStudents) {
             await prisma.$transaction(async (transaction) => {
@@ -254,9 +260,9 @@ const handlePost = async (req, res, refresh_token) => {
                         last_name: i?.last_name,
                         admission_no: i?.admission_no?.toString(),
                         admission_date: i?.admission_date,
-                        admission_status: i?.admission_status,
+                        admission_status: i?.admission_status?.toLowerCase(),
                         date_of_birth: i?.date_of_birth,
-                        gender: i?.gender,
+                        gender: i?.gender?.toLowerCase(),
                         blood_group: i?.blood_group,
                         religion: i?.religion,
                         phone: i?.phone?.toString(),
@@ -279,8 +285,8 @@ const handlePost = async (req, res, refresh_token) => {
                         },
                         user: {
                             create: {
-                                username: i?.first_name.split(' ').join('').toLowerCase() + Date.now().toString().substring(0, 4),//i.username,
-                                password: i.password,
+                                username: i?.username,
+                                password: i?.password,
                                 user_role_id: student_role.id,
                                 role_id: student_role.id,
                                 school_id: parseInt(refresh_token?.school_id)

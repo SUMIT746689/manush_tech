@@ -61,15 +61,23 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     setEditUser(null);
   };
 
-  const handleCreateUserSuccess = () => {
-    showNotification('The user account was created successfully');
-
+  const handleCreateUserSuccess = (mess) => {
+    showNotification(mess);
     setOpen(false);
   };
+
 
   const handleFormSubmit = async (_values, formValue) => {
     const { resetForm, setErrors, setStatus, setSubmitting } = formValue
     try {
+      const hansleResponseSuccess = (msg) => {
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        handleCreateUserSuccess(msg);
+        reFetchData(true);
+      }
+
 
       const formData = new FormData();
       for (const i in _values) {
@@ -79,30 +87,20 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
         else {
           formData.append(`${i}`, _values[i])
         }
-
-
+      }
+      if (editUser) {
+        await axios.patch(`/api/user/${editUser.id}`, formData)
+        hansleResponseSuccess('The user account was edited successfully')
+      }
+      else {
+        await axios.post(`/api/user`, formData)
+        hansleResponseSuccess('The user account was created successfully')
       }
 
-      if (editUser)
-        axios.patch(`/api/user/${editUser.id}`, formData).then(() => {
-          resetForm();
-          setStatus({ success: true });
-          setSubmitting(false);
-          handleCreateUserSuccess();
-          reFetchData(true);
-        });
-      else
-        axios.post(`/api/user`, formData).then(() => {
-          resetForm();
-          setStatus({ success: true });
-          setSubmitting(false);
-          handleCreateUserSuccess();
-          reFetchData(true);
-        });
       // await wait(1000);
     } catch (err) {
-      console.error(err);
-      showNotification('There was an error, try again later', 'error');
+      console.log(err);
+      showNotification(err?.response?.data?.error, 'error')
       setStatus({ success: false });
       // @ts-ignore
       setErrors({ submit: err.message });

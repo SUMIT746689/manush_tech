@@ -357,7 +357,7 @@ function Managementschools() {
 
                                 }}>
                                     <Image
-                                        src="/elitbuzz.png"
+                                        src="/mram.png"
                                         alt="Watermark"
                                         style={{
                                             position: 'absolute',
@@ -416,7 +416,7 @@ function Managementschools() {
                                                         <Grid sx={{
                                                             maxWidth: '10em'
                                                         }}>
-                                                            <img src="/elitbuzz.png" alt='logo' />
+                                                            <img src="/mram.png" alt='logo' />
                                                         </Grid>
                                                         <Grid sx={{
                                                             textAlign: 'center'

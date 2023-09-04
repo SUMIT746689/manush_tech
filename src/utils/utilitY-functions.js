@@ -25,3 +25,7 @@ export function registration_no_generate() {
 export function unique_password_generate(){
   return Date.now().toString(36) + Math.random().toString(36).substring(0,8);
 }
+export function generateUsername(firstName) {
+  const text = Date.now().toString()
+  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
+}

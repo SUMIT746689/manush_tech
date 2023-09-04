@@ -12,7 +12,7 @@ import {
   Button,
 } from '@mui/material';
 import useNotistick from '@/hooks/useNotistick';
-import { registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
+import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 
@@ -120,7 +120,6 @@ function RegistrationSecondPart({
           academic_year_id: student ? student?.academic_year_id : undefined,
           roll_no: student ? student?.class_roll_no : undefined,
           registration_no: student ? student?.class_registration_no : registration_no_generate(),
-          discount: student ? student?.discount : 0,
           student_photo: null,
           student_present_address: student ? student?.student_present_address : '',
           student_permanent_address: student ? student?.student_info?.student_permanent_address : '',
@@ -425,28 +424,6 @@ function RegistrationSecondPart({
                       />
                     </Grid>
 
-                    {/* discount */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(touched.discount && errors.discount)}
-                        fullWidth
-                        helperText={touched.discount && errors.discount}
-                        label={t('Discount')}
-                        name="discount"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="number"
-                        value={values.discount}
-                        variant="outlined"
-                      />
-                    </Grid>
-
                     {/* previous_school */}
                     <Grid item xs={12} md={6}>
                       <TextField
@@ -600,7 +577,3 @@ function RegistrationSecondPart({
 export default RegistrationSecondPart;
 
 
-function generateUsername(firstName: string) {
-  const text = Date.now().toString()
-  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
-}

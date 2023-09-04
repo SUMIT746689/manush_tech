@@ -118,7 +118,7 @@ function Logo() {
             {/* <LogoSign> */}
               {/* <LogoSignInner /> */}
             {/* </LogoSign> */}
-            <img className='w-20' src='/elitbuzz.png'/>
+            <img className='w-20' src='/mram.png'/>
           {/* </LogoSignWrapper> */}
         </Badge>
       </LogoWrapper>

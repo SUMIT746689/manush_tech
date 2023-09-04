@@ -27,7 +27,7 @@ import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 
 import useNotistick from '@/hooks/useNotistick';
-import { DatePicker } from '@mui/lab';
+import { DatePicker, MobileDatePicker } from '@mui/lab';
 import dayjs from 'dayjs';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
@@ -691,34 +691,32 @@ function PageHeader({
                       }}
                       item
                     >
-                      <DatePicker
-                        label="provide birth date"
+                      <MobileDatePicker
+                        label="Provide birth date"
+                        inputFormat='dd/MM/yyyy'
                         value={values.date_of_birth}
                         onChange={(n) => {
                           const value = dayjs(n);
                           if (n) {
                             setFieldValue('date_of_birth', value)
                           }
-
                         }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            sx={{
-                              '& fieldset': {
-                                borderRadius: '3px'
-                              }
-                            }}
-                            size="small"
-                            fullWidth
-                            error={Boolean(
-                              touched?.date_of_birth && errors?.date_of_birth
-                            )}
-                            helperText={
-                              touched?.date_of_birth && errors?.date_of_birth
+                        renderInput={(params) => <TextField
+                          size='small'
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
                             }
-                          />
-                        )}
+                          }}
+                          fullWidth
+                          {...params}
+                          error={Boolean(
+                            touched?.date_of_birth && errors?.date_of_birth
+                          )}
+                          helperText={
+                            touched?.date_of_birth && errors?.date_of_birth
+                          }
+                        />}
                       />
                     </Grid>
                   </Grid>

@@ -17,11 +17,11 @@ export const post = async (req, res) => {
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
-   
+
 
     const { username, password, role } = fields;
     const parseRole = JSON.parse(role)
-     
+
     if (!username || !password || !parseRole.permission)
       throw new Error('provide all required informations');
 
@@ -58,7 +58,12 @@ export const post = async (req, res) => {
       (permission) => permission.value === parseRole.permission
     );
     if (!findUser) throw Error('Permission denied !')
-
+    const isExist = await prisma.user.findFirst({
+      where: {
+        username
+      }
+    })
+    if(username) throw Error('This username is taken, try another !')
     const data = {
       username: username,
       password: hashPassword
@@ -88,7 +93,7 @@ export const post = async (req, res) => {
       await fspromises.rename(files.user_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, user_imageNewName))
         .then(() => {
           data['user_photo'] = path.join(uploadFolderName, user_imageNewName)
-          
+
         })
         .catch(err => {
           data['user_photo'] = path.join(uploadFolderName, files.user_photo?.newFilename)

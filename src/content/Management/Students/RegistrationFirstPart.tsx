@@ -13,7 +13,6 @@ import {
   CircularProgress,
   Button,
 } from '@mui/material';
-import axios from 'axios';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
@@ -22,7 +21,6 @@ import FormLabel from '@mui/material/FormLabel';
 import useNotistick from '@/hooks/useNotistick';
 import { MobileDatePicker, MobileDateTimePicker } from '@mui/lab';
 import { registration_no_generate } from '@/utils/utilitY-functions';
-import { useAuth } from '@/hooks/useAuth';
 
 function RegistrationFirstPart({
   setTotalFormData,
@@ -33,24 +31,23 @@ function RegistrationFirstPart({
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const [gender, setGender] = useState('male');
-  const { user } = useAuth();
   
   return (
     <>
       <Formik
         initialValues={{
-          first_name: student ? student?.student_info?.first_name : undefined,
-          middle_name: student ? student?.student_info?.middle_name : '',
-          last_name: student ? student?.student_info?.last_name : '',
-          admission_no: student ? student?.student_info?.admission_no : registration_no_generate(),
-          admission_date: student ? student?.student_info?.admission_date : null,
-          date_of_birth: student ? student?.student_info?.date_of_birth : null,
-          gender: student ? student?.student_info?.gender : 'male',
-          blood_group: student ? student?.student_info?.blood_group : '',
-          religion: student ? student?.student_info?.religion : '',
-          phone: student ? student?.student_info?.phone : undefined,
-          email: student ? student?.student_info?.email : '',
-          national_id: student ? student?.student_info?.national_id : '',
+          first_name: student ? (student?.first_name || student?.student_info?.first_name) : undefined,
+          middle_name: student ? (student?.middle_name || student?.student_info?.middle_name) : '',
+          last_name: student ? (student?.middle_name || student?.student_info?.last_name) : '',
+          admission_no: student ? ( student?.admission_no|| student?.student_info?.admission_no) : registration_no_generate(),
+          admission_date: student ? ( student?.admission_date || student?.student_info?.admission_date) : null,
+          date_of_birth: student ? ( student?.date_of_birth || student?.student_info?.date_of_birth) : null,
+          gender: student ? ( student?.gender || student?.student_info?.gender) : 'male',
+          blood_group: student ? ( student?.blood_group|| student?.student_info?.blood_group) : '',
+          religion: student ? (student?.religion || student?.student_info?.religion) : '',
+          phone: student ? (student?.phone || student?.student_info?.phone) : undefined,
+          email: student ? ( student?.email || student?.student_info?.email) : '',
+          national_id: student ? (student?.national_id || student?.student_info?.national_id) : '',
           student_photo: null
         }}
         validationSchema={Yup.object().shape({

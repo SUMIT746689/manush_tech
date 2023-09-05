@@ -8,14 +8,14 @@ import fs from 'fs';
 
 import { fileRename, fileUpload } from '@/utils/upload';
 
-const postHandle = async (req, res, authenticate_user) => {
+const postHandle = async (req, res, refresh_token) => {
   try {
-    if (!authenticate_user?.school_id) throw new Error('permission denied');
+    if (!refresh_token?.school_id) throw new Error('permission denied');
 
     const subscription = await prisma.subscription.findFirstOrThrow({
       where: {
         AND: [
-          { school_id: parseInt(authenticate_user.school_id) },
+          { school_id: parseInt(refresh_token.school_id) },
           { is_active: true }
         ]
       },
@@ -24,7 +24,7 @@ const postHandle = async (req, res, authenticate_user) => {
 
     const studentCount = await prisma.student.count({
       where: {
-        student_info: { school_id: parseInt(authenticate_user.school_id) }
+        student_info: { school_id: parseInt(refresh_token.school_id) }
       }
     });
 
@@ -40,11 +40,24 @@ const postHandle = async (req, res, authenticate_user) => {
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
+
+    console.log({ files, fields });
+
     if (error) {
       throw new Error('Server Error !')
     }
-    const filePathQuery = {}
+    const filePathQuery = fields?.filePathQuery ? JSON.parse(fields?.filePathQuery) : {}
 
+    for (let i in filePathQuery) {
+      const oldPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, filePathQuery[i]);
+      const newPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName,filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1))
+      console.log({oldPath, newPath});
+      
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) throw err
+        console.log('Successfully moved file!')
+      })
+    }
     if (files?.student_photo?.newFilename) {
       filePathQuery['student_photo_path'] = await fileRename(files,
         uploadFolderName, "student_photo",
@@ -202,7 +215,7 @@ const postHandle = async (req, res, authenticate_user) => {
 
     const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
       where: {
-        school_id: authenticate_user?.school_id,
+        school_id: refresh_token?.school_id,
         is_active: true
       }
     })

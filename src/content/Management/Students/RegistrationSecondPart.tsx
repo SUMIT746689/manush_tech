@@ -47,7 +47,7 @@ function RegistrationSecondPart({
 
   useEffect(() => {
     if (classesOptions && student) {
-      setselectedClass(classesOptions?.find(i => i.id == student?.section?.class_id))
+      setselectedClass(classesOptions?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id)))
     }
   }, [classesOptions, student])
 
@@ -56,7 +56,9 @@ function RegistrationSecondPart({
     if (student) {
       console.log("student__", student);
 
-      const targetClassSections = classes?.find(i => i.id == student?.section?.class_id)
+      const targetClassSections = classes?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id ))
+      console.log("targetClassSections__",targetClassSections);
+      
       setSectionsForSelectedClass(targetClassSections?.sections?.map(i => {
         return {
           label: i.name,
@@ -75,7 +77,7 @@ function RegistrationSecondPart({
   useEffect(() => {
     if (student && sectionsForSelectedClass?.length > 0) {
       console.log("sectionsForSelectedClass__", sectionsForSelectedClass);
-      setSelecetedSection(sectionsForSelectedClass.find(i => i.id == student.section.id))
+      setSelecetedSection(sectionsForSelectedClass.find(i => i.id == (Number(student?.section_id) || student?.section?.id)))
     }
     // setSelecetedSection(sectionsForSelectedClass)
   }, [sectionsForSelectedClass, student])
@@ -112,18 +114,18 @@ function RegistrationSecondPart({
     <>
       <Formik
         initialValues={{
-          username: student ? student?.student_info?.user?.username : generateUsername(totalFormData.first_name),
-          password: student ? "" : password,
-          confirm_password: student ? "" : password,
-          class_id: student ? student?.section?.class_id : undefined,
-          section_id: student ? student?.section?.id : undefined,
-          academic_year_id: student ? student?.academic_year_id : undefined,
+          username: student ? (student?.student_info?.user?.username || student?.username) : generateUsername(totalFormData.first_name),
+          password: student ? (student?.password || "" ) : password,
+          confirm_password: student ? ( student?.password || "") : password,
+          class_id: student ? ( student?.class_id ? Number(student?.class_id) : student?.section?.class_id) : undefined,
+          section_id: student ? (student?.section_id ? Number(student?.section_id) : student?.section?.id) : undefined,
+          academic_year_id: student ? Number(student?.academic_year_id) : undefined,
           roll_no: student ? student?.class_roll_no : undefined,
-          registration_no: student ? student?.class_registration_no : registration_no_generate(),
+          registration_no: student?.class_registration_no || registration_no_generate(),
           student_photo: null,
           student_present_address: student ? student?.student_present_address : '',
-          student_permanent_address: student ? student?.student_info?.student_permanent_address : '',
-          previous_school: student ? student?.student_info?.previous_school : ''
+          student_permanent_address: student ? ( student?.student_permanent_address || student?.student_info?.student_permanent_address) : '',
+          previous_school: student ? ( student?.previous_school || student?.student_info?.previous_school) : ''
         }}
         validationSchema={Yup.object().shape({
           username: Yup.string()
@@ -188,7 +190,7 @@ function RegistrationSecondPart({
           values,
           setFieldValue
         }) => {
-          console.log("T__values__", errors, values);
+          // console.log("T__values__", errors, values);
 
           return (
             <form onSubmit={handleSubmit}>
@@ -413,8 +415,8 @@ function RegistrationSecondPart({
                         helperText={
                           touched.registration_no && errors.registration_no
                         }
-                        disabled
-                        label={t('Registration number')}
+                        
+                        label={t('Provide an unique Registration number')}
                         name="registration_no"
                         onBlur={handleBlur}
                         onChange={handleChange}
@@ -516,7 +518,7 @@ function RegistrationSecondPart({
                     {/* student photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={student_photo ? student_photo : `/api/get_file/${student?.student_photo?.replace(/\\/g, '/')}`}
+                        <Image src={student_photo ? student_photo : `/api/get_file/${(student?.student_photo || student?.filePathQuery?.student_photo_path)?.replace(/\\/g, '/')}`}
                           height={150}
                           width={150}
                           alt='Student photo'

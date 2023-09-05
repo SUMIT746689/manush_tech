@@ -1,8 +1,10 @@
+import { School } from './../../../src/models/user';
 import { fileRename, fileUpload } from '@/utils/upload';
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import path from 'path';
+import get from 'controllers/onlineAdmission/get';
 
 export const config = {
     api: {
@@ -17,15 +19,19 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-                const requestList = await prisma.onlineAdmission.findMany();
-                res.status(200).json(requestList);
+                get(req, res);
                 break;
             case 'POST':
+                const reqDomain = new URL(req.headers.origin).host;
 
-                const headersList = headers();
-                const domain = headersList.get('host')
-                console.log("domain__", domain);
-
+                const school = await prisma.school.findFirst({
+                    where: {
+                        domain: reqDomain
+                    }
+                })
+                if (!school) {
+                    throw new Error('Bad request !')
+                }
                 const uploadFolderName = 'onlineAdmission';
 
                 const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -65,14 +71,15 @@ const index = async (req, res) => {
                         Date.now().toString() + '_' + files?.guardian_photo?.originalFilename)
                 }
 
-                // await prisma.onlineAdmission.create({
-                //     data: {
-                //         student: {
-                //             ...fields,
-                //             filePathQuery
-                //         }
-                //     }
-                // })
+                await prisma.onlineAdmission.create({
+                    data: {
+                        student: {
+                            ...fields,
+                            filePathQuery
+                        },
+                        school_id: school.id
+                    }
+                })
                 res.status(200).json({ success: true, message: "Admission Application submitted !!" });
                 break;
             default:
@@ -81,7 +88,7 @@ const index = async (req, res) => {
         }
     } catch (err) {
         for (const i in filePathQuery) {
-            fs.unlinkSync(path.join(process.cwd(),filePathQuery[i]))
+            fs.unlinkSync(path.join(process.cwd(), filePathQuery[i]))
         }
         console.log(err);
         res.status(500).json({ message: err.message });

@@ -7,7 +7,7 @@ import RegistrationThirdPart from '@/content/Management/Students/RegistrationThi
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-export default function StudentForm({student=null}){
+export default function StudentForm({ student = null, handleClose = null, onlineAdmission_id = null }) {
   const router = useRouter();
 
   const [activeStep, setActiveStep] = useState(0);
@@ -40,7 +40,8 @@ export default function StudentForm({student=null}){
   }, []);
 
   const handleCreateClassClose = () => {
-    router.push('/management/students');
+    if (handleClose) handleClose();
+    else router.push('/management/students');
   };
 
   return (
@@ -91,6 +92,8 @@ export default function StudentForm({student=null}){
               handleCreateClassClose={handleCreateClassClose}
               setUsersFlag={setClassesFlag}
               student={student}
+              onlineAdmission_id={onlineAdmission_id}
+              handleClose={handleClose}
             />
           )}
         </Grid>

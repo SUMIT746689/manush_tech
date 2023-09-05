@@ -35,7 +35,7 @@ import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import type { User } from 'src/models/user';
 import { useTranslation } from 'react-i18next';
-import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
+import ApprovalIcon from '@mui/icons-material/Approval';
 import useNotistick from '@/hooks/useNotistick';
 import NextLink from 'next/link';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
@@ -47,6 +47,7 @@ import Head from 'next/head';
 import Footer from '@/components/Footer';
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
+import StudentForm from '@/components/Student/StudentForm';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -153,18 +154,25 @@ const Results = () => {
     role: null
   });
 
-  const [discountModal, setDiscountModal] = useState(false);
+  const [open, setOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
 
   const refetch = () => {
-     axios.get('/api/onlineAdmission')
+    axios.get('/api/onlineAdmission')
+      .then(res => setUsers(res.data))
+      .catch(err => console.log(err))
   }
 
-  // useEffect(() => {
-  //   refetch()
-  // }, [])
+  useEffect(() => {
+    refetch()
+  }, [])
 
+  const handleCreateProjectClose = () => {
+    setOpen(false)
+    setSelectedStudent(null)
+    refetch();
+  }
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -197,10 +205,7 @@ const Results = () => {
     selectedItems.length > 0 && selectedItems.length < users.length;
   const selectedAllUsers = selectedItems.length === users.length;
 
-  ;
-
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
-
+  console.log("selectedStudent__", selectedStudent);
 
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(null);
@@ -209,15 +214,15 @@ const Results = () => {
   const handleDeleteCompleted = () => {
     console.log(openConfirmDelete);
 
-    axios.delete(`/api/student/${openConfirmDelete}`)
+    axios.delete(`/api/onlineAdmission/${openConfirmDelete}`)
       .then(res => {
         setOpenConfirmDelete(null);
         refetch();
-        showNotification('The student has been removed');
+        showNotification('Admission request has been removed');
       })
       .catch(err => {
         setOpenConfirmDelete(null);
-        showNotification('Student deletion failed !', 'error');
+        showNotification('Admission request deletion failed !', 'error');
       })
   };
   const handleConfirmDelete = (id) => {
@@ -229,181 +234,130 @@ const Results = () => {
       <Head>
         <title>Online admission - Management</title>
       </Head>
-     
-        <Dialog
-          fullWidth
-          maxWidth="md"
-          open={discountModal}
-          onClose={() => {
-            refetch()
-            setDiscountModal(false);
-          }}
-          sx={{ paddingX: { xs: 3, md: 0 } }}
-        >
-          <Grid item container flexDirection={'column'} sx={{ p: 4 }}>
-            <Grid display="flex" alignItems="center" sx={{ mb: { xs: 2, md: 4 } }} >
-              <Avatar
-                sx={{
-                  mr: 1
-                }}
-                src={selectedStudent?.avatar}
-              />
-              <Box>
 
-                <Typography fontSize={20} fontWeight={'bold'}>{selectedStudent?.username}</Typography>
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        open={open}
+        onClose={handleCreateProjectClose}
+      >
+        <Grid p={2}>
+          <Typography variant='h2' align='center' py={2}> Online Admission Approval</Typography>
+          <StudentForm
+            student={selectedStudent?.student}
+            handleClose={handleCreateProjectClose}
+            onlineAdmission_id={selectedStudent?.id}
+          />
+        </Grid>
 
-              </Box>
-            </Grid>
-          </Grid>
-        </Dialog>
-        <Card sx={{ minHeight: 'calc(100vh - 215px)' }}>
+      </Dialog>
+
+      <Card sx={{ minHeight: 'calc(100vh - 215px)' }}>
 
 
-          {!selectedBulkActions && (
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Box>
-                <Typography component="span" variant="subtitle1">
-                  {t('Showing')}:
-                </Typography>{' '}
-                <b>{paginatedClasses.length}</b> <b>{t('Admission request')}</b>
-              </Box>
-              <TablePagination
-                component="div"
-                count={filteredClasses.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
+        {!selectedBulkActions && (
+          <Box
+            p={2}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Box>
+              <Typography component="span" variant="subtitle1">
+                {t('Showing')}:
+              </Typography>{' '}
+              <b>{paginatedClasses.length}</b> <b>{t('Admission request')}</b>
             </Box>
-          )}
-          <Divider />
+            <TablePagination
+              component="div"
+              count={filteredClasses.length}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleLimitChange}
+              page={page}
+              rowsPerPage={limit}
+              rowsPerPageOptions={[5, 10, 15]}
+            />
+          </Box>
+        )}
+        <Divider />
 
-          {paginatedClasses.length === 0 ? (
-            <>
-              <Typography
-                sx={{
-                  py: 10
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t("We couldn't find any Admission request")}
-              </Typography>
-            </>
-          ) : (
-            <>
-              <TableContainer >
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedAllUsers}
-                          indeterminate={selectedSomeUsers}
-                          onChange={handleSelectAllUsers}
-                        />
-                      </TableCell>
-                      <TableCell>{t('student name')}</TableCell>
-                      <TableCell>{t('Class')}</TableCell>
-                      <TableCell >{t('class Roll')}</TableCell>
-                      <TableCell >{t('Section')}</TableCell>
-                      <TableCell align="center">{t('Actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paginatedClasses.map((i) => {
-                      const isUserSelected = selectedItems.includes(i.id);
-                      return (
-                        <TableRow hover key={i.id} selected={isUserSelected}>
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={isUserSelected}
-                              onChange={(event) =>
-                                handleSelectOneUser(event, i.id)
-                              }
-                              value={isUserSelected}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h5">
-                              {i?.student_info?.first_name}{i?.student_info?.middle_name ? " " + i?.student_info?.middle_name : ""}{i?.student_info?.last_name ? " " + i?.student_info?.last_name : ""}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h5">
-                              {i?.section?.class?.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h5">
-                              {i?.class_roll_no}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h5">
-                              {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align={'center'} sx={{
-                            display: 'grid',
-                            gridTemplateColumns: 'auto auto auto auto'
-                          }}>
-                            <Tooltip title={t('View Profile')} arrow>
-                              <IconButton
-                                color="primary"
+        {paginatedClasses.length === 0 ? (
+          <>
+            <Typography
+              sx={{
+                py: 10
+              }}
+              variant="h3"
+              fontWeight="normal"
+              color="text.secondary"
+              align="center"
+            >
+              {t("We couldn't find any Admission request")}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <TableContainer >
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align={'center'}>{t('Class')}</TableCell>
+                    <TableCell align={'center'}>{t('Academic year')}</TableCell>
+                    <TableCell align="center">{t('Actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedClasses.map((i) => {
+                    const isUserSelected = selectedItems.includes(i.id);
+                    return (
+                      <TableRow hover key={i.id} selected={isUserSelected}>
 
-                              >
-                                <VisibilityIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                        <TableCell align={'center'}>
+                          <Typography variant="h5">
+                            {i?.student?.class_id}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align={'center'}>
+                          <Typography variant="h5">
+                            {i?.student?.academic_year_id}
+                          </Typography>
+                        </TableCell>
 
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                color="primary"
-                              >
-                                <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
-                              </IconButton>
-                            </Tooltip>
+                        <TableCell align={'center'} sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'auto auto auto auto'
+                        }}>
 
-                            <Tooltip title={t('Discount')} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() => {
-                                  setSelectedStudent(i)
-                                  setDiscountModal(true)
-                                }}
-                              >
-                                <DiscountIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                          <Tooltip title={t('Approve')} arrow>
+                            <IconButton
+                              color="primary"
+                              onClick={() => {
+                                setSelectedStudent(i)
+                                setOpen(true)
+                              }}
+                            >
+                              <ApprovalIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={() => handleConfirmDelete(i.id)}
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          )}
-        </Card>
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={() => handleConfirmDelete(i.id)}
+                              color="primary"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
+      </Card>
 
       <Footer />
 

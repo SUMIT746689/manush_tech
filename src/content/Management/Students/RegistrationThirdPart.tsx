@@ -26,6 +26,8 @@ function RegistrationFirstPart({
   handleCreateClassClose,
   setUsersFlag,
   student,
+  onlineAdmission_id,
+  handleClose
 }) {
   const router = useRouter()
   const { t }: { t: any } = useTranslation();
@@ -51,7 +53,8 @@ function RegistrationFirstPart({
           guardian_phone: student ? student?.guardian_phone : '',
           guardian_profession: student ? student?.guardian_profession : '',
           guardian_photo: null,
-          relation_with_guardian: student ? student?.relation_with_guardian : ''
+          relation_with_guardian: student ? student?.relation_with_guardian : '',
+          filePathQuery: student ? student?.filePathQuery : {}
         }}
         validationSchema={Yup.object().shape({
           father_name: Yup.string().max(255).nullable(true)
@@ -71,10 +74,13 @@ function RegistrationFirstPart({
             const formData = new FormData();
 
             for (let i in _values) {
-              formData.append(`${i}`, _values[i]);
+              if (i == 'filePathQuery') {
+                formData.append(`${i}`, JSON.stringify(_values[i]));
+              }
+              else formData.append(`${i}`, _values[i]);
             }
 
-            if (student) {
+            if (student && !onlineAdmission_id) {
               const res = await axios.patch(`/api/student/${router.query.id}`, formData)
               if (res.data.success) {
                 resetForm();
@@ -98,7 +104,11 @@ function RegistrationFirstPart({
                 setUsersFlag(true);
                 setActiveStep(0);
                 showNotification(res.data.success);
-                router.push('/management/students/registration');
+                if (onlineAdmission_id) {
+                  await axios.delete(`/api/onlineAdmission/${onlineAdmission_id}`)
+                  handleClose();
+                }
+                else router.push('/management/students/registration');
               }
             }
 
@@ -212,7 +222,7 @@ function RegistrationFirstPart({
                     {/* father_photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={father_photo ? father_photo : `/api/get_file/${student?.student_info?.father_photo?.replace(/\\/g, '/')}`}
+                        <Image src={father_photo ? father_photo : `/api/get_file/${(student?.student_info?.father_photo || student?.filePathQuery?.father_photo_path)?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Father's photo:"
@@ -317,7 +327,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={mother_photo ? mother_photo : `/api/get_file/${student?.student_info?.mother_photo?.replace(/\\/g, '/')}`}
+                        <Image src={mother_photo ? mother_photo : `/api/get_file/${(student?.student_info?.mother_photo || student?.filePathQuery?.mother_photo_path)?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Mother's photo:"
@@ -428,7 +438,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} item xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={guardian_photo ? guardian_photo : `/api/get_file/${student?.guardian_photo?.replace(/\\/g, '/')}`}
+                        <Image src={guardian_photo ? guardian_photo : `/api/get_file/${(student?.guardian_photo || student?.filePathQuery?.guardian_photo_path)?.replace(/\\/g, '/')}`}
                           height={100}
                           width={100}
                           alt="Guardian's photo:"

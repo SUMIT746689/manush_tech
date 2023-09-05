@@ -91,16 +91,16 @@ function RegistrationFirstPart({
               formData.append(`${i}`, _values[i]);
             }
 
-            await axios.post(`${serverHost}/api/onlineAdmission`, formData)
+         await axios.post(`${serverHost}/api/onlineAdmission`, formData)
 
-            resetForm();
-            setTotalFormData({})
-            setStatus({ success: true });
-            setSubmitting(false);
-            setUsersFlag(true);
-            setActiveStep(0);
+            // resetForm();
+            // setTotalFormData({})
+            // setStatus({ success: true });
+            // setSubmitting(false);
+            // setUsersFlag(true);
+            // setActiveStep(0);
             showNotification('Online Admission form submitted !!');
-            router.push('/online-admission');
+            // router.push('/online-admission');
 
           } catch (err) {
             console.log(err);

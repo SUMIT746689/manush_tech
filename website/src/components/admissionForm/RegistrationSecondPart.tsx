@@ -18,7 +18,7 @@ import useNotistick from '../../hooks/useNotistick';
 
 function generateUsername(firstName: string) {
   const text = Date.now().toString()
-  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
+  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5) + Math.random().toString(36).substring(0, 4)
 }
 function registration_no_generate() {
   return (Date.now().toString() + Math.random().toString()).substring(0, 11);
@@ -105,10 +105,10 @@ function RegistrationSecondPart({
           password: password,
           confirm_password: password,
           class_id: undefined,
-          section_id: undefined,
+          // section_id: undefined,
           academic_year_id: undefined,
-          roll_no: undefined,
-          registration_no: registration_no_generate(),
+          // roll_no: undefined,
+          // registration_no: registration_no_generate(),
           student_photo: null,
           student_present_address: '',
           student_permanent_address: '',
@@ -120,7 +120,7 @@ function RegistrationSecondPart({
             .required(t('First name field is required')),
 
           class_id: Yup.number().integer().positive().required(t('Class field is required')),
-          section_id: Yup.number().integer().positive().required(t('Section field is required')),
+          // section_id: Yup.number().integer().positive().required(t('Section field is required')),
 
           academic_year_id: Yup.number().positive().integer().required(),
 
@@ -145,10 +145,8 @@ function RegistrationSecondPart({
             })
           ,
 
-          roll_no: Yup.string().required(t('roll no is required!')),
-          registration_no: Yup.string().required(
-            t('registration no is required!')
-          )
+          // roll_no: Yup.string().required(t('roll no is required!')),
+          // registration_no: Yup.string().required(t('registration no is required!'))
         })}
         onSubmit={async (
           _values,
@@ -194,6 +192,7 @@ function RegistrationSecondPart({
                     <Grid item xs={12}>
                       <TextField
                         required
+                        disabled
                         fullWidth
                         size="small"
                         sx={{
@@ -291,7 +290,7 @@ function RegistrationSecondPart({
                     </Grid>
 
                     {/* section */}
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
                       {selectedClass && selectedClass.has_section && (
                         <Autocomplete
                           size="small"
@@ -331,7 +330,7 @@ function RegistrationSecondPart({
                           }}
                         />
                       )}
-                    </Grid>
+                    </Grid> */}
 
                     {/* academicYears */}
                     <Grid item xs={12} md={6}>
@@ -365,7 +364,7 @@ function RegistrationSecondPart({
                     </Grid>
 
                     {/* roll_no */}
-                    <Grid item xs={12} sm={6} md={6}>
+                    {/* <Grid item xs={12} sm={6} md={6}>
                       <TextField
                         required
                         size="small"
@@ -386,10 +385,10 @@ function RegistrationSecondPart({
                         value={values.roll_no}
                         variant="outlined"
                       />
-                    </Grid>
+                    </Grid> */}
 
                     {/* registration_no */}
-                    <Grid item xs={12} sm={6} md={6}>
+                    {/* <Grid item xs={12} sm={6} md={6}>
                       <TextField
                         required
                         size="small"
@@ -414,9 +413,9 @@ function RegistrationSecondPart({
                         value={values.registration_no}
                         variant="outlined"
                       />
-                    </Grid>
+                    </Grid> */}
 
-                
+
 
                     {/* previous_school */}
                     <Grid item xs={12} md={6}>

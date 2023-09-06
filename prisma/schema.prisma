@@ -28,11 +28,13 @@ model User {
   student      StudentInformation?
 
   // admin_school School? @relation(name: "AdminUserSchool")
-  SentSmsDetail      SentSmsDetail[]
-  EmployeeAttendance EmployeeAttendance[]
-  StudentFee         StudentFee[]
-  Leave              Leave[]
-  SentEmailDetail    SentEmailDetail[]
+  SentSmsDetail              SentSmsDetail[]
+  EmployeeAttendance         EmployeeAttendance[]
+  StudentFee                 StudentFee[]
+  Leave                      Leave[]
+  SentEmailDetail            SentEmailDetail[]
+  tbl_attendence_queue       tbl_attendance_queue[]
+  tbl_manual_attendace_queue tbl_manual_attendace_queue[]
 
   @@map("users")
 }
@@ -51,29 +53,30 @@ model School {
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
-  admins              User[]                @relation("AdminUserSchool")
-  teachers            Teacher[]
-  classes             Class[]
-  student_list        StudentInformation[]
-  rooms               Room[]
-  periods             Period[]
-  fees                Fee[]
-  exams               Exam[]
-  holidays            Holiday[]
-  academic_years      AcademicYear[]
-  attendances         Attendance[]
-  subscription        Subscription[]
-  websiteui           WebsiteUi[]
-  RequestPackage      RequestPackage[]
-  SmsGateway          SmsGateway[]
-  SmsTemplate         SmsTemplate[]
-  SentSms             SentSms[]
-  CertificateTemplate CertificateTemplate[]
-  Transaction         Transaction[]
-  GradingSystem       GradingSystem[]
-  Notice              Notice[]
-  EmailTemplate       EmailTemplate[]
-  SentEmail           SentEmail[]
+  admins               User[]                 @relation("AdminUserSchool")
+  teachers             Teacher[]
+  classes              Class[]
+  student_list         StudentInformation[]
+  rooms                Room[]
+  periods              Period[]
+  fees                 Fee[]
+  exams                Exam[]
+  holidays             Holiday[]
+  academic_years       AcademicYear[]
+  attendances          Attendance[]
+  subscription         Subscription[]
+  websiteui            WebsiteUi[]
+  RequestPackage       RequestPackage[]
+  SmsGateway           SmsGateway[]
+  SmsTemplate          SmsTemplate[]
+  SentSms              SentSms[]
+  CertificateTemplate  CertificateTemplate[]
+  Transaction          Transaction[]
+  GradingSystem        GradingSystem[]
+  Notice               Notice[]
+  EmailTemplate        EmailTemplate[]
+  SentEmail            SentEmail[]
+  tbl_attendence_queue tbl_attendance_queue[]
 
   // routines Routine[]
   @@map("schools")
@@ -859,32 +862,116 @@ enum DiscountType {
   flat
 }
 
+model tbl_manual_attendace_queue {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  created_at DateTime @default(now())
+  
+  user       User     @relation(fields: [user_id], references: [id])
+}
+
+model tbl_attendance_queue {
+  id              Int      @id @default(autoincrement())
+  school_id       Int
+  machine_id      String
+  user_id         Int
+  status          Int
+  submission_time DateTime
+
+  school School @relation(fields: [school_id], references: [id])
+  user   User   @relation(fields: [user_id], references: [id])
+
+  @@map("tbl_attendance_queue")
+}
+
 model tbl_queued_sms {
-  id                    Int       @id @default(autoincrement())
-  sms_shoot_id          String // school_id-user_id-dateTime
-  user_id               Int
-  //0campaign_id           Int?
-  user_name             String?
+  id                  Int       @id @default(autoincrement())
+  sms_shoot_id        String // school_id-user_id-dateTime
+  user_id             Int
+  //campaign_id           Int?
+  user_name           String?
+  sms_type            String
+  sms_text            String    @db.Text
   //route_id              Int
   //route_name            String?
   //sender_id             Int
-  sender_name           String?
+  sender_name         String?
   //coverage_id           Int
   //coverage_network_name String?
-  contacts              String    @db.LongText
-  pushed_via            String
+  submission_time     DateTime?
+  contacts            String    @db.LongText
+  pushed_via          String
   //charges_per_sms       Float     @default(0)
-  number_of_sms_parts   Int       @default(1)
-  total_count           Int
-  sms_type              String
-  sms_text              String    @db.Text
-  submission_time       DateTime?
+  number_of_sms_parts Int       @default(1)
+  total_count         Int
   //is_dlr_requested      Int       @default(0)
-  status                Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
-  sms_gateway_status    String?
+  status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
+  sms_gateway_status  String?
   //is_black_list         Int       @default(0)
-  fail_count            Int       @default(0)
-  priority              Int       @default(5) // 1-> highest
-  
+  fail_count          Int       @default(0)
+  priority            Int       @default(5) // 1-> highest
+
   @@unique([id, status])
+  @@map("tbl_queued_sms")
+}
+
+model tbl_sms_history {
+  id                  Int       @id @default(autoincrement())
+  sms_shoot_id        String // school_id-user_id-dateTime
+  user_id             Int
+  //campaign_id           Int?
+  user_name           String?
+  sms_type            String
+  sms_text            String    @db.Text
+  //route_id              Int
+  //route_name            String?
+  //sender_id             Int
+  sender_name         String?
+  //coverage_id           Int
+  //coverage_network_name String?
+  submission_time     DateTime?
+  contacts            String    @db.LongText
+  pushed_via          String
+  //charges_per_sms       Float     @default(0)
+  number_of_sms_parts Int       @default(1)
+  total_count         Int
+  //is_dlr_requested      Int       @default(0)
+  status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
+  sms_gateway_status  String?
+  //is_black_list         Int       @default(0)
+  fail_count          Int       @default(0)
+  priority            Int       @default(5) // 1-> highest
+
+  // id                    Int @id @default(autoincrement())
+  // sms_shoot_id String 
+  // user_id  
+  // user_name
+  // sms_type
+  // sms_text 
+  // sent_via //
+  // route_id 
+  // route_name
+  // sender_id
+  // sender_name
+  // coverage_id
+  // coverage_network_name
+  // submission_time
+  // sending_time
+  // last_reply_time
+  // msisdn 
+  // is_dlr_requested
+  // dlr
+  // dlr_received 
+  // vendor_sms_id
+  // vendor_dlr
+  // sms_status
+  // sms_status_str
+  // sms_gateway_status
+  // is_black_list
+  // number_of_sms_parts
+  // charges_per_sms
+  // retry_count
+  // next_retry_time
+
+  @@map("tbl_sms_history")
 }

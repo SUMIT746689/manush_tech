@@ -1,7 +1,4 @@
-import { PrismaClient } from "@prisma/client"
-import { authenticate } from "middleware/authenticate";
-import fs from 'fs';
-const prisma = new PrismaClient()
+import prisma from "@/lib/prisma_client";
 
 const index = async (req, res) => {
     try {
@@ -9,7 +6,6 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'POST':
-
 
                 // const { date, status, school_id, section_id, exam_id } = req.query;
                 // const { sectionAttendence } = req.body;
@@ -107,49 +103,21 @@ const index = async (req, res) => {
                 // }
 
                 console.log("req.body___", req.body, typeof (req.body));
+                const body = JSON.parse(req.body);
 
-                // fs.appendFile('mynewfile.txt', (req.body), (err) => {
-                //     if (err) {
-                //         console.log(err);
-                //     } else {
-                //         console.log('file written !');
-                //     }
-                // });
+                const data2 = body.map(i => ({
+                    user_id: 6 || parseInt(i.userID),
+                    school_id: i.schoolID,
+                    submission_time: new Date(i.timestamp),
+                    status: i.status,
+                    machine_id: i.machineID,
+                }))
 
-                // {
-                //     "schoolID": 6,
-                //         "machineID": "COAW220860397",
-                //             "userID": "1",
-                //                 "timestamp": "2022-10-24 13:02:28",
-                //                     "status": 4,
-                //                         "punch": 255
-                // },
+                await prisma.tbl_attendance_queue.createMany({
+                    data: data2
+                })
 
-                // const data = req.body.map(i => ({
-                //     sms_shoot_id: 'ecwc',
-                //     user_id: i.userID,
-                //     submission_time: i.timestamp,
-                //     status: i.status,
-                //     route_id: 1,
-                //     sender_id: 1,
-                //     coverage_id: 1,
-                //     contacts: '0186786',
-                //     pushed_via: 'wrgve',
-                //     charges_per_sms: 0.25,
-                //     total_count: 4,
-                //     sms_type: 'masking',
-                //     sms_text: 'eqfretrh rwgvebttrynt',
-                //     is_black_list: 2,
-                //     fail_count: 3,
-                //     priority: 4
-
-                // }))
-                // await prisma.tbl_queued_sms.createMany({
-                //     data
-                // })
-
-
-                res.status(200).json({ statusCode: '0000', message: 'success' })
+                res.status(200).json({ statusCode: '200', message: 'success' })
 
                 break;
             default:
@@ -159,7 +127,6 @@ const index = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({ statusCode: '500', message: err.message });
-
     }
 
 }

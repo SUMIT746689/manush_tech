@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
-import { Autocomplete, Box, FormControl, FormControlLabel, Grid, Paper, Radio, TableContainer, TableBody, RadioGroup, Table, TableHead, TableCell, TextField, TableRow } from '@mui/material';
+import { FormControl, FormControlLabel, Grid, Paper, Radio, TableContainer, TableBody, RadioGroup, Table, TableHead, TableCell, TextField, TableRow } from '@mui/material';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { Fragment, forwardRef, useEffect, useState } from 'react';
@@ -8,33 +8,19 @@ import { useTranslation } from 'react-i18next';
 import { TableVirtuoso } from 'react-virtuoso';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '../AutoCompleteWrapper';
 
-export const ClassAndSectionSelect = ({ classes, selectedDate, selectedSection, setSelectedSection, flag }) => {
+export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, setSelectedClass, selectedSection, setSelectedSection, flag }) => {
     const { t }: { t: any } = useTranslation();
-    const [selectedClass, setSelectedClass] = useState(null);
+    // const [selectedClass, setSelectedClass] = useState(null);
     const [sections, setSections] = useState(null);
 
     const handleClassSelect = (e, value) => {
         setSelectedClass(value)
         setSelectedSection(null)
         if (value?.id) {
-
-            const selectedClassSections = classes.find(i => i.id == value?.id)
+            const selectedClassSections = classes.find(i => i.id == value?.id);
             if (selectedClassSections) {
-
-                if (selectedClassSections.has_section) {
-                    setSections(selectedClassSections?.sections?.map(j => {
-                        return {
-                            label: j.name,
-                            id: j.id
-                        }
-                    }))
-                }
-                else {
-                    setSelectedSection({
-                        label: selectedClassSections?.sections[0].name,
-                        id: selectedClassSections?.sections[0].id
-                    })
-                }
+                if (selectedClassSections.has_section) setSections(selectedClassSections?.sections?.map(j => ({ label: j.name, id: j.id })));
+                else setSelectedSection({ label: selectedClassSections?.sections[0].name, id: selectedClassSections?.sections[0].id });
             }
         }
 

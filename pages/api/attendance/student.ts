@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
-
-const prisma = new PrismaClient()
 
 const index = async (req, res) => {
     try {
@@ -74,8 +72,7 @@ const index = async (req, res) => {
                 })
 
                 if (sectionAttendence) {
-                    console.log({ sectionAttendence });
-
+                
                     for (const i of sectionAttendence) {
 
                         const updatequery = {

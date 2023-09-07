@@ -34,7 +34,7 @@ model User {
   Leave                      Leave[]
   SentEmailDetail            SentEmailDetail[]
   tbl_attendence_queue       tbl_attendance_queue[]
-  tbl_manual_attendace_queue tbl_manual_attendace_queue[]
+  // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
 
   @@map("users")
 }
@@ -53,30 +53,31 @@ model School {
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
-  admins               User[]                 @relation("AdminUserSchool")
-  teachers             Teacher[]
-  classes              Class[]
-  student_list         StudentInformation[]
-  rooms                Room[]
-  periods              Period[]
-  fees                 Fee[]
-  exams                Exam[]
-  holidays             Holiday[]
-  academic_years       AcademicYear[]
-  attendances          Attendance[]
-  subscription         Subscription[]
-  websiteui            WebsiteUi[]
-  RequestPackage       RequestPackage[]
-  SmsGateway           SmsGateway[]
-  SmsTemplate          SmsTemplate[]
-  SentSms              SentSms[]
-  CertificateTemplate  CertificateTemplate[]
-  Transaction          Transaction[]
-  GradingSystem        GradingSystem[]
-  Notice               Notice[]
-  EmailTemplate        EmailTemplate[]
-  SentEmail            SentEmail[]
-  tbl_attendence_queue tbl_attendance_queue[]
+  admins                             User[]                               @relation("AdminUserSchool")
+  teachers                           Teacher[]
+  classes                            Class[]
+  student_list                       StudentInformation[]
+  rooms                              Room[]
+  periods                            Period[]
+  fees                               Fee[]
+  exams                              Exam[]
+  holidays                           Holiday[]
+  academic_years                     AcademicYear[]
+  attendances                        Attendance[]
+  subscription                       Subscription[]
+  websiteui                          WebsiteUi[]
+  RequestPackage                     RequestPackage[]
+  SmsGateway                         SmsGateway[]
+  SmsTemplate                        SmsTemplate[]
+  SentSms                            SentSms[]
+  CertificateTemplate                CertificateTemplate[]
+  Transaction                        Transaction[]
+  GradingSystem                      GradingSystem[]
+  Notice                             Notice[]
+  EmailTemplate                      EmailTemplate[]
+  SentEmail                          SentEmail[]
+  tbl_attendence_queue               tbl_attendance_queue[]
+  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
 
   // routines Routine[]
   @@map("schools")
@@ -150,29 +151,31 @@ model Class {
   has_section Boolean @default(false)
   school_id   Int
 
-  sections Section[]
-  subjects Subject[]
-  school   School    @relation(fields: [school_id], references: [id])
-  fees     Fee[]
-  Group    Group[]
+  sections                           Section[]
+  subjects                           Subject[]
+  school                             School                               @relation(fields: [school_id], references: [id])
+  fees                               Fee[]
+  Group                              Group[]
+  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
 
   @@map("classes")
 }
 
 model Section {
-  id               Int          @id @default(autoincrement())
-  name             String?      @db.VarChar(40)
-  class_id         Int
-  class_teacher_id Int?
-  is_class         Boolean      @default(true)
-  class            Class        @relation(fields: [class_id], references: [id])
-  class_teacher    Teacher?     @relation("class_teacher", fields: [class_teacher_id], references: [id])
-  students         Student[]
-  teachers         Teacher[]    @relation("SectionToTeacher")
-  periods          Period[]
-  attendaces       Attendance[]
-  exams            Exam[]
-  groups           Group[]
+  id                                 Int                                  @id @default(autoincrement())
+  name                               String?                              @db.VarChar(40)
+  class_id                           Int
+  class_teacher_id                   Int?
+  is_class                           Boolean                              @default(true)
+  class                              Class                                @relation(fields: [class_id], references: [id])
+  class_teacher                      Teacher?                             @relation("class_teacher", fields: [class_teacher_id], references: [id])
+  students                           Student[]
+  teachers                           Teacher[]                            @relation("SectionToTeacher")
+  periods                            Period[]
+  attendaces                         Attendance[]
+  exams                              Exam[]
+  groups                             Group[]
+  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
 
   @@map("sections")
 }
@@ -410,10 +413,11 @@ model AcademicYear {
 
   school School @relation(fields: [school_id], references: [id])
 
-  exams         Exam[]
-  students      Student[]
-  fees          Fee[]
-  GradingSystem GradingSystem[]
+  exams                              Exam[]
+  students                           Student[]
+  fees                               Fee[]
+  GradingSystem                      GradingSystem[]
+  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
 
   @@map("academic_years")
 }
@@ -862,12 +866,28 @@ enum DiscountType {
   flat
 }
 
-model tbl_manual_attendace_queue {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  created_at DateTime @default(now())
-  
-  user       User     @relation(fields: [user_id], references: [id])
+// model tbl_manual_attendace_queue {
+//   id         Int      @id @default(autoincrement())
+//   user_id    Int
+//   created_at DateTime @default(now())
+
+//   user User @relation(fields: [user_id], references: [id])
+// }
+
+model tbl_manual_student_attendace_queue {
+  id               Int      @id @default(autoincrement())
+  class_id         Int
+  section_id       Int?
+  school_id        Int
+  academic_year_id Int
+  created_at       DateTime @default(now())
+
+  class        Class        @relation(fields: [class_id], references: [id])
+  sections     Section?     @relation(fields: [section_id], references: [id])
+  school       School       @relation(fields: [school_id], references: [id])
+  academicYear AcademicYear @relation(fields: [academic_year_id], references: [id])
+
+  @@map("tbl_manual_student_attendace_queue")
 }
 
 model tbl_attendance_queue {

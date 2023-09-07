@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function get(req, res, refresh_token) {
   try {
     const { user_type } = req.query;
-    console.log({ user_type });
+
     const where = {
       school_id: Number(refresh_token.school_id)
     }

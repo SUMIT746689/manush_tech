@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types';
-import {
-  Autocomplete, Box, Card, Checkbox, Grid, Divider, Table, TableBody, TableCell, TableHead, TableContainer,
-  TableRow, TextField, Typography, Button, useTheme, CircularProgress, Paper, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
-} from '@mui/material';
+import { Card, Grid, TableHead, TextField, Paper, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { forwardRef, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { TableVirtuoso } from 'react-virtuoso';
 import useNotistick from '@/hooks/useNotistick';
 import { ClassAndSectionSelect } from '@/components/Attendence';
@@ -16,6 +13,7 @@ import { ClassAndSectionSelect } from '@/components/Attendence';
 import { MobileDatePicker } from '@mui/lab';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { TextFieldWrapper } from '@/components/TextFields';
 
 
 
@@ -72,7 +70,8 @@ function fixedHeaderContent() {
           style={{
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-
+            padding: '10px 0px',
+            marginBottom: '1px solid black'
           }}
 
         >
@@ -200,21 +199,18 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
         <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
       </RadioGroup>
 
-      <TextField
-        sx={{
-          minWidth: '150px'
-        }}
-        size='small'
-        variant="outlined"
-        value={remarkValue}
-        onChange={(e) => { setRemarkValue(e.target.value) }}
-        onBlur={(e) => {
-          console.log("onblue", attendenceValue, remarkValue);
-          if (attendenceValue && remarkValue !== '') { handleUpdateApi(attendenceValue) }
-        }}
-        label="Remarks"
-        type='text'
-      />
+      <Grid minWidth={200} pt={1}>
+        <TextFieldWrapper
+          label="Remarks"
+          name={"remarks"}
+          value={remarkValue}
+          handleChange={(e) => { setRemarkValue(e.target.value) }}
+          handleBlur={(e) => { if (attendenceValue && remarkValue !== '') { handleUpdateApi(attendenceValue) } }}
+          touched={undefined}
+          errors={undefined}
+        />
+      </Grid>
+
 
     </div>
   );
@@ -229,14 +225,16 @@ const allAttandenceOptions = [
   { label: 'All Bunk', id: 'bunk' },
   { label: 'All Holiday', id: 'holiday' }
 ]
-const Results = () => {
+
+const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelectedSection }) => {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const [targetsectionStudents, setTargetsectionStudents] = useState([]);
   const [students, setStudents] = useState(null);
   const [classes, setClasses] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedSection, setSelectedSection] = useState(null);
+
+
   const [sectionAttendence, setSectionAttendence] = useState([])
 
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -249,11 +247,6 @@ const Results = () => {
       .then(res => setClasses(res.data))
       .catch(err => console.log(err))
   }, [])
-
-  // useEffect(() => {
-  //   console.log("sectionAttendence__", sectionAttendence);
-
-  // }, [sectionAttendence])
 
 
   useEffect(() => {
@@ -270,7 +263,6 @@ const Results = () => {
     }
   }, [user, selectedSection, academicYear])
 
-
   const handleAttendenceFind = () => {
     if (selectedSection && selectedDate && academicYear) {
       setStudents(null)
@@ -278,8 +270,6 @@ const Results = () => {
 
       axios.get(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}`)
         .then(response => {
-          console.log("AttendenceHistory__", response.data);
-
           const temp = targetsectionStudents?.map(i => {
             let attendance;
             let remark;
@@ -300,13 +290,10 @@ const Results = () => {
               remark: remark
             }
           })
-          console.log("student attende__", temp);
-
           setStudents(temp);
 
 
         }).catch(err => {
-          console.log(err)
           // showNotification(err.message, 'error')
           showNotification(err?.response?.data?.message, 'error')
         })
@@ -352,6 +339,7 @@ const Results = () => {
     <Grid sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
       <Card
         sx={{
+          borderRadius: 0.4,
           p: 1,
           pb: 0,
           mb: 2,
@@ -379,7 +367,7 @@ const Results = () => {
             renderInput={(params) => <TextField
               size='small'
               sx={{
-                mb:1,
+                mb: 1,
                 [`& fieldset`]: {
                   borderRadius: 0.6,
                 }
@@ -395,18 +383,20 @@ const Results = () => {
           flag={false}
           classes={classes}
           selectedDate={selectedDate}
+          selectedClass={selectedClass}
+          setSelectedClass={setSelectedClass}
           selectedSection={selectedSection}
           setSelectedSection={setSelectedSection}
         />
 
 
         {/* <Grid item  > */}
-          {
-            selectedSection ?
-              <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
-              :
-              <DisableButtonWrapper >Find</DisableButtonWrapper>
-          }
+        {
+          selectedSection ?
+            <ButtonWrapper handleClick={handleAttendenceFind}>Find</ButtonWrapper>
+            :
+            <DisableButtonWrapper >Find</DisableButtonWrapper>
+        }
         {/* </Grid> */}
         {
           students && students.length > 0 ?
@@ -417,13 +407,8 @@ const Results = () => {
                 value={selectedForAll}
                 handleChange={(e, value: any) => {
                   if (value) {
-                    if (value.id !== 'notTaken') {
-                      setSelectedForAll(value)
-                    }
-                    else {
-                      setSelectedForAll(null)
-                    }
-
+                    if (value.id !== 'notTaken') setSelectedForAll(value);
+                    else setSelectedForAll(null);
                   }
                 }}
                 label={'Select For Everyone'}

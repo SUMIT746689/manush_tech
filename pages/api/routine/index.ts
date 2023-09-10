@@ -29,6 +29,7 @@ const index = async (req, res) => {
                                 }
                             }
                         },
+                        subject: true,
                         section: {
                             select: {
                                 name: true,

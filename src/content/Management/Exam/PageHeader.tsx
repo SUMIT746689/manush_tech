@@ -30,7 +30,7 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 
-function PageHeader({ editExam, setEditExam, classes, getExam }): any {
+function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -90,6 +90,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
           if (j.id == i.subject?.id) {
             j.mark = i.subject_total
             j.exam_date = i.exam_date
+            j.exam_room = i?.exam_room
             temp.push(j);
             break;
           }
@@ -128,8 +129,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
   };
 
   const gettingSubject = (class_id) => {
-    axios
-      .get(`/api/subject?class_id=${class_id}`)
+    axios.get(`/api/subject?class_id=${class_id}`)
       .then((res) => {
         console.log('sub__', res.data);
 
@@ -148,7 +148,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
         console.log(err);
       });
   };
-
   const gettingSections = (class_id, setFieldValue) => {
     const targetClass = classes?.find(i => i.id == class_id)
 
@@ -203,7 +202,15 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
 
       let subject_id_list = [];
       for (const i of subject) {
-        subject_id_list.push({ id: i.id, mark: parseFloat(i.mark), exam_date: i.exam_date });
+        const temp = {
+          id: i.id,
+          mark: parseFloat(i.mark),
+          exam_date: i.exam_date,
+        }
+        if (i?.exam_room) {
+          temp['exam_room'] = parseInt(i?.exam_room)
+        }
+        subject_id_list.push(temp);
       }
       let query = {};
       if (editExam) {
@@ -261,7 +268,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
       setSubmitting(false);
     }
   }
-
+  const subjectLength = subject.length;
   return (
     <>
       {/* <Grid container justifyContent="space-between" alignItems="center">
@@ -378,8 +385,6 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                         value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
                         handleChange={(event, newValue) => handleClassSelect(event, newValue, setFieldValue)}
                       />
-
-
                       {/* select section */}
                       {((sections && editExam?.section?.class?.has_section) || (sections && selectedClass && selectedClass?.has_section)) ?
                         <>
@@ -438,6 +443,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           placeholder="select a section ..."
                         />
                       }
+
                     </Grid>
 
 
@@ -488,7 +494,7 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                             />
 
                             <Grid
-                              item
+                              container
                               justifyContent="flex-end"
                               textAlign={{ sm: 'right', md: 'left' }}
                             >
@@ -496,16 +502,30 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                 subject?.map((option, index) => (
                                   <Grid container sx={{
                                     display: 'grid',
-                                    gridTemplateColumns: '150px 250px',
-                                    marginTop: '12px'
-                                  }} gap={1}
+                                    gridTemplateColumns: {
+                                      sm: '1fr',
+                                      md: '95px 220px 180PX',
+                                    },
+                                    marginTop: '12px',
+                                    borderBottom: {
+                                      xs: subjectLength > 1 && index < subjectLength - 1 && '1px dotted red',
+                                      sm: '0px'
+                                    },
+                                    pb: {
+                                      xs: subjectLength > 1 && index < subjectLength - 1 && 2,
+                                      sm: '0px'
+                                    }
+                                  }}
+                                    gap={1}
+
                                   >
                                     <Grid item>
                                       <TextField
                                         sx={{
                                           '& fieldset': {
                                             borderRadius: '3px'
-                                          }
+                                          },
+                                          minWidth: '100%'
                                         }}
                                         size='small'
                                         key={option.label}
@@ -541,12 +561,33 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                                             sx={{
                                               '& fieldset': {
                                                 borderRadius: '3px'
-                                              }
+                                              },
+                                              minWidth: '100%'
                                             }}
                                             {...params}
                                           />
                                         )}
                                       />
+                                    </Grid>
+                                    <Grid item>
+                                      <AutoCompleteWrapper
+                                        label='Select exam room'
+                                        placeholder='Select exam rooom...'
+                                        options={rooms}
+                                        value={rooms?.find((i) => i.id == option?.exam_room) || null}
+                                        handleChange={(e, v) => {
+                                          if (v) {
+                                            const temp = [...subject];
+                                            temp[index].exam_room = v.id;
+                                            console.log(temp);
+                                            setSubject(temp);
+                                            setFieldValue('subject_id_list', temp);
+                                          }
+                                        }}
+                                      />
+
+
+
                                     </Grid>
                                   </Grid>
 
@@ -561,43 +602,32 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                     {/* Is add mark to final */}
                     {
                       subject.length > 0 &&
-                      <>
                         <Grid
-                          item
-                          justifyContent="flex-end"
-                          textAlign={{ sm: 'right' }}
-                          m={1}
+                          container
+                          display={'grid'}
+                          gridTemplateColumns={'10% 90%'}
+                          gap={1}
                         >
-                          <Box
-                            pl={0}
-                            alignSelf="center"
-                          >
-                            <Checkbox
-                              sx={{p:0}}
-                              checked={checked}
-                              onChange={(event) => {
-                                console.log(event.target.checked);
+                          <Checkbox
+                            sx={{ p: 0 }}
+                            checked={checked}
+                            onChange={(event) => {
+                              console.log(event.target.checked);
 
-                                setChecked(event.target.checked);
-                              }}
-                              inputProps={{ 'aria-label': 'controlled' }}
-                            />
-                          </Box>
-                        </Grid>
-                        <Grid
+                              setChecked(event.target.checked);
+                            }}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                          />
+                          <>
+                            Will this exam add to the final grade?
+                          </>
 
-                          item
-                          xs={12}
-                          sm={8}
-                          md={9}
-                          pt={1.25}
-                        >
-                          Will this exam add to the final grade?
                         </Grid>
-                      </>
+
+                      
                     }
                     {
-                      checked && <>
+                      checked && <Grid pt={2} container>
                         <TextFieldWrapper
                           errors={errors.final_percent}
                           touched={touched.final_percent}
@@ -607,8 +637,8 @@ function PageHeader({ editExam, setEditExam, classes, getExam }): any {
                           handleChange={handleChange}
                           type='number'
                           value={values.final_percent}
-                         />
-                      </>
+                        />
+                      </Grid>
                     }
 
 

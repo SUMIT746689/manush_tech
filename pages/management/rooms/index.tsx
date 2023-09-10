@@ -15,8 +15,6 @@ function Managementrooms() {
   const [editRooms, setEditRooms] = useState<Project>(null);
 
   const { data,reFetchData, error } = useClientFetch('/api/rooms');
-  const { data: schoolData, error: schoolError } =
-    useClientFetch('/api/school');
 
   useEffect(() => {
     if (data?.success) setRooms(data.rooms);
@@ -32,7 +30,6 @@ function Managementrooms() {
           editRooms={editRooms}
           setEditRooms={setEditRooms}
           reFetchData={reFetchData}
-          schoolData={schoolData}
         />
       </PageTitleWrapper>
 

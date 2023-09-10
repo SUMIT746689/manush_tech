@@ -39,7 +39,7 @@ function RegistrationFirstPart({
           first_name: student ? (student?.first_name || student?.student_info?.first_name) : undefined,
           middle_name: student ? (student?.middle_name || student?.student_info?.middle_name) : '',
           last_name: student ? (student?.middle_name || student?.student_info?.last_name) : '',
-          admission_no: student ? ( student?.admission_no|| student?.student_info?.admission_no) : registration_no_generate(),
+          admission_no: student ? ( student?.admission_no|| student?.student_info?.admission_no) : '',
           admission_date: student ? ( student?.admission_date || student?.student_info?.admission_date) : null,
           date_of_birth: student ? ( student?.date_of_birth || student?.student_info?.date_of_birth) : null,
           gender: student ? ( student?.gender || student?.student_info?.gender) : 'male',
@@ -56,9 +56,6 @@ function RegistrationFirstPart({
             .required(t('First name field is required')),
           middle_name: Yup.string().max(255).nullable(true),
           last_name: Yup.string().max(255).nullable(true),
-          admission_no: Yup.string().required(
-            t('Admission number is required!')
-          ),
           admission_date: Yup.date().required(t('Admission date is required!')),
           date_of_birth: Yup.date().required(t('Date of birth is required!')),
           gender: Yup.string().required(t('select a gender')),

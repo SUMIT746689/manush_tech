@@ -93,7 +93,8 @@ const Results = () => {
                     start_time: TimeConverter(j?.start_time),
                     end_time: TimeConverter(j?.end_time),
                     room: j.room.name,
-                    teacher: j.teacher.user.username,
+                    teacher: j?.teacher?.user?.username,
+                    subject: j?.subject?.name,
                     section: j.section.name,
                     class: j.section.class.name
                   })
@@ -148,7 +149,9 @@ const Results = () => {
 
           setRoutine(sortedRoutineByDay)
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          console.log("err__",err)
+        })
     }
   }
   return (
@@ -245,10 +248,12 @@ const Results = () => {
                                     {slot.end_time}
 
                                     <br />
+                                    {slot?.subject} <br />
                                     {slot?.room} <br />
-                                    {slot?.teacher} <br />
+                                    
                                     {selectedClass?.has_section ? slot?.section : '(no section)'}<br />
-                                    {slot?.class}
+                                    {slot?.class} <br />
+                                    {slot?.teacher} <br />
                                   </div>
 
                                 </Typography>

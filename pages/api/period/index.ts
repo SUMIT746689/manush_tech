@@ -43,8 +43,8 @@ const index = async (req, res) => {
                 
                 
                 */
-               console.log(req.body);
-               
+                console.log(req.body);
+
                 if (req.body.start_time == req.body.end_time) {
                     return res.status(406).send({ message: "start and end times should not be equel" });
                 }
@@ -93,53 +93,56 @@ const index = async (req, res) => {
                         section_id: period.section_id
                     }
                 })
-                
+
                 const reqStartTime = start_time.getHours() * 60 + start_time.getMinutes()
                 const reqEndTime = end_time.getHours() * 60 + end_time.getMinutes()
 
-                
+
                 for (let period of formattedFilteredPeriod) {
 
-                    const storedStartTime = period.start_time.getHours()* 60 +period.start_time.getMinutes();
-                    const storedEndTime = period.end_time.getHours()* 60 + period.end_time.getMinutes();
+                    const storedStartTime = period.start_time.getHours() * 60 + period.start_time.getMinutes();
+                    const storedEndTime = period.end_time.getHours() * 60 + period.end_time.getMinutes();
 
-                  
+
                     // period overlap checking
                     if ((reqStartTime >= storedStartTime && reqStartTime <= storedEndTime) || (reqEndTime >= storedStartTime && reqEndTime <= storedEndTime)) {
                         return res.status(409).send({ message: "schedule booked. choose another" })
                     }
                 }
 
-                const filterTeacherClassTime = await prisma.period.findMany({
-                    where: {
-                        school_id: parseInt(req.body.school_id),
-                        day: req.body.day,
-                        teacher_id: parseInt(req.body.teacher_id)
-                    },
+                if (req.body.teacher_id) {
+                    const filterTeacherClassTime = await prisma.period.findMany({
+                        where: {
+                            school_id: parseInt(req.body.school_id),
+                            day: req.body.day,
+                            teacher_id: parseInt(req.body.teacher_id)
+                        },
 
-                })
-                const formattedFilteredPeriodForTeacher = filterTeacherClassTime.map(period => {
-                    return {
-                        day: period.day,
-                        start_time: new Date((period.start_time)),
-                        end_time: new Date((period.end_time))
+                    })
+                    const formattedFilteredPeriodForTeacher = filterTeacherClassTime.map(period => {
+                        return {
+                            day: period.day,
+                            start_time: new Date((period.start_time)),
+                            end_time: new Date((period.end_time))
+                        }
+                    })
+
+                    for (let period of formattedFilteredPeriodForTeacher) {
+
+                        const storedStartTime = period.start_time.getHours() * 60 + period.start_time.getMinutes();
+                        const storedEndTime = period.end_time.getHours() * 60 + period.end_time.getMinutes();
+
+                        console.log("stored-> ", storedStartTime, " ", storedEndTime);
+
+                        // period overlap checking
+                        if ((reqStartTime >= storedStartTime && reqStartTime <= storedEndTime) || (reqEndTime >= storedStartTime && reqEndTime <= storedEndTime)) {
+                            return res.status(409).send({ message: "This teacher has another calss in this time !!" })
+                        }
+
+
                     }
-                })
-
-                for (let period of formattedFilteredPeriodForTeacher) {
-
-                    const storedStartTime = period.start_time.getHours()* 60 +period.start_time.getMinutes();
-                    const storedEndTime = period.end_time.getHours()* 60 +period.end_time.getMinutes();
-
-                    console.log("stored-> ", storedStartTime, " ", storedEndTime);
-
-                    // period overlap checking
-                    if ((reqStartTime >= storedStartTime && reqStartTime <= storedEndTime) || (reqEndTime >= storedStartTime && reqEndTime <= storedEndTime)) {
-                        return res.status(409).send({ message: "This teacher has another calss in this time !!" })
-                    }
-
-
                 }
+
 
                 await prisma.period.create({
                     data: {
@@ -149,7 +152,8 @@ const index = async (req, res) => {
                         end_time: new Date(req.body.end_time),
                         school_id: req.body.school_id,
                         section_id: req.body.section_id,
-                        teacher_id: req.body.teacher_id
+                        teacher_id: req.body.teacher_id,
+                        subject_id: req.body.subject_id
                     }
                 })
                 res.status(200).json({ message: "period created successfull!!" });

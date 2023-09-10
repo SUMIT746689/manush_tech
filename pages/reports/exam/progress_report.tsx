@@ -4,16 +4,15 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Checkbox, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, Card, Checkbox, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
 import PageHeader from 'src/content/Management/Attendence/PageHeader';
-import { AuthConsumer } from 'src/contexts/JWTAuthContext';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
-import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -38,6 +37,7 @@ function Managementschools() {
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(5);
 
+    const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);
 
     const progressReportPrint = useRef()
@@ -132,6 +132,8 @@ function Managementschools() {
                         <Grid item  >
                             <Box p={1}>
                                 <ClassAndSectionSelect
+                                    selectedClass={selectedClass}
+                                    setSelectedClass={setSelectedClass}
                                     classes={classes}
                                     selectedDate={null}
                                     selectedSection={selectedSection}

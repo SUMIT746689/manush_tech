@@ -39,6 +39,7 @@ function Attendence() {
     const [targetsectionStudents, setTargetsectionStudents] = useState(null);
     const [students, setStudents] = useState(null);
     const [classes, setClasses] = useState([]);
+    const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);
     const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
     const [examlist, setExamlist] = useState(null)
@@ -160,6 +161,8 @@ function Attendence() {
                             <Grid item  >
                                 <Box p={1}>
                                     <ClassAndSectionSelect
+                                        selectedClass={selectedClass}
+                                        setSelectedClass={setSelectedClass}
                                         flag={true}
                                         classes={classes}
                                         selectedDate={null}

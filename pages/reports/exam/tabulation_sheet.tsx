@@ -4,8 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Checkbox, Divider, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, useTheme } from '@mui/material';
-import Results from 'src/content/Management/Result/Results';
+import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
@@ -13,9 +12,7 @@ import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 import { useTranslation } from 'next-i18next';
 import useNotistick from '@/hooks/useNotistick';
-import Image from 'next/image';
 import ReactToPrint from 'react-to-print';
-import dayjs from 'dayjs';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
@@ -45,7 +42,7 @@ function Managementschools() {
     const [limit, setLimit] = useState<number>(5);
     const [tableHeader, setTableHeader] = useState([])
     const [exams, setExams] = useState(null);
-
+    const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);
     const [selectedExam, setSelectedExam] = useState(null);
 
@@ -132,6 +129,8 @@ function Managementschools() {
                 <Grid item  >
                     <Box p={1}>
                         <ClassAndSectionSelect
+                            selectedClass={selectedClass}
+                            setSelectedClass={setSelectedClass}
                             classes={classes}
                             selectedDate={null}
                             selectedSection={selectedSection}

@@ -4,7 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Grid, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Card, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography, useTheme } from '@mui/material';
 
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
@@ -371,7 +371,7 @@ function Managementschools() {
                         }
 
                         {
-                            (!result || !finalResult) && <TableEmptyWrapper title="" />
+                            (!result && !finalResult) && <TableEmptyWrapper title="" />
                         }
                     </Grid>
                 </Grid>

@@ -214,6 +214,8 @@ function Attendence() {
   const [targetsectionStudents, setTargetsectionStudents] = useState([]);
   const [students, setStudents] = useState(null);
   const [classes, setClasses] = useState([]);
+  
+  const [selectedClass, setSelectedClass] = useState([]);
   // const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedExam, setSelectedExam] = useState(null);
@@ -371,6 +373,8 @@ function Attendence() {
 
             <Grid item  >
               <ClassAndSectionSelect
+                selectedClass={selectedClass}
+                setSelectedClass={setSelectedClass}
                 flag={true}
                 classes={classes}
                 selectedDate={null}
@@ -435,7 +439,7 @@ function Attendence() {
           </Card>
 
           <Grid container spacing={0} justifyContent={'flex-end'} >
-            <Paper style={{ height: 400, width: '100%'}}>
+            <Paper style={{ height: 400, width: '100%' }}>
 
               <TableVirtuoso
                 data={students || []}

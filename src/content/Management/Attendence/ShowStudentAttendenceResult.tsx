@@ -25,9 +25,6 @@ function ShowStudentAttendence({ data }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const [targetsectionStudents, setTargetsectionStudents] = useState(null);
-  const [students, setStudents] = useState(null);
-  const [classes, setClasses] = useState([]);
-  const [selectedSection, setSelectedSection] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [examlist, setExamlist] = useState([])
   const { user } = useAuth();

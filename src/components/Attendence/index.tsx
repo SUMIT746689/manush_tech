@@ -69,7 +69,7 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                             minWidth="100%"
                             label='Select Class'
                             placeholder='select a class...'
-                            options={classes.map(i => {
+                            options={classes?.map(i => {
                                 return {
                                     label: i.name,
                                     id: i.id,
@@ -90,14 +90,14 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                                 minWidth="100%"
                                 label='Select Class'
                                 placeholder='select a class...'
-                                options={classes.map(i => {
+                                options={classes?.map(i => {
                                     return {
                                         label: i.name,
                                         id: i.id,
                                         has_section: i.has_section
                                     }
                                 })}
-                                value={undefined}
+                                value={selectedClass}
                                 handleChange={handleClassSelect}
                             />
 

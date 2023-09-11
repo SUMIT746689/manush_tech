@@ -52,7 +52,8 @@ const index = async (req, res) => {
                             select: {
                                 subject: true,
                                 subject_total: true,
-                                exam_date: true
+                                exam_date: true,
+                                exam_room: true
                             }
                         }
                     }
@@ -116,6 +117,12 @@ const index = async (req, res) => {
                 })
 
                 for (let i of subject_id_list) {
+                    const room = {}
+                    if (i?.exam_room) {
+                        room['connect'] = {
+                            id: parseInt(i.exam_room)
+                        }
+                    }
                     await prisma.examDetails.create({
                         data: {
                             exam: {
@@ -126,8 +133,8 @@ const index = async (req, res) => {
 
                             },
                             subject_total: parseFloat(i.mark),
-                            exam_date: new Date(i.exam_date)
-                            // ...query
+                            exam_date: new Date(i.exam_date),
+                            room
                         }
                     })
                 }
@@ -165,7 +172,8 @@ const index = async (req, res) => {
                                 exam_id: parseInt(req.body.exam_id),
                                 subject_id: parseInt(i.id),
                                 subject_total: parseFloat(i.mark),
-                                exam_date: new Date(i.exam_date)
+                                exam_date: new Date(i.exam_date),
+                                exam_room: i.exam_room ? parseInt(i.exam_room) : null
                             })
                         }
                         await prisma.examDetails.createMany({
@@ -212,9 +220,6 @@ const handleUpdate = async (req, res) => {
         }
         if (req.body.final_percent || req.body.final_percent == 0) {
             updateQuery['final_percent'] = req.body.final_percent == 0 ? null : req.body.final_percent
-        }
-        if (req.body.exam_date) {
-            updateQuery['exam_date'] = new Date(req.body.exam_date)
         }
         console.log("req.body__", req.body, "updateQuery__", updateQuery);
         const temp = await prisma.exam.update({

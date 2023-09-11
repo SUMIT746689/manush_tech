@@ -188,7 +188,7 @@ model StudentInformation {
   middle_name               String?
   last_name                 String?
   school_id                 Int
-  admission_no              String
+  admission_no              String?
   admission_date            DateTime
   admission_status          AdmissionStatus @default(waiting)
   date_of_birth             DateTime        @db.Date
@@ -278,6 +278,7 @@ model Subject {
   class    Class  @relation(fields: [class_id], references: [id])
 
   exam_details ExamDetails[]
+  Period       Period[]
 
   @@map("subjects")
 }
@@ -287,8 +288,9 @@ model Room {
   name      String
   school_id Int
 
-  periods Period[]
-  school  School   @relation(fields: [school_id], references: [id])
+  periods     Period[]
+  school      School        @relation(fields: [school_id], references: [id])
+  ExamDetails ExamDetails[]
 
   @@map("rooms")
 }
@@ -302,7 +304,9 @@ model Period {
   teacher_id Int?
   section_id Int?
   school_id  Int
+  subject_id Int
 
+  subject Subject @relation(fields: [subject_id], references: [id])
   room    Room     @relation(fields: [room_id], references: [id])
   teacher Teacher? @relation(fields: [teacher_id], references: [id])
   section Section? @relation(fields: [section_id], references: [id])
@@ -449,10 +453,11 @@ model ExamDetails {
   subject_id    Int
   subject_total Float
   exam_date     DateTime
+  exam_room     Int?
 
-  exam    Exam    @relation(fields: [exam_id], references: [id])
-  subject Subject @relation(fields: [subject_id], references: [id])
-
+  exam         Exam                   @relation(fields: [exam_id], references: [id])
+  subject      Subject                @relation(fields: [subject_id], references: [id])
+  room         Room?                  @relation(fields: [exam_room], references: [id])
   participants StudentResultDetails[]
 
   @@map("exam_details")

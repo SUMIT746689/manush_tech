@@ -12,7 +12,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { TextFieldWrapper } from '@/components/TextFields';
 
 
-function PageHeader({ editRooms, setEditRooms, reFetchData, schoolData }): any {
+function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();

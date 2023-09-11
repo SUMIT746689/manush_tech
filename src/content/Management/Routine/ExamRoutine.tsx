@@ -151,6 +151,15 @@ const ExamResults = () => {
                                                 }}>
                                                     Time Slot
                                                 </TableCell>
+                                                <TableCell sx={{
+                                                    border: '1px solid darkgrey',
+                                                    borderCollapse: 'collapse',
+                                                    fontSize: '11px',
+                                                    px: 1,
+                                                    py: 0.5
+                                                }}>
+                                                    Room
+                                                </TableCell>
 
                                                 <TableCell sx={{
                                                     border: '1px solid darkgrey',
@@ -196,6 +205,16 @@ const ExamResults = () => {
                                                             </Typography>
                                                         </TableCell>
 
+                                                        <TableCell sx={{
+                                                            border: '1px solid darkgrey',
+                                                            borderCollapse: 'collapse',
+                                                            px: 1,
+                                                            py: 0.5
+                                                        }}>
+                                                            <Typography sx={{ fontSize: '11px' }} >
+                                                                {i?.room?.name}
+                                                            </Typography>
+                                                        </TableCell>
                                                         <TableCell sx={{
                                                             border: '1px solid darkgrey',
                                                             borderCollapse: 'collapse',

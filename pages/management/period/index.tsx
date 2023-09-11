@@ -29,7 +29,7 @@ function PeriodManagement() {
         </DialogTitle>
       </PageTitleWrapper> */}
 
-      <Grid sx={{ minHeight: 'calc(100vh - 315px)' }}>
+      <Grid sx={{ minHeight: 'calc(100vh - 233px)' }}>
         <PageHeader />
       </Grid>
 

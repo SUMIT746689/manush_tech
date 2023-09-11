@@ -23,6 +23,7 @@ function Managementschools() {
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classes, setClasses] = useState([]);
+  const [rooms, setRooms] = useState([]);
 
   const getExam = () => {
     axios
@@ -30,7 +31,7 @@ function Managementschools() {
         `/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`
       )
       .then((res) => {
-        console.log("exam list__",res?.data[0], typeof(res?.data[0]?.exam_date));
+        console.log("exam list__", res?.data[0], typeof (res?.data[0]?.exam_date));
 
         setExams(res.data)
       })
@@ -46,6 +47,12 @@ function Managementschools() {
     axios.get(`/api/class?school_id=${user?.school_id}`)
       .then(res => setClasses(res.data))
       .catch(err => console.log(err));
+    axios.get('/api/rooms').then(res => {
+      setRooms(res.data.rooms.map(i => ({
+        label: i.name,
+        id: i.id
+      })))
+    })
   }, [])
 
 
@@ -57,6 +64,7 @@ function Managementschools() {
       <PageTitleWrapper>
         <PageHeader
           classes={classes}
+          rooms={rooms}
           editExam={editExam}
           setEditExam={setEditExam}
           getExam={getExam}

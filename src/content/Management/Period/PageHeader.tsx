@@ -37,6 +37,7 @@ function PageHeader() {
   const [rooms, setRooms] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [subjectList, setSubjectList] = useState([]);
   const [sections, setSections] = useState([]);
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [endTime, setEndTime] = useState<Dayjs | null>(null);
@@ -106,6 +107,23 @@ function PageHeader() {
         } else {
           setFieldValue('section_id', selectedClass.sections[0].id);
         }
+
+        axios.get(`/api/subject?class_id=${selectedClass.id}`)
+          .then((res) => {
+            console.log('sub__', res.data);
+
+            setSubjectList(
+              res.data?.map((i) => {
+                return {
+                  label: i.name,
+                  id: i.id,
+                };
+              })
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     }
   };
@@ -119,6 +137,7 @@ function PageHeader() {
           start_time: undefined,
           end_time: undefined,
           section_id: undefined,
+          subject_id: undefined,
           teacher_id: undefined
         }}
         validationSchema={Yup.object().shape({
@@ -172,9 +191,9 @@ function PageHeader() {
           setFieldValue
         }) => {
           return (
-            <Grid display={"grid"} gridTemplateColumns={{md:"1fr 1fr"}} sx={{}} mt={2} mx={1} gap={1}>
+            <Grid display={"grid"} gridTemplateColumns={{ md: "1fr 1fr" }} sx={{}} mt={2} mx={1} gap={1}>
 
-              <Card sx={{ ":nth-of-type": {order:2} , p: 1, justifyContent: 'center', borderRadius: 0.6, width: "100%" }}>
+              <Card sx={{ ":nth-of-type": { order: 2 }, p: 1, justifyContent: 'center', borderRadius: 0.6, width: "100%" }}>
                 <form onSubmit={handleSubmit}>
                   <DialogTitleWrapper name="period" editData={undefined} />
                   <DialogContent
@@ -191,6 +210,7 @@ function PageHeader() {
                           label={t('Class')}
                           placeholder={t('select a class...')}
                           minWidth="100%"
+                          required={true}
                           options={classes?.map((i) => ({ label: i.name, id: i.id, has_section: i.has_section }))}
                           value={selectedClass}
                           handleChange={(e, v) => handleClassSelect(e, v, setFieldValue)}
@@ -200,6 +220,7 @@ function PageHeader() {
                           (selectedClass && selectedClass.has_section) ? (<>
                             <AutoCompleteWrapper
                               minWidth="100%"
+                              required={true}
                               label={t('section')}
                               placeholder={t('Select Section...')}
                               options={sections}
@@ -212,9 +233,22 @@ function PageHeader() {
                             <EmptyAutoCompleteWrapper minWidth="100%" label="Section" placeholder="select a section..." value={undefined} options={[]} />
                         }
 
+                        {/* Select subject */}
+                        <AutoCompleteWrapper
+                        required={true}
+                          minWidth="100%"
+                          label={t('Subject')}
+                          placeholder={t('select a subject...')}
+                          options={subjectList}
+                          value={subjectList.find(i => i.id == values.subject_id) || null}
+                          handleChange={(e, value) => {
+                            setFieldValue('subject_id', value?.id);
+                          }}
+                        />
                         {/* Select room */}
                         <AutoCompleteWrapper
                           minWidth="100%"
+                          required={true}
                           label={t('Room')}
                           placeholder={t('select a room...')}
                           options={rooms?.map((i) => ({ label: i.name, id: i.id }))}
@@ -228,6 +262,7 @@ function PageHeader() {
                         {/* Select day */}
                         <AutoCompleteWrapper
                           minWidth="100%"
+                          required={true}
                           label={t('Select Day')}
                           placeholder="select a day..."
                           options={[
@@ -256,6 +291,7 @@ function PageHeader() {
                         {/* start_time */}
                         <Grid item xs={12} sm={6} md={6}>
                           <MobileTimePicker
+                          
                             label="Start Time"
                             value={startTime}
                             onChange={(n) => {
@@ -273,6 +309,7 @@ function PageHeader() {
                             renderInput={(params) => (
                               <TextField
                                 fullWidth
+                                required={true}
                                 sx={{
                                   [`& fieldset`]: {
                                     borderRadius: 0.6,
@@ -307,6 +344,7 @@ function PageHeader() {
                             renderInput={(params) => (
                               <TextField
                                 fullWidth
+                                required={true}
                                 sx={{
                                   [`& fieldset`]: {
                                     borderRadius: 0.6,
@@ -356,7 +394,7 @@ function PageHeader() {
               </Card>
               {/* {
                 bookedClass && ( */}
-              <Grid item height="100%" width="full" overflow="auto" sx={{":nth-of-type":{order:1}}} >
+              <Grid item height="100%" width="full" overflow="auto" sx={{ ":nth-of-type": { order: 1 } }} >
                 <TableContainer component={Paper} sx={{ minHeight: "100%", borderRadius: 0.6 }}>
                   <Table
                     sx={{ minWidth: 600 }}

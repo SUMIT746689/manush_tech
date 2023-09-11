@@ -27,6 +27,13 @@ export default async function RootLayout({ children }) {
       }
     },
     select: {
+      school: {
+        select: {
+          name: true,
+          address: true,
+          phone: true
+        }
+      },
       header_image: true,
       eiin_number: true,
       facebook_link: true,
@@ -46,13 +53,17 @@ export default async function RootLayout({ children }) {
         <body>
           <LayoutWrapper>
             <Header
+              name={school_info?.school?.name}
+              phone={school_info?.school?.phone}
+              address={school_info?.school?.address}
               eiin_number={school_info?.eiin_number}
               header_image={`${process.env.SERVER_HOST}/api/get_file/${school_info?.header_image?.replace(/\\/g, '/')}`}
+              serverhost={`${process.env.SERVER_HOST}`}
             />
             <Nav serverhost={`${process.env.SERVER_HOST}`} />
-            <div onClick={console.log("hi....")}>
+            {/* <div onClick={console.log("hi....")}> */}
               {children}
-            </div>
+            {/* </div> */}
           </LayoutWrapper>
           <Footer
             facebook_link={school_info?.facebook_link || ''}

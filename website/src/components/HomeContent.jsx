@@ -18,7 +18,7 @@ const secondaryColor = 'text-sky-700';
 const SpeechesCard = ({ title, image, description }) => {
   const ref = useRef();
   useIntersectionObserver(ref, {});
-  console.log("`${process.env.SERVER_HOST}${image}`__", `${process.env.SERVER_HOST}${image}`);
+
   return (
     <div ref={ref}>
       <div
@@ -203,17 +203,17 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
   return (
     <div
       ref={ref}
-      className={` bg-slate-200 border border-slate-400 h-72 max-h-72 `}
+      className={` bg-slate-200 border border-slate-400 h-fit sm:h-72 sm:max-h-72 `}
     >
       <div className={`${headColor} ${primaryColor} px-2 py-3 mb-1 text-xl`}>
         {title}
       </div>
-      <div className="px-4 py-2 grid grid-cols-12 gap-10">
+      <div className="px-4 py-2 grid grid-cols-12 gap-4 sm:gap-10">
         <img
-          className="col-span-4 pr-2 md:pr-3 p-3 object-cover max-h-40 float-right"
+          className=" col-span-3 sm:col-span-4 pr-2 md:pr-3 p-3 object-contain sm:object-cover max-h-28 lg:max-h-40 float-right"
           src={`${image}`}
         />
-        <div className=" col-span-8 text-xs sm:text-sm font-medium leading-9 ">
+        <div className=" col-span-9 sm:col-span-8 text-xs sm:text-sm font-medium leading-9 ">
           <ul className="list-[square] leading-9">{listData}</ul>
         </div>
       </div>
@@ -223,7 +223,7 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 
 
 
-export default function HomeContent({ latest_news, carousel_image, speechDatas,facebook_link }) {
+export default function HomeContent({ latest_news, carousel_image, speechDatas, facebook_link }) {
 
   // const ref = useRef(null);
   const announceref = useRef(null);

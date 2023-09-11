@@ -12,8 +12,7 @@ const primaryColor = "text-sky-100";
 const whiteColor = "text-gray-100";
 const secondaryColor = "text-sky-700";
 
-const footerIconClass =
-  "cursor-pointer p-3 text-5xl w-14 h-14 rounded-full shadow-sm shadow-black hover:rotate-[360deg] duration-500 scale-1.1";
+const footerIconClass ="cursor-pointer p-3 text-2xl lg:text-5xl w-10 h-10 lg:w-14 lg:h-14 rounded-full shadow-sm shadow-black hover:rotate-[360deg] duration-500 scale-1.1";
 
 function Footer({ facebook_link, twitter_link, youtube_link, google_link, linkedin_link }) {
   return (
@@ -24,7 +23,7 @@ function Footer({ facebook_link, twitter_link, youtube_link, google_link, linked
         <div className=" relative top-4 mb-4 text-center md:text-left">
           ©Copyright© 2023 MRAM Technologies Ltd . All Rights Reserved.
         </div>
-        <div className=" text-2xl flex gap-2 pt-3 md:pt-0 justify-center md:justify-end">
+        <div className=" text-sm lg:text-2xl flex gap-2 pt-3 md:pt-0 justify-center md:justify-end">
           <Link href={facebook_link} target='_blank'><FaFacebookF className={footerIconClass} /></Link>
           <Link href={twitter_link}  target='_blank'><AiOutlineTwitter className={footerIconClass} /></Link>
           <Link href={google_link} target='_blank'><AiOutlineGooglePlus className={footerIconClass} /></Link>

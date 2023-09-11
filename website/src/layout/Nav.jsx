@@ -145,7 +145,7 @@ const NavLinks = ({ serverhost }) => {
   );
 };
 
-const MobileNavBar = ({ serverhost }) => {
+const MobileNavBar = ({ serverhost, primaryColor, primaryBgColor }) => {
 
   const [isHideNav, setisHideNav] = useState(true);
   const handleClick = () => {
@@ -156,15 +156,18 @@ const MobileNavBar = ({ serverhost }) => {
   }
   return (
     <>
-      <nav className={`${isHideNav ? "hidden" : " fixed"} z-40  top-0 left-0 w-screen h-screen backdrop-blur-sm`} onClick={handleHideNavbar}>
+
+      <nav className={`${isHideNav ? "hidden" : " fixed"} z-[70] top-0 left-0 w-screen overflow-y-auto h-screen backdrop-blur-sm`} onClick={handleHideNavbar}>
       </nav>
 
       <nav
         id="sidenav-6"
-        className="fixed left-0 top-0 z-[1035] h-screen w-60 duration-300 -translate-x-full overflow-hidden bg-sky-700 shadow-[0_4px_12px_0_rgba(0,0,0,0.5),_0_2px_4px_rgba(0,0,0,0.6)] data-[te-sidenav-hidden='false']:translate-x-0"
+        className={` ${primaryColor} ${primaryBgColor} text-xs fixed left-0 top-0 z-[1035] h-screen w-48 duration-150 -translate-x-full overflow-hidden bg-sky-700 shadow-[0_4px_12px_0_rgba(0,0,0,0.5),_0_2px_4px_rgba(0,0,0,0.6)] data-[te-sidenav-hidden='false']:translate-x-0`}
         data-te-sidenav-init
         data-te-sidenav-hidden={isHideNav}
-        data-te-sidenav-accordion={"true"}>
+        data-te-sidenav-accordion={"true"}
+      >
+
         <ul className="relative m-0 list-none px-[0.2rem]" data-te-sidenav-menu-ref>
 
           <Link href="/" onClick={handleHideNavbar}>
@@ -251,26 +254,32 @@ const MobileNavBar = ({ serverhost }) => {
         </ul>
 
       </nav>
-      <button
-        onClick={handleClick}
-        className=" inline-block bg-primary px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-sky-800 hover:shadow-lg focus:bg-sky-900 focus:scale-90 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg"
-        data-te-sidenav-toggle-ref
-        data-te-target="#sidenav-6"
-        aria-controls="#sidenav-6"
-        aria-haspopup="true">
-        <span className="block [&>svg]:h-5 [&>svg]:w-5 [&>svg]:text-white">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-5 w-5">
-            <path
-              fillRule="evenodd"
-              d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
-              clipRule="evenodd" />
-          </svg>
-        </span>
-      </button>
+
+      <nav
+        className="sticky text-right top-0 shadow z-[60] shadow-sky-900 bg-sky-700 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white transition duration-150 ease-in-out hover:bg-sky-800 hover:shadow-lg focus:bg-sky-900 focus:scale-90 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg"
+      >
+        <button
+          onClick={handleClick}
+          // className='w-full relative right-0'
+          // className="sticky top-0 shadow z-[50] shadow-sky-900 bg-sky-700 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white transition duration-150 ease-in-out hover:bg-sky-800 hover:shadow-lg focus:bg-sky-900 focus:scale-90 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg"
+          data-te-sidenav-toggle-ref
+          data-te-target="#sidenav-6"
+          aria-controls="#sidenav-6"
+          aria-haspopup="true">
+          <span className="block [&>svg]:h-5 [&>svg]:w-5 [&>svg]:text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-5 w-5">
+              <path
+                fillRule="evenodd"
+                d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+                clipRule="evenodd" />
+            </svg>
+          </span>
+        </button>
+      </nav>
     </>
   )
 }
@@ -280,16 +289,16 @@ function Nav({ serverhost }) {
   return (
     <>
       <nav
-        className={`${primaryBgColor} ${primaryColor} hidden lg:grid text-sm grid-flow-col divide-x`}
+        className={`${primaryBgColor} ${primaryColor} hidden lg:grid text-sm grid-flow-col divide-x sticky top-0.5 z-[60] shadow shadow-slate-800`}
       >
         <NavLinks serverhost={serverhost} />
       </nav>
-      <nav
+      {/* <nav
         // className={`${primaryBgColor} ${primaryColor} lg:hidden grid lg: text-sm grid-flow-col justify-end divide-x`}
-        className={`${primaryBgColor} ${primaryColor} lg:hidden flex justify-end divide-x text-sm z-50`}
-      >
-        <MobileNavBar />
-      </nav>
+        // className={`${primaryBgColor} ${primaryColor} lg:hidden flex justify-end divide-x text-sm`}
+      > */}
+      <MobileNavBar primaryBgColor={primaryBgColor} primaryColor={primaryColor} />
+      {/* </nav> */}
     </>
   );
 }

@@ -51,6 +51,7 @@ import dayjs from 'dayjs';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { formatNumber } from '@/utils/numberFormat';
+import fee from 'pages/api/fee';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -91,6 +92,10 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
+const filterFees = (fees, filter) => {
+  if (filter === "all") return fees;
+  return fees.filter(fee => (fee["status"] === filter ? true : false))
+}
 
 const applyPagination = (sessions, page, limit) => {
   return sessions.slice(page * limit, page * limit + limit);
@@ -173,8 +178,12 @@ const Results = ({
   };
   // @ts-ignore
   useEffect(() => {
-    const paginatedschools = applyPagination(sessions?.fees || [], page, limit);
+    const filterFees_ = filterFees(sessions?.fees || [], filter)
+    setFilteredFees(()=>filterFees_ || [])
+    
+    const paginatedschools = applyPagination(filterFees_ || [], page, limit);
     setPaginatedSchool(paginatedschools);
+  
   }, [sessions, filter, page])
 
   const selectedBulkActions = selectedItems.length > 0;
@@ -303,6 +312,8 @@ const Results = ({
       setSelectedStudent(null);
     }
   };
+
+
   return (
     <>
       <Card
@@ -413,7 +424,7 @@ const Results = ({
           </Grid>
         </Card>
       }
-      <Card sx={{ minHeight: 'calc(100vh - 405px) !important' }}>
+      <Card sx={{ minHeight: 'calc(100vh - 358px) !important' }}>
 
         <Box
           p={2}

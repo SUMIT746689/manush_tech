@@ -25,11 +25,11 @@ function PaymentInvoice({ printFees, student }) {
   useEffect(() => {
     const totalAmount = printFees.reduce((prev, curr) => prev + curr.amount, 0) || 0;
     setTotalNumber(totalAmount);
-    const totalPaidAmount_ = printFees.reduce((prev, curr) =>  ["paid","partial paid"].includes(curr?.status) ? prev + (curr.paidAmount || curr.amount) : prev , 0) || 0;
+    const totalPaidAmount_ = printFees.reduce((prev, curr) => ["paid", "partial paid"].includes(curr?.status) ? prev + (curr.paidAmount || curr.amount) : prev, 0) || 0;
     setTotalPaidAmount(totalPaidAmount_);
     setWord(numberToWordConverter(totalPaidAmount_));
   }, [printFees])
-console.log({totalNumber})
+
   return (
     <Box p={6} height={'screen'} sx={{
       display: 'block',
@@ -105,9 +105,9 @@ console.log({totalNumber})
                   <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{dayjs(payment.last_payment_date).format('YYYY-MM-DD HH:MM')}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{ formatNumber(payment.amount)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment.amount)}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.status === 'unpaid' ? 0 :  formatNumber(payment.paidAmount || payment.amount)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.status === 'unpaid' ? 0 : formatNumber(payment.paidAmount || payment.amount)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -117,7 +117,7 @@ console.log({totalNumber})
 
       <Grid container mt={1} px={1} justifyContent="space-between">
         <Grid sx={{ textTransform: 'capitalize' }}>IN WORD: <b>{word} {user?.school?.currency} only</b></Grid>
-        <Grid>Total Paid Amount: <b>{ formatNumber(totalPaidAmount)}</b></Grid>
+        <Grid>Total: <b>{formatNumber(totalPaidAmount)}</b></Grid>
       </Grid>
 
       <Grid container mt={10} justifyContent="space-between">

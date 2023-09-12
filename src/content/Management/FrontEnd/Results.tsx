@@ -178,7 +178,7 @@ const Results = ({ data, reFetchData }) => {
                   }}>
                     <FileUploadFieldWrapper
                       htmlFor="header_image"
-                      label="select Header image"
+                      label="Select School logo"
                       name="header_image"
                       value={values?.header_image?.name || values?.header_image || ''}
                       handleChangeFile={(e) => {

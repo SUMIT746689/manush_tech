@@ -111,7 +111,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
-            logo: editSchool?.logo || '',
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -276,35 +275,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                     value={values.domain}
                   />
 
-
-                  <FileUploadFieldWrapper
-                    htmlFor="Logo"
-                    label="Logo"
-                    name="logo"
-                    value={values?.logo?.name || values?.logo || ''}
-                    handleChangeFile={(e) => {
-                      if (e.target.files?.length) {
-                        const photoUrl = URL.createObjectURL(e.target.files[0]);
-                        setLogo(photoUrl)
-                        setFieldValue('logo', e.target.files[0])
-                      }
-                    }}
-                    handleRemoveFile={(e) => {
-                      setLogo(null)
-                      setFieldValue('logo', undefined)
-                    }}
-                  />
-
-
-                  {
-                    (logo || editSchool?.logo) &&
-                    <Image src={logo ? logo : `/api/get_file/${editSchool?.logo?.replace(/\\/g, '/')}`}
-                      height={150}
-                      width={150}
-                      alt='User photo'
-                      loading='lazy'
-                    />
-                  }
                 </Grid>
               </DialogContent>
               <DialogActionWrapper

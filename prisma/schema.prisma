@@ -49,7 +49,6 @@ model School {
   /// school should not be created without an existing user
   // admin_id Int     @unique
   currency String?
-  logo     String?
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")

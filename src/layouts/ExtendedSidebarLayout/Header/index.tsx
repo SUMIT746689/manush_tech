@@ -26,6 +26,7 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import axios from 'axios';
 import { getOneCookies } from '@/utils/utilitY-functions';
 import { useAuth } from '@/hooks/useAuth';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -69,9 +70,9 @@ function Header() {
         );
 
         if (storedAcademicYear) {
-         
+
           const temp = list.find((i) => i.id == storedAcademicYear.id);
-         
+
           if (temp) {
             setSelectedAcademicYear({ label: temp.label, id: temp.id });
           } else {
@@ -102,6 +103,17 @@ function Header() {
       setAcademicYear(selectedAcademicYear);
     }
   }, [selectedAcademicYear]);
+
+  const handleAcademicYearChange = (event: any, newValue: string | null) => {
+
+    if (newValue) {
+      localStorage.setItem(
+        'academicYear',
+        JSON.stringify(newValue)
+      );
+      setSelectedAcademicYear(newValue);
+    }
+  }
 
   return (
     <HeaderWrapper
@@ -136,34 +148,13 @@ function Header() {
       <Box display="flex" alignItems="center">
         {/* @ts-ignore */}
         {user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid>
-            <Autocomplete
+          <Grid pt={1} minWidth={150}>
+            <AutoCompleteWrapper
+              label="Academic Year"
+              placeholder="select a academic year..."
               value={selectedAcademicYear}
-              onChange={(event: any, newValue: string | null) => {
-                console.log('newValue__', newValue);
-                if (newValue) {
-                  console.log(JSON.stringify(newValue));
-
-                  localStorage.setItem(
-                    'academicYear',
-                    JSON.stringify(newValue)
-                  );
-                  setSelectedAcademicYear(newValue);
-                }
-              }}
               options={academicYearList}
-              size="small"
-              sx={{
-                '& fieldset': {
-                  borderRadius: '3px'
-                },
-                //  borderRadius:'1px',
-                width: '180px',
-                marginRight: '5vh'
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Academic year" />
-              )}
+              handleChange={handleAcademicYearChange}
             />
           </Grid>
         )}

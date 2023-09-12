@@ -297,7 +297,7 @@ function Nav({ serverhost }) {
         // className={`${primaryBgColor} ${primaryColor} lg:hidden grid lg: text-sm grid-flow-col justify-end divide-x`}
         // className={`${primaryBgColor} ${primaryColor} lg:hidden flex justify-end divide-x text-sm`}
       > */}
-      <MobileNavBar primaryBgColor={primaryBgColor} primaryColor={primaryColor} />
+      <MobileNavBar serverhost={serverhost} primaryBgColor={primaryBgColor} primaryColor={primaryColor} />
       {/* </nav> */}
     </>
   );

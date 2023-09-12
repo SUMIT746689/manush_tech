@@ -22,12 +22,13 @@ const SidebarWrapper = styled(Box)(
 );
 
 function Sidebar() {
-  const { sidebarToggle, toggleSidebar,closeSidebar } = useContext(SidebarContext);
-  // const closeSidebar = () => toggleSidebar();
+  const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
+  const closeSidebar = () => toggleSidebar();
   const theme = useTheme();
 
   return (
     <>
+      {/* for desktop device */}
       <SidebarWrapper
         sx={{
           display: {
@@ -80,6 +81,8 @@ function Sidebar() {
         />
         <SidebarFooter />
       </SidebarWrapper>
+
+      {/* for mobile device */}
       <Drawer
         sx={{
           boxShadow: `${theme.sidebar.boxShadow}`
@@ -88,7 +91,10 @@ function Sidebar() {
         open={sidebarToggle}
         onClose={closeSidebar}
         variant="temporary"
-        elevation={9}
+        ModalProps={{
+          keepMounted: false,
+        }}
+      // elevation={1}
       >
         <SidebarWrapper
           sx={{

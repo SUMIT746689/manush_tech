@@ -167,8 +167,8 @@ function Header() {
             display: { lg: 'none', xs: 'inline-block' }
           }}
         >
-          <Tooltip arrow title="Show Menu">
-            <IconButton color="primary" onClick={toggleSidebar}>
+          <Tooltip arrow title="Show Menu" onClick={toggleSidebar}>
+            <IconButton color="primary">
               {!sidebarToggle ? (
                 <MenuTwoToneIcon fontSize="small" />
               ) : (

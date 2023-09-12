@@ -1,4 +1,4 @@
-import prisma from "./prisma_client.js";
+import prisma from "./prisma_client.js.js";
 
 
 const studentAttendence = (attend_queue, student_id, index) => {

@@ -210,10 +210,10 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
       </div>
       <div className="px-4 py-2 grid grid-cols-12 gap-4 sm:gap-10">
         <img
-          className=" col-span-3 sm:col-span-4 pr-2 md:pr-3 p-3 object-contain sm:object-cover max-h-28 lg:max-h-40 float-right"
+          className=" col-span-3 pr-2 md:pr-3 p-3 object-contain sm:object-cover max-h-28 lg:max-h-40 float-right"
           src={`${image}`}
         />
-        <div className=" col-span-9 sm:col-span-8 text-xs sm:text-sm font-medium leading-9 ">
+        <div className=" col-span-9 text-xs sm:text-sm font-medium leading-9 ">
           <ul className="list-[square] leading-9">{listData}</ul>
         </div>
       </div>
@@ -284,7 +284,7 @@ export default function HomeContent({ latest_news, carousel_image, speechDatas, 
           </div>
 
           {/* services */}
-          <div className="grid gap-4 mb-4 md:grid-cols-2 ">
+          <div className="grid mt-4 gap-4 mb-4 lg:grid-cols-2 ">
             {serviceDatas.map((service, index) => (
               <div key={index}>
                 <ServiceCard

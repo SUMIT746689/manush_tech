@@ -256,7 +256,7 @@ const MobileNavBar = ({ serverhost, primaryColor, primaryBgColor }) => {
       </nav>
 
       <nav
-        className="sticky text-right top-0 shadow z-[60] shadow-sky-900 bg-sky-700 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white transition duration-150 ease-in-out hover:bg-sky-800 hover:shadow-lg focus:bg-sky-900 focus:scale-90 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg"
+        className=" sticky lg:hidden text-right top-0 shadow z-[60] shadow-sky-900 bg-sky-700 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white transition duration-150 ease-in-out hover:bg-sky-800 hover:shadow-lg focus:bg-sky-900 focus:scale-90 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-sky-800 active:shadow-lg"
       >
         <button
           onClick={handleClick}

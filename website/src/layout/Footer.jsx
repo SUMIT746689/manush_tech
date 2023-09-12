@@ -12,7 +12,7 @@ const primaryColor = "text-sky-100";
 const whiteColor = "text-gray-100";
 const secondaryColor = "text-sky-700";
 
-const footerIconClass ="cursor-pointer p-3 text-2xl lg:text-5xl w-10 h-10 lg:w-14 lg:h-14 rounded-full shadow-sm shadow-black hover:rotate-[360deg] duration-500 scale-1.1";
+const footerIconClass ="cursor-pointer p-3 text-2xl lg:text-3xl w-10 h-10 lg:w-12 lg:h-12 rounded-full shadow-sm shadow-black hover:rotate-[360deg] duration-500 scale-1.1";
 
 function Footer({ facebook_link, twitter_link, youtube_link, google_link, linkedin_link }) {
   return (

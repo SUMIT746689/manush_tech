@@ -2,17 +2,7 @@ import { useContext } from 'react';
 import Scrollbar from 'src/components/Scrollbar';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 
-import {
-  Box,
-  Drawer,
-  alpha,
-  styled,
-  Divider,
-  useTheme,
-  lighten,
-  darken,
-  Grid
-} from '@mui/material';
+import { Box, Drawer, alpha, styled, Divider, useTheme, lighten, darken, Grid } from '@mui/material';
 
 import SidebarTopSection from './SidebarTopSection';
 import SidebarMenu from './SidebarMenu';
@@ -32,8 +22,8 @@ const SidebarWrapper = styled(Box)(
 );
 
 function Sidebar() {
-  const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
-  const closeSidebar = () => toggleSidebar();
+  const { sidebarToggle, toggleSidebar,closeSidebar } = useContext(SidebarContext);
+  // const closeSidebar = () => toggleSidebar();
   const theme = useTheme();
 
   return (
@@ -59,7 +49,7 @@ function Sidebar() {
           <Grid container mt={3}>
             <Box
               sx={{
-                ml:10,
+                ml: 10,
                 width: 52,
               }}
             >
@@ -113,7 +103,7 @@ function Sidebar() {
               <Box
                 mx={2}
                 sx={{
-                  ml:10,
+                  ml: 10,
                   width: 52
                 }}
               >

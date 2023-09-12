@@ -60,7 +60,7 @@ export const AutoCompleteWrapperWithoutRenderInput = ({ minWidth = null, require
             {...rnParams}
             name={name}
             error={Boolean(error && touched)}
-            helperText={ touched && error}
+            helperText={touched && error}
             label={label}
             placeholder={placeholder}
           />

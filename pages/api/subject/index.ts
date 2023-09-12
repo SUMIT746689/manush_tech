@@ -28,11 +28,8 @@ const index = async (req, res) => {
         res.status(200).json(sections);
         break;
       case 'POST':
-        await prisma.subject.create({
-          data: {
-            name: req.body.name,
-            class_id: req.body.class_id
-          }
+        await prisma.subject.createMany({
+          data: req.body.data
         });
         res.status(200).json({ message: 'Subject created successfully' });
         break;

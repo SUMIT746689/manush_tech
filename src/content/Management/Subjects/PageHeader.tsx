@@ -32,6 +32,7 @@ function PageHeader({
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
+  const [selectedClass, setSelectedClass] = useState([])
 
   useEffect(() => {
     if (editSubject) handleCreateClassOpen();
@@ -43,12 +44,13 @@ function PageHeader({
 
   const handleCreateClassClose = () => {
     setOpen(false);
+    setSelectedClass([])
     setEditSubject(null);
   };
 
   const handleCreateUserSuccess = (message) => {
     showNotification(message);
-    setOpen(false);
+    handleCreateClassClose()
     reFetchSubjects();
   };
   const handleFormSubmit = async (
@@ -56,20 +58,30 @@ function PageHeader({
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
-      if (editSubject)
-        axios.patch(`/api/subject/${editSubject.id}`, _values).then(() => {
-          resetForm();
-          setStatus({ success: true });
-          setSubmitting(false);
-          handleCreateUserSuccess(t('The subject was updated successfully'));
-        });
-      else
-        axios.post(`/api/subject`, _values).then(() => {
-          resetForm();
-          setStatus({ success: true });
-          setSubmitting(false);
-          handleCreateUserSuccess(t('The subject was created successfully'));
-        });
+      if (editSubject) {
+        await axios.patch(`/api/subject/${editSubject.id}`, _values)
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        handleCreateUserSuccess(t('The subject was updated successfully'));
+      }
+      else {
+        console.log(_values);
+        if (!_values?.class_id?.length) {
+          throw new Error('please select class')
+        }
+        const data = _values?.class_id?.map(i => ({
+          name: _values?.name,
+          class_id: i.value
+        }))
+        await axios.post(`/api/subject`, { data })
+        resetForm();
+        setStatus({ success: true });
+        setSubmitting(false);
+        handleCreateUserSuccess(t('The subject was created successfully'));
+
+      }
+
       // await wait(1000);
     } catch (err) {
       console.error(err);
@@ -109,17 +121,18 @@ function PageHeader({
         <Formik
           initialValues={{
             name: editSubject?.name || '',
-            class_id: editSubject?.class_id || null
+            class_id: editSubject ? editSubject?.class_id : []
           }}
           validationSchema={Yup.object().shape({
             name: Yup.string()
               .max(255)
               .required(t('The class name field is required')),
 
-            class_id: Yup.number()
+            class_id: editSubject ? Yup.number()
               .positive()
               .integer()
-              .required(t('The class field is required'))
+              .required(t('The class field is required')) : Yup.array().required(t('The class field is required'))
+
           })}
           onSubmit={handleFormSubmit}
         >
@@ -151,16 +164,26 @@ function PageHeader({
                       handleBlur={handleBlur}
                       handleChange={handleChange}
                       value={values.name}
-                    />
-
+                    /> 
                     <AutoCompleteWrapper
+                      multiple={editSubject ? false : true}
                       minWidth="100%"
-                      value={classList.find((cls) => cls.value === values.class_id) || null}
+                      value={editSubject ? (classList.find((cls) => cls.value === values.class_id) || null) : selectedClass}
                       options={classList}
                       label="Class"
                       placeholder={"select class..."}
                       // @ts-ignore
-                      handleChange={(event, value) => setFieldValue('class_id', value?.value || null)}
+                      handleChange={(event, value) => {
+                        console.log("value__", value);
+                        if (editSubject) {
+                          setFieldValue('class_id', value?.value || null)
+                        }
+                        else {
+                          setSelectedClass(value)
+                          setFieldValue('class_id', value)
+                        }
+
+                      }}
                     />
                   </Grid>
                 </DialogContent>

@@ -5,12 +5,9 @@ import Steps from './admissionForm/Steps';
 import { useRouter } from 'next/navigation';
 import { LocalizationProvider } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import axios from 'axios';
 import RegistrationFirstPart from './admissionForm/RegistrationFirstPart';
 import RegistrationSecondPart from './admissionForm/RegistrationSecondPart';
 import RegistrationThirdPart from './admissionForm/RegistrationThirdPart';
-import ReactToPrint from 'react-to-print';
-import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { useTranslation } from 'react-i18next';
 
 const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
@@ -21,9 +18,7 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
     const [totalFormData, setTotalFormData] = useState({});
     const [classesFlag, setClassesFlag] = useState(false);
     const registration3rdPart = useRef(null)
-    const [marged, setMarged] = useState([]);
-    console.log("marged__", marged);
-
+    
     const central = useRef(null)
     const handleCreateClassClose = () => {
 
@@ -36,20 +31,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
                 <h1 className=' text-center text-2xl'>Online Admission</h1>
                 <br />
                 <br />
-                {
-                    activeStep === 2 && <ReactToPrint
-                        content={() => central.current}
-                        onBeforeGetContent={() => setMarged(p => [...p, registration3rdPart.current])}
-                        // pageStyle={`{ size: 2.5in 4in }`}
-                        trigger={() => (
-                            <Button
-                                startIcon={<LocalPrintshopIcon />}
-                                variant="contained" size='small'>
-                                Preview and Print
-                            </Button>
-                        )}
-                    />
-                }
 
                 <Grid>
                     <Steps activeStep={activeStep} setActiveStep={setActiveStep} />
@@ -73,7 +54,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
                                 setTotalFormData={setTotalFormData}
                                 setActiveStep={setActiveStep}
                                 handleCreateClassClose={handleCreateClassClose}
-                                setMarged={setMarged}
                             />
 
 
@@ -86,7 +66,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
                                 handleCreateClassClose={handleCreateClassClose}
                                 classes={classes}
                                 academicYears={academicYears}
-                                setMarged={setMarged}
 
                             />
 
@@ -101,7 +80,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
                                 handleCreateClassClose={handleCreateClassClose}
                                 setUsersFlag={setClassesFlag}
                                 serverHost={serverHost}
-                                setMarged={setMarged}
                                 ref={registration3rdPart}
                             />
 
@@ -109,14 +87,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
                     </Grid>
 
                     {/* <Data ref={central}>{marged?.map(i=><React.Fragment>{i}</React.Fragment>)}</Data> */}
-                    <Grid display={'none'}>
-                        <Grid sx={{
-                            p: 4
-                        }} ref={central}>
-                            <Typography fontSize={25} textAlign={'center'} pb={2}>{t('Admission Form')}</Typography>
-                            {marged?.map(i => <div dangerouslySetInnerHTML={{ __html: i?.outerHTML }} />)}
-                        </Grid>
-                    </Grid>
 
                 </Grid>
             </Grid>

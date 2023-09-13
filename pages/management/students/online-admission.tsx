@@ -240,6 +240,7 @@ const Results = () => {
         maxWidth="lg"
         open={open}
         onClose={handleCreateProjectClose}
+        scroll='body'
       >
         <Grid p={2}>
           <Typography variant='h2' align='center' py={2}> Online Admission Approval</Typography>
@@ -308,9 +309,10 @@ const Results = () => {
                 </TableHead>
                 <TableBody>
                   {paginatedClasses.map((i) => {
-                    const isUserSelected = selectedItems.includes(i.id);
+                    console.log(i);
+                    
                     return (
-                      <TableRow hover key={i.id} selected={isUserSelected}>
+                      <TableRow hover key={i.id} >
 
                         <TableCell align={'center'}>
                           <Typography variant="h5">

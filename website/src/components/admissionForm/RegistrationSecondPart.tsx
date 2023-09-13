@@ -32,8 +32,7 @@ function RegistrationSecondPart({
   setActiveStep,
   handleCreateClassClose,
   classes,
-  academicYears,
-  setMarged
+  academicYears
 }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -155,7 +154,6 @@ function RegistrationSecondPart({
           try {
             setActiveStep(2);
             setTotalFormData((value) => ({ ...value, ..._values }));
-            setMarged(p => registration2ndPart.current && [...p, registration2ndPart.current])
           } catch (err) {
             console.error(err);
             showNotification('There was an error, try again later', 'error');

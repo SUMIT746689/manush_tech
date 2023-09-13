@@ -41,13 +41,13 @@ function RegistrationFirstPart({
     <>
       <Formik
         initialValues={{
-          father_name: student ? student?.student_info?.father_name : '',
-          father_phone: student ? student?.student_info?.father_phone : '',
-          father_profession: student ? student?.student_info?.father_profession : '',
+          father_name: student ? (student?.student_info?.father_name || student?.father_name || '') : '',
+          father_phone: student ? (student?.student_info?.father_phone || student?.father_phone || '') : '',
+          father_profession: student ? (student?.student_info?.father_profession || student?.father_profession || '') : '',
           father_photo: null,
-          mother_name: student ? student?.student_info?.mother_name : '',
-          mother_phone: student ? student?.student_info?.mother_phone : '',
-          mother_profession: student ? student?.student_info?.mother_profession : '',
+          mother_name: student ? (student?.student_info?.mother_name || student?.mother_name || '') : '',
+          mother_phone: student ? (student?.student_info?.mother_phone || student?.mother_phone || '') : '',
+          mother_profession: student ? (student?.student_info?.mother_profession || student?.mother_profession || '') : '',
           mother_photo: null,
           guardian_name: student ? student?.guardian_name : '',
           guardian_phone: student ? student?.guardian_phone : '',
@@ -70,6 +70,7 @@ function RegistrationFirstPart({
               ...totalFormData,
               school_id: user?.school_id
             };
+            console.log({ _values });
 
             const formData = new FormData();
 

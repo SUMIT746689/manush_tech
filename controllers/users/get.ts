@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+const tables = Prisma.ModelName;
 
 export const get = async (req, res) => {
   try {
@@ -15,19 +15,19 @@ export const get = async (req, res) => {
     const user = await prisma.user.findFirst({
       where: {
         id: refresh_token.id,
-        
-          deleted_at: null
-        
+
+        deleted_at: null
+
       },
       include: {
         role: true
       }
     });
-    console.log({ user });
+    const { role } = req.query;
 
     const AND = [];
     AND.push({
-        deleted_at: null
+      deleted_at: null
     })
     if (user.role.title === 'SUPER_ADMIN') AND.push({
       role: {
@@ -45,13 +45,25 @@ export const get = async (req, res) => {
           }
         }
       );
+      if (role && role !== 'SUPER_ADMIN' && role !== 'ADMIN') {
+        AND.push({
+          role: {
+            title: role
+          }
+        })
+      }
+
     }
     else throw new Error('Only role 1 and 2 is allowed to see validate data')
     // : [{ school_id: user.school_id }, { id: { not: user.id } }]
+
+
+    console.log(AND);
+
     const users = await prisma.user.findMany({
       where: {
         AND,
-        
+
       },
       select: {
         id: true,
@@ -75,12 +87,10 @@ export const get = async (req, res) => {
         user_photo: true
       }
     });
-
-    console.log({ users });
     res.status(200).json(users);
   } catch (err) {
     console.log(err);
-    
+
     res.status(404).json({ error: err.message });
   }
 };

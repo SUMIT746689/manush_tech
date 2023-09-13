@@ -111,7 +111,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
-            logo: editSchool?.logo || '',
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -276,35 +275,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                     value={values.domain}
                   />
 
-
-                  <FileUploadFieldWrapper
-                    htmlFor="Logo"
-                    label="Logo"
-                    name="logo"
-                    value={values?.logo?.name || values?.logo || ''}
-                    handleChangeFile={(e) => {
-                      if (e.target.files?.length) {
-                        const photoUrl = URL.createObjectURL(e.target.files[0]);
-                        setLogo(photoUrl)
-                        setFieldValue('logo', e.target.files[0])
-                      }
-                    }}
-                    handleRemoveFile={(e) => {
-                      setLogo(null)
-                      setFieldValue('logo', undefined)
-                    }}
-                  />
-
-
-                  {
-                    (logo || editSchool?.logo) &&
-                    <Image src={logo ? logo : `/api/get_file/${editSchool?.logo?.replace(/\\/g, '/')}`}
-                      height={150}
-                      width={150}
-                      alt='User photo'
-                      loading='lazy'
-                    />
-                  }
                 </Grid>
               </DialogContent>
               <DialogActionWrapper
@@ -341,22 +311,29 @@ const SelectAdmin = ({ setFieldValue, oldSelectedAdminID }) => {
     if (err) return;
 
     setOptions(
-      users.map((user) => {
-        return {
-          id: user.id,
-          label: user.username
-        };
-      })
+      users.map((user) => ({
+        id: user.id,
+        label: user.username
+      }))
     );
     // if (oldSelectedAdminID && oldSelectedAdminID?.length > 0) {
     if (oldSelectedAdminID) {
-      oldSelectedAdminID.forEach((adminID) => {
-        const user: any = users.find((user) => user.id === adminID);
-        setSelectedOption((values) => [
-          ...values,
-          { id: user?.id, label: user?.username }
-        ]);
-      });
+      const prevSelected = [...selectedOption];
+
+      for (const i of oldSelectedAdminID) {
+        const user: any = users.find((user) => user.id === i);
+        if (user) {
+          prevSelected.push({ id: user?.id, label: user?.username })
+        }
+      }
+      setSelectedOption(prevSelected)
+      // oldSelectedAdminID.forEach((adminID) => {
+      //   const user: any = users.find((user) => user.id === adminID);
+      //   setSelectedOption((values) => [
+      //     ...values,
+      //     { id: user?.id, label: user?.username }
+      //   ]);
+      // });
     }
   };
 

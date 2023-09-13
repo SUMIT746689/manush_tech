@@ -311,22 +311,29 @@ const SelectAdmin = ({ setFieldValue, oldSelectedAdminID }) => {
     if (err) return;
 
     setOptions(
-      users.map((user) => {
-        return {
-          id: user.id,
-          label: user.username
-        };
-      })
+      users.map((user) => ({
+        id: user.id,
+        label: user.username
+      }))
     );
     // if (oldSelectedAdminID && oldSelectedAdminID?.length > 0) {
     if (oldSelectedAdminID) {
-      oldSelectedAdminID.forEach((adminID) => {
-        const user: any = users.find((user) => user.id === adminID);
-        setSelectedOption((values) => [
-          ...values,
-          { id: user?.id, label: user?.username }
-        ]);
-      });
+      const prevSelected = [...selectedOption];
+
+      for (const i of oldSelectedAdminID) {
+        const user: any = users.find((user) => user.id === i);
+        if (user) {
+          prevSelected.push({ id: user?.id, label: user?.username })
+        }
+      }
+      setSelectedOption(prevSelected)
+      // oldSelectedAdminID.forEach((adminID) => {
+      //   const user: any = users.find((user) => user.id === adminID);
+      //   setSelectedOption((values) => [
+      //     ...values,
+      //     { id: user?.id, label: user?.username }
+      //   ]);
+      // });
     }
   };
 

@@ -38,7 +38,8 @@ import {
   Switch,
   FormControlLabel,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Autocomplete
 } from '@mui/material';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import KeyIcon from '@mui/icons-material/Key';
@@ -56,6 +57,7 @@ import axios from 'axios';
 import { useAuth } from 'src/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
 import { fetchData } from '@/utils/post';
+import { useSearchUsers } from '@/hooks/useSearchUsers';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -153,12 +155,8 @@ const applyPagination = (
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
+const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
-  const [allUsers, setAllUsers] = useState(users)
-  useEffect(() => {
-    setAllUsers(users)
-  }, [users])
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -171,6 +169,32 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
   const [filters, setFilters] = useState<Filters>({
     role: null
   });
+  const [allUsers, setAllUsers] = useState(users);
+  const [searchToken, setSearchToken] = useState(null);
+
+
+  const getNsetOptions = () => {
+    axios.get(`/api/user?role=${searchToken}`)
+      .then(res => setAllUsers(res.data))
+      .catch(err => console.log(err))
+  };
+
+  useEffect(() => {
+    if (searchToken) {
+      getNsetOptions();
+    }else{
+      reFetchData()
+    }
+  }, [searchToken]);
+
+
+  useEffect(() => {
+    setAllUsers(users)
+  }, [users])
+
+
+
+
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -227,11 +251,11 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   //change user active or disable 
-  const handleUserEnabled = async(user)=> {
+  const handleUserEnabled = async (user) => {
     // console.log({user})
-    const [err,response]:any =  await fetchData(`/api/user/activition/${user.id}`,'patch',{is_enabled:!user.is_enabled,role:user.user_role});
-    if(response.message) reFetchData(true)
-    console.log({err,response});
+    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !user.is_enabled, role: user.user_role });
+    if (response.message) reFetchData(true)
+    console.log({ err, response });
   }
 
   return (
@@ -274,30 +298,48 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
       </Dialog>
 
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-        <Box p={2}>
-          {!selectedBulkActions && (
-            <TextField
+        <Grid p={2} display={'grid'} gridTemplateColumns={'auto auto'} gap={4}>
+          {/* {!selectedBulkActions && ( */}
+          <TextField
+            sx={{
+              m: 0
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchTwoToneIcon />
+                </InputAdornment>
+              )
+            }}
+            onChange={handleQueryChange}
+            placeholder={t('Search by name, email or username...')}
+            value={query}
+            size="small"
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+          <Autocomplete
+            size="small"
+            id="multiple-limit-tags"
+            options={roleOptions || []}
+            value={searchToken}
+            onChange={(e, v) => setSearchToken(v)}
+            renderInput={(params) => <TextField
               sx={{
-                m: 0
+                [`& fieldset`]: {
+                  borderRadius: 0.6,
+                }
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchTwoToneIcon />
-                  </InputAdornment>
-                )
-              }}
-              onChange={handleQueryChange}
-              placeholder={t('Search by name, email or username...')}
-              value={query}
-              size="small"
-              fullWidth
-              margin="normal"
-              variant="outlined"
+              {...params}
+              label="Filter by role"
             />
-          )}
-          {selectedBulkActions && <BulkActions />}
-        </Box>
+            }
+          />
+
+          {/*  )} */}
+          {/* {selectedBulkActions && <BulkActions />} */}
+        </Grid>
 
         <Divider />
 
@@ -322,13 +364,13 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={selectedAllUsers}
                         indeterminate={selectedSomeUsers}
                         onChange={handleSelectAllUsers}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{t('Username')}</TableCell>
                     <TableCell>{t('Role')}</TableCell>
                     <TableCell>{t('School name')}</TableCell>
@@ -339,12 +381,12 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
                 </TableHead>
                 <TableBody>
                   {paginatedUsers.map((user) => {
-                    
+
 
                     const isUserSelected = selectedItems.includes(user.id);
                     return (
                       <TableRow hover key={user.id} selected={isUserSelected}>
-                        <TableCell padding="checkbox">
+                        {/* <TableCell padding="checkbox">
                           <Checkbox
                             checked={isUserSelected}
                             onChange={(event) =>
@@ -352,7 +394,7 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
                             }
                             value={isUserSelected}
                           />
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell>
                           <Typography variant="h5">{user?.username}</Typography>
                         </TableCell>
@@ -371,7 +413,7 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
                             {user?.school?.name}
                           </Typography>
                         </TableCell>
-                        
+
                         <TableCell>
                           {/* @ts-ignore */}
                           <Button
@@ -391,9 +433,9 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
 
                         <TableCell>
                           {/* @ts-ignore */}
-                          <Typography variant="h5" color={ user?.is_enabled ? 'green' : 'red'}>
+                          <Typography variant="h5" color={user?.is_enabled ? 'green' : 'red'}>
                             {/* {user?.is_enabled ? 'Enable' : 'Disable'} */}
-                            <Switch checked={user?.is_enabled} onClick={()=>handleUserEnabled(user)} />
+                            <Switch checked={user?.is_enabled} onClick={() => handleUserEnabled(user)} />
                           </Typography>
                         </TableCell>
 
@@ -414,15 +456,15 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
                                   onClick={() => {
                                     try {
                                       axios.put(`/api/permission/attach-user`, {
-                                          role_id: user.user_role.id,
-                                          user_id: user.id
-                                        })
+                                        role_id: user.user_role.id,
+                                        user_id: user.id
+                                      })
                                         .then(() => {
-                                          axios.get('/api/user').then((res) => setAllUsers(res.data))
+                                          reFetchData()
                                         })
                                     } catch (err) {
                                       console.log(err);
-                                      
+
                                     }
 
                                   }}
@@ -437,7 +479,7 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
                                 // href={'/management/users/single/' + user.id}
                                 color="primary"
                                 onClick={() => {
-                                  
+
                                   axios
                                     .get(`/api/user/${user?.id}`)
                                     .then((res) => {
@@ -542,7 +584,7 @@ const Results: FC<ResultsProps> = ({ users, reFetchData, setEditUser }) => {
     </>
   );
 };
-const SinglePermission = ({ setAllUsers,singlePermission, selectedUser }) => {
+const SinglePermission = ({ setAllUsers, singlePermission, selectedUser }) => {
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.permissions?.length > 0
       ? selectedUser?.permissions.find((j) => j.id == singlePermission.id)

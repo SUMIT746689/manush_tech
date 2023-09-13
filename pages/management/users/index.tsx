@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
@@ -10,9 +10,10 @@ import Results from 'src/content/Management/Users/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
 
 function ManagementUsers() {
-
-  const { data: users, reFetchData } = useClientFetch('/api/user')
+  const { data: allUsers, reFetchData } = useClientFetch('/api/user')
+  const { data: roles } = useClientFetch('/api/role/school_other_role')
   const [editUser, setEditUser] = useState(null);
+  console.log({ roles });
 
   return (
     <>
@@ -36,7 +37,10 @@ function ManagementUsers() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results users={users || []} reFetchData={reFetchData} setEditUser={setEditUser} />
+          <Results
+            users={allUsers || []}
+            roleOptions={roles?.map(i => i.title) || []}
+            reFetchData={reFetchData} setEditUser={setEditUser} />
         </Grid>
       </Grid>
       <Footer />

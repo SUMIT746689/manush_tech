@@ -63,7 +63,8 @@ export const post = async (req, res) => {
         username
       }
     })
-    if(username) throw Error('This username is taken, try another !')
+
+    if(isExist) throw Error('This username is taken, try another !')
     const data = {
       username: username,
       password: hashPassword

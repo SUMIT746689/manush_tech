@@ -8,7 +8,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
         sx={{
           ...sx,
           borderRadius: 0.5,
-          height: 36,
+          minHeight: 36,
           width: '100%',
           ":disabled": {
             backgroundColor: 'lightgray'

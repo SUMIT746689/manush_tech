@@ -1,18 +1,18 @@
-import { Autocomplete, Box, Card, Grid, Divider, TextField, Button } from '@mui/material';
+import { Card, Grid, Divider, TextField, Button, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import useNotistick from '@/hooks/useNotistick';
 
 const tableStyle: object = {
   border: '1px solid black',
   borderCollapse: 'collapse',
-  minWidth: '70px',
+  minWidth: '36px',
   textAlign: 'center',
   // backgroundColor: '#cccccc'
 };
@@ -27,6 +27,7 @@ import ReactToPrint from 'react-to-print';
 import { MobileDatePicker } from '@mui/lab';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 function Attendence() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -39,7 +40,7 @@ function Attendence() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { user } = useAuth();
-
+  console.log({ user })
   const attendenceRef = useRef();
 
   useEffect(() => {
@@ -127,6 +128,7 @@ function Attendence() {
     }
 
   };
+  console.log({ selectedClass, selectedSection });
   return (
     <>
       <Head>
@@ -137,7 +139,7 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: { xs: 2, sm: 4 } }}
         container
         direction="row"
         justifyContent="center"
@@ -145,11 +147,11 @@ function Attendence() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Card sx={{ p: 1, pb: 0, mb: 3, display:"grid", gridTemplateColumns:{sm:"1fr 1fr 1fr",md:"1fr 1fr 1fr 1fr 1fr"}, columnGap:1 }}>
+          <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr 1fr" }, columnGap: 1 }}>
 
-            <Grid item width="100%" 
-            // sx={{gridColumnStart:1,gridColumnEnd:3}} 
-            pb={1} >
+            <Grid item width="100%"
+              // sx={{gridColumnStart:1,gridColumnEnd:3}} 
+              pb={1} >
               <MobileDatePicker
                 label="Select Date"
                 views={['year', 'month']}
@@ -254,124 +256,142 @@ function Attendence() {
             }
 
           </Card>
-          <Divider />
-          <Grid
-            sx={{
-              maxHeight: 'calc(100vh - 450px) !important',
-              minHeight: 'calc(100vh - 450px) !important',
+          {/* attendance type */}
+          <Card sx={{ display: "flex", flexWrap: 'wrap', justifyContent: 'space-between', fontWeight: 600, color: '#4454cc', ml: "auto", columnGap: { xs: 3 },rowGap:1, p: 1, width: { xs: 1, md: 1 / 2 }, borderRadius: 0.5 }} >
+            <Grid>Present = P</Grid>
+            <Grid>Holiday = H</Grid>
+            <Grid>Absent = A</Grid>
+            <Grid>Bunk = B</Grid>
+            <Grid>Late = L</Grid>
+          </Card>
+          <br />
 
+          {/* present table */}
+          <Card
+            sx={{
+              height: 'calc(100vh - 412px) !important',
               overflowX: 'auto',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              p: 1,
+              borderRadius: 0.5
             }}
-            justifyContent={'flex-end'}
+          // justifyContent={'flex-end'}
           >
             {
-              targetsectionStudents && students && <div ref={attendenceRef}>
+              (targetsectionStudents && students)
+                ?
+                <div ref={attendenceRef}>
+                  <Grid>
+                    <Typography variant='h3'>School: {user?.school?.name || ''}</Typography>
 
-                <table style={tableStyle}>
-                  <thead>
-                    <tr>
-                      {[-1, ...Array(32).keys()].map((i) => (
-                        <th style={tableStyle}>
-                          {i > 1 ? i : i == -1 ? 'Name' : i == 0 ? 'Roll' : i}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
+                    <Typography variant='h5'>Class: {selectedClass?.label || ''}</Typography>
+                    <Typography variant='h5'>Section: {selectedSection?.label || ''}</Typography>
+                  </Grid>
 
-                  <tbody style={{
-                    overflowX: 'auto',
-                    overflowY: 'auto'
-                  }}>
-                    {targetsectionStudents?.map((i) => {
-                      return (
-                        <tr>
-                          {students?.map((j) => {
-                            if (j.student_id_list) {
-                              const found = j.student_id_list.find(
-                                (st) => st.student_id == i.student_id
-                              );
+                  <table style={{ ...tableStyle, width: '100%' }}>
+                    <thead>
+                      <tr>
+                        {[-1, ...Array(32).keys()].map((i) => (
+                          <th style={tableStyle}>
+                            {i > 1 ? i : i == -1 ? 'Name' : i == 0 ? 'Roll' : i}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
 
-                              if (found) {
-                                return (
-                                  <td
-                                    style={
-                                      found.status == 'absent'
-                                        ? {
-                                          ...tableStyle,
-                                          backgroundColor: 'red',
-                                          color: 'white'
-                                        }
-                                        : found.status == 'late'
+                    <tbody style={{
+                      overflowX: 'auto',
+                      overflowY: 'auto'
+                    }}>
+                      {targetsectionStudents?.map((i) => {
+                        return (
+                          <tr>
+                            {students?.map((j) => {
+                              if (j.student_id_list) {
+                                const found = j.student_id_list.find((st) => st.student_id == i.student_id);
+
+                                if (found) {
+                                  return (
+                                    <td
+                                      style={
+                                        found.status == 'absent'
                                           ? {
                                             ...tableStyle,
-                                            backgroundColor: 'yellow',
-                                            color: 'black'
+                                            backgroundColor: 'red',
+                                            color: 'white'
                                           }
-                                          : found.status == 'bunk'
+                                          : found.status == 'late'
                                             ? {
                                               ...tableStyle,
-                                              backgroundColor: 'blue',
-                                              color: 'white'
+                                              backgroundColor: 'yellow',
+                                              color: 'black'
                                             }
-                                            : {
-                                              ...tableStyle,
-                                              backgroundColor: 'green',
-                                              color: 'white'
-                                            }
-                                    }
-                                  >
-                                    {found.status}
-                                  </td>
-                                );
+                                            : found.status == 'bunk'
+                                              ? {
+                                                ...tableStyle,
+                                                backgroundColor: 'blue',
+                                                color: 'white'
+                                              }
+                                              : {
+                                                ...tableStyle,
+                                                backgroundColor: 'green',
+                                                color: 'white'
+                                              }
+                                      }
+                                    >
+                                      {found.status.slice(0, 1)}
+                                    </td>
+                                  );
+                                } else {
+                                  return (
+                                    <td style={tableStyle}> &nbsp; &nbsp; </td>
+                                  );
+                                }
                               } else {
-                                return (
-                                  <td style={tableStyle}> &nbsp; &nbsp; </td>
-                                );
+                                if (j == 'name')
+                                  return (
+                                    <td
+                                      style={{
+                                        ...tableStyle,
+                                        backgroundColor: '#00997a',
+                                        color: 'white'
+                                      }}
+                                    >
+                                      {i.name}
+                                    </td>
+                                  );
+                                else
+                                  return (
+                                    <td
+                                      style={{
+                                        ...tableStyle,
+                                        backgroundColor: '#00997a',
+                                        color: 'white'
+                                      }}
+                                    >
+                                      {i.class_roll_no}
+                                    </td>
+                                  );
                               }
-                            } else {
-                              if (j == 'name')
-                                return (
-                                  <td
-                                    style={{
-                                      ...tableStyle,
-                                      backgroundColor: '#00997a',
-                                      color: 'white'
-                                    }}
-                                  >
-                                    {i.name}
-                                  </td>
-                                );
-                              else
-                                return (
-                                  <td
-                                    style={{
-                                      ...tableStyle,
-                                      backgroundColor: '#00997a',
-                                      color: 'white'
-                                    }}
-                                  >
-                                    {i.class_roll_no}
-                                  </td>
-                                );
-                            }
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
 
-                  {/* <tfoot>
+                    {/* <tfoot>
             <tr>
               <td>Sum</td>
               <td>$180</td>
             </tr>
           </tfoot> */}
-                </table>
-              </div>
+                  </table>
+                </div>
+                :
+                <TableEmptyWrapper title="attendance" />
             }
 
-          </Grid>
+          </Card>
         </Grid >
       </Grid >
       <Footer />

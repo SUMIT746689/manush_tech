@@ -21,7 +21,7 @@ export function SidebarProvider({ children }: Props) {
   };
 
   const closeSidebar = () => {
-    setSidebarToggle(false);
+    setSidebarToggle(() => false);
   };
 
   return (

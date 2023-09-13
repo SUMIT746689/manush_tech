@@ -10,9 +10,7 @@ import {
   Tooltip,
   styled,
   useTheme,
-  Grid,
-  Autocomplete,
-  TextField
+  Grid
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';

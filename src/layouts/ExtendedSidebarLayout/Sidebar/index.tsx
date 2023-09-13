@@ -91,9 +91,6 @@ function Sidebar() {
         open={sidebarToggle}
         onClose={closeSidebar}
         variant="temporary"
-        ModalProps={{
-          keepMounted: false,
-        }}
       // elevation={1}
       >
         <SidebarWrapper

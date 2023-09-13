@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import 'react-quill/dist/quill.snow.css';
-import { Grid, Dialog, DialogTitle, DialogContent, Box, Typography, TextField, CircularProgress, Button, useTheme, Autocomplete } from '@mui/material';
+import { Grid, Dialog, DialogTitle, DialogContent, Typography, useTheme, Button, } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
@@ -136,7 +136,7 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
 
     } catch (err) {
       showNotification(err?.response?.data?.message, 'error');
-      console.error("errrrrrrrrr__", err?.response?.data?.message);
+      console.error("err", err?.response?.data?.message);
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -183,7 +183,7 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
 
     } catch (err) {
       showNotification(err?.response?.data?.message, 'error');
-      console.error("errrrrrrrrr__", err?.response?.data?.message);
+      console.error("err", err?.response?.data?.message);
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -197,17 +197,13 @@ function PageHeader({ editExam, setEditExam, classes, selectClasses,
         handleCreateClassOpen={undefined}
         actionButton={
 
-          <Grid display={'grid'} columnGap={3} gridTemplateColumns={{ xs: '1fr 1fr', sm: '1fr 1fr 1fr' }} py={2}>
-
+          <Grid item  width="100%" display={'grid'} columnGap={1} gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr',md:'1fr 1fr 1fr' }} py={2}>
             <Grid item>
               <ButtonWrapper
                 handleClick={undefined}
-                size='small'
-                variant="contained"
                 href={`/bulkExamMark.xlsx`}
               >
                 Download Subject wise Bulk Excel format
-
               </ButtonWrapper>
             </Grid>
 

@@ -6,14 +6,17 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'POST':
-                
-                console.log("req.body___", req.body, typeof (req.body));
+                // console.log("req.body___", req.body, typeof (req.body));
                 const body = JSON.parse(req.body);
 
+                // body.forEach(element => {
+                //     console.log("element", element)
+                // });
+
                 const data2 = body.map(i => ({
-                    user_id: 6 || parseInt(i.userID),
-                    school_id: i.schoolID,
-                    submission_time: new Date(i.timestamp),
+                    user_id: 4 || parseInt(i.userID),
+                    school_id: 1 || i.schoolID,
+                    submission_time: new Date(Date.now()||i.timestamp),
                     status: i.status,
                     machine_id: i.machineID,
                 }))
@@ -26,7 +29,7 @@ const index = async (req, res) => {
 
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['POST']);
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {

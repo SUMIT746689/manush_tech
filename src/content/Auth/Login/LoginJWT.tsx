@@ -95,7 +95,7 @@ export const LoginJWT: FC = (props) => {
         value={formik.values.password}
         variant="outlined"
       />
-      <Box
+      {/* <Box
         alignItems="center"
         display={{ xs: 'block', md: 'flex' }}
         justifyContent="space-between"
@@ -123,7 +123,7 @@ export const LoginJWT: FC = (props) => {
         <Link href="/auth/recover-password">
           <b>{t('Lost password?')}</b>
         </Link>
-      </Box>
+      </Box> */}
 
       {Boolean(formik.touched.terms && formik.errors.terms) && (
         <FormHelperText error>{formik.errors.terms}</FormHelperText>

@@ -224,7 +224,7 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 
 
 export default function HomeContent({ latest_news, carousel_image, speechDatas, facebook_link }) {
-
+  console.log({ latest_news });
   // const ref = useRef(null);
   const announceref = useRef(null);
   const noticeRef = useRef(null);

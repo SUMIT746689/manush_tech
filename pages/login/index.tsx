@@ -82,7 +82,7 @@ function LoginBasic() {
   return (
     <>
       <Head>
-        <title>Login - Basic</title>
+        <title>Login</title>
       </Head>
       <MainContent>
         <TopWrapper style={{display:'flex',flexDirection:'column',justifyContent:'center'}}>

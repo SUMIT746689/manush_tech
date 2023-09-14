@@ -116,7 +116,7 @@ function HeaderUserbox() {
   const theme = useTheme();
   const router = useRouter();
 
-  const { logout,user } = useAuth();
+  const { logout, user } = useAuth();
 
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -206,11 +206,12 @@ function HeaderUserbox() {
       data: [465, 546, 234, 576, 554, 338, 427, 348, 586, 254, 348]
     }
   ];
+  console.log({ user });
 
   return (
     <>
       <UserBoxButton color="primary" ref={ref} onClick={handleOpen}>
-        <UserAvatar alt={user?.username} src={user?.user_photo} />
+        <UserAvatar alt={user?.username} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} />
       </UserBoxButton>
       <Popover
         disableScrollLock
@@ -232,8 +233,8 @@ function HeaderUserbox() {
           }}
           display="flex"
         >
-          <Avatar variant="rounded" alt={'profile photo'} src={user?.user_photo} />
-          
+          <Avatar variant="rounded" alt={'profile photo'} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} />
+
           <UserBoxText>
             <UserBoxLabel variant="body1">{user?.username}</UserBoxLabel>
             <UserBoxDescription variant="body2">

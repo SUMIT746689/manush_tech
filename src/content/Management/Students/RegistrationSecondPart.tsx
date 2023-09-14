@@ -124,8 +124,8 @@ function RegistrationSecondPart({
           registration_no: student?.class_registration_no || registration_no_generate(),
           student_photo: null,
           student_present_address: student ? student?.student_present_address : '',
-          student_permanent_address: student ? ( student?.student_permanent_address || student?.student_info?.student_permanent_address) : '',
-          previous_school: student ? ( student?.previous_school || student?.student_info?.previous_school) : ''
+          student_permanent_address: student ? ( student?.student_permanent_address || student?.student_info?.student_permanent_address || '') : '',
+          previous_school: student ? ( student?.previous_school || student?.student_info?.previous_school  || '') : ''
         }}
         validationSchema={Yup.object().shape({
           username: Yup.string()

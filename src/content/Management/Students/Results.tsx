@@ -333,7 +333,7 @@ const Results = ({ users, refetch, discount }) => {
                         </TableCell>
                         <TableCell>
                           <Typography variant="h5">
-                            {i?.student_info?.first_name}{i?.student_info?.middle_name ? " " + i?.student_info?.middle_name : ""}{i?.student_info?.last_name ? " " + i?.student_info?.last_name : ""}
+                            {[i?.student_info?.first_name,i?.student_info?.middle_name,i?.student_info?.last_name].join(' ')}
                           </Typography>
                         </TableCell>
                         <TableCell>

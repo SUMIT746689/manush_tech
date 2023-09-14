@@ -36,14 +36,14 @@ function RegistrationFirstPart({
     <>
       <Formik
         initialValues={{
-          first_name: student ? (student?.first_name || student?.student_info?.first_name) : undefined,
-          middle_name: student ? (student?.middle_name || student?.student_info?.middle_name) : '',
-          last_name: student ? (student?.middle_name || student?.student_info?.last_name) : '',
+          first_name: student ? (student?.first_name || student?.student_info?.first_name || '') : undefined,
+          middle_name: student ? (student?.middle_name || student?.student_info?.middle_name || '') : '',
+          last_name: student ? (student?.middle_name || student?.student_info?.last_name || '') : '',
           admission_no: student ? ( student?.admission_no|| student?.student_info?.admission_no) : '',
           admission_date: student ? ( student?.admission_date || student?.student_info?.admission_date) : null,
           date_of_birth: student ? ( student?.date_of_birth || student?.student_info?.date_of_birth) : null,
           gender: student ? ( student?.gender || student?.student_info?.gender) : 'male',
-          blood_group: student ? ( student?.blood_group|| student?.student_info?.blood_group) : '',
+          blood_group: student ? ( student?.blood_group|| student?.student_info?.blood_group || '') : '',
           religion: student ? (student?.religion || student?.student_info?.religion) : '',
           phone: student ? (student?.phone || student?.student_info?.phone) : undefined,
           email: student ? ( student?.email || student?.student_info?.email) : '',

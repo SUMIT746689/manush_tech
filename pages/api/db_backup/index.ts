@@ -26,7 +26,7 @@ const index = async (req, res, refresh_token) => {
                 //  const command = `docker exec mysql /usr/bin/mysqldump -u ${process.env.DB_USER} -p ${process.env.DB_PASSWORD} school > ${backupPath}`
 
                 // backup from hard dick
-                const command = `mysqldump -u ${process.env.DB_USER} -p ${process.env.DB_PASSWORD} school > ${backupPath}`
+                const command = `mysqldump -u ${process.env.DB_USER} -p ${process.env.DB_PASSWORD} ${process.env.DB_NAME} > ${backupPath}`
 
                 exec(command, async (err, stdout, stderr) => {
                     if (err) {

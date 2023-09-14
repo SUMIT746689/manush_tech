@@ -25,7 +25,7 @@ import useNotistick from '../../hooks/useNotistick';
 function RegistrationFirstPart({
   setTotalFormData,
   setActiveStep,
-  handleCreateClassClose, setMarged
+  handleCreateClassClose
 }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -39,7 +39,6 @@ function RegistrationFirstPart({
           first_name: undefined,
           middle_name: '',
           last_name: '',
-          admission_no: undefined,
           admission_date: null,
           date_of_birth: null,
           gender: 'male',
@@ -56,9 +55,6 @@ function RegistrationFirstPart({
             .required(t('First name field is required')),
           middle_name: Yup.string().max(255).nullable(true),
           last_name: Yup.string().max(255).nullable(true),
-          admission_no: Yup.string().required(
-            t('Admission number is required!')
-          ),
           admission_date: Yup.date().required(t('Admission date is required!')),
           date_of_birth: Yup.date().required(t('Date of birth is required!')),
           gender: Yup.string().required(t('select a gender')),
@@ -76,7 +72,6 @@ function RegistrationFirstPart({
           try {
             console.log('clicked');
             setTotalFormData((values: any) => ({ ...values, ..._values }));
-            setMarged(p => registration1stPart.current && [...p, registration1stPart.current])
             setActiveStep(1);
           } catch (err) {
             console.error(err);
@@ -176,7 +171,7 @@ function RegistrationFirstPart({
                     </Grid>
 
                     {/* admission_no   */}
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                       <TextField
                         // required
                         size="small"
@@ -198,7 +193,7 @@ function RegistrationFirstPart({
                         value={values.admission_no}
                         variant="outlined"
                       />
-                    </Grid>
+                    </Grid> */}
 
                     {/* admission_date */}
                     <Grid item xs={12} md={6}>

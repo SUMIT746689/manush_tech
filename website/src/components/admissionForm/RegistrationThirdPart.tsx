@@ -25,8 +25,7 @@ function RegistrationFirstPart({
   setActiveStep,
   handleCreateClassClose,
   setUsersFlag,
-  serverHost,
-  setMarged
+  serverHost
 }) {
   const router = useRouter()
   const { t }: { t: any } = useTranslation();
@@ -37,20 +36,6 @@ function RegistrationFirstPart({
   const [guardian_photo, setGuardian_photo] = useState(null);
 
   const registration3rdPart = useRef(null)
-
-  const handleSave = () => {
-    setMarged(p => {
-      const temp = [...p]
-      const len = temp.length;
-      if (len >= 3) {
-
-        temp.splice(2, 1)
-        return [temp, registration3rdPart.current]
-      } else {
-        return registration3rdPart.current && [...p, registration3rdPart.current]
-      }
-    })
-  }
 
   return (
     <>
@@ -491,19 +476,6 @@ function RegistrationFirstPart({
                       />
                     </Grid>
                   </Grid>
-                </Grid>
-                <Grid container sx={{
-                  display: 'flex',
-                  justifyContent: 'center'
-                }}>
-                  <Button
-                    color='primary'
-                    variant="contained"
-                    onClick={handleSave}
-
-                  >
-                    {t('Save')}
-                  </Button>
                 </Grid>
               </DialogContent>
               <DialogActions

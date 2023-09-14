@@ -35,7 +35,6 @@ const index = async (req, res, refresh_token) => {
 
       case 'PATCH':
         const { name, code, std_entry_time, std_exit_time } = req.body;
-        console.log({ std_entry_time, std_exit_time })
         const class_ = await prisma.class.findFirst({
           where: { id: parseInt(id) },
           select: { has_section: true }
@@ -59,8 +58,7 @@ const index = async (req, res, refresh_token) => {
 
           if (std_entry_time) sectionQuery['std_entry_time'] = new Date(std_entry_time);
           if (std_exit_time) sectionQuery['std_exit_time'] = new Date(std_exit_time);
-          console.log({ sectionQuery });
-
+          
           await prisma.section.updateMany({
             where: { class_id: parseInt(id) },
             data: sectionQuery

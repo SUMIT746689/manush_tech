@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma_client";
 
 const section = async (req, res) => {
   try {
@@ -20,7 +18,7 @@ const section = async (req, res) => {
         res.status(200).json(user);
         break;
       case 'PATCH':
-        const { name, class_id, class_teacher_id, group_ids } = req.body;
+        const { name, class_id, class_teacher_id, group_ids, std_entry_time, std_exit_time } = req.body;
 
         const quries = {
           where: {
@@ -31,11 +29,12 @@ const section = async (req, res) => {
 
         if (name) quries.data['name'] = name;
         if (class_id) quries.data['class_id'] = class_id;
-        if (class_teacher_id)
-          quries.data['class_teacher_id'] = class_teacher_id;
-        if (group_ids) {
-          quries.data['groups'] = { connect: group_ids.map((id) => ({ id })) }
-        } else {
+        if (class_teacher_id) quries.data['class_teacher_id'] = class_teacher_id;
+        if (std_entry_time) quries.data['std_entry_time'] = std_entry_time;
+        if (std_exit_time) quries.data['std_exit_time'] = std_exit_time;
+        if (group_ids) quries.data['groups'] = { connect: group_ids.map((id) => ({ id })) }
+
+        else {
           // quries['groups'] = { connect: { id: group_id } };
           // quries.data['group_id'] = null;
         }

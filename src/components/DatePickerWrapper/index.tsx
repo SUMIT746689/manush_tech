@@ -1,6 +1,6 @@
 
 import { Grid, TextField } from '@mui/material';
-import { DatePicker, MobileDatePicker } from '@mui/lab';
+import { DatePicker, MobileDatePicker, TimePicker } from '@mui/lab';
 import dayjs from 'dayjs';
 
 export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEndDate }) {
@@ -67,6 +67,31 @@ export const DatePickerWrapper = ({ label, date, handleChange }) => {
               sx={{
                 [`& fieldset`]: {
                   borderRadius: 0.6,
+                }
+              }}
+              fullWidth
+              {...params}
+            />}
+      />
+    </Grid>
+  )
+}
+
+export const TimePickerWrapper = ({ label, value, handleChange, minWidth="100%" }) => {
+  return (
+    <Grid minWidth={minWidth} item pb={1}>
+      <TimePicker
+        label={label}
+        value={value}
+        onChange={handleChange}
+        renderInput={
+          (params) =>
+            <TextField
+              size='small'
+              sx={{
+                [`& fieldset`]: {
+                  borderRadius: 0.6,
+                  minWidth: minWidth,
                 }
               }}
               fullWidth

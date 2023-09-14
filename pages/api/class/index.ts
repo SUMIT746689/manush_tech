@@ -1,8 +1,7 @@
 import prisma from '@/lib/prisma_client';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res,refresh_token) => {
+const index = async (req, res, refresh_token) => {
   try {
     const { method } = req;
 
@@ -17,38 +16,46 @@ const index = async (req, res,refresh_token) => {
             sections: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                std_entry_time: true,
+                std_exit_time: true
               }
             },
             Group: true
           }
         });
-
-
         res.status(200).json(classes);
         break;
       case 'POST':
-        const name = req.body.name.trim()
+        const { name: name_, code, section_name, std_entry_time, std_exit_time } = req.body;
+        const { school_id } = refresh_token;
+        const name = name_.trim();
+
         const isExists = await prisma.class.findFirst({
           where: {
             name,
-            school_id: refresh_token.school_id
+            school_id
           }
         })
-        if (isExists) {
-          throw new Error('This class is already exists !')
-        }
+        if (isExists) throw new Error('This class is already exists !');
+
         const newClass = await prisma.class.create({
           data: {
             name,
-            code: req.body.code,
-            school_id: refresh_token.school_id
+            code,
+            school_id
             // has_section: true,
           }
         });
-        const sectionName = req.body.section_name
-          ? req.body.section_name
-          : `default-${req.body.name}`;
+        const sectionName = section_name ? section_name : `default-${name}`;
+        
+        const sectionQuery = {
+          name: sectionName,
+          class_id: newClass.id
+        };
+        if (std_entry_time) sectionQuery["std_entry_time"] = new Date(std_entry_time);
+        if (std_exit_time) sectionQuery["std_exit_time"] = new Date(std_exit_time);
+
         await prisma.section.create({
           data: {
             name: sectionName,

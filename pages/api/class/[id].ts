@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res,refresh_token) => {
+const index = async (req, res, refresh_token) => {
   try {
     const { method } = req;
 
@@ -34,7 +34,13 @@ const index = async (req, res,refresh_token) => {
         break;
 
       case 'PATCH':
-        const { name, code } = req.body;
+        const { name, code, std_entry_time, std_exit_time } = req.body;
+        console.log({ std_entry_time, std_exit_time })
+        const class_ = await prisma.class.findFirst({
+          where: { id: parseInt(id) },
+          select: { has_section: true }
+        });
+
 
         const quries = {
           where: { id: parseInt(id) },
@@ -47,6 +53,20 @@ const index = async (req, res,refresh_token) => {
         await prisma.class.update({
           ...quries
         });
+
+        if (!class_.has_section && (std_entry_time || std_entry_time)) {
+          const sectionQuery = {};
+
+          if (std_entry_time) sectionQuery['std_entry_time'] = new Date(std_entry_time);
+          if (std_exit_time) sectionQuery['std_exit_time'] = new Date(std_exit_time);
+          console.log({ sectionQuery });
+
+          await prisma.section.updateMany({
+            where: { class_id: parseInt(id) },
+            data: sectionQuery
+          })
+        }
+
         res.status(200).json({ success: 'update successfully' });
         break;
 

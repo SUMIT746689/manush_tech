@@ -162,11 +162,14 @@ model Class {
 }
 
 model Section {
-  id                                 Int                                  @id @default(autoincrement())
-  name                               String?                              @db.VarChar(40)
-  class_id                           Int
-  class_teacher_id                   Int?
-  is_class                           Boolean                              @default(true)
+  id               Int       @id @default(autoincrement())
+  name             String?   @db.VarChar(40)
+  class_id         Int
+  class_teacher_id Int?
+  is_class         Boolean   @default(true)
+  std_entry_time   DateTime? @db.Time()
+  std_exit_time    DateTime? @db.Time()
+
   class                              Class                                @relation(fields: [class_id], references: [id])
   class_teacher                      Teacher?                             @relation("class_teacher", fields: [class_teacher_id], references: [id])
   students                           Student[]
@@ -305,7 +308,7 @@ model Period {
   school_id  Int
   subject_id Int
 
-  subject Subject @relation(fields: [subject_id], references: [id])
+  subject Subject  @relation(fields: [subject_id], references: [id])
   room    Room     @relation(fields: [room_id], references: [id])
   teacher Teacher? @relation(fields: [teacher_id], references: [id])
   section Section? @relation(fields: [section_id], references: [id])

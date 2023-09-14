@@ -29,6 +29,8 @@ import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import TimePicker from '@mui/lab/TimePicker';
+import { TimePickerWrapper } from '@/components/DatePickerWrapper';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -140,7 +142,6 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             group_ids: Array.from(personName, (v: any) => v.value)
           })
           .then((res) => {
-            console.log({ res });
             if (res.data.success) {
               resetForm();
               setStatus({ success: true });
@@ -219,7 +220,9 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             name: editSection?.name || undefined,
             class_id: editSection?.class_id || undefined,
             // group_id: editSection?.group_id || null,
-            class_teacher_id: editSection?.class_teacher_id || null
+            class_teacher_id: editSection?.class_teacher_id || null,
+            std_entry_time: editSection?.std_entry_time || '',
+            std_exit_time: editSection?.std_exit_time || '',
           }}
           validationSchema={Yup.object().shape({
             name: Yup.string()
@@ -239,6 +242,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             values,
             setFieldValue
           }) => {
+            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -333,6 +337,21 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                       </Grid>
                     )}
 
+                    <TimePickerWrapper
+                      label="Student Entry Time"
+                      value={values.std_entry_time}
+                      // handleChange={(value)=>{console.log({value})}}
+                      handleChange={(value) => setFieldValue("std_entry_time", value)}
+                    />
+
+                    <TimePickerWrapper
+                      label="Student Exit Time"
+                      value={values.std_exit_time}
+                      // handleChange={handleChange}
+                      handleChange={(value) => setFieldValue("std_exit_time", value)}
+                    />
+
+
                     <AutoCompleteWrapper
                       minWidth={"100%"}
                       label="Class Teacher"
@@ -343,13 +362,13 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                     />
                   </Grid>
                 </DialogContent>
-               <DialogActionWrapper
-                title="Section"
-                handleCreateClassClose={handleCreateClassClose}
-                errors={errors}
-                editData={editSection}
-                isSubmitting={isSubmitting}
-               />
+                <DialogActionWrapper
+                  title="Section"
+                  handleCreateClassClose={handleCreateClassClose}
+                  errors={errors}
+                  editData={editSection}
+                  isSubmitting={isSubmitting}
+                />
               </form>
             );
           }}

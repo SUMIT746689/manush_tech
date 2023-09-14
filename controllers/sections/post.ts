@@ -1,32 +1,41 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
+
 // @ts-ignore
 const post = async (req, res, refresh_token) => {
+
+  let { name, class_id, std_entry_time, std_exit_time } = req.body;
+
   let query = {
-    name: req.body.name,
-    class_id: req.body.class_id
+    name,
+    class_id
   };
 
-  const isSection = await prisma.class.findUnique({
+  if(std_entry_time) query["std_entry_time"] = new Date(std_entry_time)
+  if(std_exit_time) query["std_exit_time"] = new Date(std_exit_time)
+
+  const class_ = await prisma.class.findUnique({
     where: {
-      id: parseInt(req.body.class_id)
+
+      id: parseInt(req.body.class_id),
+      // school_id: parseInt(refresh_token.school_id)
     }
   });
-  if (isSection && isSection.has_section == false) {
+  if (class_ && class_.has_section == false) {
     const section_id = await prisma.section.findFirst({
       where: {
-        class_id: isSection.id
+        class_id: class_.id
       }
     });
+    
+    delete query.class_id;
+
     await prisma.section.update({
       where: {
         id: section_id.id
       },
-      data: {
-        name: req.body.name
-      }
+      data: query
     });
     await prisma.class.update({
       where: {

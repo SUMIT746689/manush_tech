@@ -22,7 +22,7 @@ async function put(req, res, refresh_token) {
     try {
 
         if (error) {
-            throw new Error('something wrong !')
+            throw new Error('image upload failed !')
         }
 
         const websiteUirow = await prisma.websiteUi.findFirst({

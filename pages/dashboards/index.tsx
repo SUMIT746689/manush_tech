@@ -16,7 +16,7 @@ export async function getServerSideProps(context: any) {
   try {
 
     const refresh_token: any = serverSideAuthentication(context);
-    if (!refresh_token) return { redirect: { destination: '/auth/login/basic' } };
+    if (!refresh_token) return { redirect: { destination: '/login' } };
 
     const updateHolidays = async () => {
       const resHolidays = await prisma.holiday.findMany({

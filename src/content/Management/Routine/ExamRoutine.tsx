@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import {
     Autocomplete, Box, Card, Grid, Divider, Table, TableBody, TableCell, TableHead, TableContainer,
-    TableRow, TextField, Typography, Button,
+    TableRow, TextField, Typography, Button, Avatar,
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
@@ -80,7 +80,7 @@ const ExamResults = () => {
                 .catch(err => console.log(err))
         }
     }
-
+    console.log({selectedClass});
     return (
         <>
             <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
@@ -121,11 +121,35 @@ const ExamResults = () => {
                     {
                         routine ?
                             <Grid ref={routineRef} sx={{ p: 1 }}>
-                                <Typography
-                                    variant="h4"
-                                    fontWeight="normal"
-                                    color="text.secondary"
-                                    align="center">Exam Title: {selectedExam?.label}</Typography>
+                                <Grid container pt={4} spacing={2} justifyContent={"space-between"} px={7}>
+                                    <Grid item>
+                                        <Avatar variant="rounded"  >
+                                            {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                                        </Avatar>
+                                    </Grid>
+
+                                    <Grid width={'60%'} item>
+                                        <Typography
+                                            variant="h3"
+                                            align="center"
+                                        >
+                                            {user?.school?.name}
+                                        </Typography>
+                                        <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                                            {user?.school?.address}, {user?.school?.phone}
+                                        </Typography>
+                                        <Typography variant="h6" align="center" >
+                                            Exam Title : {selectedExam?.label}, Class : {selectedClass?.label}, Section : {selectedClass?.has_section ? selectedSection?.label : 'no section'}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="h4" >
+                                            Exam Routine
+                                        </Typography>
+
+                                    </Grid>
+                                </Grid>
+
                                 <TableContainer sx={{ p: 1 }}  >
                                     <Table>
                                         <TableHead sx={{

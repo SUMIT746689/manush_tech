@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import {
   Autocomplete, Box, Card, Grid, Divider, Table, TableBody, TableCell, TableHead, TableContainer,
-  TableRow, TextField, Typography, Button,
+  TableRow, TextField, Typography, Button, Avatar,
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
@@ -150,7 +150,7 @@ const Results = () => {
           setRoutine(sortedRoutineByDay)
         })
         .catch(err => {
-          console.log("err__",err)
+          console.log("err__", err)
         })
     }
   }
@@ -181,102 +181,133 @@ const Results = () => {
 
         <>
           {
-            routine ? <TableContainer sx={{ p: 1 }} ref={routineRef} >
-              <Table>
-                <TableHead sx={{
-                  border: '1px solid darkgrey',
-                  borderCollapse: 'collapse'
-                }}>
-                  <TableRow>
-                    <TableCell sx={{
-                      border: '1px solid darkgrey',
-                      borderCollapse: 'collapse',
-                      fontSize: '11px',
-                      px: 1,
-                      py: 0.5
-                    }}>
-                      Weeks
-                    </TableCell>
-                    {
-                      slotHeader.map(i => <TableCell key={i} sx={{
+            routine ? <Grid ref={routineRef}>
+              <Grid container pt={4} spacing={2} justifyContent={"space-between"} px={7}>
+
+                <Grid item>
+                  <Avatar variant="rounded"  >
+                    {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                  </Avatar>
+                </Grid>
+
+                <Grid width={'60%'} item>
+                  <Typography
+                    variant="h3"
+                    align="center"
+                  >
+                    {user?.school?.name}
+                  </Typography>
+                  <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                    {user?.school?.address}, {user?.school?.phone}
+                  </Typography>
+                  <Typography variant="h6" align="center" >
+                    Class : {selectedClass?.label}, Section : {selectedSection?.label}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="h4" >
+                    Class Routine
+                  </Typography>
+
+                </Grid>
+              </Grid>
+              <TableContainer sx={{ p: 1, mt: 3 }}  >
+                <Table>
+                  <TableHead sx={{
+                    border: '1px solid darkgrey',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <TableRow>
+                      <TableCell sx={{
                         border: '1px solid darkgrey',
                         borderCollapse: 'collapse',
                         fontSize: '11px',
-                        p: 0.5,
-                        textAlign: 'center'
-                      }}>{t(`${i?.actualStart_time} - ${i?.actualEnd_time}`)}</TableCell>)
-                    }
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {routine?.map((i) => {
-
-                    return (
-                      <TableRow
-                        hover
-                        key={i.id}
-
-                      >
-                        <TableCell sx={{
+                        px: 1,
+                        py: 0.5
+                      }}>
+                        Weeks
+                      </TableCell>
+                      {
+                        slotHeader.map(i => <TableCell key={i} sx={{
                           border: '1px solid darkgrey',
                           borderCollapse: 'collapse',
-                          px: 1,
-                          py: 0.5
-                        }}>
-                          <Typography sx={{ fontSize: '11px' }} >
-                            {i?.day}
-                          </Typography>
-                        </TableCell>
+                          fontSize: '11px',
+                          p: 0.5,
+                          textAlign: 'center'
+                        }}>{t(`${i?.actualStart_time} - ${i?.actualEnd_time}`)}</TableCell>)
+                      }
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {routine?.map((i) => {
 
-                        {
-                          slotHeader.map((e, index) => {
+                      return (
+                        <TableRow
+                          hover
+                          key={i.id}
 
-                            const slot = i?.classSlot.find(element => element.start_time == e.actualStart_time && element.end_time == e.actualEnd_time)
-                            console.log("slot__", slot);
+                        >
+                          <TableCell sx={{
+                            border: '1px solid darkgrey',
+                            borderCollapse: 'collapse',
+                            px: 1,
+                            py: 0.5
+                          }}>
+                            <Typography sx={{ fontSize: '11px' }} >
+                              {i?.day}
+                            </Typography>
+                          </TableCell>
 
-                            if (slot) {
-                              return <TableCell key={index} sx={{
-                                border: '1px solid darkgrey',
-                                borderCollapse: 'collapse',
-                                minHeight: '20px',
-                                minWidth: '20px',
-                                p: 0.5
-                              }}>
-                                <Typography noWrap variant="h5" sx={{ fontSize: '11px' }}>
-                                  <div className=' text-center'>
-                                    {slot.start_time}-
-                                    {slot.end_time}
+                          {
+                            slotHeader.map((e, index) => {
 
-                                    <br />
-                                    {slot?.subject} <br />
-                                    {slot?.room} <br />
-                                    
-                                    {selectedClass?.has_section ? slot?.section : '(no section)'}<br />
-                                    {slot?.class} <br />
-                                    {slot?.teacher} <br />
-                                  </div>
+                              const slot = i?.classSlot.find(element => element.start_time == e.actualStart_time && element.end_time == e.actualEnd_time)
+                              console.log("slot__", slot);
 
-                                </Typography>
-                              </TableCell>
-                            } else {
-                              return <TableCell key={index} sx={{
-                                border: '1px solid darkgrey',
-                                borderCollapse: 'collapse',
-                                minHeight: '20px',
-                                minWidth: '20px'
-                              }}>
-                                <Typography ></Typography></TableCell>
-                            }
+                              if (slot) {
+                                return <TableCell key={index} sx={{
+                                  border: '1px solid darkgrey',
+                                  borderCollapse: 'collapse',
+                                  minHeight: '20px',
+                                  minWidth: '20px',
+                                  p: 0.5
+                                }}>
+                                  <Typography noWrap variant="h5" sx={{ fontSize: '11px' }}>
+                                    <div className=' text-center'>
+                                      {slot.start_time}-
+                                      {slot.end_time}
 
-                          })
-                        }
+                                      <br />
+                                      {slot?.subject} <br />
+                                      {slot?.room} <br />
 
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                                      {selectedClass?.has_section ? slot?.section : '(no section)'}<br />
+                                     
+                                      {slot?.teacher} <br />
+                                    </div>
+
+                                  </Typography>
+                                </TableCell>
+                              } else {
+                                return <TableCell key={index} sx={{
+                                  border: '1px solid darkgrey',
+                                  borderCollapse: 'collapse',
+                                  minHeight: '20px',
+                                  minWidth: '20px'
+                                }}>
+                                  <Typography ></Typography></TableCell>
+                              }
+
+                            })
+                          }
+
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
               :
               <TableEmptyWrapper title="result" />
 
@@ -285,7 +316,7 @@ const Results = () => {
 
         </>
 
-      </Card>
+      </Card >
 
 
     </>

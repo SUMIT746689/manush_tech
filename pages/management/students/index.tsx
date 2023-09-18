@@ -257,7 +257,7 @@ function ManagementClasses() {
                   id: i.id,
                   has_section: i.has_section
                 };
-              })}
+              }) || []}
               filterSelectedOptions
               renderInput={(params) => (
                 <TextField

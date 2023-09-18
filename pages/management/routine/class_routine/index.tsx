@@ -89,6 +89,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function ClassRoutine({data}) {
+console.log({data});
 
   // const { user }:any = useAuth();
 

@@ -33,7 +33,7 @@ export const Authenticated: FC<AuthenticatedProps> = (props) => {
 
     if (!auth.isAuthenticated) {
       router.push({
-        pathname: '/auth/login/basic',
+        pathname: '/login',
         query: { backTo: router.asPath }
       });
     } else if (name && !permissionsArray.includes(name)) {

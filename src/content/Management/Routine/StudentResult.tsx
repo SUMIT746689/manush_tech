@@ -17,7 +17,6 @@ const StudentResults = ({data}) => {
   const [slotHeader, setSlotHeader] = useState([]);
   const [studentClass, setStudentClass] = useState('');
   const [section, setSection] = useState('');
-  const { user } = useAuth()
   const routineRef = useRef()
 
 
@@ -42,6 +41,8 @@ const StudentResults = ({data}) => {
 
     axios.get(`/api/routine/student`)
       .then(res => {
+        console.log("res___",res.data);
+        
         let routine = [];
         let index = 0;
         let uniqueDay = [];
@@ -61,8 +62,9 @@ const StudentResults = ({data}) => {
                 classSlot.push({
                   start_time: TimeConverter(j?.start_time),
                   end_time: TimeConverter(j?.end_time),
-                  room: j.room.name,
-                  teacher: j.teacher.user.username,
+                  room: j?.room?.name,
+                  teacher: j?.teacher?.user?.username,
+                  subject: j?.subject?.name,
                   section: j.section.name,
                   class: j.section.class.name
                 })
@@ -115,6 +117,7 @@ const StudentResults = ({data}) => {
       })
       .catch(err => console.log(err))
   }
+console.log("routine__",routine);
 
   return (
     <>
@@ -202,6 +205,7 @@ const StudentResults = ({data}) => {
                                     {slot.end_time}
 
                                     <br />
+                                    {slot?.subject} <br />
                                     {slot?.room} <br />
                                     {slot?.teacher} <br />
                                     {/* {section}<br /> */}

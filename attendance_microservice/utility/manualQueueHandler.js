@@ -19,6 +19,8 @@ export const studentManualQueueHanlde = async (student_attendace_queue) => {
         where: whereSection,
         select: {
           id: true,
+          std_entry_time: true,
+          std_exit_time: true,
           students: {
             where: {
               academic_year_id
@@ -42,10 +44,13 @@ export const studentManualQueueHanlde = async (student_attendace_queue) => {
   if (!responseStudentsViaClass?.sections || responseStudentsViaClass.sections.length === 0) throw new Error("No students founds");
 
   responseStudentsViaClass.sections.forEach((section, index) => {
+    // const getEntryTime = new Date(section.std_entry_time);
+    // const getEntryMinute = getEntryTime.getMinutes();
+    // const getEntryHours = getEntryTime.getHours();
+    // console.log({ getEntryTime, getEntryMinute, getEntryHours });
     section.students?.forEach(student => {
-
       //create table for student attendence
-      studentAttendence(class_id, student, created_at, school_id, section.id, index)
+      studentAttendence({ std_entry_time: section.std_entry_time, class_id, student, last_time: created_at, school_id, section_id: section.id, index })
     })
   })
 } 

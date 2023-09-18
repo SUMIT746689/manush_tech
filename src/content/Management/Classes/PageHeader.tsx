@@ -92,8 +92,6 @@ function PageHeader({ editClass, setEditClass, reFetchData }) {
       setSubmitting(false);
     }
   };
-  console.log({ editClass })
-
   return (
     <>
       <PageHeaderTitleWrapper

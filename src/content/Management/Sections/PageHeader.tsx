@@ -242,7 +242,6 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             values,
             setFieldValue
           }) => {
-            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

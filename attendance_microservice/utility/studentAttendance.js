@@ -3,24 +3,63 @@ import prisma from "./prisma_client.js";
 import { isUserAttend } from "./verifyUserAttend.js";
 
 
-export const studentAttendence = async (class_id, student, last_time, school_id, section_id, index) => {
+export const studentAttendence = async ({ std_entry_time, class_id, student, last_time, school_id, section_id, index }) => {
+
+  // console.log({ std_entry_time, last_time });
+  const std_attend_date_ = new Date(last_time);
+  const std_max_attend_date_ = new Date(last_time);
+  
+  std_max_attend_date_.setHours(23);
+  std_max_attend_date_.setMinutes(59);
+  std_max_attend_date_.setSeconds(59);
+  std_max_attend_date_.setMilliseconds(999);
+  
+  const entry_time = new Date(std_entry_time);
+  entry_time.setFullYear(std_attend_date_.getFullYear());
+  entry_time.setMonth(std_attend_date_.getMonth());
+  entry_time.setDate(std_attend_date_.getDate());
+  
   try {
     const { id, guardian_phone, class_roll_no } = student;
     const { student_info: { user_id } = {} } = student;
 
-    const isAttend = user_id ? await isUserAttend(user_id) : false;
-
-    // create attendance for student
-    prisma.attendance.create({
-      data: {
+    
+    // searching have any one attendance record selected date wise
+    const findAttendence_ = await prisma.attendance.findFirst({
+      where: {
         student_id: id,
-        date: new Date(last_time),
-        status: isAttend ? "present" : "late",
-        section_id,
-        school_id,
+        date: { gte: std_attend_date_, lte: std_max_attend_date_ }
+      },
+      select: {
+        id: true,
       }
-    }).catch((error) => { console.log("error create attendance", error) });
-
+    });
+    
+    // create/update attendance for student
+    if (findAttendence_) {
+      // search for atttence record
+      const isAttend = user_id ? await isUserAttend({ user_id, entry_time }) : false;
+      
+      prisma.attendance.update({
+        where: { id: findAttendence_.id },
+        data: { status: isAttend ? "present" : "late" }
+        // data: { status: isAttend ? "present" : "late" }
+      })
+        .catch((error) => { console.log("error update attendance", error.message) });
+    }
+    else {
+      prisma.attendance.create({
+        data: {
+          student_id: id,
+          date: new Date(last_time),
+          status: "late",
+          // status: "absent",
+          section_id,
+          school_id,
+        }
+      })
+        .catch((error) => { console.log("error create attendance", error) });
+    }
 
     // store user data to sent sms queue table 
     if (!guardian_phone) return;

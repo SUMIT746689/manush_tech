@@ -466,14 +466,21 @@ model ExamDetails {
 }
 
 model Attendance {
-  id         Int              @id @default(autoincrement())
-  student_id Int
-  date       DateTime
-  status     AttendenceStatus
-  remark     String?
-  section_id Int
-  school_id  Int
-  exam_id    Int?
+  id               Int              @id @default(autoincrement())
+  student_id       Int
+  first_name       String?
+  middle_name      String?
+  last_name        String?
+  class_name       String?
+  section_name     String?
+  class_roll_no    String?
+  date             DateTime
+  status           AttendenceStatus
+  remark           String?
+  section_id       Int
+  school_id        Int
+  exam_id          Int?
+  time_diff_in_min Int?
 
   student Student @relation(fields: [student_id], references: [id])
   section Section @relation(fields: [section_id], references: [id])
@@ -489,6 +496,7 @@ enum AttendenceStatus {
   late
   bunk
   holiday
+  row_status
 }
 
 model EmployeeAttendance {

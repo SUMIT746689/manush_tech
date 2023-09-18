@@ -8,22 +8,22 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
   // console.log({ std_entry_time, last_time });
   const std_attend_date_ = new Date(last_time);
   const std_max_attend_date_ = new Date(last_time);
-  
+
   std_max_attend_date_.setHours(23);
   std_max_attend_date_.setMinutes(59);
   std_max_attend_date_.setSeconds(59);
   std_max_attend_date_.setMilliseconds(999);
-  
+
   const entry_time = new Date(std_entry_time);
   entry_time.setFullYear(std_attend_date_.getFullYear());
   entry_time.setMonth(std_attend_date_.getMonth());
   entry_time.setDate(std_attend_date_.getDate());
-  
+
   try {
     const { id, guardian_phone, class_roll_no } = student;
     const { student_info: { user_id } = {} } = student;
 
-    
+
     // searching have any one attendance record selected date wise
     const findAttendence_ = await prisma.attendance.findFirst({
       where: {
@@ -34,16 +34,21 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
         id: true,
       }
     });
-    
+    console.log({ findAttendence_ });
+
     // create/update attendance for student
     if (findAttendence_) {
-      // search for atttence record
+    
+      //verify user has already attend
       const isAttend = user_id ? await isUserAttend({ user_id, entry_time }) : false;
+      console.log({isAttend})
       
-      prisma.attendance.update({
+
+      // search for atttence record
+      await prisma.attendance.update({
         where: { id: findAttendence_.id },
+        // data: { status: "present"}
         data: { status: isAttend ? "present" : "late" }
-        // data: { status: isAttend ? "present" : "late" }
       })
         .catch((error) => { console.log("error update attendance", error.message) });
     }

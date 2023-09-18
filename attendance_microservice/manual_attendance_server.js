@@ -14,7 +14,7 @@ const main = async () => {
   }
   catch (err) {
     prisma.$disconnect();
-    console.log({ err: err.message })
+    console.log({ "server": err.message })
   }
 }
 

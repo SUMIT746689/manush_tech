@@ -6,14 +6,19 @@ import { isUserAttend } from "./verifyUserAttend.js";
 export const studentAttendence = async ({ std_entry_time, class_id, student, last_time, school_id, section_id, index }) => {
 
   // console.log({ std_entry_time, last_time });
+  const std_min_attend_date_wise = new Date(last_time);
+  std_min_attend_date_wise.setHours(0);
+  std_min_attend_date_wise.setMinutes(0);
+  std_min_attend_date_wise.setSeconds(0);
+  std_min_attend_date_wise.setMilliseconds(0);
+
+  const std_max_attend_date_wise = new Date(last_time);
+  std_max_attend_date_wise.setHours(23);
+  std_max_attend_date_wise.setMinutes(59);
+  std_max_attend_date_wise.setSeconds(59);
+  std_max_attend_date_wise.setMilliseconds(999);
+
   const std_attend_date_ = new Date(last_time);
-  const std_max_attend_date_ = new Date(last_time);
-
-  std_max_attend_date_.setHours(23);
-  std_max_attend_date_.setMinutes(59);
-  std_max_attend_date_.setSeconds(59);
-  std_max_attend_date_.setMilliseconds(999);
-
   const entry_time = new Date(std_entry_time);
   entry_time.setFullYear(std_attend_date_.getFullYear());
   entry_time.setMonth(std_attend_date_.getMonth());
@@ -28,7 +33,7 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
     const findAttendence_ = await prisma.attendance.findFirst({
       where: {
         student_id: id,
-        date: { gte: std_attend_date_, lte: std_max_attend_date_ }
+        date: { gte: std_min_attend_date_wise, lte: std_max_attend_date_wise }
       },
       select: {
         id: true,
@@ -38,11 +43,9 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
 
     // create/update attendance for student
     if (findAttendence_) {
-    
-      //verify user has already attend
-      const isAttend = user_id ? await isUserAttend({ user_id, entry_time }) : false;
-      console.log({isAttend})
-      
+
+      //verify user had attended before
+      const isAttend = user_id ? await isUserAttend({ user_id, std_min_attend_date_wise, entry_time }) : false;
 
       // search for atttence record
       await prisma.attendance.update({

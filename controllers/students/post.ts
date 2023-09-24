@@ -104,7 +104,6 @@ const postHandle = async (req, res, refresh_token) => {
       Number(process.env.SALTROUNDS)
     );
 
-
     await prisma.$transaction(async (transaction) => {
 
       const student_role = await transaction.role.findFirst({
@@ -160,7 +159,6 @@ const postHandle = async (req, res, refresh_token) => {
         }
       });
 
-
       const student = await transaction.student.create({
         data: {
           class_roll_no: fields?.roll_no,
@@ -205,13 +203,14 @@ const postHandle = async (req, res, refresh_token) => {
           payment_method: 'pending',
         });
       }
+
       console.log("StudentFeeContainer__", StudentFeeContainer);
 
       await transaction.studentFee.createMany({
         data: StudentFeeContainer
       });
 
-    })
+    });
 
     const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
       where: {
@@ -240,7 +239,7 @@ const postHandle = async (req, res, refresh_token) => {
     // res.status(200).json({ success: 'student created successfully but sms sending failed' });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ error: error.message });
+    res.status(404).json({ message: error.message });
   }
 };
 

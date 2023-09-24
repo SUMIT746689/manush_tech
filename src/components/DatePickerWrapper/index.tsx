@@ -4,8 +4,16 @@ import { DatePicker, MobileDatePicker, TimePicker } from '@mui/lab';
 import dayjs from 'dayjs';
 
 export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEndDate }) {
-  const handleStartDate = (e) => setStartDate(dayjs(e));
-  const handleEndDate = (e) => setEndDate(dayjs(e));
+  const handleStartDate = (e) => {
+    setStartDate(dayjs(e));
+    setEndDate(null)
+  }
+  const handleEndDate = (e) => {
+    const temp = dayjs(e)
+    if (startDate && temp >= startDate) {
+      setEndDate(temp);
+    }
+  }
   return (
     <Grid display={"grid"} gridTemplateColumns='1fr 1fr' pb={1} item gap={0.5}>
       <Grid >
@@ -77,7 +85,7 @@ export const DatePickerWrapper = ({ label, date, handleChange }) => {
   )
 }
 
-export const TimePickerWrapper = ({ label, value, handleChange, minWidth="100%" }) => {
+export const TimePickerWrapper = ({ label, value, handleChange, minWidth = "100%" }) => {
   return (
     <Grid minWidth={minWidth} item pb={1}>
       <TimePicker

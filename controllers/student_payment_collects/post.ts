@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import dayjs from 'dayjs';
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma_client";
 
 export const post = async (req, res, refresh_token) => {
   try {
@@ -24,8 +21,8 @@ export const post = async (req, res, refresh_token) => {
         discount: true
       }
     })
-    console.log("AllDiscount__",AllDiscount);
-    
+    console.log("AllDiscount__", AllDiscount);
+
     const discount = AllDiscount?.discount?.filter(i => i.fee_id == fee_id);
     console.log("discount1__", discount);
 
@@ -90,7 +87,14 @@ export const post = async (req, res, refresh_token) => {
               voucher_id: voucher.id,
               transID,
               school_id: refresh_token.school_id,
-              created_at: temp.created_at
+              created_at: temp.created_at,
+
+              account_id: 1,
+              account_name:'effr',
+              acccount_number:'rgferg',
+              voucher_name:'fger',
+              voucher_type:'credit',
+              voucher_amount: 30
             }
           })
           res.status(200).json({

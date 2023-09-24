@@ -50,8 +50,8 @@ export default async function post(req, res, refresh_token) {
         reference: `${refresh_token.name}, ${refresh_token.role.title.toUpperCase()}`,
         type: 'credit',
         resource_type: 'fee',
-        resource_id: fee.id
-
+        resource_id: fee.id,
+        school_id: refresh_token.school_id
       }
     })
 

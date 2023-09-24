@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import useNotistick from '@/hooks/useNotistick';
 
 // wrap your app
 interface AuthState {
@@ -198,7 +199,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
         router.push("/dashboards")
         // router.prefetch('/dashboards')
         // .then(() => location.reload() );
-        
+
         dispatch({
           type: 'LOGIN',
           payload: {
@@ -212,14 +213,14 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
       })
       .catch((err) => {
         console.log({ err });
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            error: err.message,
-            isAuthenticated: false,
-            user: null
-          }
+
+        setNotification({
+          open: true,
+          vertical: 'top',
+          horizontal: 'right',
+          message: err.message
         });
+       
       });
     // const accessToken = await authApi.login({ username, password });
     // const user = await authApi.me(accessToken);
@@ -241,7 +242,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
             user: response?.user || null
           }
         });
-        
+
 
       })
       .catch((err) => {

@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma_client';
+import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 const index = async (req, res) => {
   try {

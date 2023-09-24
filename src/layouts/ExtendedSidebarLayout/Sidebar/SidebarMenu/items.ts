@@ -385,7 +385,43 @@ const menuItems: MenuItems[] = [
           },
         ]
       },
-
+      {
+        name:'Office Accounting',
+        icon: AccountBalanceIcon,
+        items: [
+          {
+            name: 'Account',
+            link: '/management/accounting/account',
+            icon: PaidIcon
+          },
+          {
+            name: 'Voucher Head',
+            link: '/management/accounting/voucher_head',
+            icon: PaidIcon
+          },
+          
+          {
+            name: 'New Deposit',
+            link: '/management/accounting/voucher_deposit',
+            icon: PaidIcon
+          },
+          {
+            name: 'New Expense',
+            link: '/management/accounting/voucher_expense',
+            icon: PaidIcon
+          },
+          {
+            name: 'All transactions',
+            link: '/management/accounting/all_transactions',
+            icon: PaidIcon
+          },
+          {
+            name: 'Profit and loss',
+            link: '/management/accounting/profit_and_loss',
+            icon: PaidIcon
+          },
+        ]
+      },
       {
         name: 'Holidays',
         link: '/management/holidays',

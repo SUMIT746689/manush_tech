@@ -5,7 +5,9 @@ import {
     Grid,
     Divider,
     TextField,
-    Button
+    Button,
+    Avatar,
+    Typography
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -245,9 +247,42 @@ function Attendence() {
                         }}
                         justifyContent={'flex-end'}
                     >
-                        {
-                            targetsectionStudents && <div ref={attendenceRef}>
 
+
+                        {
+                            targetsectionStudents && <div ref={attendenceRef} style={{
+                                paddingLeft: '25px',
+                                paddingRight: '25px'
+                            }}>
+                                <Grid container py={2} spacing={2} justifyContent={"space-between"} px={7}>
+
+                                    <Grid item>
+                                        <Avatar variant="rounded"  >
+                                            {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                                        </Avatar>
+                                    </Grid>
+
+                                    <Grid width={'60%'} item>
+                                        <Typography
+                                            variant="h3"
+                                            align="center"
+                                        >
+                                            {user?.school?.name}
+                                        </Typography>
+                                        <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                                            {user?.school?.address}, {user?.school?.phone}
+                                        </Typography>
+                                        <Typography variant="h6" align="center" >
+                                            Class : {selectedClass?.label}, Section : {selectedSection?.label}, Exam Title : {selectedExam?.label}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="h4" >
+                                            Exam Attendence Report
+                                        </Typography>
+
+                                    </Grid>
+                                </Grid>
                                 <table style={tableStyle}>
                                     <thead>
                                         <tr>

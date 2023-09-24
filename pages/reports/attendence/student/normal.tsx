@@ -1,4 +1,4 @@
-import { Card, Grid, Divider, TextField, Button, Typography } from '@mui/material';
+import { Card, Grid, Divider, TextField, Button, Typography, Avatar } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -256,14 +256,7 @@ function Attendence() {
             }
 
           </Card>
-          {/* attendance type */}
-          <Card sx={{ display: "flex", flexWrap: 'wrap', justifyContent: 'space-between', fontWeight: 600, color: '#4454cc', ml: "auto", columnGap: { xs: 3 },rowGap:1, p: 1, width: { xs: 1, md: 1 / 2 }, borderRadius: 0.5 }} >
-            <Grid>Present = P</Grid>
-            <Grid>Holiday = H</Grid>
-            <Grid>Absent = A</Grid>
-            <Grid>Bunk = B</Grid>
-            <Grid>Late = L</Grid>
-          </Card>
+
           <br />
 
           {/* present table */}
@@ -281,13 +274,43 @@ function Attendence() {
               (targetsectionStudents && students)
                 ?
                 <div ref={attendenceRef}>
-                  <Grid>
-                    <Typography variant='h3'>School: {user?.school?.name || ''}</Typography>
+                  <Grid container py={2} spacing={2} justifyContent={"space-between"} px={7}>
 
-                    <Typography variant='h5'>Class: {selectedClass?.label || ''}</Typography>
-                    <Typography variant='h5'>Section: {selectedSection?.label || ''}</Typography>
+                    <Grid item>
+                      <Avatar variant="rounded"  >
+                        {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                      </Avatar>
+                    </Grid>
+
+                    <Grid width={'60%'} item>
+                      <Typography
+                        variant="h3"
+                        align="center"
+                      >
+                        {user?.school?.name}
+                      </Typography>
+                      <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                        {user?.school?.address}, {user?.school?.phone}
+                      </Typography>
+                      <Typography variant="h6" align="center" >
+                        Class : {selectedClass?.label}, Section : {selectedSection?.label}, Month : {dayjs(selectedDate).format('MMMM, YYYY')}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h4" >
+                        Class Attendence Report
+                      </Typography>
+
+                    </Grid>
                   </Grid>
-
+                  {/* attendance type */}
+                  <Card sx={{ display: "flex", flexWrap: 'wrap', justifyContent: 'space-between', fontWeight: 600, color: '#4454cc', ml: "auto", columnGap: { xs: 3 }, rowGap: 1, p: 1,my:1, width: { xs: 1, md: 1 / 2 }, borderRadius: 0.5 }} >
+                    <Grid>Present = P</Grid>
+                    <Grid>Holiday = H</Grid>
+                    <Grid>Absent = A</Grid>
+                    <Grid>Bunk = B</Grid>
+                    <Grid>Late = L</Grid>
+                  </Card>
                   <table style={{ ...tableStyle, width: '100%' }}>
                     <thead>
                       <tr>

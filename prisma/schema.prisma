@@ -78,6 +78,8 @@ model School {
   OnlineAdmission                    OnlineAdmission[]
   tbl_attendence_queue               tbl_attendance_queue[]
   tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
+  Accounts                           Accounts[]
+  Voucher                            Voucher[]
 
   // routines Routine[]
   @@map("schools")
@@ -800,13 +802,15 @@ model Voucher {
   id            Int             @id @default(autoincrement())
   title         String
   description   String
-  amount        Float
+  amount        Float?
   reference     String
   type          TransactionType
-  resource_id   Int
-  resource_type String
+  resource_id   Int?
+  resource_type String?
+  school_id     Int?
   created_at    DateTime        @default(now())
 
+  school      School?       @relation(fields: [school_id], references: [id])
   Transaction Transaction[]
 
   @@map("vouchers")
@@ -817,17 +821,56 @@ enum TransactionType {
   credit
 }
 
-model Transaction {
-  id             Int      @id @default(autoincrement())
-  amount         Float
-  payment_method String
-  transID        String?
-  voucher_id     Int
-  school_id      Int
-  created_at     DateTime @default(now())
+model payment_method {
+  id         Int    @id @default(autoincrement())
+  title      String
+  account_id Int
 
-  voucher Voucher @relation(fields: [voucher_id], references: [id])
-  school  School  @relation(fields: [school_id], references: [id])
+  account     Accounts      @relation(fields: [account_id], references: [id])
+  Transaction Transaction[]
+}
+
+model Accounts {
+  id             Int              @id @default(autoincrement())
+  title          String
+  created_at     DateTime         @default(now())
+  account_number String
+  description    String           @db.Text
+  balance        Float
+  school_id      Int
+  school         School           @relation(fields: [school_id], references: [id])
+  Transaction    Transaction[]
+  payment_method payment_method[]
+
+  @@unique([school_id, title])
+  @@map("accounts")
+}
+
+model Transaction {
+  id                Int     @id @default(autoincrement())
+  amount            Float
+  transID           String?
+  voucher_id        Int
+  account_id        Int?
+  payment_method_id Int?
+  school_id         Int
+
+  account_name    String?
+  acccount_number String?
+  payment_method  String?
+  voucher_name    String?
+  voucher_type    String?
+  voucher_amount  Float?
+
+  Ref         String?
+  attachment  String?
+  description String?
+  created_at  DateTime @default(now())
+
+  voucher             Voucher         @relation(fields: [voucher_id], references: [id])
+  account             Accounts?       @relation(fields: [account_id], references: [id])
+  payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
+  school              School          @relation(fields: [school_id], references: [id])
 
   @@map("transactions")
 }

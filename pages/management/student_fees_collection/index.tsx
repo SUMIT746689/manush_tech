@@ -20,6 +20,8 @@ function Managementschools() {
   const [selectedFees, setSelectedFees] = useState<any[]>([]);
 
   const { data, error } = useClientFetch('/api/student_payment_collect');
+  const { data: accounts } = useClientFetch(`/api/account`);
+
   const { data: classData, error: classError } = useClientFetch('/api/class');
   useEffect(() => {
     if (data?.success) setDatas(data.data);
@@ -58,6 +60,12 @@ function Managementschools() {
       >
         <Grid item xs={12}>
           <Results
+            accounts={accounts}
+            accountsOption={accounts?.map(i => ({
+              label: i.title,
+              id: i.id
+            })) || []}
+
             classes={classData}
             sessions={datas}
             setSessions={setDatas}

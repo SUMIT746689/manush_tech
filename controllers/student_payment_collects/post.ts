@@ -1,13 +1,76 @@
 import prisma from "@/lib/prisma_client";
 
+
+const handleTransaction = ({ data, account, voucher, refresh_token }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await prisma.$transaction(async (trans) => {
+        const temp = await trans.studentFee.create({
+          data
+        });
+        await trans.transaction.create({
+          data: {
+            amount: data.collected_amount,
+            account_id: account.id,
+            payment_method_id: account?.payment_method[0]?.id,
+            voucher_id: voucher.id,
+            transID: data.transID,
+            school_id: refresh_token.school_id,
+            created_at: temp.created_at,
+
+            payment_method: account?.payment_method[0]?.title,
+            account_name: account.title,
+            acccount_number: account.account_number,
+            voucher_type: voucher.type,
+            voucher_name: voucher.title,
+            voucher_amount: voucher.amount,
+          }
+        })
+        const transaction_amount = data.collected_amount
+
+        await trans.accounts.update({
+          where: {
+            id: account.id
+          },
+          data: {
+            balance: account.balance + transaction_amount
+          }
+        })
+      })
+      resolve("done")
+    } catch (err) {
+      reject(new Error(`${err.message}`))
+    }
+  })
+}
 export const post = async (req, res, refresh_token) => {
   try {
-    const { student_id, fee_id, payment_method, collected_by_user, transID }: any = req.body;
+    const { student_id, fee_id,
+      account_id,
+      payment_method_id,
+      collected_by_user,
+      transID }: any = req.body;
     const collected_amount = parseFloat(req.body.collected_amount);
 
-    if (!student_id || !fee_id || !collected_amount)
-      throw new Error('provide valid informations');
-
+    if (!student_id || !fee_id || !collected_amount) throw new Error('provide valid informations');
+    const voucher = await prisma.voucher.findFirstOrThrow({
+      where: {
+        resource_type: 'fee',
+        resource_id: fee_id
+      }
+    })
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        id: Number(account_id)
+      },
+      include: {
+        payment_method: {
+          where: {
+            id: Number(payment_method_id)
+          }
+        }
+      }
+    })
     const fee = await prisma.fee.findFirst({
       where: { id: fee_id }
     });
@@ -47,19 +110,16 @@ export const post = async (req, res, refresh_token) => {
       }
     })
     //  return res.send(isAlreadyAvaliable)
-    const voucher = await prisma.voucher.findFirst({
-      where: {
-        resource_type: 'fee',
-        resource_id: fee_id
-      }
-    })
+
     const data = {
       student_id,
       fee_id,
       collected_amount,
-      payment_method,
+      account_id,
+      payment_method_id,
+      payment_method: account?.payment_method[0]?.title,
       transID,
-      collected_by: parseInt(collected_by_user)
+      collected_by: Number(collected_by_user)
     }
 
     const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
@@ -70,6 +130,7 @@ export const post = async (req, res, refresh_token) => {
 
     const late_fee = fee.late_fee ? fee.late_fee : 0;
 
+
     if (last_trnsation_date > last_date) {
 
       if (totalPaidAmount === feeAmount + late_fee) throw new Error('Already Paid in Late');
@@ -77,26 +138,7 @@ export const post = async (req, res, refresh_token) => {
       else if (totalPaidAmount < feeAmount + late_fee) {
         if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)
         else {
-          const temp = await prisma.studentFee.create({
-            data
-          });
-          await prisma.transaction.create({
-            data: {
-              amount: data.collected_amount,
-              payment_method: data.payment_method,
-              voucher_id: voucher.id,
-              transID,
-              school_id: refresh_token.school_id,
-              created_at: temp.created_at,
-
-              account_id: 1,
-              account_name:'effr',
-              acccount_number:'rgferg',
-              voucher_name:'fger',
-              voucher_type:'credit',
-              voucher_amount: 30
-            }
-          })
+          await handleTransaction({ data, account, voucher, refresh_token })
           res.status(200).json({
             success: true
           })
@@ -108,19 +150,7 @@ export const post = async (req, res, refresh_token) => {
       if (totalPaidAmount === feeAmount) throw new Error('Already Paid !')
       else if (totalPaidAmount + collected_amount > feeAmount) throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`)
       else {
-        const temp = await prisma.studentFee.create({
-          data
-        });
-        await prisma.transaction.create({
-          data: {
-            amount: data.collected_amount,
-            payment_method: data.payment_method,
-            voucher_id: voucher.id,
-            school_id: refresh_token.school_id,
-            transID,
-            created_at: temp.created_at
-          }
-        })
+        await handleTransaction({ data, account, voucher, refresh_token })
         res.status(200).json({
           success: true
         });

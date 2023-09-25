@@ -216,7 +216,7 @@ function FeesPaymentReport() {
                             isOptionEqualToValue={(option: any, value: any) =>
                                 option.id === value.id
                             }
-                             getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
+                            getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
                             renderInput={(params) => (
                                 <TextField
                                     fullWidth
@@ -373,7 +373,16 @@ function FeesPaymentReport() {
                                                 if (project?.status == 'paid' || project?.status === 'paid late') {
                                                     due = 0;
                                                 }
-
+                                                const status_color = { p: 0.5 };
+                                                if (project?.status === 'paid' || project?.status === 'paid late') {
+                                                    status_color['color'] = 'green'
+                                                }
+                                                else if (project?.status === 'partial paid') {
+                                                    status_color['color'] = 'blue'
+                                                }
+                                                else {
+                                                    status_color['color'] = 'red'
+                                                }
                                                 return (
                                                     <TableRow
                                                         hover
@@ -404,15 +413,7 @@ function FeesPaymentReport() {
                                                         </TableCell>
 
                                                         <TableCell
-                                                            sx={
-                                                                // @ts-ignore
-                                                                (project?.status === 'paid' || project?.status === 'paid late')
-                                                                    ? { color: 'green' }
-                                                                    : // @ts-ignore
-                                                                    project?.status === 'partial paid'
-                                                                        ? { color: 'blue' }
-                                                                        : { color: 'red' }
-                                                            }
+                                                            sx={status_color}
                                                         >
                                                             <Typography noWrap variant="h5">
                                                                 {/* @ts-ignore */}
@@ -476,7 +477,7 @@ function FeesPaymentReport() {
                         textAlign: 'center',
                         paddingBottom: 1
                     }}>
-                        <h1>Name : {[datas?.first_name,datas?.middle_name,datas?.last_name].join(' ')}</h1>
+                        <h1>Name : {[datas?.first_name, datas?.middle_name, datas?.last_name].join(' ')}</h1>
                         <h2>Class roll : {datas?.class_roll_no}</h2>
                         <h2>Class registration no : {datas?.class_registration_no}</h2>
                         <h2>Discount : {datas?.discount}</h2>

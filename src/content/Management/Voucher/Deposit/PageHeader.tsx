@@ -140,7 +140,6 @@ function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher
             values,
             setFieldValue
           }) => {
-            console.log("values__", values);
 
             return (
               <form onSubmit={handleSubmit}>

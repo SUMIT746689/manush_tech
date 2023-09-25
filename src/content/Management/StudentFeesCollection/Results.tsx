@@ -112,8 +112,9 @@ const Results = ({
   setPrintFees,
   filteredFees,
   setFilteredFees,
-  setSelectedFees
-
+  setSelectedFees,
+  accounts,
+  accountsOption
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
 
@@ -179,11 +180,11 @@ const Results = ({
   // @ts-ignore
   useEffect(() => {
     const filterFees_ = filterFees(sessions?.fees || [], filter)
-    setFilteredFees(()=>filterFees_ || [])
-    
+    setFilteredFees(() => filterFees_ || [])
+
     const paginatedschools = applyPagination(filterFees_ || [], page, limit);
     setPaginatedSchool(paginatedschools);
-  
+
   }, [sessions, filter, page])
 
   const selectedBulkActions = selectedItems.length > 0;
@@ -236,12 +237,13 @@ const Results = ({
     }
   };
 
-  const handleCollection = (student_id, fee_id, fee, amount, payment_method, transID) => {
+  const handleCollection = (student_id, fee_id, fee, amount, selectedAccount, selectedGateway, transID) => {
     axios.post('/api/student_payment_collect', {
       student_id: student_id,
       collected_by_user: user?.id,
       fee_id: fee_id,
-      payment_method: payment_method,
+      account_id: selectedAccount?.id,
+      payment_method_id: selectedGateway?.id,
       collected_amount: amount,
       transID: transID
     })
@@ -500,123 +502,129 @@ const Results = ({
           </>
         ) : (
           <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllschools}
-                        indeterminate={selectedSomeschools}
-                        onChange={handleSelectAllschools}
-                      />
-                    </TableCell>
-                    <TableCell>{t('Fee Title')}</TableCell>
-                    <TableCell>{t('Pay Amount')}</TableCell>
-                    <TableCell>{t('Status')}</TableCell>
-                    <TableCell>{t('Due')}</TableCell>
-                    <TableCell>{t('Last payment date')}</TableCell>
-                    <TableCell>{t('Total payable amount')}</TableCell>
 
-                    <TableCell align="center">{t('Actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedschools.map((project) => {
+            <table>
+              <thead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedAllschools}
+                      indeterminate={selectedSomeschools}
+                      onChange={handleSelectAllschools}
+                    />
+                  </TableCell>
+                  <TableCell>{t('Fee Title')}</TableCell>
+                  <TableCell>{t('Pay Amount')}</TableCell>
+                  <TableCell>{t('Status')}</TableCell>
+                  <TableCell>{t('Due')}</TableCell>
+                  <TableCell>{t('Last payment date')}</TableCell>
+                  <TableCell>{t('Total payable amount')}</TableCell>
 
-                    const last_date = dayjs(project.last_date).valueOf()
-                    const today = project.last_payment_date ? dayjs(project.last_payment_date).valueOf() : 0;
-                    const changeColor = today > last_date ? {
-                      color: 'red'
-                    } : {}
-                    const isschoolselected = selectedItems.includes(project.id);
+                  <TableCell align="center">{t('Actions')}</TableCell>
+                </TableRow>
+              </thead>
+              <TableBody>
+                {paginatedschools.map((project) => {
 
-                    let due;
-                    if (project?.status == 'paid' || project?.status === 'paid late') {
-                      due = 0
-                    } else {
-                      due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
-                        (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
+                  const last_date = dayjs(project.last_date).valueOf()
+                  const today = project.last_payment_date ? dayjs(project.last_payment_date).valueOf() : 0;
+                  const changeColor = today > last_date ? {
+                    color: 'red'
+                  } : {}
+                  const isschoolselected = selectedItems.includes(project.id);
 
-                      if (today < last_date) {
-                        due -= (project.late_fee ? project.late_fee : 0)
-                      }
+                  let due;
+                  if (project?.status == 'paid' || project?.status === 'paid late') {
+                    due = 0
+                  }
+                  else {
+                    due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
+                      (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
+
+                    if (today < last_date) {
+                      due -= (project.late_fee ? project.late_fee : 0)
                     }
+                  }
+                  const status_color = { p: 0.5 };
+                  if (project?.status === 'paid' || project?.status === 'paid late') {
+                    status_color['color'] = 'green'
+                  }
+                  else if (project?.status === 'partial paid') {
+                    status_color['color'] = 'blue'
+                  }
+                  else {
+                    status_color['color'] = 'red'
+                  }
 
 
-                    return (
-                      <TableRow
-                        hover
-                        key={project.id}
-                        selected={isschoolselected}
-                      >
-                        <TableCell padding="checkbox" sx={{ p: 0.5 }}>
-                          <Checkbox
-                            checked={isschoolselected}
-                            onChange={(event) =>
-                              handleSelectOneProject(event, project.id, project)
-                            }
-                            value={isschoolselected}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ p: 0.5 }}>
-                          <Typography noWrap variant="h5">
-                            {project?.title}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ p: 0.5 }}>
-                          <Typography noWrap variant="h5">
-                            {formatNumber(project?.amount.toFixed(1))}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell
-                          sx={
-                            // @ts-ignore
-                            (project?.status === 'paid' || project?.status === 'paid late')
-                              ? { color: 'green' }
-                              : // @ts-ignore
-                              project?.status === 'partial paid'
-                                ? { color: 'blue' }
-                                : { color: 'red' }, { p: 0.5 }
+                  return (
+                    <TableRow
+                      hover
+                      key={project.id}
+                      selected={isschoolselected}
+                    >
+                      <TableCell padding="checkbox" sx={{ p: 0.5 }}>
+                        <Checkbox
+                          checked={isschoolselected}
+                          onChange={(event) =>
+                            handleSelectOneProject(event, project.id, project)
                           }
-                        >
-                          <Typography noWrap variant="h5">
-                            {/* @ts-ignore */}
-                            {project?.status.toUpperCase()}
-                          </Typography>
-                        </TableCell>
+                          value={isschoolselected}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ p: 0.5 }}>
+                        <Typography noWrap variant="h5">
+                          {project?.title}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ p: 0.5 }}>
+                        <Typography noWrap variant="h5">
+                          {formatNumber(project?.amount.toFixed(1))}
+                        </Typography>
+                      </TableCell>
 
-                        <TableCell sx={{ p: 0.5 }}>
-                          <Typography noWrap variant="h5">
-                            {formatNumber(due)}
-                          </Typography>
-                        </TableCell>
+                      <TableCell
+                        sx={status_color}
+                      >
+                        <Typography noWrap variant="h5">
+                          {/* @ts-ignore */}
 
-                        <TableCell sx={{ p: 0.5 }}>
-                          <Typography noWrap variant="h5">
-                            {
-                              project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
-                                'MMMM D, YYYY h:mm A'
-                              ) : ''}
-                          </Typography>
-                        </TableCell>
+                          {project?.status.toUpperCase()}
+                        </Typography>
+                      </TableCell>
 
-                        <TableCell sx={{ p: 0.5 }}>
-                          <Typography noWrap variant="h5" sx={changeColor}>
-                            {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(Number(project?.amount) + Number(project?.late_fee)).toFixed(2)}`}
-                          </Typography>
-                        </TableCell>
+                      <TableCell sx={{ p: 0.5 }}>
+                        <Typography noWrap variant="h5">
+                          {formatNumber(due)}
+                        </Typography>
+                      </TableCell>
 
-                        <TableCell align="center" sx={{ p: 0.5 }}>
-                          <Typography noWrap>
-                            <AmountCollection
-                              due={due}
-                              project={project}
-                              handleCollection={handleCollection}
-                              student_id={selectedStudent?.id}
-                            />
-                            {/* <Tooltip title={t('Edit')} arrow>
+                      <TableCell sx={{ p: 0.5 }}>
+                        <Typography noWrap variant="h5">
+                          {
+                            project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
+                              'MMMM D, YYYY h:mm A'
+                            ) : ''}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell sx={{ p: 0.5 }}>
+                        <Typography noWrap variant="h5" sx={changeColor}>
+                          {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(Number(project?.amount) + Number(project?.late_fee)).toFixed(2)}`}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell align="center" sx={{ p: 0.5 }}>
+                        <Typography noWrap>
+                          <AmountCollection
+                            accounts={accounts}
+                            accountsOption={accountsOption}
+                            due={due}
+                            project={project}
+                            handleCollection={handleCollection}
+                            student_id={selectedStudent?.id}
+                          />
+                          {/* <Tooltip title={t('Edit')} arrow>
                                 <IconButton
                                   onClick={() =>
                                     setEditData({
@@ -630,7 +638,7 @@ const Results = ({
                                 </IconButton>
                               </Tooltip> */}
 
-                            {/* <Tooltip title={t('Delete')} arrow>
+                          {/* <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() => handleConfirmDelete(project.id)}
                                 color="primary"
@@ -638,14 +646,14 @@ const Results = ({
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>
                             </Tooltip> */}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </table>
+
           </>
         )}
       </Card>
@@ -723,11 +731,13 @@ const Results = ({
   );
 };
 
-const AmountCollection = ({ due, project, student_id, handleCollection }) => {
+const AmountCollection = ({ due, project, student_id, handleCollection, accounts, accountsOption }) => {
   const { t }: { t: any } = useTranslation();
   const [amount, setAmount] = useState(due);
-  const [payment_method, setPayment_method] = useState('Cash');
+  const [selectedGateway, setSelectedGateway] = useState(null);
   const [transID, setTransID] = useState(null)
+  const [selectedAccount, setSelectedAccount] = useState(null)
+  const [gatewayOption, setGatewayOption] = useState([])
   return (
     <Grid container
       sx={{
@@ -738,36 +748,50 @@ const AmountCollection = ({ due, project, student_id, handleCollection }) => {
       }}
     >
       <Grid item sx={{
-        minWidth: '130px',
-        p: 1
+        display: 'grid',
+        gridTemplateColumns: "130px 130px",
+        gap: 1,
+        p: 1,
       }}>
         <AutoCompleteWrapper
-          label={t('pay via')}
-          placeholder={t('Select payment_method...')}
+          label={t('Account')}
+          placeholder={t('Select account...')}
           // getOptionLabel={(option) => option.name}
-          options={['Cash', 'Bkash', 'Nagad', 'Rocket', 'Upay', 'Trustpay', 'UCash', 'Card']}
-          value={payment_method}
-          // renderInput={(params) => (
-          //   <TextField
-          //     {...params}
-          //     fullWidth
-          //     variant="outlined"
-          //     label={t('pay via')}
-          //     placeholder={t('Select payment_method...')}
-          //   />
-          // )}
+          options={accountsOption}
+          value={selectedAccount}
+          handleChange={(e, v) => {
+            if (v) {
+              const temp = accounts?.find((i) => i.id === v?.id)?.payment_method?.map(j => ({
+                label: j.title,
+                id: j.id
+              }))
+              console.log(temp);
+              setGatewayOption(temp)
+            }
+            else {
+              setGatewayOption([])
+            }
+            setSelectedAccount(v)
+            setSelectedGateway(null)
+          }}
+        />
+        <AutoCompleteWrapper
+          label={t('Pay via')}
+          placeholder={t('Select Pay via...')}
+          options={gatewayOption}
+          value={selectedGateway}
           handleChange={(e, value) => {
             console.log(value);
             if (value == 'Cash') {
               setTransID(null)
             }
-            setPayment_method(value)
+            setSelectedGateway(value)
           }}
         />
 
       </Grid>
       {
-        payment_method && payment_method !== 'Cash' && <Grid item sx={{
+        selectedGateway && selectedAccount?.label?.toLowerCase() !== 'cash' && <Grid item sx={{
           minWidth: '130px',
           p: 1
         }}>
@@ -779,7 +803,7 @@ const AmountCollection = ({ due, project, student_id, handleCollection }) => {
             errors={undefined}
             handleChange={(e) => setTransID(e.target.value)}
             handleBlur={undefined}
-            required={payment_method !== 'Cash' ? true : false}
+            required={selectedGateway !== 'Cash' ? true : false}
           // type
           />
 
@@ -801,10 +825,12 @@ const AmountCollection = ({ due, project, student_id, handleCollection }) => {
       <Grid item pt={0.8}>
         <Button
           variant="contained"
-          disabled={amount && payment_method && Number(amount) > 0 && (payment_method !== 'Cash' && transID || payment_method == 'Cash' && !transID) ? false : true}
+          disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label !== 'Cash' && transID || selectedAccount?.label == 'Cash' && !transID) ? false : true}
           onClick={() => {
-            handleCollection(student_id, project.id, project, amount, payment_method, transID);
-            setPayment_method(null);
+            handleCollection(student_id, project.id, project, amount, selectedAccount, selectedGateway, transID);
+            setSelectedAccount(null)
+            setSelectedGateway(null);
+            setTransID(null)
             setAmount(() => null);
           }}
           sx={{ borderRadius: 0.5 }}

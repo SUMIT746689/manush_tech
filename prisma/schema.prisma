@@ -387,19 +387,23 @@ model Fee {
 }
 
 model StudentFee {
-  id               Int     @id @default(autoincrement())
-  student_id       Int
-  fee_id           Int
-  collected_amount Float
-  payment_method   String
-  transID          String?
+  id                Int     @id @default(autoincrement())
+  student_id        Int
+  fee_id            Int
+  collected_amount  Float
+  payment_method    String
+  transID           String?
+  account_id        Int?
+  payment_method_id Int?
 
   collected_by Int?
   created_at   DateTime @default(now())
 
-  student           Student @relation(fields: [student_id], references: [id])
-  fee               Fee     @relation(fields: [fee_id], references: [id])
-  collected_by_user User?   @relation(fields: [collected_by], references: [id])
+  account             Accounts?       @relation(fields: [account_id], references: [id])
+  payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
+  student             Student         @relation(fields: [student_id], references: [id])
+  fee                 Fee             @relation(fields: [fee_id], references: [id])
+  collected_by_user   User?           @relation(fields: [collected_by], references: [id])
 
   @@map("student_fees")
 }
@@ -828,6 +832,7 @@ model payment_method {
 
   account     Accounts      @relation(fields: [account_id], references: [id])
   Transaction Transaction[]
+  StudentFee  StudentFee[]
 }
 
 model Accounts {
@@ -841,6 +846,7 @@ model Accounts {
   school         School           @relation(fields: [school_id], references: [id])
   Transaction    Transaction[]
   payment_method payment_method[]
+  StudentFee     StudentFee[]
 
   @@unique([school_id, title])
   @@map("accounts")

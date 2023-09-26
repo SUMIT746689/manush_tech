@@ -513,6 +513,7 @@ const Results = ({
                       onChange={handleSelectAllschools}
                     />
                   </TableCell>
+                  <TableCell align="center">{t('SL')}</TableCell>
                   <TableCell align="center">{t('Fee Title')}</TableCell>
                   <TableCell align="center">{t('Pay Amount')}</TableCell>
                   <TableCell align="center">{t('Status')}</TableCell>
@@ -524,7 +525,7 @@ const Results = ({
                 </TableRow>
               </thead>
               <TableBody>
-                {paginatedfees.map((fee) => {
+                {paginatedfees.map((fee,index) => {
 
                   const last_date = dayjs(fee.last_date).valueOf()
                   const today = fee.last_payment_date ? dayjs(fee.last_payment_date).valueOf() : 0;
@@ -569,6 +570,11 @@ const Results = ({
                           }
                           value={isschoolselected}
                         />
+                      </TableCell>
+                      <TableCell sx={{ p: 0.5 }} align="center">
+                        <Typography noWrap variant="h5">
+                          {index+1}
+                        </Typography>
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">

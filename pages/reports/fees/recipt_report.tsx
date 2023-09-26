@@ -341,7 +341,7 @@ function FeesPaymentReport() {
 
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {i?.student?.discount?.toFixed(2)}
+                                                                    {i?.student?.discount}
                                                                 </Typography>
                                                             </TableCell>
 
@@ -438,7 +438,7 @@ function FeesPaymentReport() {
                                         <td style={tableStyle}>{i?.payment_method}</td>
                                         <td style={tableStyle}>{i?.fee?.title}</td>
                                         <td style={tableStyle}>{i?.collected_amount}</td>
-                                        <td style={tableStyle}>{i?.student?.discount?.toFixed(2)}</td>
+                                        {/* <td style={tableStyle}>{i?.student?.discount?.toFixed(2)}</td> */}
                                         <td style={tableStyle}>{total?.toFixed(2)}</td>
                                     </tr>
                                 );

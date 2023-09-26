@@ -316,7 +316,7 @@ const Results: FC<ResultsProps> = ({
                       <TableCell>{t('Amount')}</TableCell>
                       <TableCell>{t('Class')}</TableCell>
                       <TableCell>{t('Last date')}</TableCell>
-                      <TableCell>{t('Last fee Fine')}</TableCell>
+                      <TableCell>{t('Late fee Fine')}</TableCell>
 
                       <TableCell align="center">{t('Actions')}</TableCell>
                     </TableRow>
@@ -374,7 +374,7 @@ const Results: FC<ResultsProps> = ({
                           </TableCell>
                           <TableCell>
                             <Typography noWrap variant="h5">
-                              {formatNumber(fee?.late_fee?.toFixed(2))} {currency}
+                              {fee?.late_fee ? formatNumber(fee?.late_fee?.toFixed(2)) : 0} {currency}
                             </Typography>
                           </TableCell>
 

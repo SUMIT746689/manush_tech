@@ -15,11 +15,12 @@ import {
   CircularProgress,
   Autocomplete,
   Button,
-  useTheme
+  useTheme,
+  Checkbox
 } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
-import { MobileDatePicker } from '@mui/lab';
+import { DatePicker, DateTimePicker, MobileDatePicker } from '@mui/lab';
 import useNotistick from '@/hooks/useNotistick';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
@@ -28,14 +29,16 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 
+const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i }))
 
 function PageHeader({ name, editData, seteditData, academicYearsData, classData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
-  const theme = useTheme();
   const { showNotification } = useNotistick();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const [checked, setChecked] = useState(false);
+
   useEffect(() => {
     if (editData) handleCreateClassOpen();
   }, [editData]);
@@ -45,6 +48,7 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
   };
 
   const handleCreateClassClose = () => {
+    setChecked(false)
     setOpen(false);
     seteditData(null);
   };
@@ -56,6 +60,9 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
 
   const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
+
+      console.log("submit");
+
       const successResponse = (message) => {
         showNotification('fees ' + message + ' successfully');
         resetForm();
@@ -66,11 +73,11 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
       };
       _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
       _values['late_fee'] = parseFloat(_values.late_fee)
-     
+
       // dayjs(_values.last_date).format('YYYY-MM-DD')
 
       if (editData) {
-        const res = await axios.patch(`/api/fee/${editData.id}`,_values);
+        const res = await axios.patch(`/api/fee/${editData.id}`, _values);
         successResponse('updated');
       } else {
         _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
@@ -119,7 +126,7 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
       </Grid> */}
       <Dialog
         fullWidth
-        maxWidth="xs"
+        maxWidth="md"
         open={open}
         onClose={handleCreateClassClose}
       >
@@ -144,6 +151,7 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
             _for: editData?.for || undefined,
             academic_year_id: editData?.academic_year_id || academicYear?.id || undefined,
             class_id: editData?.class_id || undefined,
+            months: [],
             late_fee: editData?.late_fee || 0,
             submit: null
           }}
@@ -157,7 +165,8 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
             school_id: Yup.number()
               .min(1)
               .required(t('The school id is required')),
-            last_date: Yup.date().required(t('Date is required')),
+            last_date: !checked && Yup.date().required(t('Date is required')),
+            months: Yup.array(),
             academic_year_id: Yup.number()
               .min(1)
               .required(t('academic field is required')),
@@ -168,6 +177,7 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
           onSubmit={handleSubmit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
+
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -176,7 +186,7 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
                     p: 3
                   }}
                 >
-                  <Grid container>
+                  <Grid display={'grid'} gap={2} gridTemplateColumns={'auto auto'}>
                     {/* title  */}
                     <TextFieldWrapper
                       errors={errors?.title}
@@ -228,29 +238,32 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
                     />
 
                     {/* Last Date */}
-                    <MobileDatePicker
-                      label="Last Date"
-                      inputFormat='dd/MM/yyyy'
-                      value={values?.last_date}
-                      onChange={(value) => setFieldValue('last_date', value)}
-                      renderInput={(params) => (
-                        <TextField
-                          size='small'
-                          sx={{
-                            [`& fieldset`]: {
-                              borderRadius: 0.6,
-                            },
-                            mb: 1
-                          }}
-                          {...params}
-                          name="last_date"
-                          error={Boolean(errors?.last_date && touched?.last_date)}
-                          fullWidth
-                          defaultValue={''}
-                          helperText={touched?.last_date && errors?.last_date}
-                        />
-                      )}
-                    />
+                    {
+
+                      !checked && <MobileDatePicker
+                        label="Last Date"
+                        inputFormat='dd/MM/yyyy'
+                        value={values?.last_date}
+                        onChange={(value) => setFieldValue('last_date', value)}
+                        renderInput={(params) => (
+                          <TextField
+                            size='small'
+                            sx={{
+                              [`& fieldset`]: {
+                                borderRadius: 0.6,
+                              },
+                              mb: 1
+                            }}
+                            {...params}
+                            name="last_date"
+                            error={Boolean(errors?.last_date && touched?.last_date)}
+                            fullWidth
+                            defaultValue={''}
+                            helperText={touched?.last_date && errors?.last_date}
+                          />
+                        )}
+                      />
+                    }
 
                     {/* late_fee */}
                     <TextFieldWrapper
@@ -265,6 +278,95 @@ function PageHeader({ name, editData, seteditData, academicYearsData, classData,
                     />
 
                   </Grid>
+
+                  {
+                    !editData && <Grid
+                      container
+                      display={'grid'}
+                      gridTemplateColumns={'10% 90%'}
+                      gap={1}
+                    >
+                      <Checkbox
+                        sx={{ p: 0 }}
+                        checked={checked}
+                        onChange={(event) => {
+                          console.log(event.target.checked);
+                          if (!event.target.checked) {
+
+                            setFieldValue('months', [])
+                          } else {
+                            setFieldValue('last_date', null)
+                          }
+                          setChecked(event.target.checked);
+                        }}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                      />
+                      <>
+                        Do yo want monthly repetition ?
+                      </>
+
+                    </Grid>
+                  }
+                  {
+                    !editData && checked && <AutoCompleteWrapperWithoutRenderInput
+                      minWidth="100%"
+                      label="Select multiple month"
+                      placeholder="Month..."
+                      multiple
+                      value={values.months}
+                      options={month}
+                      name="month"
+                      error={errors?.months}
+                      touched={touched?.months}
+                      // @ts-ignore
+                      handleChange={(e, value: any) => setFieldValue('months', value)}
+                    />
+                  }
+
+
+                  {
+                    !editData && checked && <Grid pt={1}>
+
+                      {
+                        values?.months?.map((option, index) => {
+                          const onKeyDown = (e) => {
+                            e.preventDefault();
+                          };
+
+                          return <>
+                            <DatePicker
+                              label={`${option.label} Last Date`}
+                              inputFormat='dd/MM/yyyy'
+                              value={option.last_date || null}
+                              onChange={(n: any) => {
+                                const temp = [...values.months];
+                                temp[index].last_date = n;
+                                console.log(temp);
+                                setFieldValue('months', temp);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  required
+                                  size='small'
+                                  sx={{
+                                    [`& fieldset`]: {
+                                      borderRadius: 0.6,
+                                    },
+                                    mb: 1
+                                  }}
+                                  {...params}
+                                  onKeyDown={onKeyDown}
+                                  fullWidth
+                                />
+                              )}
+                            />
+                          </>
+                        })
+                      }
+
+
+                    </Grid>
+                  }
                 </DialogContent>
                 <DialogActionWrapper
                   title="Fees"

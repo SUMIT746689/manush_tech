@@ -130,10 +130,11 @@ export const post = async (req, res, refresh_token) => {
 
     const late_fee = fee.late_fee ? fee.late_fee : 0;
 
+    // console.log(totalPaidAmount, '     ', collected_amount, '     ', feeAmount);
 
     if (last_trnsation_date > last_date) {
 
-      if (totalPaidAmount === feeAmount + late_fee) throw new Error('Already Paid in Late');
+      if (totalPaidAmount >= feeAmount + late_fee) throw new Error('Already Paid in Late');
 
       else if (totalPaidAmount < feeAmount + late_fee) {
         if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)

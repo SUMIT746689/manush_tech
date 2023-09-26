@@ -13,6 +13,8 @@ import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { MobileDatePicker } from '@mui/lab';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -21,7 +23,14 @@ const tableStyle: object = {
     fontSize: '0.8em'
     // backgroundColor: '#cccccc'
 };
-
+const buttonStyle: object = {
+    borderRadius: 0.5,
+    minHeight: 36,
+    width: '100%',
+    ":disabled": {
+        backgroundColor: 'lightgray'
+    }
+}
 function FeesPaymentReport() {
 
     const { t }: { t: any } = useTranslation();
@@ -40,7 +49,8 @@ function FeesPaymentReport() {
 
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null)
-    const [payment_method, setPayment_method] = useState(null);
+    const [account, setAccount] = useState([]);
+    const [selectedAccount, setSelectedAccount] = useState(null);
 
     const handlePageChange = (_event: any, newPage: number): void => {
 
@@ -58,7 +68,7 @@ function FeesPaymentReport() {
     useEffect(() => {
         // @ts-ignore
 
-        const paginatedTransaction = applyPagination(datas.data || [], page, limit);
+        const paginatedTransaction = applyPagination(datas?.data || [], page, limit);
 
         console.log(paginatedTransaction, page, limit);
 
@@ -66,21 +76,27 @@ function FeesPaymentReport() {
     }, [datas, filter, page])
 
     useEffect(() => {
-        getData(dayjs().startOf('date'), dayjs().endOf('date'), 'All')
+        axios.get('/api/account').then(res => setAccount(res?.data?.map(i => ({
+            label: i.title,
+            id: i.id
+        }))))
+        getData(dayjs().startOf('date'), dayjs().endOf('date'))
     }, [])
 
-    const getData = (startDate, endDate, payment_method) => {
+    const getData = (startDate, endDate) => {
         const tempToDate = new Date(endDate)
         tempToDate.setDate(tempToDate.getDate() + 1)
-        axios.get(`/api/reports/student_payment_collection_history?from_date=${startDate}&to_date=${dayjs(tempToDate).format('YYYY-MM-DD')}${payment_method == 'All' ? '' : `&payment_method=${payment_method}`}`)
+        axios.get(`/api/reports/student_payment_collection_history?from_date=${dayjs(startDate).format('YYYY-MM-DD')}&to_date=${dayjs(tempToDate).format('YYYY-MM-DD')}${selectedAccount ? `&account_id=${selectedAccount?.id}` : ''}`)
             .then(res => {
+
                 let sumTotal = 0, SumCollectedAmount = 0
                 for (const c of res.data) {
-                    sumTotal += (c?.collected_amount - c?.student?.discount)
+                    // sumTotal += (c?.collected_amount - c?.student?.discount)
+                    // sumTotal += (c?.collected_amount )
                     SumCollectedAmount += c?.collected_amount
                 }
                 setDatas({
-                    sumTotal: sumTotal?.toFixed(2),
+                    // sumTotal: sumTotal?.toFixed(2),
                     SumCollectedAmount: SumCollectedAmount?.toFixed(2),
                     data: res.data
                 })
@@ -88,8 +104,8 @@ function FeesPaymentReport() {
     }
     const handlePaymentHistoryFind = (e) => {
         e.preventDefault();
-        if (startDate && endDate && payment_method) {
-            getData(startDate, endDate, payment_method)
+        if (startDate && endDate) {
+            getData(startDate, endDate)
         }
 
     }
@@ -109,58 +125,33 @@ function FeesPaymentReport() {
 
             <form onSubmit={handlePaymentHistoryFind}>
                 <Card sx={{
-                    display: 'grid', maxWidth: 900, mx: 'auto', p: 1, gridTemplateColumns: { sm: 'auto auto auto auto auto' }, gap: 1
+                    display: 'grid', mx: 'auto', p: 1, gridTemplateColumns: { sm: 'auto', md: '1fr 2fr 1fr 0.5fr 0.5fr' }, gap: 1
                 }}>
                     <Grid item >
-                        <Autocomplete
-                            id="tags-outlined"
-                            options={['All', 'Cash', 'Bkash', 'Nagad', 'Rocket', 'Upay', 'Trustpay', 'UCash', 'Card']}
-                            filterSelectedOptions
-                            renderInput={(params) => (
-                                <TextField
-                                    fullWidth
-                                    {...params}
-                                    label={t('Payment Via')}
-                                    placeholder="Select Payment Via"
-                                    required
-                                />
-                            )}
-                            onChange={(e, v) => {
-                                setPayment_method(v)
-                            }}
-                        />
-                    </Grid>
-                    <Grid item >
-                        <MobileDatePicker
-                            label="Select start Date"
-                            inputFormat='dd/MM/yyyy'
-                            value={startDate}
-
-                            onChange={(newValue) => {
-
-                                setStartDate(newValue ? dayjs(newValue).format('YYYY-MM-DD') : null);
-                            }}
-                            renderInput={(params) => <TextField fullWidth {...params} required />}
-                        />
-                    </Grid>
-
-
-                    <Grid item >
-                        <MobileDatePicker
-                            label="Select end Date"
-                            inputFormat='dd/MM/yyyy'
-                            value={endDate}
-
-                            onChange={(newValue) => {
-
-
-                                setEndDate(newValue ? dayjs(newValue).format('YYYY-MM-DD') : null);
-                            }}
-                            renderInput={(params) => <TextField fullWidth {...params} required />}
+                        <AutoCompleteWrapper
+                            minWidth="100%"
+                            label={t('Select account')}
+                            placeholder={t('Account...')}
+                            limitTags={2}
+                            // getOptionLabel={(option) => option.id}
+                            options={account}
+                            value={undefined}
+                            handleChange={(e, v) => setSelectedAccount(v ? v : null)}
                         />
                     </Grid>
                     <Grid item>
-                        <Button type='submit' variant='contained'>Search</Button>
+                        <DateRangePickerWrapper
+                            startDate={startDate}
+                            setStartDate={setStartDate}
+                            endDate={endDate}
+                            setEndDate={setEndDate}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Button type='submit' variant='contained'
+                            sx={buttonStyle}
+                        >Search</Button>
+
                     </Grid>
                     {
                         datas?.data && <Grid item>
@@ -170,6 +161,7 @@ function FeesPaymentReport() {
                                 pageStyle={`@page { size: A4; } .printable-item { page-break-after: always; }`}
                                 trigger={() => (
                                     <Button
+                                        sx={buttonStyle}
                                         startIcon={<LocalPrintshopIcon />}
                                         variant="contained">
                                         print
@@ -190,6 +182,7 @@ function FeesPaymentReport() {
                             // maxHeight: 'calc(1080vh - 450px) !important',
                             minHeight: 'calc(108vh - 450px) !important',
                             overflow: 'auto',
+
                         }}
                         justifyContent={'flex-end'}>
 
@@ -254,9 +247,9 @@ function FeesPaymentReport() {
                                                 <TableCell>{t('Payment via')}</TableCell>
                                                 <TableCell>{t('Fee title')}</TableCell>
                                                 <TableCell>{t('Collected amount')}</TableCell>
-                                                <TableCell>{t('Discount')}</TableCell>
+                                                {/* <TableCell>{t('Discount')}</TableCell> */}
 
-                                                <TableCell>{t('Total')}</TableCell>
+                                                {/* <TableCell>{t('Total')}</TableCell> */}
 
 
                                             </TableRow>
@@ -272,7 +265,8 @@ function FeesPaymentReport() {
                                                     if (i?.student?.student_info?.last_name) {
                                                         name += i?.student?.student_info?.last_name
                                                     }
-                                                    const total = i?.collected_amount - i?.student?.discount
+                                                    // const total = i?.collected_amount - i?.student?.discount
+                                                    const total = i?.collected_amount
 
                                                     return (
                                                         <TableRow
@@ -339,17 +333,17 @@ function FeesPaymentReport() {
                                                                 </Typography>
                                                             </TableCell>
 
-                                                            <TableCell>
+                                                            {/* <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {i?.student?.discount}
+                                                                   {i?.student?.discount} 
                                                                 </Typography>
-                                                            </TableCell>
+                                                            </TableCell> */}
 
-                                                            <TableCell>
+                                                            {/* <TableCell>
                                                                 <Typography noWrap variant="h5">
                                                                     {total?.toFixed(2)}
                                                                 </Typography>
-                                                            </TableCell>
+                                                            </TableCell> */}
 
 
 
@@ -364,8 +358,8 @@ function FeesPaymentReport() {
                                                 <TableCell colSpan={8}></TableCell>
                                                 <TableCell>{t('Total Collected amount')}</TableCell>
                                                 <TableCell>{datas?.SumCollectedAmount}</TableCell>
-                                                <TableCell>{t('Total')}</TableCell>
-                                                <TableCell>{datas?.sumTotal}</TableCell>
+                                                {/* <TableCell>{t('Total')}</TableCell> */}
+                                                {/* <TableCell>{datas?.sumTotal}</TableCell> */}
                                             </TableRow>
                                         </TableFooter>
                                     </Table>
@@ -407,8 +401,8 @@ function FeesPaymentReport() {
                                 <th style={tableStyle}>{t('Payment via')}</th>
                                 <th style={tableStyle}>{t('Fee title')}</th>
                                 <th style={tableStyle}>{t('Collected amount')}</th>
-                                <th style={tableStyle}>{t('Discount')}</th>
-                                <th style={tableStyle}>{t('Total')}</th>
+                                {/* <th style={tableStyle}>{t('Discount')}</th> */}
+                                {/* <th style={tableStyle}>{t('Total')}</th> */}
                             </tr>
                         </thead>
                         <tbody style={{
@@ -424,7 +418,8 @@ function FeesPaymentReport() {
                                 if (i?.student?.student_info?.last_name) {
                                     name += i?.student?.student_info?.last_name
                                 }
-                                const total = i?.collected_amount - i?.student?.discount
+                                // const total = i?.collected_amount - i?.student?.discount
+                                // const total = i?.collected_amount 
 
                                 return (
                                     <tr>
@@ -438,8 +433,8 @@ function FeesPaymentReport() {
                                         <td style={tableStyle}>{i?.payment_method}</td>
                                         <td style={tableStyle}>{i?.fee?.title}</td>
                                         <td style={tableStyle}>{i?.collected_amount}</td>
-                                        {/* <td style={tableStyle}>{i?.student?.discount?.toFixed(2)}</td> */}
-                                        <td style={tableStyle}>{total?.toFixed(2)}</td>
+                                        {/* <td style={tableStyle}>{i?.student?.discount}</td> */}
+                                        {/* <td style={tableStyle}>{total?.toFixed(2)}</td> */}
                                     </tr>
                                 );
                             })}
@@ -447,8 +442,8 @@ function FeesPaymentReport() {
                                 <td style={tableStyle} colSpan={8}></td>
                                 <td style={tableStyle}>{t('Total Collected amount')}</td>
                                 <td style={tableStyle}>{datas?.SumCollectedAmount}</td>
-                                <td style={tableStyle}>{t('Total')}</td>
-                                <td style={tableStyle}>{datas?.sumTotal}</td>
+                                {/* <td style={tableStyle}>{t('Total')}</td> */}
+                                {/* <td style={tableStyle}>{datas?.sumTotal}</td> */}
                             </tr>
                         </tbody>
 

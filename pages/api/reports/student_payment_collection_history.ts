@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import dayjs from 'dayjs';
-
-const prisma = new PrismaClient();
 
 const index = async (req, res) => {
     try {
@@ -9,10 +7,13 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-                const { from_date, to_date, payment_method, collected_by } = req.query;
+                const { from_date, to_date, payment_method, collected_by,account_id } = req.query;
                 const query = {};
                 if (payment_method) {
                     query['payment_method'] = payment_method
+                }
+                if(account_id){
+                    query['account_id'] = Number(account_id)
                 }
                 if (collected_by) {
                     query['collected_by'] = collected_by

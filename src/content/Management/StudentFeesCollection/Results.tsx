@@ -830,7 +830,7 @@ const AmountCollection = ({ due, project, student_id, handleCollection, accounts
       <Grid item pt={0.8}>
         <Button
           variant="contained"
-          disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label !== 'Cash' && transID || selectedAccount?.label == 'Cash' && !transID) ? false : true}
+          disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label?.toLowerCase() !== 'cash' && transID || selectedAccount?.label?.toLowerCase() === 'cash' && !transID) ? false : true}
           onClick={() => {
             handleCollection(student_id, project.id, project, amount, selectedAccount, selectedGateway, transID);
             setSelectedAccount(null)

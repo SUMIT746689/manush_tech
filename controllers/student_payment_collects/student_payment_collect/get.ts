@@ -48,7 +48,7 @@ export const get = async (req, res) => {
       }
     });
 
-    console.log("all_fees__", all_fees.section.class.fees);
+    // console.log("all_fees__", all_fees.section.class.fees);
 
     const fees = all_fees.section.class.fees.map((fee) => {
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);

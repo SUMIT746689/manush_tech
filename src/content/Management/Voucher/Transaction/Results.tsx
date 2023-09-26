@@ -267,13 +267,19 @@ const Results = ({ users }) => {
                     <TableCell align='center'>{t('Creation date')}</TableCell>
                     <TableCell align='center'>{t('Pay via')}</TableCell>
                     <TableCell align="center">{t('Amount')}</TableCell>
+                    <TableCell align="center">{t('Dr')}</TableCell>
+                    <TableCell align="center">{t('Cr')}</TableCell>
+                    <TableCell align="center">{t('Balance')}</TableCell>
                     <TableCell align="center">{t('Description')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {paginatedClasses.map((i) => {
-
                     const isUserSelected = selectedItems.includes(i.id);
+                    const voucher_type = i.voucher_type.toLowerCase()
+                    const dr = voucher_type === 'debit' ? i?.amount : 0;
+                    const cr = voucher_type === 'credit' ? i?.amount : 0;
+                    const balance = (dr ? dr * -1 : dr) + cr
                     return (
                       <TableRow hover key={i.id} selected={isUserSelected}>
                         <TableCell align='center'>
@@ -314,6 +320,21 @@ const Results = ({ users }) => {
                         <TableCell align='center'>
                           <Typography variant="h5">
                             {i?.amount}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {dr}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {cr}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {balance}
                           </Typography>
                         </TableCell>
                         <TableCell align='center'>

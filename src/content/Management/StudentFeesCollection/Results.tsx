@@ -124,7 +124,7 @@ const Results = ({
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filter, setFilter] = useState<string>('all');
-  const [paginatedschools, setPaginatedSchool] = useState<any>([]);
+  const [paginatedfees, setPaginatedSchool] = useState<any>([]);
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -331,7 +331,7 @@ const Results = ({
                 id: i.id,
                 has_section: i.has_section
               };
-            })}
+            }) || []}
             value={undefined}
             label="Select Class"
             placeholder="select a class"
@@ -468,7 +468,7 @@ const Results = ({
             <Typography component="span" variant="subtitle1">
               {t('Showing')}:
             </Typography>{' '}
-            <b>{paginatedschools.length}</b> <b>{t('fees')}</b>
+            <b>{paginatedfees.length}</b> <b>{t('fees')}</b>
           </Box>
           <TablePagination
             component="div"
@@ -483,7 +483,7 @@ const Results = ({
 
         <Divider />
 
-        {paginatedschools.length === 0 ? (
+        {paginatedfees.length === 0 ? (
           <>
             <Typography
               sx={{
@@ -501,55 +501,53 @@ const Results = ({
             </Typography>
           </>
         ) : (
-          <>
+          <TableContainer>
 
             <table>
               <thead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" align="center">
                     <Checkbox
                       checked={selectedAllschools}
                       indeterminate={selectedSomeschools}
                       onChange={handleSelectAllschools}
                     />
                   </TableCell>
-                  <TableCell>{t('Fee Title')}</TableCell>
-                  <TableCell>{t('Pay Amount')}</TableCell>
-                  <TableCell>{t('Status')}</TableCell>
-                  <TableCell>{t('Due')}</TableCell>
-                  <TableCell>{t('Last payment date')}</TableCell>
-                  <TableCell>{t('Total payable amount')}</TableCell>
+                  <TableCell align="center">{t('Fee Title')}</TableCell>
+                  <TableCell align="center">{t('Pay Amount')}</TableCell>
+                  <TableCell align="center">{t('Status')}</TableCell>
+                  <TableCell align="center">{t('Due')}</TableCell>
+                  <TableCell align="center">{t('Last payment date')}</TableCell>
+                  <TableCell align="center">{t('Total payable amount')}</TableCell>
 
                   <TableCell align="center">{t('Actions')}</TableCell>
                 </TableRow>
               </thead>
               <TableBody>
-                {paginatedschools.map((project) => {
+                {paginatedfees.map((fee) => {
 
-                  const last_date = dayjs(project.last_date).valueOf()
-                  const today = project.last_payment_date ? dayjs(project.last_payment_date).valueOf() : 0;
+                  const last_date = dayjs(fee.last_date).valueOf()
+                  const today = fee.last_payment_date ? dayjs(fee.last_payment_date).valueOf() : 0;
                   const changeColor = today > last_date ? {
                     color: 'red'
                   } : {}
-                  const isschoolselected = selectedItems.includes(project.id);
+                  const isschoolselected = selectedItems.includes(fee.id);
 
                   let due;
-                  if (project?.status == 'paid' || project?.status === 'paid late') {
+                  if (fee?.status == 'paid' || fee?.status === 'paid late') {
                     due = 0
                   }
                   else {
-                    due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
-                      (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
-
+                    due = (fee?.amount + (fee.late_fee ? fee.late_fee : 0) - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
                     if (today < last_date) {
-                      due -= (project.late_fee ? project.late_fee : 0)
+                      due -= (fee.late_fee ? fee.late_fee : 0)
                     }
                   }
                   const status_color = { p: 0.5 };
-                  if (project?.status === 'paid' || project?.status === 'paid late') {
+                  if (fee?.status === 'paid' || fee?.status === 'paid late') {
                     status_color['color'] = 'green'
                   }
-                  else if (project?.status === 'partial paid') {
+                  else if (fee?.status === 'partial paid') {
                     status_color['color'] = 'blue'
                   }
                   else {
@@ -560,57 +558,58 @@ const Results = ({
                   return (
                     <TableRow
                       hover
-                      key={project.id}
+                      key={fee.id}
                       selected={isschoolselected}
                     >
                       <TableCell padding="checkbox" sx={{ p: 0.5 }}>
                         <Checkbox
                           checked={isschoolselected}
                           onChange={(event) =>
-                            handleSelectOneProject(event, project.id, project)
+                            handleSelectOneProject(event, fee.id, fee)
                           }
                           value={isschoolselected}
                         />
                       </TableCell>
-                      <TableCell sx={{ p: 0.5 }}>
+                      <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {project?.title}
+                          {fee?.title}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ p: 0.5 }}>
+                      <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {formatNumber(project?.amount.toFixed(1))}
+                          {formatNumber(fee?.amount.toFixed(1))}
                         </Typography>
                       </TableCell>
 
                       <TableCell
                         sx={status_color}
+                        align="center"
                       >
                         <Typography noWrap variant="h5">
                           {/* @ts-ignore */}
 
-                          {project?.status.toUpperCase()}
+                          {fee?.status.toUpperCase()}
                         </Typography>
                       </TableCell>
 
-                      <TableCell sx={{ p: 0.5 }}>
+                      <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
                           {formatNumber(due)}
                         </Typography>
                       </TableCell>
 
-                      <TableCell sx={{ p: 0.5 }}>
+                      <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
                           {
-                            project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
-                              'MMMM D, YYYY h:mm A'
+                            fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format(
+                              'DD/MM/YYYY,h:mm a'
                             ) : ''}
                         </Typography>
                       </TableCell>
 
-                      <TableCell sx={{ p: 0.5 }}>
+                      <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5" sx={changeColor}>
-                          {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(Number(project?.amount) + Number(project?.late_fee)).toFixed(2)}`}
+                          {(today <= last_date || fee?.status === 'paid late') ? "" : `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(Number(fee?.amount) + Number(fee?.late_fee)).toFixed(2)}`}
                         </Typography>
                       </TableCell>
 
@@ -620,7 +619,7 @@ const Results = ({
                             accounts={accounts}
                             accountsOption={accountsOption}
                             due={due}
-                            project={project}
+                            project={fee}
                             handleCollection={handleCollection}
                             student_id={selectedStudent?.id}
                           />
@@ -654,7 +653,7 @@ const Results = ({
               </TableBody>
             </table>
 
-          </>
+          </TableContainer>
         )}
       </Card>
 

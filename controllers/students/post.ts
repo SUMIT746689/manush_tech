@@ -50,9 +50,9 @@ const postHandle = async (req, res, refresh_token) => {
 
     for (let i in filePathQuery) {
       const oldPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, filePathQuery[i]);
-      const newPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName,filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1))
-      console.log({oldPath, newPath});
-      
+      const newPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1))
+      console.log({ oldPath, newPath });
+
       fs.rename(oldPath, newPath, (err) => {
         if (err) throw err
         console.log('Successfully moved file!')
@@ -103,6 +103,20 @@ const postHandle = async (req, res, refresh_token) => {
       fields?.password,
       Number(process.env.SALTROUNDS)
     );
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        school_id: refresh_token?.school_id
+      },
+      select: {
+        id: true,
+        payment_method: {
+          take: 1
+        }
+      }
+    })
+    const account_id = account?.id
+    const payment_method_id = account?.payment_method[0]?.id
+    if (!payment_method_id) throw new Error('Payment method not added')
 
     await prisma.$transaction(async (transaction) => {
 
@@ -200,7 +214,9 @@ const postHandle = async (req, res, refresh_token) => {
           student_id: student?.id,
           fee_id: i.id,
           collected_amount: 0,
-          payment_method: 'pending',
+          account_id,
+          payment_method_id,
+          payment_method: account.payment_method[0].title,
         });
       }
 

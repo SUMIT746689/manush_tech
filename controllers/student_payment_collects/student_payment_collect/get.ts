@@ -1,17 +1,25 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import dayjs from 'dayjs';
-
-
-const prisma = new PrismaClient();
 
 export const get = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id, fromDate, toDate } = req.query;
 
     if (!id) throw new Error('provide student_id');
 
+    const dateFilter = {}, query = {}
+    if (fromDate) dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0))
+    if (toDate) dateFilter['lte'] = new Date(new Date(toDate).setUTCHours(23, 59, 59, 999))
+
+    if (fromDate || toDate) query['created_at'] = dateFilter
+
+    console.log("query__",query);
+    
     const student_fee = await prisma.studentFee.findMany({
-      where: { student_id: Number(id) },
+      where: {
+        student_id: Number(id),
+        ...query
+      },
       include: {
         fee: true,
         collected_by_user: {
@@ -54,13 +62,13 @@ export const get = async (req, res) => {
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
 
       // console.log("fee", fee);
-       console.log("findStudentFee__", findStudentFee);
+      // console.log("findStudentFee__", findStudentFee);
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
         // console.log("findStudentFee__",findStudentFee);
 
         const discount = all_fees?.discount?.filter(i => i.fee_id == fee.id);
-        console.log("discount1__", discount);
+        // console.log("discount1__", discount);
 
         const totalDiscount = discount.reduce((a, c) => {
           if (c.type == 'percent') return a + (c.amt * fee.amount) / 100
@@ -98,7 +106,7 @@ export const get = async (req, res) => {
       }
       else {
         const discount = all_fees?.discount?.filter(i => i.fee_id == fee.id);
-        console.log("discount1__", discount);
+        // console.log("discount1__", discount);
 
         const totalDiscount = discount.reduce((a, c) => {
           if (c.type == 'percent') return a + (c.amt * fee.amount) / 100
@@ -108,7 +116,7 @@ export const get = async (req, res) => {
         fee['amount'] = feeAmount
         return ({ ...fee, status: 'unpaid' })
       }
-       
+
     })
     const data = {
       ...all_fees.student_info,

@@ -5,6 +5,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
   return (
     <Grid container sx={{ pb: 1, justifyContent: 'center' }}>
       <Button variant="contained" size="small" disabled={disabled}
+        startIcon={startIcon}
         sx={{
           ...sx,
           borderRadius: 0.5,

@@ -5,7 +5,13 @@ import dayjs from 'dayjs';
 
 export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEndDate }) {
   const handleStartDate = (e) => {
-    setStartDate(dayjs(e));
+    if (e) {
+      setStartDate(dayjs(e));
+    }
+    else {
+      setStartDate(null)
+    }
+
     setEndDate(null)
   }
   const handleEndDate = (e) => {
@@ -21,6 +27,7 @@ export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEn
           label="Start Date"
           inputFormat='dd/MM/yyyy'
           value={startDate}
+          clearable
           onChange={handleStartDate}
           renderInput={
             (params) =>
@@ -41,6 +48,7 @@ export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEn
           label="End Date"
           inputFormat='dd/MM/yyyy'
           value={endDate}
+          clearable
           onChange={handleEndDate}
           renderInput={
             (params) =>
@@ -54,7 +62,6 @@ export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEn
                 }}
                 {...params} />}
         />
-
       </Grid>
     </Grid>
   );
@@ -68,6 +75,7 @@ export const DatePickerWrapper = ({ label, date, handleChange }) => {
         inputFormat='dd/MM/yyyy'
         value={date}
         onChange={handleChange}
+
         renderInput={
           (params) =>
             <TextField
@@ -76,6 +84,9 @@ export const DatePickerWrapper = ({ label, date, handleChange }) => {
                 [`& fieldset`]: {
                   borderRadius: 0.6,
                 }
+              }}
+              onKeyDown={(e) => {
+                e.preventDefault()
               }}
               fullWidth
               {...params}

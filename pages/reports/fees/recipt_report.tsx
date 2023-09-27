@@ -15,6 +15,7 @@ import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { MobileDatePicker } from '@mui/lab';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -23,14 +24,6 @@ const tableStyle: object = {
     fontSize: '0.8em'
     // backgroundColor: '#cccccc'
 };
-const buttonStyle: object = {
-    borderRadius: 0.5,
-    minHeight: 36,
-    width: '100%',
-    ":disabled": {
-        backgroundColor: 'lightgray'
-    }
-}
 function FeesPaymentReport() {
 
     const { t }: { t: any } = useTranslation();
@@ -148,9 +141,9 @@ function FeesPaymentReport() {
                         />
                     </Grid>
                     <Grid item>
-                        <Button type='submit' variant='contained'
-                            sx={buttonStyle}
-                        >Search</Button>
+                        <ButtonWrapper type='submit' handleClick={null}>
+                            Search
+                        </ButtonWrapper>
 
                     </Grid>
                     {
@@ -160,12 +153,9 @@ function FeesPaymentReport() {
                                 // pageStyle={`{ size: 2.5in 4in }`}
                                 pageStyle={`@page { size: A4; } .printable-item { page-break-after: always; }`}
                                 trigger={() => (
-                                    <Button
-                                        sx={buttonStyle}
-                                        startIcon={<LocalPrintshopIcon />}
-                                        variant="contained">
-                                        print
-                                    </Button>
+                                    <ButtonWrapper handleClick={null} startIcon={<LocalPrintshopIcon />}>
+                                        Print
+                                    </ButtonWrapper>
                                 )}
                             />
                         </Grid>

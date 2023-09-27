@@ -17,6 +17,10 @@ import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import { TableHeadWrapper } from '@/components/TableWrapper';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
+import CsvExport from '@/components/Export/Csv';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -34,7 +38,10 @@ function FeesPaymentReport() {
     const [students, setStudents] = useState<[object?]>([]);
 
     const [filteredFees, setFilteredFees] = useState<any>([]);
-    const { data: classData, error: classError } = useClientFetch('/api/class');
+    const [classData, setClassData] = useState<any>([]);
+    const [classOptions, setClassOptions] = useState<any>([]);
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null)
 
     const printPageRef = useRef();
 
@@ -46,22 +53,57 @@ function FeesPaymentReport() {
     const { user } = useAuth();
     const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
 
+    const export_data = () => {
+
+        const customize_data = filteredFees.map((fee, index) => ({
+            SL: index + 1,
+            'Fee Title': fee?.title,
+            'Fee Amount': fee?.amount.toFixed(1),
+            'Paid Amount': fee?.paidAmount?.toFixed(1),
+            'Status': fee?.status.toUpperCase(),
+            'Fine': fee?.late_fee?.toFixed(1),
+            'Last date': dayjs(fee?.last_date).format(
+                'MMMM D, YYYY h:mm A'
+            ),
+            'Due': fee?.due?.toFixed(1),
+            'Last payment date': fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format(
+                'MMMM D, YYYY h:mm A'
+            ) : '',
+            'Collected by': fee?.collected_by_user,
+            'Total payable amount': (fee?.today <= fee?.last_date || fee?.status === 'paid late') ? "" : `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(fee?.amount + fee?.late_fee).toFixed(1)}`,
+        }));
+        return customize_data;
+    }
     useEffect(() => {
+        axios.get('/api/class').then(res => {
+            setClassData(res.data)
+            setClassOptions(res.data?.map((i) => {
+                return {
+                    label: i.name,
+                    id: i.id,
+                    has_section: i.has_section
+                };
+            }))
+        })
+    }, [])
+
+    const Find = () => {
         if (selectedStudent) {
+            console.log(fromDate, ' ', toDate);
+
             axios
                 // @ts-ignore
-                .get(`/api/student_payment_collect/${selectedStudent.id}`)
+                .get(`/api/student_payment_collect/${selectedStudent.id}?${fromDate ? `fromDate=${fromDate}` : ''}${toDate ? `&toDate=${toDate}` : ''}`)
                 .then((res) => {
-                    console.log("re_____",res.data);
-                    
+                    console.log("re_____", res.data);
+
                     if (res.data?.success) setDatas(res.data.data);
                 })
                 .catch((err) => {
                     console.log(err.message);
                 });
         }
-    }, [selectedStudent]);
-
+    }
 
     const handlePageChange = (_event: any, newPage: number): void => {
         setPage(newPage);
@@ -85,16 +127,49 @@ function FeesPaymentReport() {
         });
     };
 
-    // @ts-ignore
     useEffect(() => {
         // @ts-ignore
         const filteredfeesdata = applyFilters(datas?.fees || [], filter);
         setFilteredFees(filteredfeesdata);
         const paginatedTransaction = applyPagination(filteredfeesdata, page, limit);
 
-        console.log(paginatedTransaction, page, limit);
+        const customizedData = paginatedTransaction.map(fee => {
 
-        setPaginatedTransection(paginatedTransaction);
+            const last_date = dayjs(fee.last_date).valueOf()
+            const today = fee.last_payment_date ? dayjs(fee.last_payment_date).valueOf() : 0;
+            const changeColor = today > last_date ? {
+                color: 'red'
+            } : {}
+
+            let due;
+            if (fee?.status == 'paid' || fee?.status === 'paid late') {
+                due = 0
+            }
+            else {
+                due = (fee?.amount + (fee.late_fee ? fee.late_fee : 0) - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
+                if (today < last_date) {
+                    due -= (fee.late_fee ? fee.late_fee : 0)
+                }
+            }
+            const status_color = { p: 0.5 };
+            if (fee?.status === 'paid' || fee?.status === 'paid late') {
+                status_color['color'] = 'green'
+            }
+            else if (fee?.status === 'partial paid') {
+                status_color['color'] = 'blue'
+            }
+            else {
+                status_color['color'] = 'red'
+            }
+            fee['due'] = due
+            fee['status_color'] = status_color
+            fee['changeColor'] = changeColor
+            fee['today'] = today
+            fee['last_date'] = last_date
+            return fee
+        })
+
+        setPaginatedTransection(customizedData);
     }, [datas, filter, page])
 
     const [sections, setSections] = useState(null);
@@ -151,52 +226,37 @@ function FeesPaymentReport() {
                 <PageHeader title={'Payment history'} />
             </PageTitleWrapper>
 
-            <Card sx={{ display: 'grid', maxWidth: 900, mx: 'auto', p: 1, gridTemplateColumns: { sm: 'auto auto auto' }, gap: 1 }}>
+            <Card sx={{ display: 'grid', maxWidth: 1000, mx: 'auto', pt: 1, px: 1, gridTemplateColumns: { sm: '1.5fr 1.5fr 2fr 2.5fr 1fr' }, gap: 1 }}>
                 <Grid item >
-                    <Autocomplete
-                        id="tags-outlined"
-                        options={classData?.map((i) => {
-                            return {
-                                label: i.name,
-                                id: i.id,
-                                has_section: i.has_section
-                            };
-                        }) || []}
-                        filterSelectedOptions
-                        renderInput={(params) => (
-                            <TextField
-                                fullWidth
-                                {...params}
-                                label={t('Select class')}
-                                placeholder="Name"
-                            />
-                        )}
-                        onChange={handleClassSelect}
+
+                    <AutoCompleteWrapper
+                        minWidth="100%"
+                        label={t('Select class')}
+                        placeholder={t('Class...')}
+                        limitTags={2}
+                        options={classOptions}
+                        value={selectedClass}
+                        handleChange={handleClassSelect}
                     />
                 </Grid>
 
                 {selectedClass && sections && selectedClass.has_section && (
 
                     <Grid item >
-                        <Autocomplete
-                            id="tags-outlined"
+                        <AutoCompleteWrapper
+                            minWidth="100%"
+                            label={t('Select section')}
+                            placeholder={t('Section...')}
+                            limitTags={2}
                             options={sections}
                             value={selectedSection}
-                            filterSelectedOptions
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="select section"
-                                    placeholder="Name"
-                                />
-                            )}
-
-                            onChange={(e, v) => {
+                            handleChange={(e, v) => {
                                 setSelectedSection(v);
                                 setDatas([])
                                 setSelectedStudent(null);
                             }}
                         />
+
                     </Grid>
 
                 )}
@@ -204,28 +264,31 @@ function FeesPaymentReport() {
                 {selectedClass && selectedSection && (<>
 
                     <Grid item >
-                        <Autocomplete
-                            fullWidth
-                            disablePortal
-                            value={selectedStudent}
+                        <AutoCompleteWrapper
+                            minWidth="100%"
+                            label={t('Select Student by roll')}
+                            placeholder={t('Roll and name...')}
+                            limitTags={2}
                             options={students}
+                            value={selectedStudent}
                             isOptionEqualToValue={(option: any, value: any) =>
                                 option.id === value.id
                             }
                             getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
-                            renderInput={(params) => (
-                                <TextField
-                                    fullWidth
-                                    {...params}
-                                    label="Select Student by roll"
-                                />
-                            )}
-                            // @ts-ignore
-                            onChange={(e, value: any) => setSelectedStudent(value)}
+                            handleChange={(e, value: any) => setSelectedStudent(value)}
                         />
                     </Grid>
-
-
+                    <Grid item >
+                        <DateRangePickerWrapper
+                            startDate={fromDate}
+                            setStartDate={setFromDate}
+                            endDate={toDate}
+                            setEndDate={setToDate}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <ButtonWrapper handleClick={Find}>Find</ButtonWrapper>
+                    </Grid>
                 </>)}
             </Card>
 
@@ -250,14 +313,12 @@ function FeesPaymentReport() {
                                 <Grid item sx={{
                                     display: 'flex',
                                     gap: 1,
-                                    maxHeight: 40
+                                    maxHeight: 30
                                 }}>
-                                    <FormControl  >
-                                        <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
+                                    <FormControl sx={{ minWidth: '180px' }}>
+                                        <InputLabel size='normal' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
                                         <Select
                                             fullWidth
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
                                             size="small"
                                             label="Filter By"
 
@@ -287,13 +348,17 @@ function FeesPaymentReport() {
                                         content={() => printPageRef.current}
                                         // pageStyle={`{ size: 2.5in 4in }`}
                                         trigger={() => (
-                                            <Button
-                                                startIcon={<LocalPrintshopIcon />}
-                                                variant="contained">
+                                            <ButtonWrapper handleClick={null} startIcon={<LocalPrintshopIcon />}>
                                                 print
-                                            </Button>
+                                            </ButtonWrapper>
                                         )}
                                     />
+                                    <Grid item>
+                                        <ButtonWrapper handleClick={null} variant='outlined'>
+                                            <CsvExport exportData={export_data()} />
+                                        </ButtonWrapper>
+                                    </Grid>
+
                                 </Grid>
 
                                 <TableHeadWrapper
@@ -310,128 +375,101 @@ function FeesPaymentReport() {
                         <Divider />
                         {
                             paginatedTransection.length !== 0 && <>
-                                <TableContainer  >
-                                    <Table >
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>{t('Fee Title')}</TableCell>
-                                                <TableCell>{t('Fee Amount')}</TableCell>
-                                                <TableCell>{t('Paid Amount')}</TableCell>
-                                                <TableCell>{t('Due')}</TableCell>
-                                                <TableCell>{t('Status')}</TableCell>
-                                                <TableCell>{t('Fine')}</TableCell>
-                                                <TableCell>{t('Last date')}</TableCell>
-                                                <TableCell>{t('Last payment date')}</TableCell>
-                                                <TableCell>{t('Collected by ')}</TableCell>
-                                                <TableCell>{t('Total payable amount')}</TableCell>
+                                <Table >
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>{t('Fee Title')}</TableCell>
+                                            <TableCell>{t('Fee Amount')}</TableCell>
+                                            <TableCell>{t('Paid Amount')}</TableCell>
+                                            <TableCell>{t('Due')}</TableCell>
+                                            <TableCell>{t('Status')}</TableCell>
+                                            <TableCell>{t('Fine')}</TableCell>
+                                            <TableCell>{t('Last date')}</TableCell>
+                                            <TableCell>{t('Last payment date')}</TableCell>
+                                            <TableCell>{t('Collected by ')}</TableCell>
+                                            <TableCell>{t('Total payable amount')}</TableCell>
 
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody >
-                                            {paginatedTransection?.map((fee) => {
-                                                const last_date = dayjs(fee.last_date).valueOf()
-                                                const today = fee.last_payment_date ? dayjs(fee.last_payment_date).valueOf() : 0;
-                                                const changeColor = today > last_date ? {
-                                                  color: 'red'
-                                                } : {}
-                                                 
-                                                let due;
-                                                if (fee?.status == 'paid' || fee?.status === 'paid late') {
-                                                  due = 0
-                                                }
-                                                else {
-                                                  due = (fee?.amount + (fee.late_fee ? fee.late_fee : 0) - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
-                                                  if (today < last_date) {
-                                                    due -= (fee.late_fee ? fee.late_fee : 0)
-                                                  }
-                                                }
-                                                const status_color = { p: 0.5 };
-                                                if (fee?.status === 'paid' || fee?.status === 'paid late') {
-                                                  status_color['color'] = 'green'
-                                                }
-                                                else if (fee?.status === 'partial paid') {
-                                                  status_color['color'] = 'blue'
-                                                }
-                                                else {
-                                                  status_color['color'] = 'red'
-                                                }
-                                                return (
-                                                    <TableRow
-                                                        hover
-                                                        key={fee.id}
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody >
+                                        {paginatedTransection?.map((fee) => {
+
+                                            return (
+                                                <TableRow
+                                                    hover
+                                                    key={fee.id}
+                                                >
+
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.title}
+                                                        </Typography>
+                                                    </TableCell>
+
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.amount.toFixed(1)}
+                                                        </Typography>
+                                                    </TableCell>
+
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.paidAmount?.toFixed(1)}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.due?.toFixed(1)}
+                                                        </Typography>
+                                                    </TableCell>
+
+                                                    <TableCell
+                                                        sx={fee?.status_color}
                                                     >
+                                                        <Typography noWrap variant="h5">
+                                                            {/* @ts-ignore */}
+                                                            {fee?.status.toUpperCase()}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.late_fee?.toFixed(1)}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {dayjs(fee?.last_date).format(
+                                                                'MMMM D, YYYY h:mm A'
+                                                            )}
+                                                        </Typography>
+                                                    </TableCell>
 
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {fee?.title}
-                                                            </Typography>
-                                                        </TableCell>
-
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {fee?.amount.toFixed(1)}
-                                                            </Typography>
-                                                        </TableCell>
-
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {fee?.paidAmount?.toFixed(1)}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {due?.toFixed(1)}
-                                                            </Typography>
-                                                        </TableCell>
-
-                                                        <TableCell
-                                                            sx={status_color}
-                                                        >
-                                                            <Typography noWrap variant="h5">
-                                                                {/* @ts-ignore */}
-                                                                {fee?.status.toUpperCase()}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {fee?.late_fee?.toFixed(1)}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {dayjs(fee?.last_date).format(
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {
+                                                                fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format(
                                                                     'MMMM D, YYYY h:mm A'
-                                                                )}
-                                                            </Typography>
-                                                        </TableCell>
-
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {
-                                                                    fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format(
-                                                                        'MMMM D, YYYY h:mm A'
-                                                                    ) : ''}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5">
-                                                                {fee?.collected_by_user}
-                                                            </Typography>
-                                                        </TableCell>
+                                                                ) : ''}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5">
+                                                            {fee?.collected_by_user}
+                                                        </Typography>
+                                                    </TableCell>
 
 
-                                                        <TableCell>
-                                                            <Typography noWrap variant="h5" sx={changeColor}>
-                                                                {(today <= last_date || fee?.status === 'paid late') ? "" : `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(fee?.amount + fee?.late_fee).toFixed(1)}`}
-                                                            </Typography>
-                                                        </TableCell>
+                                                    <TableCell>
+                                                        <Typography noWrap variant="h5" sx={fee?.changeColor}>
+                                                            {(fee?.today <= fee?.last_date || fee?.status === 'paid late') ? "" : `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(fee?.amount + fee?.late_fee).toFixed(1)}`}
+                                                        </Typography>
+                                                    </TableCell>
 
-                                                    </TableRow>
-                                                );
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
                             </>
                         }
                     </Grid>
@@ -439,6 +477,7 @@ function FeesPaymentReport() {
 
 
             </Grid>
+
             <Grid sx={{
                 display: 'none',
             }} >
@@ -480,38 +519,6 @@ function FeesPaymentReport() {
                             }}>
                                 {filteredFees?.map((project) => {
 
-                                    const last_date = dayjs(project.last_date).valueOf()
-                                    const today = dayjs(project.last_payment_date).valueOf();
-                                    const changeColor = today > last_date ? {
-                                        color: 'red'
-                                    } : {}
-
-                                    let due = project?.amount;
-
-
-                                    if (today > last_date) {
-                                        console.log(project?.title, dayjs(project?.last_payment_date).format(
-                                            'MMMM D, YYYY h:mm A'
-                                        ), "         ", dayjs(project.last_payment_date).format(
-                                            'MMMM D, YYYY h:mm A'
-                                        ), " late!!!!!!!!!!");
-
-                                        due += (project.late_fee ? project.late_fee : 0);
-
-                                        if (project.paidAmount) {
-                                            due -= project.paidAmount
-                                        }
-
-                                    }
-                                    else {
-                                        if (project.paidAmount) {
-                                            due -= project.paidAmount
-                                        }
-                                    }
-                                    if (project?.status == 'paid' || project?.status === 'paid late') {
-                                        due = 0;
-                                    }
-
                                     return (
                                         <tr>
                                             <td style={tableStyle}>{project?.title}</td>
@@ -533,7 +540,7 @@ function FeesPaymentReport() {
                                             </td>
                                             <td style={tableStyle}>{project?.late_fee?.toFixed(1)}</td>
                                             <td style={tableStyle}>{dayjs(project?.last_date).format('MMMM D, YYYY h:mm A')}</td>
-                                            <td style={tableStyle}>{due?.toFixed(1)}</td>
+                                            <td style={tableStyle}>{project?.due?.toFixed(1)}</td>
                                             <td style={tableStyle}>
 
                                                 {
@@ -543,9 +550,9 @@ function FeesPaymentReport() {
 
                                             </td>
                                             <td style={tableStyle}>{project?.collected_by_user}</td>
-                                            <td style={{ ...tableStyle, ...changeColor }}>
+                                            <td style={{ ...tableStyle, ...project.changeColor }}>
 
-                                                {(today <= last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
+                                                {(project.today <= project.last_date || project?.status === 'paid late') ? "" : `${Number(project?.amount).toFixed(1)} + ${Number(project?.late_fee).toFixed(1)} = ${(project?.amount + project?.late_fee).toFixed(1)}`}
 
                                             </td>
 

@@ -241,6 +241,7 @@ model Student {
   section                 Section            @relation(fields: [section_id], references: [id])
   group                   Group?             @relation(fields: [group_id], references: [id])
   discount                Discount[]         @relation("DiscountToStudent")
+  waiver_fees             Fee[]              @relation("WaiverFeesToStudent")
 
   fees        StudentFee[]
   attendances Attendance[]
@@ -377,11 +378,12 @@ model Fee {
   class_id         Int
   school_id        Int
 
-  academic_year AcademicYear @relation(fields: [academic_year_id], references: [id])
-  class         Class        @relation(fields: [class_id], references: [id])
-  school        School       @relation(fields: [school_id], references: [id])
-  student_fees  StudentFee[]
-  Discount      Discount[]
+  academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
+  class               Class        @relation(fields: [class_id], references: [id])
+  school              School       @relation(fields: [school_id], references: [id])
+  student_fees        StudentFee[]
+  Discount            Discount[]
+  waiverFeesToStudent Student[]    @relation("WaiverFeesToStudent")
 
   @@map("fees")
 }

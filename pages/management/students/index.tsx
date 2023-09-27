@@ -21,7 +21,6 @@ import { useRef } from 'react';
 import { Autocomplete } from '@mui/material';
 import { TextField } from '@mui/material';
 import { useAuth } from '@/hooks/useAuth';
-import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
 import { ExportData } from '@/content/Management/Students/ExportData';
@@ -355,60 +354,10 @@ function ManagementClasses() {
                 id: i.id
               })) || []
             }
+            idCard={idCard}
           />
         </Grid>
       </Grid>
-      <div style={{ display: 'none', visibility: 'hidden' }}>
-        <Grid
-          ref={idCard}
-        // container
-        // spacing={0}
-        // direction="column"
-        // alignItems="center"
-        // justifyContent="center"
-        >
-          {students?.map(
-            (i) => {
-              console.log("i___", i);
-
-              const user = {
-                id: i?.class_roll_no,
-                name: `${i?.student_info?.first_name ? i?.student_info?.first_name : ''} ${i?.student_info?.middle_name ? i?.student_info?.middle_name : ''} ${i?.student_info?.last_name ? i?.student_info?.last_name : ''}`,
-                schoolName: i?.student_info?.school?.name,
-                class: i?.section?.class?.name,
-                roll: i?.class_roll_no,
-                section: i?.section?.class?.has_section ? i?.section?.name : 'No section',
-                blood_group: i?.student_info?.blood_group,
-                academicYear: i?.academic_year?.title,
-                phone: i?.phone,
-                birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
-
-                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : 'https://cdn4.iconfinder.com/data/icons/modern-education-and-knowledge-power-1/512/499_student_education_graduate_learning-512.png'
-              };
-              return <IdentityCard user={user} />;
-            }
-            // <Grid
-            //   container
-            //   spacing={0}
-            //   direction="column"
-            //   alignItems="center"
-            //   justifyContent="center"
-            //   style={{
-            //     pageBreakInside: 'avoid',
-            //     breakInside: 'avoid'
-            //   }}
-            // >
-            //   <p>{`${i?.student_info?.first_name}`+`${i?.student_info?.middle_name ? " " + i?.student_info?.middle_name : ""}`+`${i?.student_info?.last_name ? " " + i?.student_info?.last_name : ""}`}</p>
-            //   <p> Class : {i?.section?.class?.name}</p>
-            //   <p>Section : {i?.section?.name}</p>
-            //   <p>Section roll : {i?.class_roll_no}</p>
-            //   <p>{i?.student_info?.school?.name}</p>
-            //   <br />
-
-            // </Grid>
-          )}
-        </Grid>
-      </div>
       <Footer />
     </>
   );

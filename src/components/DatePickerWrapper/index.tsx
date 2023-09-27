@@ -16,8 +16,11 @@ export function DateRangePickerWrapper({ startDate, setStartDate, endDate, setEn
   }
   const handleEndDate = (e) => {
     const temp = dayjs(e)
-    if (startDate && temp >= startDate) {
+    if (e && startDate && temp >= startDate) {
       setEndDate(temp);
+    }
+    else {
+      setEndDate(null)
     }
   }
   return (

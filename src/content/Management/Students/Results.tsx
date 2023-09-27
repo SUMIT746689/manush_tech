@@ -42,8 +42,10 @@ import NextLink from 'next/link';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import DiscountIcon from '@mui/icons-material/Discount';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
+import dayjs from 'dayjs';
 import axios from 'axios';
+
+import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -137,7 +139,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users, refetch, discount }) => {
+const Results = ({ users, refetch, discount, idCard }) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -333,7 +335,7 @@ const Results = ({ users, refetch, discount }) => {
                         </TableCell>
                         <TableCell>
                           <Typography variant="h5">
-                            {[i?.student_info?.first_name,i?.student_info?.middle_name,i?.student_info?.last_name].join(' ')}
+                            {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -416,7 +418,31 @@ const Results = ({ users, refetch, discount }) => {
           </>
         )}
       </Card>
+      <div style={{ display: 'none', visibility: 'hidden' }}>
+        <Grid ref={idCard}>
+          {users?.filter?.(j => selectedItems.includes(j.id))?.map(
+            (i) => {
+              console.log("i___", i);
 
+              const user = {
+                id: i?.class_roll_no,
+                name: `${i?.student_info?.first_name ? i?.student_info?.first_name : ''} ${i?.student_info?.middle_name ? i?.student_info?.middle_name : ''} ${i?.student_info?.last_name ? i?.student_info?.last_name : ''}`,
+                schoolName: i?.student_info?.school?.name,
+                class: i?.section?.class?.name,
+                roll: i?.class_roll_no,
+                section: i?.section?.class?.has_section ? i?.section?.name : 'No section',
+                blood_group: i?.student_info?.blood_group,
+                academicYear: i?.academic_year?.title,
+                phone: i?.phone,
+                birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
+
+                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : 'https://cdn4.iconfinder.com/data/icons/modern-education-and-knowledge-power-1/512/499_student_education_graduate_learning-512.png'
+              };
+              return <IdentityCard user={user} />;
+            }
+          )}
+        </Grid>
+      </div>
       <DialogWrapper
         open={openConfirmDelete ? true : false}
         maxWidth="sm"
@@ -477,7 +503,7 @@ const Results = ({ users, refetch, discount }) => {
   );
 };
 
-const SinglePermission = ({   singleDiscount, selectedUser }) => {
+const SinglePermission = ({ singleDiscount, selectedUser }) => {
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.discount?.length > 0
@@ -496,7 +522,7 @@ const SinglePermission = ({   singleDiscount, selectedUser }) => {
         })
         .then(() => {
           setChecked(false);
-          
+
         })
         .catch((err) => {
           console.log(err);
@@ -509,7 +535,7 @@ const SinglePermission = ({   singleDiscount, selectedUser }) => {
         })
         .then(() => {
           setChecked(true);
-          
+
         })
         .catch((err) => {
           console.log(err);

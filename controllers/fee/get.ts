@@ -8,7 +8,10 @@ export default async function get(req: any, res: any, refresh_token) {
       school_id: refresh_token.school_id,
     }
     if (req.query.academic_year_id) {
-      where['academic_year_id'] = parseInt(req.query.academic_year_id)
+      where['academic_year_id'] = Number(req.query.academic_year_id)
+    }
+    if (req.query.class_id) {
+      where['class_id'] = Number(req.query.class_id)
     }
 
     //@ts-ignore

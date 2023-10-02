@@ -139,7 +139,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users, refetch, discount, idCard }) => {
+const Results = ({ users, refetch, discount, idCard ,fee}) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -227,26 +227,26 @@ const Results = ({ users, refetch, discount, idCard }) => {
         sx={{ paddingX: { xs: 3, md: 0 } }}
       >
         <Grid item container flexDirection={'column'} sx={{ p: 4 }}>
-          <Grid display="flex" alignItems="center" sx={{ mb: { xs: 2, md: 4 } }} >
-            <Avatar
-              sx={{
-                mr: 1
-              }}
-              src={selectedStudent?.avatar}
-            />
-            <Box>
-
-              <Typography fontSize={20} fontWeight={'bold'}>{selectedStudent?.username}</Typography>
-
-            </Box>
-          </Grid>
-
-          <Grid item container display={'grid'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 1, sm: 2 } }}>
+          <Typography fontSize={20} fontWeight={'bold'}>Discount</Typography>
+          <br />
+          <Grid item container display={'grid'} p={4} border={'1px solid lightGray'} borderRadius={'8px'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 1, sm: 2 } }}>
             {discount?.map((i: any) => (
-              <SinglePermission
+              <SingleDiscount
                 key={i.id}
                 selectedUser={selectedStudent}
                 singleDiscount={i}
+              />
+            ))}
+          </Grid>
+          <br />
+          <Typography fontSize={20} fontWeight={'bold'}>Waiver fee</Typography>
+          <br />
+          <Grid item container display={'grid'} p={4} border={'1px solid lightGray'} borderRadius={'8px'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 1, sm: 2 } }}>
+            {fee?.map((i: any) => (
+              <SingleFee
+                key={i.id}
+                selectedUser={selectedStudent}
+                singleFee={i}
               />
             ))}
           </Grid>
@@ -503,7 +503,57 @@ const Results = ({ users, refetch, discount, idCard }) => {
   );
 };
 
-const SinglePermission = ({ singleDiscount, selectedUser }) => {
+const SingleFee = ({ singleFee, selectedUser }) => {
+
+  const [checked, setChecked] = useState(
+    selectedUser && selectedUser?.waiver_fees?.length > 0
+      ? selectedUser?.waiver_fees.find((j) => j.id == singleFee.id)
+        ? true
+        : false
+      : false
+  );
+
+  const handleWaiverFeeUpdate = (e) => {
+    if (checked) {
+      axios
+        .put(`/api/fee/detach`, {
+          fee_id: singleFee.id,
+          student_id: selectedUser.id
+        })
+        .then(() => {
+          setChecked(false);
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      axios
+        .put(`/api/fee/attach`, {
+          fee_id: singleFee.id,
+          student_id: selectedUser.id
+        })
+        .then(() => {
+          setChecked(true);
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  return (
+    <Box display={'flex'} justifyContent="space-between" p={1} borderRadius={0.4} sx={{ backgroundColor: 'lightGray', ":hover": { backgroundColor: 'darkGray' } }} key={singleFee.id}>
+      <Typography sx={{ my: 'auto', textTransform: 'capitalize', fontSize: { xs: 10, md: 15 } }}>
+        {singleFee?.label}
+      </Typography>
+      <Switch sx={{ my: 'auto' }} checked={checked} onChange={handleWaiverFeeUpdate} />
+    </Box>
+  );
+};
+
+const SingleDiscount = ({ singleDiscount, selectedUser }) => {
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.discount?.length > 0
@@ -513,7 +563,7 @@ const SinglePermission = ({ singleDiscount, selectedUser }) => {
       : false
   );
 
-  const handlePermissionUpdate = (e) => {
+  const handleDiscountUpdate = (e) => {
     if (checked) {
       axios
         .put(`/api/discount/detach`, {
@@ -548,7 +598,7 @@ const SinglePermission = ({ singleDiscount, selectedUser }) => {
       <Typography sx={{ my: 'auto', textTransform: 'capitalize', fontSize: { xs: 10, md: 15 } }}>
         {singleDiscount?.label}
       </Typography>
-      <Switch sx={{ my: 'auto' }} checked={checked} onChange={handlePermissionUpdate} />
+      <Switch sx={{ my: 'auto' }} checked={checked} onChange={handleDiscountUpdate} />
     </Box>
   );
 };

@@ -40,7 +40,8 @@ function ManagementClasses() {
   const [sections, setSections] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [discount, setDiscount] = useState(null);
+  const [discount, setDiscount] = useState([]);
+  const [fee, setFee] = useState([]);
 
   const idCard = useRef();
 
@@ -53,10 +54,19 @@ function ManagementClasses() {
       axios.get(`/api/discount?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`)
         .then(res => {
           console.log("discount__", res.data);
-
-          setDiscount(res.data)
+          setDiscount(res.data?.map(i => ({
+            label: `${i?.title} (${i?.amt} ${i?.type})`,
+            id: i.id
+          }))
+          )
         })
         .catch(err => console.log(err))
+      axios.get(`/api/fee?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`)
+        .then(res => setFee(res?.data?.data?.map(i => ({
+          label: i.title,
+          id: i.id
+        }))))
+        .catch(err => console.log(err));
     }
 
   }, [selectedClass, academicYear])
@@ -348,12 +358,8 @@ function ManagementClasses() {
         <Grid item xs={12}>
           <Results users={students}
             refetch={handleStudentList}
-            discount={
-              discount?.map(i => ({
-                label: `${i?.title} (${i?.amt} ${i?.type})`,
-                id: i.id
-              })) || []
-            }
+            discount={discount}
+            fee={fee}
             idCard={idCard}
           />
         </Grid>

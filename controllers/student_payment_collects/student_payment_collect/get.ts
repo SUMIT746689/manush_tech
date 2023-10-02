@@ -13,8 +13,8 @@ export const get = async (req, res) => {
 
     if (fromDate || toDate) query['created_at'] = dateFilter
 
-    console.log("query__",query);
-    
+    console.log("query__", query);
+
     const student_fee = await prisma.studentFee.findMany({
       where: {
         student_id: Number(id),
@@ -36,6 +36,7 @@ export const get = async (req, res) => {
         class_registration_no: true,
         class_roll_no: true,
         discount: true,
+        waiver_fees: true,
         student_info: {
           select: {
             id: true,
@@ -56,9 +57,12 @@ export const get = async (req, res) => {
       }
     });
 
-    // console.log("all_fees__", all_fees.section.class.fees);
+    console.log("all_fees__", all_fees);
 
-    const fees = all_fees.section.class.fees.map((fee) => {
+    const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map(i => i.id) : [];
+    
+    const fees = all_fees.section.class.fees?.filter(i => !waiver_fee.includes(i.id))?.map((fee) => {
+
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
 
       // console.log("fee", fee);
@@ -125,7 +129,7 @@ export const get = async (req, res) => {
       discount: all_fees.discount,
       fees
     };
-    console.log({ data });
+    // console.log({ data });
 
 
     res.status(200).json({ data, success: true });

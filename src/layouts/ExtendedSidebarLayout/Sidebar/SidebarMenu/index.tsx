@@ -166,7 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-  // console.log("permissions__", permissions, item);
+   console.log("permissions__", permissions, item);
 
   const sub_menu = () => {
     ev.push(
@@ -224,7 +224,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
-    else if (item.name === 'Accounts') {
+    else if (item.name === 'Office Accounting') {
       if (permissions.findIndex(i => i.group == 'accounts') > -1) ev.push(
         <SidebarMenuItem
           key={key}

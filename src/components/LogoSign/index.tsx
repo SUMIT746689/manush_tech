@@ -118,7 +118,7 @@ function Logo() {
             {/* <LogoSign> */}
               {/* <LogoSignInner /> */}
             {/* </LogoSign> */}
-            <img className='w-20' src='/mram.png'/>
+            <img style={{ filter: "drop-shadow(1px 1px 2px white)", objectFit:"contain", maxWidth:"130px", maxHeight:"60px" }} src='/mram.png'/>
           {/* </LogoSignWrapper> */}
         </Badge>
       </LogoWrapper>

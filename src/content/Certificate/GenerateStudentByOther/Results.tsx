@@ -202,7 +202,7 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
               {selectedBulkActions && (
                 selectedItems.length > 0 && selectedTemplate && (
                   <>
-                    <GenerateCertificateExport publicationDate={printDate} datas={students.filter(std => selectedItems.includes(std.id))} template={templates.find(tmp => selectedTemplate === tmp.id)} />
+                    <GenerateCertificateExport _for={"student"} publicationDate={printDate} datas={students.filter(std => selectedItems.includes(std.id))} template={templates.find(tmp => selectedTemplate === tmp.id)} />
                     <CsvExport exportData={export_data()} />
                   </>
                 )

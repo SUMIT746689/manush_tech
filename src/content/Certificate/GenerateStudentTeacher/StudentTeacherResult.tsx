@@ -110,7 +110,7 @@ const StudentTeacharResults: FC<ResultsProps> = ({ certificateFor, templates, st
     }));
     return customize_data;
   }
-
+  
   return (
     <>
 

@@ -59,7 +59,7 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
   const { user } = useAuth()
   const description = template.content
 
-  console.log({ datas })
+  console.log({ _for, datas })
   return (
     datas.map((data) => {
       if (!data) return
@@ -149,7 +149,7 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
             </Grid>
 
             <Grid item container py={3} display="flex" justifyContent="space-around" alignItems="center" >
-              <Typography width={300} textAlign="center" variant='h5'> {_for === "student" ? `Registration No: ${data?.class_registration_no}` : `Staff No:${data?.id}`}</Typography>
+              <Typography width={300} textAlign="center" variant='h5'> {_for === "student" ? `Registration No: ${data?.class_registration_no}` : `Staff No: ${data?.id}`}</Typography>
               <Avatar
                 alt="logo"
                 variant={template.photo_style}
@@ -157,7 +157,7 @@ export const GenerateCertificate = ({ _for, publicationDate, datas, template, wi
                 sx={{ width: template.photo_size, height: template.photo_size }}
 
               />
-              <Typography width={300} variant='h5' textAlign={"center"}>{_for === "student" && `Addmission On: ${data?.created_at}`}</Typography>
+              <Typography width={300} variant='h5' textAlign={"center"}>{_for === "student" && `Addmission On: ${data?.student_info?.admission_no || ''}`}</Typography>
             </Grid>
 
 

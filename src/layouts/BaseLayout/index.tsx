@@ -9,11 +9,11 @@ interface BaseLayoutProps {
 const BaseLayout: FC<BaseLayoutProps> = ({ children }) => {
   return (
     <Box
-      sx={{
-        display: 'flex',
-        flex: 1,
-        height: '100%'
-      }}
+      // sx={{
+      //   display: 'flex',
+      //   flex: 1,
+      //   height: '100%'
+      // }}
     >
       {children}
     </Box>

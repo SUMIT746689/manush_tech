@@ -10,7 +10,11 @@ import {
   Tooltip,
   styled,
   useTheme,
-  Grid
+  Grid,
+  Autocomplete,
+  TextField,
+  Container,
+  InputAdornment
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -25,6 +29,8 @@ import axios from 'axios';
 import { getOneCookies } from '@/utils/utilitY-functions';
 import { useAuth } from '@/hooks/useAuth';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { customBorder } from '@/utils/mui_style';
+import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -33,7 +39,7 @@ const HeaderWrapper = styled(Box)(
         padding: ${theme.spacing(0, 2)};
         right: 0;
         z-index: 6;
-        background-color: ${alpha(theme.header.background, 0.95)};
+        background: ${"#002884"};
         backdrop-filter: blur(3px);
         position: fixed;
         justify-content: space-between;
@@ -118,46 +124,92 @@ function Header() {
       display="flex"
       alignItems="center"
       sx={{
-        boxShadow:
-          theme.palette.mode === 'dark'
-            ? `0 1px 0 ${alpha(
-              lighten(theme.colors.primary.main, 0.7),
-              0.15
-            )}, 0px 2px 8px -3px rgba(0, 0, 0, 0.2), 0px 5px 22px -4px rgba(0, 0, 0, .1)`
-            : `0px 2px 8px -3px ${alpha(
-              theme.colors.alpha.black[100],
-              0.2
-            )}, 0px 5px 22px -4px ${alpha(
-              theme.colors.alpha.black[100],
-              0.1
-            )}`
+        // boxShadow: "-1px 15px 48px 0px rgba(0,40,132,1)"
+        boxShadow: "-2px 8px 21px -4px rgba(0,40,132,0.7)"
       }}
     >
-      <Stack
-        direction="row"
-        divider={<Divider orientation="vertical" flexItem />}
-        alignItems="center"
-        spacing={2}
-      >
-        {/* <HeaderSearch /> */}
-        {/* <HeaderMenu /> */}
-      </Stack>
+
+      {/* search section */}
+      <Grid sx={{ display: { xs: "none", md: "block" } }}>
+        <TextField
+          size='small'
+          id="search"
+          type="search"
+          // label="Search"
+          placeholder='search here...'
+          color='primary'
+          // value={""}
+          // onChange={() => { }}
+          // fontColor="primary"
+          sx={{
+            [`& fieldset`]: {
+              borderRadius: 0.6
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'red'
+            },
+            display: { xs: "hidden", sm: "block" },
+            maxWidth: 600,
+          }}
+          InputProps={{
+            style: {
+              color: "#FFFFFF",
+              borderColor: "white",
+              border: "2px solid #FFFFFF",
+              borderRadius: "6px"
+            },
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchTwoToneIcon sx={{ color: "#FFFFFF" }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Grid>
+
+
+      {/* @ts-ignore */}
+      {user?.role?.title !== 'SUPER_ADMIN' &&
+        <Box sx={{ display: { xs: "none", sm: "block" }, backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.5, fontWeight: 600, fontSize: 12 }}>
+          Customer Support <br />
+          <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
+        </Box>
+      }
+
+      {/* @ts-ignore */}
+      {user?.role?.title !== 'SUPER_ADMIN' && (
+        <Grid pt={1} minWidth={150} sx={{ display: { xs: "block", sm: "none" } }}>
+          <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
+          <CustomAutoCompleteWrapper
+            // label="Academic Year"
+            label=""
+            placeholder="select a academic year..."
+            value={selectedAcademicYear}
+            options={academicYearList}
+            handleChange={handleAcademicYearChange}
+          />
+        </Grid>
+      )}
 
       <Box display="flex" alignItems="center">
         {/* @ts-ignore */}
         {user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid pt={1} minWidth={150}>
-            <AutoCompleteWrapper
-              label="Academic Year"
+          <Grid pt={1} minWidth={150} sx={{ pr:2, display: { xs: "none", sm: "block" } }}>
+            <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
+            <CustomAutoCompleteWrapper
+              // label="Academic Year"
+              label=""
               placeholder="select a academic year..."
               value={selectedAcademicYear}
               options={academicYearList}
               handleChange={handleAcademicYearChange}
             />
+
           </Grid>
         )}
         {/* <HeaderButtons /> */}
         <HeaderUserbox />
+
         <Box
           component="span"
           sx={{
@@ -165,8 +217,8 @@ function Header() {
             display: { lg: 'none', xs: 'inline-block' }
           }}
         >
-          <Tooltip arrow title="Show Menu" onClick={toggleSidebar}>
-            <IconButton color="primary">
+          <Tooltip arrow title="Show Menu" onClick={toggleSidebar} >
+            <IconButton sx={{ color: "#FFFFFF", border: "2px solid #FFFFFF" }}>
               {!sidebarToggle ? (
                 <MenuTwoToneIcon fontSize="small" />
               ) : (
@@ -181,3 +233,54 @@ function Header() {
 }
 
 export default Header;
+
+
+export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
+
+  return (
+    <Grid item pb={1} sx={
+      minWidth && {
+        minWidth
+      }
+    }
+    >
+      <Autocomplete
+        fullWidth
+        {...params}
+        size='small'
+        sx={{
+          color: "#002884",
+          [`& fieldset`]: {
+            color: "#002884",
+            borderRadius: 0.6,
+            // backgroundColor: "#FFFFFF",
+            // border:"2px solid #FFFFFF",
+            // ":hover":  {border:"2px solid #FFFFFF"},
+          }
+        }}
+        id="tags-outlined"
+        options={options}
+        value={value}
+        filterSelectedOptions
+        renderInput={(rnParams) => (
+          <TextField
+            size="small"
+            fullWidth
+            required={required}
+            {...rnParams}
+            sx={{
+              fontWeight: 600,
+              color: "#002884",
+              backgroundColor: "white",
+              borderRadius: 0.6
+            }}
+            // sx={{border:"2px solid #FFFFFF"}}
+            label={label}
+            placeholder={placeholder}
+          />
+        )}
+        onChange={handleChange}
+      />
+    </Grid>
+  )
+}

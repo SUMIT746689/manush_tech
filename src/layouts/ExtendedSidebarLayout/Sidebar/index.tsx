@@ -13,7 +13,6 @@ const SidebarWrapper = styled(Box)(
   ({ theme }) => `
         width: ${theme.sidebar.width};
         min-width: ${theme.sidebar.width};
-        color: ${theme.colors.alpha.trueWhite[70]};
         position: relative;
         z-index: 7;
         height: 100%;
@@ -38,10 +37,8 @@ function Sidebar() {
           position: 'fixed',
           left: 0,
           top: 0,
-          background:
-            theme.palette.mode === 'dark'
-              ? alpha(lighten(theme.header.background, 0.1), 0.5)
-              : darken(theme.colors.alpha.black[100], 0.5),
+          background: "#002884",
+          // background:"#212c6f",
           boxShadow:
             theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
         }}
@@ -83,6 +80,7 @@ function Sidebar() {
       </SidebarWrapper>
 
       {/* for mobile device */}
+      {/* <div className=' md:hidden z-[1000] drop-shadow-md bg-sky-500 blur opacity-40 absolute w-full min-h-screen h-full overflow-hidden '> </div> */}
       <Drawer
         sx={{
           boxShadow: `${theme.sidebar.boxShadow}`
@@ -95,10 +93,7 @@ function Sidebar() {
       >
         <SidebarWrapper
           sx={{
-            background:
-              theme.palette.mode === 'dark'
-                ? theme.colors.alpha.white[100]
-                : darken(theme.colors.alpha.black[100], 0.5)
+            background: "#002884",
           }}
         >
           <Scrollbar>

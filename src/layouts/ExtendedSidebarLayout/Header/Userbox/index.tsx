@@ -24,6 +24,7 @@ import { Chart } from 'src/components/Chart';
 import type { ApexOptions } from 'apexcharts';
 import Text from 'src/components/Text';
 import MonetizationOnTwoToneIcon from '@mui/icons-material/MonetizationOnTwoTone';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const DotLegend = styled('span')(
   ({ theme }) => `
@@ -210,8 +211,9 @@ function HeaderUserbox() {
 
   return (
     <>
-      <UserBoxButton color="primary" ref={ref} onClick={handleOpen}>
-        <UserAvatar alt={user?.username} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} />
+      <UserBoxButton sx={{border:"2px solid #FFFFFF",borderRadius:0.5}} ref={ref} onClick={handleOpen}>
+        {/* <UserAvatar sx={{borderRadius:0.5}} alt={user?.username} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} /> */}
+        <AccountCircleIcon sx={{color:"#FFFFFF"}}/>
       </UserBoxButton>
       <Popover
         disableScrollLock

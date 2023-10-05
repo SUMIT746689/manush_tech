@@ -10,6 +10,7 @@ import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/tea
 import dayjs from 'dayjs';
 // import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
@@ -63,23 +64,35 @@ export async function getServerSideProps(context: any) {
         break;
 
       case 'ADMIN':
+        blockCount['role'] = 'admin';
         blockCount['students'] = {
           count: await prisma.student.count({
             where: { student_info: { school_id: refresh_token?.school_id } }
           })
         };
-
         const school = await prisma.school.findFirst({
           where: {
-            id: refresh_token?.school_id
+            id: refresh_token?.school_id,
+          },
+          include: {
+            subscription: {
+              include: {
+                package: true
+              }
+            },
+            Notice: {
+              orderBy: { created_at: 'desc' }
+            }
           }
-        })
+        });
         blockCount['domain'] = school?.domain || '';
         blockCount['teachers'] = {
           count: await prisma.teacher.count({
             where: { school_id: refresh_token?.school_id }
           })
         };
+        blockCount["school"] = school;
+
         await updateHolidays();
         break;
 
@@ -144,10 +157,6 @@ export async function getServerSideProps(context: any) {
 
 function DashboardReports({ blockCount }) {
 
-  // useEffect(() => {
-    // router.reload()
-  // }, [])
-
   switch (blockCount?.role) {
     case 'teacher':
       return (
@@ -156,7 +165,6 @@ function DashboardReports({ blockCount }) {
           <TeacherDashboardReportsContent blockCount={blockCount} />
         </>
       )
-
     case 'student':
       return (
         <>
@@ -164,7 +172,13 @@ function DashboardReports({ blockCount }) {
           <StudentDashboardReportsContent blockCount={blockCount} />
         </>
       )
-
+    case 'admin':
+      return (
+        <>
+          <Head><title>Dashboard</title></Head>
+          <AdminDashboardReportsContent blockCount={blockCount} />
+        </>
+      )
     default:
       return (
         <>

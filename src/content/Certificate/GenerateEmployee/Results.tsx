@@ -169,6 +169,7 @@ const Results: FC<ResultsProps> = ({ defauleRole, roles, templates }) => {
     return customize_data;
   }
 
+  console.log({employees});
   return (
     <>
 
@@ -236,7 +237,7 @@ const Results: FC<ResultsProps> = ({ defauleRole, roles, templates }) => {
                       />
                     </TableCell>
                     <TableCell>{t('ID')}</TableCell>
-                    <TableCell>{t('Name')}</TableCell>
+                    <TableCell>{t('UserName')}</TableCell>
                     <TableCell>{t('Department')}</TableCell>
                     <TableCell>{t('Mobile No')}</TableCell>
                   </TableRow>
@@ -267,7 +268,7 @@ const Results: FC<ResultsProps> = ({ defauleRole, roles, templates }) => {
                             {student.id}
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
-                            {student.student_info?.first_name + (student.student_info?.middle_name || " ") + (student.student_info?.last_name || " ")}
+                            {student?.username || " "}
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>
                             {student.user_role?.title}

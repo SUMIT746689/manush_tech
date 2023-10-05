@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  Tooltip,
-  Typography,
-  Container,
-  Alert,
-  styled
-} from '@mui/material';
+import { Box, Card, styled, Grid, Switch } from '@mui/material';
 import Head from 'next/head';
 import { useAuth } from 'src/hooks/useAuth';
 import { Guest } from 'src/components/Guest';
@@ -17,8 +9,50 @@ import { LoginJWT } from 'src/content/Auth/Login/LoginJWT';
 import { useTranslation } from 'react-i18next';
 // import Logo from 'src/components/LogoSign';
 import BaseLayout from 'src/layouts/BaseLayout';
-import Link from 'src/components/Link';
+// import Link from 'src/components/Link';
 import { useRouter } from 'next/router';
+
+const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: '#1890ff',
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor: 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
+
 
 const icons = {
   Auth0: '/static/images/logo/auth0.svg',
@@ -59,7 +93,6 @@ const MainContent = styled(Box)(
   () => `
     height: 100%;
     display: flex;
-    flex: 1;
     flex-direction: column;
 `
 );
@@ -69,7 +102,6 @@ const TopWrapper = styled(Box)(
   display: flex;
   width: 100%;
   flex: 1;
-  padding: 20px;
 `
 );
 
@@ -77,109 +109,38 @@ function LoginBasic() {
   const { method } = useAuth() as any;
   const { t }: { t: any } = useTranslation();
   const router = useRouter();
-  const { demo } = router.query;
 
   return (
     <>
       <Head>
         <title>Login</title>
       </Head>
-      <MainContent>
-        <TopWrapper style={{display:'flex',flexDirection:'column',justifyContent:'center'}}>
-          <Container maxWidth="sm" >
-            {/* <Logo /> */}
-            <Card
-              sx={{
-                mt: 3,
-                px: 4,
-                pt: 5,
-                pb: 3
-              }}
-            >
-              <Box>
-                <Typography
-                  variant="h2"
-                  sx={{
-                    mb: 1
-                  }}
-                >
-                  {t('Sign in')}
-                </Typography>
-                <Typography
-                  variant="h4"
-                  color="text.secondary"
-                  fontWeight="normal"
-                  sx={{
-                    mb: 3
-                  }}
-                >
-                  {t('Fill in the fields below to sign into your account.')}
-                </Typography>
-              </Box>
-              {/* {method === 'Auth0' && <LoginAuth0 />}
-              {method === 'FirebaseAuth' && <LoginFirebaseAuth />} */}
-              {method === 'JWT' && <LoginJWT />}
-              {/* {method === 'Amplify' && <LoginAmplify />} */}
-              {/* <Box my={4}>
-                <Typography
-                  component="span"
-                  variant="subtitle2"
-                  color="text.primary"
-                  fontWeight="bold"
-                >
-                  {t('Don’t have an account, yet?')}
-                </Typography>{' '}
-                <Link
-                  href={
-                    demo
-                      ? `/auth/register/basic?demo=${demo}`
-                      : '/auth/register/basic'
-                  }
-                >
-                  <b>Sign up here</b>
-                </Link>
-              </Box> */}
-              {/* {method !== 'Auth0' && (
-                <Tooltip
-                  title={t('Used only for the live preview demonstration !')}
-                >
-                  <Alert severity="warning">
-                    Use <b>demo@example.com</b> and password <b>TokyoPass1@</b>
-                  </Alert>
-                </Tooltip>
-              )} */}
-            </Card>
-            {/* <BottomWrapper>
-              <Tooltip arrow placement="top" title="Auth0">
-                <CardImg>
-                  <img height={50} alt="Auth0" src={icons['Auth0']} />
-                </CardImg>
-              </Tooltip>
-              <Tooltip arrow placement="top" title="Firebase">
-                <CardImg>
-                  <img height={50} alt="Firebase" src={icons['FirebaseAuth']} />
-                </CardImg>
-              </Tooltip>
-              <Tooltip arrow placement="top" title="JSON Web Token">
-                <CardImg>
-                  <img height={50} alt="JSON Web Token" src={icons['JWT']} />
-                </CardImg>
-              </Tooltip>
-              <Tooltip arrow placement="top" title="Amplify">
-                <CardImg>
-                  <img height={50} alt="Amplify" src={icons['Amplify']} />
-                </CardImg>
-              </Tooltip>
-            </BottomWrapper>
+      <Grid display={{ xs: "grid", sm: "block" }}>
+        <Grid p={"68px"} maxWidth={{ xs: '250px', sm: '100%' }}>
+          <img src="/login/MRAM logo 1.png" style={{ width: 150, height: "fit-content" }} />
+        </Grid>
+        <Grid
+          sx={{
+            width: { xs: '100%', sm: 500 },
+            pl: { sx: "0", sm: "100px" },
+            textAlign: "center",
+            zIndex: "60"
+          }}
+        >
+          <Grid maxWidth={400} px={{xs:4,sm:0}} mx="auto">
+            {method === 'JWT' && <LoginJWT />}
+          </Grid>
+        </Grid>
 
-            <Alert severity="error">
-              {t(
-                'Learn how to switch between auth methods by reading the section we’ve prepared in the documentation.'
-              )}
-            </Alert> */}
-          </Container>
-        </TopWrapper>
-      </MainContent>
+        <Grid
+          display="grid"
+          sx={{ position: "absolute", zIndex: "-10", opacity: { xs: 0.1, lg: 1 }, width: "100%", height: "100vh", top: 0, right: 0 }}
+        >
+          <img src="/login/side_image.svg" style={{ position: "absolute", top: 0, right: 0, objectFit: "cover", width: "100vh", maxHeight: "100vh" }} />
+        </Grid>
+        <Grid sx={{ zIndex: "-60", background: "#F0F7FF", position: "absolute", top: 0, left: 0, right: 0, width: "100%", height: "100%" }}></Grid>
+
+      </Grid>
     </>
   );
 }

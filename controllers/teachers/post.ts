@@ -1,11 +1,9 @@
 import { fileUpload, imageFolder, saveImage, validateField } from '@/utils/upload';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import fs from 'fs';
 import path from 'path';
-
 import { authenticate } from 'middleware/authenticate';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma_client';
 
 const post = async (req, res, refresh_token) => {
   const uploadFolderName = 'teacher';
@@ -18,20 +16,21 @@ const post = async (req, res, refresh_token) => {
   }
 
   const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
+  console.log("files, fields__", files, fields);
 
   if (error) throw new Error('Error')
 
   const { resume, photo } = files;
   try {
 
-    if (files && resume) {
+    if (files && resume || fields?.resume) {
       if (photo) {
         if (
           ['image/jpeg', 'image/jpg', 'image/png'].includes(resume.mimetype)
         )
           return res.json('Only png, jpg & jpeg is supported');
       }
-      if (!resume || resume.length === 0) deleteFiles(photo.filepath);
+      if (!resume && !fields?.resume) deleteFiles(photo.filepath);
     }
     else {
       // console.log({ files });
@@ -65,12 +64,11 @@ const post = async (req, res, refresh_token) => {
       !date_of_birth ||
       !present_address ||
       !permanent_address ||
-      !resume ||
       !department_id ||
       !national_id
     )
       return res.send(
-        'username || password || first_name || gender || date_of_birth || present_address || permanent_address || resume missing'
+        'username || password || first_name || gender || date_of_birth || present_address || permanent_address'
       );
 
     const encrypePassword = await bcrypt.hash(
@@ -99,8 +97,23 @@ const post = async (req, res, refresh_token) => {
         title: 'TEACHER'
       }
     })
-    console.log("date_of_birth__",date_of_birth);
+    console.log("date_of_birth__", date_of_birth);
+
+    const filePathQuery = {}
     
+    if (fields?.resume) filePathQuery['resume'] = fields?.resume
+    if (fields?.photo) filePathQuery['photo'] = fields?.photo
+
+    for (let i in filePathQuery) {
+      const oldPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, filePathQuery[i]);
+      const newPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1))
+
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) throw err
+        console.log('Successfully moved file!')
+      })
+    }
+
     const teacher = await prisma.teacher.create({
       // @ts-ignore
       data: {
@@ -112,7 +125,8 @@ const post = async (req, res, refresh_token) => {
         permanent_address: permanent_address,
         present_address: present_address,
         joining_date: joining_date ? new Date(joining_date) : new Date(),
-        resume: path.join(uploadFolderName, resume?.newFilename),
+        // @ts-ignore
+        resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : (filePathQuery?.resume || ''),
         school: { connect: { id: refresh_token.school_id } },
         department: { connect: { id: parseInt(department_id) } },
         user: {

@@ -27,5 +27,5 @@ export function unique_password_generate(){
 }
 export function generateUsername(firstName) {
   const text = Date.now().toString()
-  return firstName.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
+  return firstName?.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
 }

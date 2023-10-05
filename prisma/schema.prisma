@@ -80,6 +80,8 @@ model School {
   tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
   Accounts                           Accounts[]
   Voucher                            Voucher[]
+  Department                         Department[]
+  TeacherRecruitment                 TeacherRecruitment[]
 
   // routines Routine[]
   @@map("schools")
@@ -110,6 +112,7 @@ model Department {
   school_id Int
 
   teachers Teacher[]
+  school   School    @relation(fields: [school_id], references: [id])
 
   @@map("departments")
 }
@@ -918,6 +921,15 @@ model OnlineAdmission {
   student   Json
   school_id Int
   school    School @relation(fields: [school_id], references: [id])
+}
+
+model TeacherRecruitment {
+  id        Int    @id @default(autoincrement())
+  teacher   Json
+  school_id Int
+  school    School @relation(fields: [school_id], references: [id])
+
+  @@map("TeacherRecruitment")
 }
 
 model Discount {

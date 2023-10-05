@@ -28,7 +28,7 @@ const postHandle = async (req, res, refresh_token) => {
       }
     });
 
-    if (studentCount >= subscription.package.student_count) throw new Error('Your package maximum students capacity has already been filled, please update your package');
+    if (studentCount >= subscription?.package?.student_count) throw new Error('Your package maximum students capacity has already been filled, please update your package');
 
     const uploadFolderName = 'studentsPhoto';
 

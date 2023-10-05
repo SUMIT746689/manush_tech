@@ -111,6 +111,9 @@ const NavLinks = ({ serverhost }) => {
       <Link href='/online-admission'>
         <div className={navLink}> অনলাইন ভর্তি</div>
       </Link>
+      <Link href='/teachers-application'>
+        <div className={navLink}> শিক্ষক আবেদন</div>
+      </Link>
 
       {/* <div className="relative group">
         <div className={navLink} >
@@ -189,6 +192,9 @@ const MobileNavBar = ({ serverhost, primaryColor, primaryBgColor }) => {
           </Link>
           <Link href='/online-admission' onClick={handleHideNavbar}>
             <div className={navLink} > অনলাইন ভর্তি</div>
+          </Link>
+          <Link href='/teachers-application' onClick={handleHideNavbar}>
+            <div className={navLink} > শিক্ষক আবেদন</div>
           </Link>
           <Link href="/notice" onClick={handleHideNavbar}>
             <div className={navLink} > নোটিশ</div>

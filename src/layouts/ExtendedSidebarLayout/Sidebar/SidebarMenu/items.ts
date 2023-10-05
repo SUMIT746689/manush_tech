@@ -171,6 +171,11 @@ const menuItems: MenuItems[] = [
             icon: GridOnIcon,
             link: '/management/department',
           },
+          {
+            name: 'Teachers recruitment',
+            link: '/management/teachers/teachers-recruitment',
+            icon: RecordVoiceOverIcon
+          },
         ]
       },
       {

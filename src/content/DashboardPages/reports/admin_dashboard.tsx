@@ -19,8 +19,6 @@ function AdminDashboardReportsContent({ blockCount = null }) {
 
   const { t }: { t: any } = useTranslation();
 
-  console.log({ blockCount })
-
   return (
     <>
 
@@ -90,7 +88,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         {/* quick links */}
         {/* <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 4, justifyContent: "center", width: 4 / 6, mx: 'auto' }} > */}
         <Grid width="100%" display="flex" justifyContent="center">
-          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", width: { xs: '100%', md: 4 / 6 }, height: 'fit-content', transition: 'all 5s' }} >
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", width: { xs: '100%', md: 4 / 6 },maxWidth:"550px", height: 'fit-content', transition: 'all 5s' }} >
             <StudentPathButton linkUrl="/management/students/registration" icon={<StudentRegIcon style={{ margin: 'auto' }} />} name="Student Registration" />
             <StudentPathButton linkUrl="/management/routine/class_routine" icon={<RoutineIcon style={{ margin: 'auto' }} />} name="Routine" />
             <StudentPathButton linkUrl="#" icon={<TeacherRoutineIcon style={{ margin: 'auto' }} />} name="Teacher Routine" />

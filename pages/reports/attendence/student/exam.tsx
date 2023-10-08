@@ -35,6 +35,9 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import ReactToPrint from 'react-to-print';
 import { ClassAndSectionSelect } from '@/components/Attendence';
+import { customBorder } from '@/utils/mui_style';
+import { EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 function Attendence() {
     const { t }: { t: any } = useTranslation();
     const { showNotification } = useNotistick();
@@ -74,31 +77,6 @@ function Attendence() {
         }
 
     }, [academicYear, selectedSection])
-
-    // const handleClassSelect = (e, value) => {
-    //   setSelectedClass(value);
-    //   setSelectedSection(null);
-    //   if (value?.id) {
-    //     const selectedClassSections = classes.find((i) => i.id == value?.id);
-    //     if (selectedClassSections) {
-    //       if (selectedClassSections.has_section) {
-    //         setSections(
-    //           selectedClassSections?.sections?.map((j) => {
-    //             return {
-    //               label: j.name,
-    //               id: j.id
-    //             };
-    //           })
-    //         );
-    //       } else {
-    //         setSelectedSection({
-    //           label: selectedClassSections?.sections[0].name,
-    //           id: selectedClassSections?.sections[0].id
-    //         });
-    //       }
-    //     }
-    //   }
-    // };
 
     const handleReportGenerate = async () => {
         try {
@@ -150,93 +128,122 @@ function Attendence() {
                 direction="row"
                 justifyContent="center"
                 alignItems="stretch"
-                spacing={3}
+                spacing={{ xs: 1, md: 3 }}
             >
                 <Grid item xs={12}>
                     <Card
                         sx={{
-                            p: 1,
-                            mb: 3
+                            pt: 1,
+                            px: 1,
+                            mb: 1,
+                            // width: '100%',
+                            columnGap: 1,
+                            display: "grid",
+                            // gridTemplateColumns: { xs: '1fr', sm: 'repeat(4, 1fr)' }
+                            gridTemplateAreas: {
+                                xs: `"classSection"
+                                "exams"
+                                "generateButton"
+                                "printButton"
+                                `,
+                                sm: `
+                                "classSection classSection"
+                                "exams exams" 
+                                "generateButton printButton"
+                                `,
+                                md: `"classSection exams exams generateButton printButton "`
+                            }
                         }}
                     >
-                        <Grid container spacing={{ xs: 2, md: 3 }} >
-                            <Grid item  >
-                                <Box p={1}>
-                                    <ClassAndSectionSelect
-                                        selectedClass={selectedClass}
-                                        setSelectedClass={setSelectedClass}
-                                        flag={true}
-                                        classes={classes}
-                                        selectedDate={null}
-                                        selectedSection={selectedSection}
-                                        setSelectedSection={setSelectedSection}
-                                    />
-                                </Box >
-                            </ Grid>
+
+                        <Grid item gridArea="classSection" width="100%" >
+                            <ClassAndSectionSelect
+                                selectedClass={selectedClass}
+                                setSelectedClass={setSelectedClass}
+                                flag={true}
+                                classes={classes}
+                                selectedDate={null}
+                                selectedSection={selectedSection}
+                                setSelectedSection={setSelectedSection}
+                            />
+                        </ Grid>
+                        <Grid item pb={1} gridArea="exams" minWidth={"100%"}>
+
                             {
-                                examlist && <Grid item xs={6} sm={4} md={3} >
-                                    <Box p={1}>
-                                        <Autocomplete
-                                            fullWidth
-                                            sx={{
-                                                mr: 10
-                                            }}
-                                            limitTags={2}
-                                            options={examlist}
-                                            value={selectedExam}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    fullWidth
-                                                    variant="outlined"
-                                                    label={t('Exams')}
-                                                    placeholder={t('Select Exam...')}
-                                                />
-                                            )}
-                                            onChange={(e, value) => setSelectedExam(value)}
-                                        />
-                                    </Box>
-                                </Grid>
+                                examlist ?
+                                    <Autocomplete
+                                        fullWidth
+                                        size='small'
+                                        sx={{
+                                            // mr: 10,
+                                            borderRadius: 0.6
+                                        }}
+                                        limitTags={2}
+                                        options={examlist}
+                                        value={selectedExam}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                size='small'
+                                                sx={customBorder}
+                                                {...params}
+                                                fullWidth
+                                                variant="outlined"
+                                                label={t('Exams')}
+                                                placeholder={t('Select Exam...')}
+                                            />
+                                        )}
+                                        onChange={(e, value) => setSelectedExam(value)}
+                                    />
+                                    :
+                                    <EmptyAutoCompleteWrapper gridArea="exams" width={"100%"} label="Exams" placeholder={t('Select Exam...')} value={undefined} options={[]} />
                             }
-
-
-                            {user && selectedSection && academicYear && selectedExam && (
-                                <>
-                                    <Grid item >
-
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            onClick={() => handleReportGenerate()}
-                                        >
-                                            Generate
-                                        </Button>
-
-                                    </Grid>
-
-                                    <Grid item >
-
-                                        <ReactToPrint
-                                            content={() => attendenceRef.current}
-                                            // pageStyle={`{ size: 2.5in 4in }`}
-                                            trigger={() => (
-                                                <Button
-                                                    startIcon={<LocalPrintshopIcon />}
-                                                    variant="contained" size='small'>
-                                                    Print
-                                                </Button>
-                                            )}
-                                        />
-
-                                    </Grid>
-
-                                </>
-
-                            )}
-
                         </Grid>
+
+                        {
+                            user && selectedSection && academicYear && selectedExam ?
+                                (
+                                    <>
+                                        <Grid item gridArea="generateButton" >
+                                            <ButtonWrapper handleClick={() => handleReportGenerate()}>
+                                                Generate
+                                            </ButtonWrapper>
+                                        </Grid>
+
+                                        <Grid item gridArea="printButton" >
+                                            <ReactToPrint
+                                                content={() => attendenceRef.current}
+                                                // pageStyle={`{ size: 2.5in 4in }`}
+                                                trigger={() => (
+                                                    <ButtonWrapper
+                                                        handleClick={() => { }}
+                                                        startIcon={<LocalPrintshopIcon />}
+                                                    >
+                                                        Print
+                                                    </ButtonWrapper>
+                                                )}
+                                            />
+                                        </Grid>
+                                    </>
+                                )
+                                :
+                                (
+                                    <>
+                                        <Grid item gridArea="generateButton" minWidth={"100%"} >
+                                            <DisableButtonWrapper >
+                                                Generate
+                                            </DisableButtonWrapper>
+                                        </Grid>
+                                        <Grid item gridArea="printButton" minWidth={"100%"} >
+                                            <DisableButtonWrapper >
+                                                Print
+                                            </DisableButtonWrapper>
+                                        </Grid>
+                                    </>
+                                )
+                        }
+
                     </Card>
-                    <Divider />
+
                     <Grid
                         sx={{
                             maxHeight: 'calc(100vh - 450px) !important',

@@ -26,7 +26,7 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
 
     }
     return (
-        <Grid columnGap={2} sx={{
+        <Grid columnGap={1} sx={{
             display: 'grid',
             gridTemplateColumns: {
                 xs: '1fr',

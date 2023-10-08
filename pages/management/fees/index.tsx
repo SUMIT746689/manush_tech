@@ -24,11 +24,6 @@ function ManagementFees() {
   const [editData, setEditData] = useState<Project>(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { data, error, reFetchData } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
-  const { data: academicYearsData, error: sessionError } = useClientFetch(
-    '/api/academic_years'
-  );
-
-  
   const { data: classData, error: classError } = useClientFetch('/api/class');
 
   useEffect(() => {
@@ -44,14 +39,6 @@ function ManagementFees() {
         {/* @ts-ignore */}
         <PageHeader
           name="Fees"
-          academicYearsData={
-            academicYearsData?.success
-              ? academicYearsData?.data?.map((i) => ({
-                  label: i.title,
-                  value: i.id
-                }))
-              : []
-          }
           classData={
             classData?.map((i) => ({
               label: i.name,

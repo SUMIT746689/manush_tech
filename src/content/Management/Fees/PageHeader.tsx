@@ -31,7 +31,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i }))
 
-function PageHeader({ name, editData, seteditData, academicYearsData, classData, reFetchData }) {
+function PageHeader({ name, editData, seteditData, classData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();

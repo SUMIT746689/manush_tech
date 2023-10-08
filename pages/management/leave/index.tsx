@@ -32,7 +32,7 @@ function ManagementLeave() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results users={leave || []} />
+          <Results users={leave || []} reFetchData={reFetchData}/>
         </Grid>
       </Grid>
       <Footer />

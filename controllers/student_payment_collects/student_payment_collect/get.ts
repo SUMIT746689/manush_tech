@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 
 export const get = async (req, res) => {
   try {
-    const { id, fromDate, toDate } = req.query;
+    const { id, fromDate, toDate, academic_year_id } = req.query;
 
     if (!id) throw new Error('provide student_id');
 
@@ -49,7 +49,11 @@ export const get = async (req, res) => {
           select: {
             class: {
               select: {
-                fees: true
+                fees: {
+                  where: {
+                    academic_year_id: Number(academic_year_id)
+                  }
+                }
               }
             }
           }
@@ -60,7 +64,7 @@ export const get = async (req, res) => {
     console.log("all_fees__", all_fees);
 
     const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map(i => i.id) : [];
-    
+
     const fees = all_fees.section.class.fees?.filter(i => !waiver_fee.includes(i.id))?.map((fee) => {
 
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);

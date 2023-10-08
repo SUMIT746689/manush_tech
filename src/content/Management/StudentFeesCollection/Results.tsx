@@ -131,10 +131,10 @@ const Results = ({
   const { user: { school: { currency } } = {} } = {} = useAuth();
 
   const handleStudentPaymentCollect = () => {
-    if (selectedStudent) {
+    if (selectedStudent && academicYear) {
       axios
         // @ts-ignore
-        .get(`/api/student_payment_collect/${selectedStudent.id}`)
+        .get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
         .then((res) => {
           if (res.data?.success) setSessions(res.data.data);
         })

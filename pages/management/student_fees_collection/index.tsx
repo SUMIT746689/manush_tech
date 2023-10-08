@@ -18,14 +18,10 @@ function Managementschools() {
   const [printFees, setPrintFees] = useState<[object?]>([]);
   const [filteredFees, setFilteredFees] = useState<any>([]);
   const [selectedFees, setSelectedFees] = useState<any[]>([]);
-
-  const { data, error } = useClientFetch('/api/student_payment_collect');
+  
   const { data: accounts } = useClientFetch(`/api/account`);
-
   const { data: classData, error: classError } = useClientFetch('/api/class');
-  useEffect(() => {
-    if (data?.success) setDatas(data.data);
-  }, [data, error]);
+
 
   const printPageRef = useRef();
   const printSelectedPageRef = useRef();

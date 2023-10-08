@@ -40,6 +40,8 @@ import {
   Zoom,
   styled,
   Chip,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -50,6 +52,15 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { useSnackbar } from 'notistack';
 import dayjs from 'dayjs';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import MobileDatePicker from '@mui/lab/MobileDatePicker';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
+import ApprovalIcon from '@mui/icons-material/Approval';
+import { useAuth } from '@/hooks/useAuth';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -150,11 +161,13 @@ const applyPagination = (
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ users }) => {
+const leave_type_options = ['sick', 'casual', 'maternity']
+const status_options = ['pending', 'approved', 'declined']
 
-  const [selectedItems, setSelectedUsers] = useState<string[]>([]);
+const Results = ({ users, reFetchData }) => {
+
   const { t }: { t: any } = useTranslation();
-
+  const { user } = useAuth();
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
@@ -162,7 +175,10 @@ const Results: FC<ResultsProps> = ({ users }) => {
   const [filters, setFilters] = useState<Filters>({
     role: null
   });
+  const [open, setOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
 
+  const { showNotification } = useNotistick();
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -181,7 +197,6 @@ const Results: FC<ResultsProps> = ({ users }) => {
 
   const filteredClasses = applyFilters(users, query, filters);
   const paginatedClasses = applyPagination(filteredClasses, page, limit);
-  const selectedBulkActions = selectedItems.length > 0;
 
 
 
@@ -207,38 +222,217 @@ const Results: FC<ResultsProps> = ({ users }) => {
     //   TransitionComponent: Zoom
     // });
   };
+  const handleCreateClassClose = () => {
+    setOpen(false);
+    setSelectedUser(null)
+  };
+
+  const handleFormSubmit = async (
+    _values,
+    { resetForm, setErrors, setStatus, setSubmitting }
+  ) => {
+    try {
+
+      const res = await axios.patch(`/api/leave/${selectedUser.id}`, _values)
+      showNotification(res.data.message)
+      resetForm();
+      setStatus({ success: true });
+      setSubmitting(false);
+      reFetchData()
+      handleCreateClassClose();
+
+    } catch (err) {
+      console.error(err);
+      showNotification(err?.response?.data?.message, 'error');
+      setStatus({ success: false });
+      //@ts-ignore
+      setErrors({ submit: err.message });
+      setSubmitting(false);
+    }
+  };
+  console.log({ selectedUser });
 
   return (
     <>
-      <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-        <Box p={2}>
-          {!selectedBulkActions && (
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Box>
-                <Typography component="span" variant="subtitle1">
-                  {t('Showing')}:
-                </Typography>{' '}
-                <b>{paginatedClasses.length}</b> <b>{t('Leave list')}</b>
-              </Box>
-              <TablePagination
-                component="div"
-                count={filteredClasses.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
-          )}
-        </Box>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={open}
+        onClose={handleCreateClassClose}
+      >
+        <DialogTitle
+          sx={{
+            p: 3
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {t('Leave Application')}
+          </Typography>
+          <Typography variant="subtitle2">
+            {t('Fill in the fields below to apply a new leave')}
+          </Typography>
+        </DialogTitle>
+        <Formik
+          initialValues={{
+            from_date: selectedUser?.from_date ? dayjs(selectedUser?.from_date) : null,
+            to_date: selectedUser?.to_date ? dayjs(selectedUser?.to_date) : null,
+            Leave_type: selectedUser?.Leave_type,
+            status: selectedUser?.status,
+            remarks: undefined
+          }}
+          validationSchema={Yup.object().shape({
+            from_date: Yup.date().required(t('The From date field is required')),
+            to_date: Yup.date()
+              .required(t('The To date field is required')),
+            Leave_type: Yup.string()
+              .required(t('Leave type field is required')),
+            status: Yup.string()
+              .required(t('Leave status field is required')),
+            remarks: Yup.string()
+              .max(255)
+          })}
+          onSubmit={handleFormSubmit}
+        >
+          {({
+            errors,
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            isSubmitting,
+            touched,
+            values,
+            setFieldValue
+          }) => {
+            return (
+              <form onSubmit={handleSubmit}>
+                <DialogContent
+                  dividers
+                  sx={{
+                    p: 3
+                  }}
+                >
+                  <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                      <Grid display={"grid"} gridTemplateColumns='1fr 1fr' pb={1} item gap={0.5}>
+                        <Grid>
+                          <MobileDatePicker
+                            inputFormat='dd/MM/yyyy'
+                            value={values.from_date}
+                            label="From date"
+                            onChange={(value) => setFieldValue("from_date", value, true)}
+                            renderInput={
+                              (params) => (
+                                <TextField
+                                  fullWidth
+                                  size='small'
+                                  error={Boolean(touched.from_date && errors.from_date)}
+                                  helperText={touched.from_date && errors.from_date}
+                                  name='from_date'
+                                  sx={{
+                                    [`& fieldset`]: {
+                                      borderRadius: 0.6,
+                                    }
+                                  }}
+                                  {...params}
+                                />
+                              )
+                            }
 
-        <Divider />
+                          />
+
+                        </Grid>
+                        <Grid>
+                          <MobileDatePicker
+                            label="To Date"
+                            inputFormat='dd/MM/yyyy'
+                            value={values.to_date}
+                            onChange={(value) => setFieldValue("to_date", value, true)}
+                            renderInput={
+                              (params) =>
+                                <TextField
+                                  fullWidth
+                                  size='small'
+                                  name='to_date'
+                                  sx={{
+                                    [`& fieldset`]: {
+                                      borderRadius: 0.6,
+                                    }
+                                  }}
+                                  {...params}
+                                />}
+
+                          />
+                        </Grid>
+                      </Grid>
+
+                    </Grid>
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      label={t('Leave type')}
+                      placeholder={t('Type...')}
+                      required
+                      limitTags={2}
+                      options={leave_type_options}
+                      error={Boolean(touched.Leave_type && errors.Leave_type)}
+                      helperText={touched.Leave_type && errors.Leave_type}
+                      value={leave_type_options.find(i => i == values.Leave_type)}
+                      handleChange={(e, v) => setFieldValue("Leave_type", v ? v : undefined)}
+                    />
+
+                    <Grid item xs={12} p={1}>
+                      <Typography variant="h6">
+                        Description : <span> {selectedUser?.description} </span>
+                      </Typography>
+                    </Grid>
+
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      label={t('Status')}
+                      placeholder={t('Status...')}
+                      required
+                      limitTags={2}
+                      options={status_options}
+                      error={Boolean(touched.status && errors.status)}
+                      helperText={touched.status && errors.status}
+                      value={status_options.find(i => i == values.status)}
+                      handleChange={(e, v) => setFieldValue("status", v ? v : undefined)}
+                    />
+                    <Grid item xs={12}>
+                      <TextField
+                        error={Boolean(touched.remarks && errors.remarks)}
+                        fullWidth
+                        margin="normal"
+                        helperText={touched.remarks && errors.remarks}
+                        label={t('Remarks')}
+                        name="remarks"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        type="text"
+                        value={values.remarks}
+                        variant="outlined"
+                        minRows={4}
+                        maxRows={5}
+                        multiline
+                      />
+                    </Grid>
+                  </Grid>
+                </DialogContent>
+                <DialogActionWrapper
+                  titleFront="+"
+                  title="Submit"
+                  editData={undefined}
+                  errors={errors}
+                  handleCreateClassClose={handleCreateClassClose}
+                  isSubmitting={isSubmitting}
+                />
+
+              </form>
+            );
+          }}
+        </Formik>
+      </Dialog>
+
+      <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
 
         {paginatedClasses.length === 0 ? (
           <>
@@ -257,63 +451,138 @@ const Results: FC<ResultsProps> = ({ users }) => {
           </>
         ) : (
           <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align='center'>{t('ID')}</TableCell>
-                    <TableCell align='center'>{t('From Date')}</TableCell>
-                    <TableCell align='center'>{t('To Date')}</TableCell>
-                    <TableCell align='center'>{t('Status')}</TableCell>
-                    <TableCell align="center">{t('Applied Date')}</TableCell>
-
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedClasses.map((i) => {
-
-                    const isUserSelected = selectedItems.includes(i.id);
-                    return (
-                      <TableRow hover key={i.id} selected={isUserSelected}>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {i?.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {dayjs(i?.from_date).format('YYYY-MM-DD')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {dayjs(i?.to_date).format('YYYY-MM-DD')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            <Chip
-                              label={i?.status}
-                              size="medium"
-                              color={i?.status == 'approved' ? 'primary' : 'error'}
-                            />
-
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {dayjs(i?.created_at).format('YYYY-MM-DD')}
-                          </Typography>
-                        </TableCell>
-
-
+            {
+              // @ts-ignore
+              user?.role?.title === 'ADMIN' ?
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align='center'>{t('ID')}</TableCell>
+                        <TableCell align='center'>{t('User Name')}</TableCell>
+                        <TableCell align='center'>{t('Role')}</TableCell>
+                        <TableCell align='center'>{t('Leave type')}</TableCell>
+                        <TableCell align='center'>{t('Status')}</TableCell>
+                        <TableCell align='center'>{t('Action')}</TableCell>
 
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedClasses.map((i) => {
+
+                        return (
+                          <TableRow hover key={i.id}>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {i?.id}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {i?.user?.username}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {i?.user?.role?.title}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {i?.Leave_type}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                <Chip
+                                  label={i?.status}
+                                  size="medium"
+                                  color={i?.status == 'approved' ? 'primary' : 'error'}
+                                />
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                <Tooltip title={t('Approve')} arrow>
+                                  <IconButton
+                                    color="primary"
+                                    onClick={() => {
+                                      setSelectedUser(i)
+                                      setOpen(true)
+                                    }}
+                                  >
+                                    <ApprovalIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Typography>
+                            </TableCell>
+
+
+
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+
+                :
+
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align='center'>{t('ID')}</TableCell>
+                        <TableCell align='center'>{t('From Date')}</TableCell>
+                        <TableCell align='center'>{t('To Date')}</TableCell>
+                        <TableCell align="center">{t('Applied Date')}</TableCell>
+                        <TableCell align='center'>{t('Status')}</TableCell>
+
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedClasses.map((i) => {
+
+                        return (
+                          <TableRow hover key={i.id}>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {i?.id}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {dayjs(i?.from_date).format('YYYY-MM-DD')}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {dayjs(i?.to_date).format('YYYY-MM-DD')}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                {dayjs(i?.created_at).format('YYYY-MM-DD')}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='center'>
+                              <Typography variant="h5">
+                                <Chip
+                                  label={i?.status}
+                                  size="medium"
+                                  color={i?.status == 'approved' ? 'primary' : 'error'}
+                                />
+                              </Typography>
+                            </TableCell>
+
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+            }
+
           </>
         )}
       </Card>

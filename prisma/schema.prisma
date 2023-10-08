@@ -35,6 +35,7 @@ model User {
   SentEmailDetail      SentEmailDetail[]
   tbl_attendence_queue tbl_attendance_queue[]
   // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
+  approved_user        Leave[]                @relation("approved_by")
 
   @@map("users")
 }
@@ -900,20 +901,32 @@ model Notice {
 }
 
 model Leave {
-  id          Int         @id @default(autoincrement())
-  user_id     Int
-  from_date   DateTime
-  to_date     DateTime
-  created_at  DateTime    @default(now())
-  status      LeaveStatus
-  description String?
-  user        User        @relation(fields: [user_id], references: [id])
+  id             Int         @id @default(autoincrement())
+  user_id        Int
+  from_date      DateTime
+  to_date        DateTime
+  created_at     DateTime    @default(now())
+  status         LeaveStatus
+  Leave_type     Leave_type
+  description    String?
+  remarks        String?
+  approved_by_id Int?
+
+  approved_by User? @relation("approved_by", fields: [approved_by_id], references: [id])
+  user        User  @relation(fields: [user_id], references: [id])
+
 }
 
 enum LeaveStatus {
   pending
   approved
   declined
+}
+
+enum Leave_type {
+  sick
+  casual
+  maternity
 }
 
 model OnlineAdmission {

@@ -38,6 +38,7 @@ import { ClassAndSectionSelect } from '@/components/Attendence';
 import { customBorder } from '@/utils/mui_style';
 import { EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 function Attendence() {
     const { t }: { t: any } = useTranslation();
     const { showNotification } = useNotistick();
@@ -167,7 +168,7 @@ function Attendence() {
                                 setSelectedSection={setSelectedSection}
                             />
                         </ Grid>
-                        <Grid item pb={1} gridArea="exams" minWidth={"100%"}>
+                        <Grid item gridArea="exams" minWidth={"100%"}>
 
                             {
                                 examlist ?
@@ -176,7 +177,8 @@ function Attendence() {
                                         size='small'
                                         sx={{
                                             // mr: 10,
-                                            borderRadius: 0.6
+                                            borderRadius: 0.6,
+                                            pb:1
                                         }}
                                         limitTags={2}
                                         options={examlist}
@@ -246,8 +248,8 @@ function Attendence() {
 
                     <Grid
                         sx={{
-                            maxHeight: 'calc(100vh - 450px) !important',
-                            minHeight: 'calc(100vh - 450px) !important',
+                            maxHeight: 'calc(100vh - 394px) !important',
+                            minHeight: 'calc(100vh - 394px) !important',
 
                             overflowX: 'auto',
                             overflowY: 'auto'
@@ -257,7 +259,8 @@ function Attendence() {
 
 
                         {
-                            targetsectionStudents && <div ref={attendenceRef} style={{
+                            targetsectionStudents ? 
+                            <div ref={attendenceRef} style={{
                                 paddingLeft: '25px',
                                 paddingRight: '25px'
                             }}>
@@ -367,6 +370,8 @@ function Attendence() {
             </tfoot> */}
                                 </table>
                             </div>
+                            :
+                            <TableEmptyWrapper title="exam attendance" />
                         }
 
                     </Grid>

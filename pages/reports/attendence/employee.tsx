@@ -1,24 +1,15 @@
-import {
-    Autocomplete,
-    Box,
-    Card,
-    Grid,
-    Divider,
-    TextField,
-    Button
-} from '@mui/material';
+import { Autocomplete, Box, Card, Grid, Divider, TextField, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
-import dayjs, { Dayjs } from 'dayjs';
-
+import dayjs from 'dayjs';
 
 import useNotistick from '@/hooks/useNotistick';
 
-const tableStyle :  object = {
+const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
     minWidth: '70px',
@@ -34,6 +25,10 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import ReactToPrint from 'react-to-print';
 import { MobileDatePicker } from '@mui/lab';
+import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
+import { customBorder } from '@/utils/mui_style';
+import { TableEmptyWrapper } from '@/components/TableWrapper';
 function Attendence() {
     const { t }: { t: any } = useTranslation();
     const { showNotification } = useNotistick();
@@ -49,9 +44,9 @@ function Attendence() {
 
     useEffect(() => {
         axios.get(`/api/role`)
-          .then(res => setRoleList(res.data))
-          .catch(err => console.log(err))
-      }, [])
+            .then(res => setRoleList(res.data))
+            .catch(err => console.log(err))
+    }, [])
 
     const handleReportGenerate = async () => {
         try {
@@ -116,121 +111,126 @@ function Attendence() {
             </PageTitleWrapper>
 
             <Grid
-                sx={{ px: 4 }}
+                sx={{ px: { xs: 1, sm: 3 } }}
                 container
                 direction="row"
                 justifyContent="center"
                 alignItems="stretch"
-                spacing={3}
+                spacing={{ xs: 1, sm: 3 }}
             >
                 <Grid item xs={12}>
-                    <Card
-                        sx={{
-                            p: 1,
-                            mb: 3
-                        }}
-                    >
-                        <Grid container spacing={{ xs: 2, md: 3 }}>
-                            <Grid item xs={6} sm={4} md={3}>
-                                <Box p={1}>
-                                    
-                                        <MobileDatePicker
-                                            label="Select Date"
-                                            views={['year', 'month']}
-                                            value={selectedDate}
-                                            onChange={(newValue) => {
-                                                if (newValue) {
-                                                    console.log(
-                                                        newValue,
-                                                        dayjs(newValue).format('YYYY-MM-DD')
-                                                    );
 
-                                                    setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
-                                                } else {
-                                                    setSelectedDate(null);
-                                                }
-                                            }}
-                                            renderInput={(params) => (
-                                                <TextField fullWidth {...params} />
-                                            )}
-                                        />
-                                   
-                                </Box>
-                            </Grid>
+                    <Card sx={{
+                        pt: 1,
+                        px: 1,
+                        mx: "auto",
+                        mb: 3,
+                        maxWidth: 1000,
+                        display: "grid",
+                        gridTemplateColumns: {
+                            xs: "1fr",
+                            sm: "1fr 1fr",
+                            md: "1fr 1fr 1fr 1fr"
+                        },
+                        columnGap: 1
+                    }}>
 
-                            {selectedDate && (
-                                <Grid item xs={6} sm={4} md={3}>
-                                    <Box p={1}>
+                        <Grid item pb={1}>
 
-                                        <Autocomplete
-                                            sx={{
-                                                m: 0
-                                            }}
-                                            limitTags={2}
-                                            // getOptionLabel={(option) => option.id}
-                                            options={roleList.map(i => {
-                                                return {
-                                                    label: i.title,
-                                                    id: i.id,
-                                                }
-                                            })}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    fullWidth
-                                                    variant="outlined"
-                                                    label={t('Select Role')}
-                                                    placeholder={t('Role...')}
-                                                />
-                                            )}
-                                            onChange={(e, v) => setSelectedRole(v ? v : null)}
-                                        />
+                            <MobileDatePicker
 
-                                    </Box>
-                                </Grid>
-                            )}
+                                label="Select Date"
+                                views={['year', 'month']}
+                                value={selectedDate}
+                                onChange={(newValue) => {
+                                    if (newValue) {
+                                        console.log(
+                                            newValue,
+                                            dayjs(newValue).format('YYYY-MM-DD')
+                                        );
 
-                            
-                            {user && selectedRole && academicYear && (
-                                <>
-                                    <Grid item >
+                                        setSelectedDate(dayjs(newValue).format('YYYY-MM-DD'));
+                                    } else {
+                                        setSelectedDate(null);
+                                    }
+                                }}
+                                renderInput={(params) => (
+                                    <TextField fullWidth sx={customBorder} {...params} size="small" />
+                                )}
+                            />
+                        </Grid>
 
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            onClick={() => handleReportGenerate()}
-                                        >
-                                            Generate
-                                        </Button>
+                        {selectedDate ?
+                            <AutoCompleteWrapper
+                                label={t('Select Role')}
+                                placeholder={t('Role...')}
+                                options={roleList.map(i => {
+                                    return {
+                                        label: i.title,
+                                        id: i.id,
+                                    }
+                                })}
+                                value={undefined}
+                                handleChange={(e, v) => setSelectedRole(v ? v : null)}
+                            />
+                            :
+                            <EmptyAutoCompleteWrapper
+                                minWidth="100%"
+                                label={t('Select Role')}
+                                placeholder={t('Role...')}
+                                options={[]}
+                                value={undefined}
+                            />
+                        }
 
-                                    </Grid>
-                                    {
-                                        students &&
+
+                        {(user && selectedRole && academicYear) ? (
+                            <>
+
+                                <ButtonWrapper
+                                    handleClick={() => handleReportGenerate()}
+                                >
+                                    Generate
+                                </ButtonWrapper>
+                                {
+                                    students ?
                                         <Grid item >
-
                                             <ReactToPrint
                                                 content={() => attendenceRef.current}
                                                 // pageStyle={`{ size: 2.5in 4in }`}
                                                 trigger={() => (
-                                                    <Button variant="contained" size='small'>
+                                                    <ButtonWrapper handleClick={() => { }}>
                                                         Print report
-                                                    </Button>
+                                                    </ButtonWrapper>
                                                 )}
                                             />
 
                                         </Grid>
-                                    }
-                                </>
+                                        :
+                                        <DisableButtonWrapper >
+                                            Print report
+                                        </DisableButtonWrapper>
 
-                            )}
+                                }
+                            </>
+                        )
+                            :
+                            <>
+                                <DisableButtonWrapper>
+                                    Generate
+                                </DisableButtonWrapper>
+                                <DisableButtonWrapper >
+                                    Print report
+                                </DisableButtonWrapper>
+                            </>
 
-                        </Grid>
+                        }
                     </Card>
-                    <Divider />
+
                     <Grid
                         sx={{
-                            maxHeight: 'calc(100vh - 450px) !important',
-                            minHeight: 'calc(100vh - 450px) !important',
+                            maxHeight: 'calc(100vh - 394px) !important',
+                            minHeight: 'calc(100vh - 394px) !important',
 
                             overflowX: 'auto',
                             overflowY: 'auto'
@@ -238,7 +238,8 @@ function Attendence() {
                         justifyContent={'flex-end'}
                     >
                         {
-                            targetRoleEmployees && students && <div ref={attendenceRef}>
+                            targetRoleEmployees && students ?
+                             <div ref={attendenceRef}>
 
                                 <table style={tableStyle}>
                                     <thead>
@@ -335,6 +336,8 @@ function Attendence() {
                                     </tbody>
                                 </table>
                             </div>
+                            :
+                            <TableEmptyWrapper title="employee attendance" />
                         }
 
                     </Grid>

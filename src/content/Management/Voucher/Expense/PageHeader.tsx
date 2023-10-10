@@ -70,6 +70,7 @@ function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher
       }
       await axios.post(`/api/transaction/expense`, formData)
       resetForm();
+      setAttachment(null)
       setStatus({ success: true });
       setSubmitting(false);
       handleCreateUserSuccess(t('The expense was created successfully'));

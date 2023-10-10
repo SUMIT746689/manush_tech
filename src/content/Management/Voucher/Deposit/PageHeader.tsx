@@ -28,7 +28,7 @@ import { CheckBox } from '@mui/icons-material';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import MobileDateTimePicker from '@mui/lab/MobileDateTimePicker';
 
-function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher,reFetchDeposit }) {
+function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher, reFetchDeposit }) {
   const { t }: { t: any } = useTranslation();
   const [openAccount, setAccountOpen] = useState(false);
   const { showNotification } = useNotistick();
@@ -72,6 +72,7 @@ function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher
       resetForm();
       setStatus({ success: true });
       setSubmitting(false);
+      setAttachment(null)
       handleCreateUserSuccess(t('The deposit was created successfully'));
       reFetchDeposit()
     } catch (err) {
@@ -89,7 +90,7 @@ function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher
         handleCreateClassOpen={handleCreateAccountOpen}
         name="Voucher Deposit"
       />
-      
+
       <Dialog
         fullWidth
         maxWidth='md'

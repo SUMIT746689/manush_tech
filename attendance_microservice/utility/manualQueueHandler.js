@@ -3,7 +3,10 @@ import { studentAttendence } from "./studentAttendance.js";
 
 export const studentManualQueueHanlde = async (student_attendace_queue) => {
 
-  const { class_id, section_id, school_id, academic_year_id, created_at } = student_attendace_queue;
+  const { id, class_id, section_id, school_id, academic_year_id, created_at } = student_attendace_queue;
+  
+  // delete queue
+  prisma.tbl_manual_student_attendace_queue.delete({ where: { id } }).catch(err=>{console.log("tbl_manual_student_attendace_queue delete",err)});
 
   const whereSection = {};
   if (section_id) whereSection["id"] = section_id;
@@ -49,6 +52,7 @@ export const studentManualQueueHanlde = async (student_attendace_queue) => {
     // const getEntryHours = getEntryTime.getHours();
     // console.log({ getEntryTime, getEntryMinute, getEntryHours });
     section.students?.forEach(student => {
+      console.log({student})
       //create table for student attendence
       studentAttendence({ std_entry_time: section.std_entry_time, class_id, student, last_time: created_at, school_id, section_id: section.id, index })
     })

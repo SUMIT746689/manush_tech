@@ -1,6 +1,6 @@
 import prisma from "./prisma_client.js";
 
-export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text,submission_time, school_id, index }) => {
+export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, index }) => {
 
   const currentDate = new Date().getTime();
   const sms_shoot_id = [String(school_id), String(currentDate), String(index)].join("_");
@@ -24,5 +24,7 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text,submiss
       //fail_count: 3,
       //priority: 4
     }
-  }).catch(err => { console.log("tbl_queue_sms", err) })
+  })
+    // .then(res => { console.log("tbl_queue_sms", res) })
+    .catch(err => { console.log("tbl_queue_sms", err) })
 }

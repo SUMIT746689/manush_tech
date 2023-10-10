@@ -93,15 +93,16 @@ const index = async (req, res) => {
                     .catch(err => { console.log(err) });
 
                     return ({
-                        user_id: 4 || parseInt(i.userID),
-                        school_id: 1 || i.schoolID,
+                        user_id: parseInt(i.userID),
+                        school_id: i.schoolID,
                         submission_time: new Date(Date.now() || i.timestamp),
                         status: i.status,
                         machine_id: i.machineID,
                     })
                 }
                 )
-
+                console.log({data2})
+                
                 await prisma.tbl_attendance_queue.createMany({
                     data: data2
                 })

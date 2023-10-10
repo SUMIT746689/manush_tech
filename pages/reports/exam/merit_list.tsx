@@ -4,7 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Autocomplete, Box, Button, Card, Divider, Grid, Paper, selectClasses, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, useTheme } from '@mui/material';
+import { Autocomplete, Avatar, Box, Button, Card, Divider, Grid, Paper, selectClasses, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, useTheme } from '@mui/material';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
@@ -14,6 +14,8 @@ import { useTranslation } from 'next-i18next';
 import useNotistick from '@/hooks/useNotistick';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 const applyPagination = (array, page, limit) => {
     return array.slice(page * limit, page * limit + limit);
@@ -118,86 +120,96 @@ function Managementschools() {
             <Head>
                 <title>Merit list section</title>
             </Head>
-            <Card sx={{ minHeight: '78vh' }}>
-                <PageTitleWrapper>
-                    <PageHeader title={'Merit list section'} />
-                </PageTitleWrapper>
 
-                <Grid p={2}>
-                    <Grid item container>
-                        <Grid item  >
-                            <Box p={1}>
-                                <ClassAndSectionSelect
-                                    selectedClass={selectedClass}
-                                    setSelectedClass={setSelectedClass}
-                                    classes={classes}
-                                    selectedDate={null}
-                                    selectedSection={selectedSection}
-                                    setSelectedSection={setSelectedSection}
-                                    flag={true}
+            <PageTitleWrapper>
+                <PageHeader title={'Merit list section'} />
+            </PageTitleWrapper>
 
-                                />
+            <Grid
+                justifyContent="center"
+                alignItems="stretch"
+                spacing={3}
+                sx={{ px: { xs: 2, sm: 4 } }}
+            >
+                <Grid item xs={12}>
+                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr 1fr" }, columnGap: 1 }}>
+                        <ClassAndSectionSelect
+                            selectedClass={selectedClass}
+                            setSelectedClass={setSelectedClass}
+                            classes={classes}
+                            selectedDate={null}
+                            selectedSection={selectedSection}
+                            setSelectedSection={setSelectedSection}
+                            flag={true}
+
+                        />
+
+
+                        {
+                            selectedSection && exams &&
+                            <AutoCompleteWrapper
+                                label="Select exam"
+                                placeholder="Exam..."
+                                options={exams}
+                                value={selectedExam}
+                                filterSelectedOptions
+                                handleChange={(e, v) => {
+                                    setSelectedExam(v)
+                                }}
+                            />
+                        }
+                        {
+                            selectedSection && selectedExam && <ButtonWrapper handleClick={handleSearchResult}>Find</ButtonWrapper>
+
+                        }
+                        {
+                            selectedBulkActions &&
+
+
+                            <ReactToPrint
+                                content={() => tabulation_sheet_Print.current}
+                                // pageStyle={`{ size: 2.5in 4in }`}
+
+                                trigger={() => (
+                                    <ButtonWrapper
+                                        handleClick={undefined}
+                                        startIcon={<LocalPrintshopIcon />}
+                                    >{t('print')}</ButtonWrapper>
+                                )}
+                            // pageStyle={"@page { size: landscape; }"}
+                            />
+
+                        }
+                    </Card>
+
+                </Grid>
+                <Divider />
+                <Card sx={{ minHeight: 'calc(100vh - 413px)' }}>
+
+                    {!selectedBulkActions && (
+                        <Box
+                            p={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Box>
+                                <Typography component="span" variant="subtitle1">
+                                    {t('Showing')}:
+                                </Typography>{' '}
+                                <b>{paginatedResults.length}</b> <b>{t('Result')}</b>
                             </Box>
-                        </Grid>
-
-                        {
-                            selectedSection && exams && <>
-                                <Grid
-                                    item xs={6} sm={4} md={3}
-                                >
-                                    <Box p={1}>
-                                        <Autocomplete
-                                            id="tags-outlined"
-                                            options={exams}
-                                            value={selectedExam}
-                                            filterSelectedOptions
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="Select exam"
-                                                    placeholder="exam"
-                                                />
-                                            )}
-                                            onChange={(e, newvalue) => {
-                                                setSelectedExam(newvalue)
-                                            }}
-                                        />
-                                    </Box>
-                                </Grid>
-                            </>
-                        }
-                        {
-                            selectedExam && <Grid item xs={2} sm={4} md={2} >
-                                <Box p={1}>
-                                    <Button variant="contained"
-                                        size="medium" onClick={handleSearchResult}>Find</Button>
-                                </Box>
-                            </Grid>
-                        }
-                        {
-                            selectedBulkActions && <Grid item xs={2} sm={4} md={1} >
-                                <Box p={1}>
-
-
-                                    <ReactToPrint
-                                        content={() => tabulation_sheet_Print.current}
-                                        // pageStyle={`{ size: 2.5in 4in }`}
-
-                                        trigger={() => (
-                                            <Button variant="contained"
-                                                startIcon={<LocalPrintshopIcon />}
-                                                size="medium">{t('print')}</Button>
-                                        )}
-                                    // pageStyle={"@page { size: landscape; }"}
-                                    />
-                                </Box>
-                            </Grid>
-                        }
-
-
-                    </Grid>
-                    <Divider />
-
+                            <TablePagination
+                                component="div"
+                                count={paginatedResults.length}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleLimitChange}
+                                page={page}
+                                rowsPerPage={limit}
+                                rowsPerPageOptions={[5, 10, 15]}
+                            />
+                        </Box>
+                    )}
                     {paginatedResults.length === 0 ? (
                         <>
                             <Typography
@@ -217,33 +229,7 @@ function Managementschools() {
                     ) : (
 
                         <>
-                            {
-                                paginatedResults &&
-                                <Box
-                                    p={2}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <Box>
-                                        <Typography component="span" variant="subtitle1">
-                                            {t('Showing')}:
-                                        </Typography>{' '}
-                                        <b>{paginatedResults.length}</b> <b>{t('result')}</b>
-                                    </Box>
-                                    <TablePagination
-                                        component="div"
-                                        count={paginatedResults.length}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleLimitChange}
-                                        page={page}
-                                        rowsPerPage={limit}
-                                        rowsPerPageOptions={[5, 10, 15]}
-                                    />
-                                </Box>
-                            }
-                            < TableContainer component={Paper}>
+                            < TableContainer>
                                 <Table aria-label="collapsible table">
                                     <TableHead>
                                         <TableRow>
@@ -275,7 +261,7 @@ function Managementschools() {
                                                     <TableCell >{name}</TableCell>
                                                     <TableCell >{i.student.class_roll_no}</TableCell>
                                                     <TableCell >{subjectlistLength == result_detailsLength ? `${i?.total_marks_obtained}/${total_exam_mark}` : 'not inserted'}</TableCell>
-                                                    <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_point : 'not inserted'}</TableCell>
+                                                    <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_point?.toFixed(2) : 'not inserted'}</TableCell>
                                                     <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_grade : 'not inserted'}</TableCell>
                                                 </TableRow>
                                             }
@@ -289,9 +275,9 @@ function Managementschools() {
 
                         </>
                     )}
+                </Card>
+            </Grid>
 
-                </Grid>
-            </Card>
             <Grid sx={{
                 display: 'none'
             }}>
@@ -299,12 +285,39 @@ function Managementschools() {
                     p: 1
                 }} ref={tabulation_sheet_Print}>
 
-                    <Grid sx={{
-                        textAlign: 'center'
-                    }}>
-                        <h1>Tabulation sheet</h1>
+                    <Grid py={2} spacing={2} sx={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 2.75fr 1fr'
+                    }} px={7}>
 
-                        <h3>Section :{selectedSection?.label}</h3>
+                        <Grid item>
+                            <Avatar variant="rounded"  >
+                                {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                            </Avatar>
+                        </Grid>
+
+                        <Grid item>
+                            <Typography
+                                variant="h3"
+                                align="center"
+                            >
+                                {user?.school?.name}
+                            </Typography>
+                            <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                                {user?.school?.address}, {user?.school?.phone}
+                            </Typography>
+                            <Typography variant="h6" align="center" >
+                                Class : {selectedClass?.label}, Section : {selectedSection?.label}
+                            </Typography>
+                        </Grid>
+
+                        <Grid item>
+                            <Typography variant="h4" >
+                                Merit list
+                            </Typography>
+                        </Grid>
+
+
                     </Grid>
                     <Grid sx={{
                         display: 'flex',
@@ -342,7 +355,7 @@ function Managementschools() {
                                                 <TableCell >{name}</TableCell>
                                                 <TableCell >{i.student.class_roll_no}</TableCell>
                                                 <TableCell >{subjectlistLength == result_detailsLength ? `${i?.total_marks_obtained}/${total_exam_mark}` : 'not inserted'}</TableCell>
-                                                <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_point : 'not inserted'}</TableCell>
+                                                <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_point?.toFixed(2) : 'not inserted'}</TableCell>
                                                 <TableCell >{subjectlistLength == result_detailsLength ? i?.calculated_grade : 'not inserted'}</TableCell>
                                             </TableRow>
                                         }

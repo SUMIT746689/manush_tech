@@ -19,7 +19,7 @@ const index = async (req, res, refresh_token) => {
             point: 'desc'
           }
         });
-        console.log("grade__", data);
+        // console.log("grade__", data);
 
         res.status(200).json(data);
         break;

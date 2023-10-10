@@ -16,6 +16,8 @@ import Image from 'next/image';
 import ReactToPrint from 'react-to-print';
 import dayjs from 'dayjs';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 
 
@@ -151,91 +153,102 @@ function Managementschools() {
             <Head>
                 <title>Report card section</title>
             </Head>
-            <Card sx={{ minHeight: '78vh' }}>
-                <PageTitleWrapper>
-                    <PageHeader title={'Report card section'} />
-                </PageTitleWrapper>
 
-                <Grid p={2}>
-                    <Grid item container>
-                        <Grid item  >
-                            <Box p={1}>
-                                <ClassAndSectionSelect
-                                    selectedClass={selectedClass}
-                                    setSelectedClass={setSelectedClass}
-                                    classes={classes}
-                                    selectedDate={null}
-                                    selectedSection={selectedSection}
-                                    setSelectedSection={setSelectedSection}
-                                    flag={true}
+            <PageTitleWrapper>
+                <PageHeader title={'Report card section'} />
+            </PageTitleWrapper>
 
-                                />
+            <Grid
+                justifyContent="center"
+                alignItems="stretch"
+                spacing={3}
+                sx={{ px: { xs: 2, sm: 4 } }}
+            >
+                <Grid item xs={12}>
+                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr 1fr" }, columnGap: 1 }}>
+
+                        <ClassAndSectionSelect
+                            selectedClass={selectedClass}
+                            setSelectedClass={setSelectedClass}
+                            classes={classes}
+                            selectedDate={null}
+                            selectedSection={selectedSection}
+                            setSelectedSection={setSelectedSection}
+                            flag={true}
+
+                        />
+
+
+                        {
+                            selectedSection && exams &&
+                            <AutoCompleteWrapper
+                                label="Select exam"
+                                placeholder="Exam..."
+                                options={exams}
+                                value={selectedExam}
+                                filterSelectedOptions
+                                handleChange={(e, v) => {
+                                    setSelectedExam(v)
+                                }}
+                            />
+
+                        }
+                        {
+                            selectedSection && selectedExam &&
+                            <ButtonWrapper
+                                handleClick={handleSearchResult}
+                            >Find</ButtonWrapper>
+                        }
+                        {
+                            selectedBulkActions &&
+                            <ReactToPrint
+                                content={() => reportCardPrint.current}
+                                // pageStyle={`{ size: 2.5in 4in }`}
+                                trigger={() => (
+                                    <ButtonWrapper
+                                        startIcon={<LocalPrintshopIcon />}
+                                        handleClick={() => {
+                                            console.log("selectedItems__", selectedItems);
+
+                                            showNotification('Not possible for now !', 'error')
+
+                                        }}>{t('print')}</ButtonWrapper>
+                                )}
+                                // pageStyle="@page { size: A4; }"
+                                pageStyle={`@page { size: landscape; } .printable-item { page-break-after: always; }`}
+                            />
+
+                        }
+
+
+                    </Card>
+                </Grid>
+                <Divider />
+                <Card sx={{ minHeight: 'calc(100vh - 413px)' }}>
+                    {!selectedBulkActions && (
+                        <Box
+                            p={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Box>
+                                <Typography component="span" variant="subtitle1">
+                                    {t('Showing')}:
+                                </Typography>{' '}
+                                <b>{paginatedResults.length}</b> <b>{t('Result')}</b>
                             </Box>
-                        </Grid>
-
-                        {
-                            selectedSection && exams && <>
-                                <Grid
-                                    item xs={6} sm={4} md={3}
-                                >
-                                    <Box p={1}>
-                                        <Autocomplete
-                                            id="tags-outlined"
-                                            options={exams}
-                                            value={selectedExam}
-                                            filterSelectedOptions
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="Select exam"
-                                                    placeholder="exam"
-                                                />
-                                            )}
-                                            onChange={(e, newvalue) => {
-                                                setSelectedExam(newvalue)
-                                            }}
-                                        />
-                                    </Box>
-                                </Grid>
-                            </>
-                        }
-                        {
-                            selectedExam && <Grid item xs={2} sm={4} md={2} >
-                                <Box p={1}>
-                                    <Button variant="contained"
-                                        size="medium" onClick={handleSearchResult}>Find</Button>
-                                </Box>
-                            </Grid>
-                        }
-                        {
-                            selectedBulkActions && <Grid item xs={2} sm={4} md={1} >
-                                <Box p={1}>
-
-
-                                    <ReactToPrint
-                                        content={() => reportCardPrint.current}
-                                        // pageStyle={`{ size: 2.5in 4in }`}
-                                        trigger={() => (
-                                            <Button variant="contained"
-                                                startIcon={<LocalPrintshopIcon />}
-                                                size="medium" onClick={() => {
-                                                    console.log("selectedItems__", selectedItems);
-
-                                                    showNotification('Not possible for now !', 'error')
-
-                                                }}>{t('print')}</Button>
-                                        )}
-                                        // pageStyle="@page { size: A4; }"
-                                        pageStyle={`@page { size: landscape; } .printable-item { page-break-after: always; }`}
-                                    />
-                                </Box>
-                            </Grid>
-                        }
-
-
-                    </Grid>
-                    <Divider />
-
+                            <TablePagination
+                                component="div"
+                                count={paginatedResults.length}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleLimitChange}
+                                page={page}
+                                rowsPerPage={limit}
+                                rowsPerPageOptions={[5, 10, 15]}
+                            />
+                        </Box>
+                    )}
                     {paginatedResults.length === 0 ? (
                         <>
                             <Typography
@@ -254,86 +267,58 @@ function Managementschools() {
                         </>
                     ) : (
 
-                        <>
-                            {
-                                paginatedResults &&
-                                <Box
-                                    p={2}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <Box>
-                                        <Typography component="span" variant="subtitle1">
-                                            {t('Showing')}:
-                                        </Typography>{' '}
-                                        <b>{paginatedResults.length}</b> <b>{t('result')}</b>
-                                    </Box>
-                                    <TablePagination
-                                        component="div"
-                                        count={paginatedResults.length}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleLimitChange}
-                                        page={page}
-                                        rowsPerPage={limit}
-                                        rowsPerPageOptions={[5, 10, 15]}
-                                    />
-                                </Box>
-                            }
-                            <TableContainer component={Paper}>
-                                <Table aria-label="collapsible table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    checked={selectedAllUsers}
-                                                    indeterminate={selectedSomeUsers}
-                                                    onChange={handleSelectAllUsers}
-                                                />
-                                            </TableCell>
-                                            <TableCell>{t('Class roll')}</TableCell>
-                                            <TableCell>{t('Total marks obtained')}</TableCell>
-                                            <TableCell>{t('GPA')}</TableCell>
-                                            <TableCell>{t('Grade')}</TableCell>
+                        <TableContainer >
+                            <Table aria-label="collapsible table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                checked={selectedAllUsers}
+                                                indeterminate={selectedSomeUsers}
+                                                onChange={handleSelectAllUsers}
+                                            />
+                                        </TableCell>
+                                        <TableCell>{t('Class roll')}</TableCell>
+                                        <TableCell>{t('Total marks obtained')}</TableCell>
+                                        <TableCell>{t('GPA')}</TableCell>
+                                        <TableCell>{t('Grade')}</TableCell>
 
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {paginatedResults?.map((row) => {
-                                            const isUserSelected = selectedItems.findIndex(i => i.id == row.id) > -1;
-                                            return (
-                                                <TableRow >
-                                                    <TableCell padding="checkbox">
-                                                        <Checkbox
-                                                            checked={isUserSelected}
-                                                            onChange={(event) =>
-                                                                handleSelectOneUser(event, row)
-                                                            }
-                                                            value={isUserSelected}
-                                                        />
-                                                    </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {paginatedResults?.map((row) => {
+                                        const isUserSelected = selectedItems.findIndex(i => i.id == row.id) > -1;
+                                        return (
+                                            <TableRow >
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox
+                                                        checked={isUserSelected}
+                                                        onChange={(event) =>
+                                                            handleSelectOneUser(event, row)
+                                                        }
+                                                        value={isUserSelected}
+                                                    />
+                                                </TableCell>
 
-                                                    <TableCell component="th" scope="row">
-                                                        {row?.student?.class_roll_no}
-                                                    </TableCell>
-                                                    <TableCell >{row?.total_marks_obtained?.toFixed(2)}</TableCell>
-                                                    <TableCell >{(row?.calculated_point).toFixed(2)}</TableCell>
-                                                    <TableCell >{row?.calculated_grade}</TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    {row?.student?.class_roll_no}
+                                                </TableCell>
+                                                <TableCell >{row?.total_marks_obtained?.toFixed(2)}</TableCell>
+                                                <TableCell >{(row?.calculated_point).toFixed(2)}</TableCell>
+                                                <TableCell >{row?.calculated_grade}</TableCell>
 
-                                                </TableRow>
+                                            </TableRow>
 
-                                            )
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
 
-                        </>
                     )}
+                </Card>
 
-                </Grid>
-            </Card>
+            </Grid>
 
             {/* print report Card */}
             <Grid sx={{
@@ -344,19 +329,11 @@ function Managementschools() {
                     {
                         selectedItems?.map(i => {
                             const resultDetailsLength = i?.result_details?.length
-                            return (<>
-                                <Grid sx={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    zIndex: 1,
-
-                                }}>
+                            return (
+                            <Grid key={i.id} sx={{
+                                position:'relative'
+                            }}>
+                               
                                     <Image
                                         src="/mram.png"
                                         alt="Watermark"
@@ -376,7 +353,7 @@ function Managementschools() {
                                         height={100}
                                         width={100}
                                     />
-                                </Grid>
+                                
                                 <Grid sx={{
                                     zIndex: 2,
                                 }}>
@@ -614,7 +591,7 @@ function Managementschools() {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                            </>)
+                            </Grid>)
                         }
 
                         )

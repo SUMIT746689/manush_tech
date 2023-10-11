@@ -1,17 +1,13 @@
+import prisma from '@/lib/prisma_client';
 import { PrismaClient } from '@prisma/client';
+import { authenticate } from 'middleware/authenticate';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
-const prisma = new PrismaClient();
 
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
   try {
     const { method } = req;
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
-
+   
     switch (method) {
       case 'GET':
         let query = {}
@@ -53,4 +49,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(index) ;

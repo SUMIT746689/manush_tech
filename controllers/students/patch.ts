@@ -114,7 +114,7 @@ const patchHandle = async (req, res, authenticate_user) => {
                 fileDelete([studentPast?.guardian_photo])
             }
 
-            const student = await transaction.student.update({
+           await transaction.student.update({
                 where: {
                     id: student_id
                 },
@@ -135,6 +135,9 @@ const patchHandle = async (req, res, authenticate_user) => {
                     student_present_address: fields?.student_present_address,
                     section: {
                         connect: { id: parseInt(fields?.section_id) }
+                    },
+                    group: {
+                        connect: { id: parseInt(fields?.group_id) }
                     },
                     academic_year: {
                         connect: { id: parseInt(fields?.academic_year_id) }

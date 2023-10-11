@@ -277,7 +277,7 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
           <Grid sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 3,
+            gap: 2,
             p: 2,
             borderLeft: {
               md: '1px solid lightgrey'
@@ -296,31 +296,31 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
                 <Grid sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2,
+                  gap: 1.5,
                   pt: 2
                 }}>
-                  <Typography variant='h6'>User name : {selectedStudent?.student_info?.user?.username}</Typography>
-                  <Typography variant='h6'>Gender : {selectedStudent?.student_info?.gender}</Typography>
-                  <Typography variant='h6'>Phone : {selectedStudent?.student_info?.phone}</Typography>
-                  <Typography variant='h6'>Religion : {selectedStudent?.student_info?.religion}</Typography>
+                  <Typography variant='h6'>User name :<br /><Typography variant='h5'> {selectedStudent?.student_info?.user?.username}</Typography> </Typography>
+                  <Typography variant='h6'>Gender :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.gender}</Typography></Typography>
+                  <Typography variant='h6'>Phone :<br /> <Typography variant='h5'> {selectedStudent?.student_info?.phone}</Typography></Typography>
+                  <Typography variant='h6'>Religion :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.religion}</Typography></Typography>
                 </Grid>
                 <Grid borderLeft={'1px dashed lightgrey'} pl={2} sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2,
+                  gap: 1.5,
                   pt: 2
                 }}>
-                  <Typography variant='h6'>Email : {selectedStudent?.student_info?.email}</Typography>
-                  <Typography variant='h6'>Birth certificate or NID : {selectedStudent?.student_info?.national_id}</Typography>
-                  <Typography variant='h6'>Previous school : {selectedStudent?.student_info?.previous_school}</Typography>
-                  <Typography variant='h6'>Present address : {selectedStudent?.student_info?.student_present_address}</Typography>
-                  <Typography variant='h6'>Permanent address : {selectedStudent?.student_info?.student_permanent_address}</Typography>
+                  <Typography variant='h6'>Email :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.email}</Typography></Typography>
+                  <Typography variant='h6'>Birth certificate or NID :<br /><Typography variant='h5'> {selectedStudent?.student_info?.national_id}</Typography> </Typography>
+                  <Typography variant='h6'>Previous school :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.previous_school}</Typography></Typography>
+                  <Typography variant='h6'>Present address :<br /><Typography variant='h5'>{selectedStudent?.student_present_address} </Typography> </Typography>
+                  <Typography variant='h6'>Permanent address :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.student_permanent_address}</Typography></Typography>
                 </Grid>
               </Grid>
             </Grid>
 
             <Grid>
-              <Typography align='center' variant='h3' p={2} borderBottom={'1px dashed lightgrey'}>Other Information</Typography>
+              <Typography align='center' variant='h3' p={2} borderBottom={'1px dashed lightgrey'}>Guardian Information</Typography>
               <Grid sx={{
                 display: 'grid',
                 gridTemplateColumns: {
@@ -332,27 +332,27 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
                 <Grid sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2,
+                  gap: 1.5,
                   pt: 2
                 }}>
-                  <Typography variant='h6'>Guardian name : {selectedStudent?.guardian_name}</Typography>
-                  <Typography variant='h6'>Relation with guardian : {selectedStudent?.relation_with_guardian}</Typography>
-                  <Typography variant='h6'>Guardian phone : {selectedStudent?.guardian_phone}</Typography>
-                  <Typography variant='h6'>Guardian profession : {selectedStudent?.guardian_profession}</Typography>
+                  <Typography variant='h6'>Guardian name :<br /><Typography variant='h5'> {selectedStudent?.guardian_name}</Typography></Typography>
+                  <Typography variant='h6'>Relation with guardian :<br /><Typography variant='h5'> {selectedStudent?.relation_with_guardian}</Typography></Typography>
+                  <Typography variant='h6'>Guardian phone :<br /><Typography variant='h5'> {selectedStudent?.guardian_phone}</Typography></Typography>
+                  <Typography variant='h6'>Guardian profession :<br /><Typography variant='h5'> {selectedStudent?.guardian_profession}</Typography></Typography>
                 </Grid>
                 <Grid borderLeft={'1px dashed lightgrey'} pl={2} sx={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2,
+                  gap: 1.5,
                   pt: 2
                 }}>
-                  <Typography variant='h6'>Father's name : {selectedStudent?.student_info?.father_name}</Typography>
-                  <Typography variant='h6'>Father's phone : {selectedStudent?.student_info?.father_phone}</Typography>
-                  <Typography variant='h6'>Father's profession : {selectedStudent?.student_info?.father_profession}</Typography>
-                  <br />
-                  <Typography variant='h6'>Mother's name : {selectedStudent?.student_info?.mother_name}</Typography>
-                  <Typography variant='h6'>Mother's phone : {selectedStudent?.student_info?.mother_phone}</Typography>
-                  <Typography variant='h6'>Mother's profession : {selectedStudent?.student_info?.mother_profession}</Typography>
+                  <Typography variant='h6'>Father's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_name}</Typography></Typography>
+                  <Typography variant='h6'>Father's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_phone}</Typography></Typography>
+                  <Typography variant='h6'>Father's profession :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_profession}</Typography></Typography>
+                  
+                  <Typography variant='h6'>Mother's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_name}</Typography></Typography>
+                  <Typography variant='h6'>Mother's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_phone}</Typography></Typography>
+                  <Typography variant='h6'>Mother's profession :<br /> <Typography variant='h5'>  {selectedStudent?.student_info?.mother_profession}</Typography></Typography>
 
                 </Grid>
               </Grid>

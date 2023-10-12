@@ -16,7 +16,7 @@ import Results from 'src/content/Management/Students/Results';
 // import RegistrationFirstPart from '@/content/Management/Students/RegistrationFirstPart';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import { AcademicYearContext, Students } from '@/contexts/UtilsContextUse';
 import { useRef } from 'react';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,7 +31,8 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 function ManagementClasses() {
 
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useContext<any[]>(Students);
+
   const { t }: { t: any } = useTranslation();
   const router = useRouter();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -49,6 +50,27 @@ function ManagementClasses() {
   const [excelFileUpload, setExcelFileUpload] = useState(null);
 
   const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
+
+  useEffect(() => {
+    if (students?.selectedClass) {
+      setSelectedClass(students?.selectedClass)
+      axios.get(`/api/class/${students?.selectedClass?.id}`)
+        .then(res => {
+          const sections = res?.data?.sections?.map((i) => ({
+            label: i.name,
+            id: i.id
+          }))
+          sections.push({
+            label: 'All sections',
+            id: 'all'
+          })
+          setSections(sections);
+          if (students?.selectedSection) {
+            setSelectedSection(sections?.find(i => i.id == students?.selectedSection?.id))
+          }
+        })
+    }
+  }, [!selectedClass, !selectedSection])
 
   useEffect(() => {
     if (selectedClass && academicYear) {
@@ -81,18 +103,18 @@ function ManagementClasses() {
         )
         .then((res) => {
           console.log('ref__', res.data);
-          setStudents(res.data);
+          setStudents({ AllStudents: res.data, selectedClass, selectedSection });
 
         });
     }
 
   }
 
-
   const handleClassSelect = (event, newValue) => {
     console.log(newValue);
     setSelectedClass(newValue);
     setSelectedSection(null);
+    setStudents(null);
 
     if (newValue) {
       const targetClassSections = classes.find((i) => i.id == newValue.id);
@@ -117,6 +139,7 @@ function ManagementClasses() {
       }
     }
   };
+
   const handleSendToRegistrationPage = () => {
     router.push('/management/students/registration');
   };
@@ -148,6 +171,7 @@ function ManagementClasses() {
     }`
   });
   // size: 85.725mm 53.975mm;
+  console.log("students__", students, selectedClass, selectedSection);
 
   return (
     <>
@@ -169,7 +193,7 @@ function ManagementClasses() {
 
         </Grid>
       </PageTitleWrapper>
-      <Card sx={{mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr auto 1fr" }, columnGap: 1 }}
+      <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr auto 1fr" }, columnGap: 1 }}
       >
 
         <ButtonWrapper
@@ -237,6 +261,7 @@ function ManagementClasses() {
             value={selectedSection}
             handleChange={(e, v) => {
               setSelectedSection(v);
+              setStudents(null);
             }}
           />
 
@@ -246,7 +271,7 @@ function ManagementClasses() {
           <ButtonWrapper handleClick={handleStudentList}> Find</ButtonWrapper>
 
         }
-        {students.length > 0 && (
+        {students?.AllStudents?.length > 0 && (
 
           <ButtonWrapper
             handleClick={handlePrint}
@@ -257,7 +282,7 @@ function ManagementClasses() {
 
         )}
         <Grid>
-          <ExportData students={students} />
+          <ExportData students={students?.AllStudents} />
         </Grid>
 
       </Card>
@@ -271,7 +296,7 @@ function ManagementClasses() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results users={students}
+          <Results students={students?.AllStudents || []}
             refetch={handleStudentList}
             discount={discount}
             fee={fee}

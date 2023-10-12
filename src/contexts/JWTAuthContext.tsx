@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import useNotistick from '@/hooks/useNotistick';
 
 // wrap your app
 interface AuthState {
@@ -147,10 +146,6 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
     setNotification({ open: true, ...newState });
   };
 
-  useEffect(() => {
-    console.log(notification);
-
-  }, [notification])
 
   useEffect(() => {
     const initialize = async (): Promise<void> => {

@@ -21,7 +21,7 @@ import useScrollTop from 'src/hooks/useScrollTop';
 import { SnackbarProvider } from 'notistack';
 import { AuthConsumer, AuthProvider } from 'src/contexts/JWTAuthContext';
 import "styles/globals.css";
-import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import { AcademicYearContext, Students } from '@/contexts/UtilsContextUse';
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
 import '@fullcalendar/timegrid/main.css'
@@ -43,6 +43,7 @@ function TokyoApp(props: TokyoAppProps) {
   useScrollTop();
 
   const [academicYear, setAcademicYear] = useState({});
+  const [students, setStudents] = useState({});
 
   Router.events.on('routeChangeStart', nProgress.start);
   Router.events.on('routeChangeError', nProgress.done);
@@ -63,24 +64,27 @@ function TokyoApp(props: TokyoAppProps) {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <AuthProvider>
                 <AcademicYearContext.Provider value={[academicYear, setAcademicYear]}>
-                  <SnackbarProvider
-                    maxSnack={6}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right'
-                    }}
-                  >
-                    <CssBaseline />
-                    <AuthConsumer>
-                      {(auth) =>
-                        !auth.isInitialized ? (
-                          <Loader />
-                        ) : (
-                          getLayout(<Component {...pageProps} />)
-                        )
-                      }
-                    </AuthConsumer>
-                  </SnackbarProvider>
+                  <Students.Provider value={[students, setStudents]}>
+                    <SnackbarProvider
+                      maxSnack={6}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right'
+                      }}
+                    >
+                      <CssBaseline />
+                      <AuthConsumer>
+                        {(auth) =>
+                          !auth.isInitialized ? (
+                            <Loader />
+                          ) : (
+                            getLayout(<Component {...pageProps} />)
+                          )
+                        }
+                      </AuthConsumer>
+                    </SnackbarProvider>
+                  </Students.Provider>
+
                 </AcademicYearContext.Provider>
               </AuthProvider>
             </LocalizationProvider>

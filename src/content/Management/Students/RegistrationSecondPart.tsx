@@ -69,24 +69,12 @@ function RegistrationSecondPart({
       const targetClassSections = classes?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id))
       console.log("targetClassSections__", targetClassSections);
 
-      // axios.get(`/api/group?class_id=${value.id}`).then(res =>{
-      //   setGroup(res?.data?.map(i => ({
-      //     label: i.name,
-      //     id: i.id
-      //   })))
-      // }).catch(err => console.log(err))
-
       setSectionsForSelectedClass(targetClassSections?.sections?.map(i => {
         return {
           label: i.name,
           id: i.id
         }
       }))
-      // const temp = targetClassSections.find()
-      // setSelecetedSection({
-      //   label: targetClassSections?.sections[0]?.name,
-      //   id: targetClassSections?.sections[0]?.id
-      // })
     }
 
   }, [student])
@@ -382,7 +370,7 @@ function RegistrationSecondPart({
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              required
+
                               size="small"
                               sx={{
                                 '& fieldset': {
@@ -616,6 +604,13 @@ function RegistrationSecondPart({
                 <Button color="secondary" onClick={handleCreateClassClose}>
                   {t('Cancel')}
                 </Button>
+                {/* <Button
+                  color="warning"
+                  variant="contained"
+                  onClick={() => setActiveStep(0)}
+                >
+                  {t('<< Previous')}
+                </Button> */}
                 <Button
                   type="submit"
                   startIcon={

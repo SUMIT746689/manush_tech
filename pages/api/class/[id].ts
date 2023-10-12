@@ -22,7 +22,8 @@ const index = async (req, res, refresh_token) => {
               }
             }
           };
-        } else {
+        }
+         else {
           query['include'] = {
             sections: true
           };

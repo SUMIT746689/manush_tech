@@ -5,6 +5,7 @@ import {
   Ref,
   forwardRef,
   useEffect,
+  FC,
 } from 'react';
 
 import PropTypes from 'prop-types';
@@ -139,7 +140,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users, refetch, discount, idCard, fee }) => {
+const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCard: any, fee: any[] }> = ({ students, refetch, discount, idCard, fee }) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -165,7 +166,7 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
 
 
   const handleSelectAllUsers = (event: ChangeEvent<HTMLInputElement>): void => {
-    setSelectedUsers(event.target.checked ? users.map((user) => user.id) : []);
+    setSelectedUsers(event.target.checked ? students.map((user) => user.id) : []);
   };
 
   const handleSelectOneUser = (
@@ -181,12 +182,12 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
     }
   };
 
-  const filteredClasses = applyFilters(users, query, filters);
+  const filteredClasses = applyFilters(students, query, filters);
   const paginatedClasses = applyPagination(filteredClasses, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
   const selectedSomeUsers =
-    selectedItems.length > 0 && selectedItems.length < users.length;
-  const selectedAllUsers = selectedItems.length === users.length;
+    selectedItems.length > 0 && selectedItems.length < students.length;
+  const selectedAllUsers = selectedItems.length === students.length;
 
   ;
 
@@ -349,7 +350,7 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
                   <Typography variant='h6'>Father's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_name}</Typography></Typography>
                   <Typography variant='h6'>Father's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_phone}</Typography></Typography>
                   <Typography variant='h6'>Father's profession :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_profession}</Typography></Typography>
-                  
+
                   <Typography variant='h6'>Mother's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_name}</Typography></Typography>
                   <Typography variant='h6'>Mother's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_phone}</Typography></Typography>
                   <Typography variant='h6'>Mother's profession :<br /> <Typography variant='h5'>  {selectedStudent?.student_info?.mother_profession}</Typography></Typography>
@@ -448,132 +449,129 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
             </Typography>
           </>
         ) : (
-          <>
-            <TableContainer >
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllUsers}
-                        indeterminate={selectedSomeUsers}
-                        onChange={handleSelectAllUsers}
-                      />
-                    </TableCell>
-                    <TableCell>{t('student name')}</TableCell>
-                    <TableCell>{t('Class')}</TableCell>
-                    <TableCell >{t('class Roll')}</TableCell>
-                    <TableCell >{t('Section')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedClasses.map((i) => {
-                    const isUserSelected = selectedItems.includes(i.id);
-                    return (
-                      <TableRow hover key={i.id} selected={isUserSelected}>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isUserSelected}
-                            onChange={(event) =>
-                              handleSelectOneUser(event, i.id)
-                            }
-                            value={isUserSelected}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {i?.section?.class?.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {i?.class_roll_no}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
-                          </Typography>
-                        </TableCell>
-                        {/*<TableCell align="center">*/}
-                        {/*  <Typography noWrap>*/}
-                        {/*    /!* <Tooltip title={t('Edit')} arrow>*/}
-                        {/*      <IconButton*/}
-                        {/*        color="primary"*/}
-                        {/*      >*/}
-                        {/*        <LaunchTwoToneIcon fontSize="small" />*/}
-                        {/*      </IconButton>*/}
-                        {/*    </Tooltip> *!/*/}
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedAllUsers}
+                      indeterminate={selectedSomeUsers}
+                      onChange={handleSelectAllUsers}
+                    />
+                  </TableCell>
+                  <TableCell>{t('student name')}</TableCell>
+                  <TableCell>{t('Class')}</TableCell>
+                  <TableCell >{t('class Roll')}</TableCell>
+                  <TableCell >{t('Section')}</TableCell>
+                  <TableCell align="center">{t('Actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedClasses.map((i) => {
+                  const isUserSelected = selectedItems.includes(i.id);
+                  return (
+                    <TableRow hover key={i.id} selected={isUserSelected}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={isUserSelected}
+                          onChange={(event) =>
+                            handleSelectOneUser(event, i.id)
+                          }
+                          value={isUserSelected}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h5">
+                          {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h5">
+                          {i?.section?.class?.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h5">
+                          {i?.class_roll_no}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h5">
+                          {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
+                        </Typography>
+                      </TableCell>
+                      {/*<TableCell align="center">*/}
+                      {/*  <Typography noWrap>*/}
+                      {/*    /!* <Tooltip title={t('Edit')} arrow>*/}
+                      {/*      <IconButton*/}
+                      {/*        color="primary"*/}
+                      {/*      >*/}
+                      {/*        <LaunchTwoToneIcon fontSize="small" />*/}
+                      {/*      </IconButton>*/}
+                      {/*    </Tooltip> *!/*/}
 
 
 
-                        {/*  </Typography>*/}
-                        {/*</TableCell>*/}
-                        <TableCell align={'center'} sx={{
-                          display: 'grid',
-                          gridTemplateColumns: 'auto auto auto auto'
-                        }}>
-                          <Tooltip title={t('View Profile')} arrow>
-                            <IconButton
-                              color="primary"
-                              onClick={() => {
-                                setSelectedStudent(i)
-                                setStudentProfileModal(true)
-                              }}
-                            >
-                              <VisibilityIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                      {/*  </Typography>*/}
+                      {/*</TableCell>*/}
+                      <TableCell align={'center'} sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto auto auto auto'
+                      }}>
+                        <Tooltip title={t('View Profile')} arrow>
+                          <IconButton
+                            color="primary"
+                            onClick={() => {
+                              setSelectedStudent(i)
+                              setStudentProfileModal(true)
+                            }}
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
 
-                          <Tooltip title={t('Edit')} arrow>
-                            <IconButton
-                              color="primary"
-                            >
-                              <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
-                            </IconButton>
-                          </Tooltip>
+                        <Tooltip title={t('Edit')} arrow>
+                          <IconButton
+                            color="primary"
+                          >
+                            <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
+                          </IconButton>
+                        </Tooltip>
 
-                          <Tooltip title={t('Discount')} arrow>
-                            <IconButton
-                              color="primary"
-                              onClick={() => {
-                                setSelectedStudent(i)
-                                setDiscountModal(true)
-                              }}
-                            >
-                              <DiscountIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                        <Tooltip title={t('Discount')} arrow>
+                          <IconButton
+                            color="primary"
+                            onClick={() => {
+                              setSelectedStudent(i)
+                              setDiscountModal(true)
+                            }}
+                          >
+                            <DiscountIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
 
-                          <Tooltip title={t('Delete')} arrow>
-                            <IconButton
-                              onClick={() => handleConfirmDelete(i.id)}
-                              color="primary"
-                            >
-                              <DeleteTwoToneIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
+                        <Tooltip title={t('Delete')} arrow>
+                          <IconButton
+                            onClick={() => handleConfirmDelete(i.id)}
+                            color="primary"
+                          >
+                            <DeleteTwoToneIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </Card>
       <div style={{ display: 'none', visibility: 'hidden' }}>
         <Grid ref={idCard}>
-          {users?.filter?.(j => selectedItems.includes(j.id))?.map(
+          {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i) => {
-              console.log("i___", i);
 
               const user = {
                 id: i?.class_roll_no,
@@ -587,7 +585,7 @@ const Results = ({ users, refetch, discount, idCard, fee }) => {
                 phone: i?.phone,
                 birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
 
-                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : 'https://cdn4.iconfinder.com/data/icons/modern-education-and-knowledge-power-1/512/499_student_education_graduate_learning-512.png'
+                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : '/dumy_student.png'
               };
               return <IdentityCard user={user} />;
             }
@@ -756,11 +754,11 @@ const SingleDiscount = ({ singleDiscount, selectedUser }) => {
 
 
 Results.propTypes = {
-  users: PropTypes.array.isRequired
+  students: PropTypes.array.isRequired
 };
 
 Results.defaultProps = {
-  users: []
+  students: []
 };
 
 export default Results;

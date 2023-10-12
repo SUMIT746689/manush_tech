@@ -1,7 +1,5 @@
-import {  Prisma, PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
 
 export default async function get(req, res) {
   try {
@@ -10,9 +8,6 @@ export default async function get(req, res) {
     const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
     if (!refresh_token) throw new Error('invalid user');
-
-    console.log({ refresh_token });
-
 
     if (refresh_token.school_id) {
       const response = await prisma.holiday.findMany({
@@ -36,11 +31,7 @@ export default async function get(req, res) {
           end_date: true
         }
       })
-      // const response = await prisma.$queryRaw(
-      //   Prisma.sql`select schools.name,subscriptions.end_date,subscriptions.is_active from subscriptions inner join schools on schools.id = subscriptions.school_id && subscriptions.is_active = true`
-      // )
-      console.log("XXXXXXXXXXXXXXXXXXX___",response);
-
+      
       if (response) return res.json({ data: response, success: true });
       else throw new Error('Invalid to find school');
     }

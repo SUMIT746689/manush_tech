@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma_client";
 
 export default async function deleteSchool(req, res,refresh_token) {
   try {

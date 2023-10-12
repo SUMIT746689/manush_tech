@@ -1,5 +1,5 @@
 import { authenticate } from 'middleware/authenticate';
-import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
+import { fileUpload } from '@/utils/upload';
 import path from 'path';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';

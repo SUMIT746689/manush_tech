@@ -4,21 +4,20 @@ import { authenticate } from 'middleware/authenticate';
 const post = async (req, res, refresh_token) => {
     try {
         /*
-                   request format
-                   -----------------
-                   {
-                       "day": "Friday",
-                       "room_id":2,
-                       "start_time":"1970-05-02 22:29:00+0000",
-                       "end_time":"1970-05-02 23:30:00+0000",
-                       "school_id":2,
-                       "section_id":23,
-                       "teacher_id":2
-                   }
-                   
-                   
-                   */
-        console.log(req.body);
+        request format
+        -----------------
+        {
+            "day": "Friday",
+            "room_id":2,
+            "start_time":"1970-05-02 22:29:00+0000",
+            "end_time":"1970-05-02 23:30:00+0000",
+            "school_id":2,
+            "section_id":23,
+            "teacher_id":2
+        }
+        
+        
+        */
 
         if (req.body.start_time == req.body.end_time) {
             return res.status(406).send({ message: "start and end times should not be equel" });
@@ -40,7 +39,7 @@ const post = async (req, res, refresh_token) => {
                     }
                 }
             })
-            if(!subject) return res.status(409).send({ message: "Invalid subject !" })
+            if (!subject) return res.status(409).send({ message: "Invalid subject !" })
         }
         // filter period for perticular day and room
 

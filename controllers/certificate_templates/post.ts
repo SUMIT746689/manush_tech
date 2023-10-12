@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 import fs from 'fs';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma_client';
 
 async function post(req, res, refresh_token) {
   try {

@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma_client";
 import { Prisma } from "@prisma/client";
 
-const prisma = new PrismaClient()
 const tables = Prisma.ModelName;
 
 const role_title = async (req, res) => {

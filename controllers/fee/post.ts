@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
+import prisma from '@/lib/prisma_client';
 
-const prisma = new PrismaClient();
 
 export default async function post(req, res, refresh_token) {
   try {

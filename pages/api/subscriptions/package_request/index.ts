@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types';
-import { PrismaClient } from '@prisma/client';
 import patch from 'controllers/subscriptions/packageRequest/patch';
 
-const prisma = new PrismaClient();
 
 const index = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;

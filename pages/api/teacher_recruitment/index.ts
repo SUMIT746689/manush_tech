@@ -1,6 +1,4 @@
-import { School } from './../../../src/models/user';
 import { fileRename, fileUpload } from '@/utils/upload';
-import { headers } from 'next/headers';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import path from 'path';

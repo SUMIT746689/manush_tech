@@ -1,11 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export default async function post(req, res) {
   try {
     const { title } = req.body;
-    console.log({ title });
+    
     if (title) {
       const response = '';
       //  await prisma.session.create({

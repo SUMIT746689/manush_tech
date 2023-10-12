@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
 
 const FinalResultAll = async (req, res) => {
     try {

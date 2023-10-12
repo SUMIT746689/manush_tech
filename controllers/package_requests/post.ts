@@ -1,16 +1,14 @@
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import formidable from 'formidable';
 import path from 'path';
 import { imageFolder } from '@/utils/upload';
+import prisma from '@/lib/prisma_client';
 
 export const config = {
   api: {
     bodyParser: false
   }
 };
-
-const prisma = new PrismaClient();
 
  const post = async (req: any, res: any,refresh_token) => {
   try {

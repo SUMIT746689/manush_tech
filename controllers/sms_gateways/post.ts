@@ -1,8 +1,5 @@
-import { Details } from '@mui/icons-material';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
-
-const prisma = new PrismaClient();
 
 async function post(req, res, refresh_token) {
   try {

@@ -1,9 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-import bcrypt from 'bcrypt';
-import { boolean } from 'yup';
-
-const prisma = new PrismaClient();
 
 export const patch = async (req, res) => {
   try {

@@ -1,15 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-
-const prisma = new PrismaClient();
 
 export default async function get(req, res) {
   try {
-    console.log("hitted!!");
-    
-    console.log({ req: req.headers.host });
-
-    // console.log({protocol: req.headers["x-forwarded-proto"]});
     const findSchool = await prisma.school.findFirst({
       where: { domain: { equals: req.headers.host } },
       include: { websiteui: true }

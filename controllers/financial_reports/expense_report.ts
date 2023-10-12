@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
 
 async function get(req, res, refresh_token) {
   try {

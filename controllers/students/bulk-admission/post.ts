@@ -1,18 +1,17 @@
 import { formidable } from 'formidable';
 import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
 import { readFile, utils } from "xlsx";
 import dayjs from 'dayjs';
 import { authenticate } from 'middleware/authenticate';
 import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import axios from 'axios';
+import prisma from '@/lib/prisma_client';
 
 export const config = {
     api: {
         bodyParser: false
     }
 };
-const prisma = new PrismaClient();
 
 const gettingFile = (req) => {
     const options: formidable.Options = {};

@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import bcrypt from 'bcrypt';
 import { fileUpload } from '@/utils/upload';
 import fspromises from 'fs/promises'
 import path from 'path';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma_client';
 
 export const post = async (req, res) => {
   try {

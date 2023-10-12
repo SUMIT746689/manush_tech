@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client';
 import { patch } from 'controllers/users/activation/patch';
-
-const prisma = new PrismaClient();
 
 const id = async (req, res) => {
   try {

@@ -1,6 +1,3 @@
-import { PrismaClient } from '@prisma/client';
-// @ts-ignore
-const prisma = new PrismaClient();
 
 export const deleteTeacher = async (req, res) => {
   const { id } = req.query;

@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
-
-const prisma = new PrismaClient();
 const patchHandle = async (req, res) => {
   try {
     const { status, id, school_id, package_id } = req.body;

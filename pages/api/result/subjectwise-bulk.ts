@@ -1,5 +1,5 @@
+import prisma from '@/lib/prisma_client';
 import { formidable } from 'formidable';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import { readFile, utils } from "xlsx";
 
@@ -8,7 +8,6 @@ export const config = {
         bodyParser: false
     }
 };
-const prisma = new PrismaClient();
 
 const gettingFile = (req) => {
     const options: formidable.Options = {};

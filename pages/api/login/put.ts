@@ -1,7 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
+import prisma from "@/lib/prisma_client";
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const prisma = new PrismaClient();
 
 export default async function put(req, res) {
   try {

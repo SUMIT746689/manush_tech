@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
-
-const prisma = new PrismaClient();
 
 const get = async (_, res, refresh_token) => {
   const sections = await prisma.section.findMany({

@@ -10,8 +10,7 @@ export const get = async (req, res) => {
     const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
     if (!refresh_token) throw new Error('invalid user');
-    console.log({ refresh_token });
-
+  
     const user = await prisma.user.findFirst({
       where: {
         id: refresh_token.id,
@@ -56,9 +55,6 @@ export const get = async (req, res) => {
     }
     else throw new Error('Only role 1 and 2 is allowed to see validate data')
     // : [{ school_id: user.school_id }, { id: { not: user.id } }]
-
-
-    console.log(AND);
 
     const users = await prisma.user.findMany({
       where: {

@@ -1,8 +1,8 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
+import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
 
 async function get(req, res, refresh_token) {
   try {

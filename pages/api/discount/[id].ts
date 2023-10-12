@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma_client";
-import { Prisma } from "@prisma/client";
 import { authenticate } from "middleware/authenticate";
 
 const id = async (req, res, refresh_token) => {
@@ -33,7 +32,7 @@ const id = async (req, res, refresh_token) => {
                 if (amt) {
                     data['amt'] = amt
                 }
-                console.log(Number(id), Number(academic_year_id), Number(refresh_token.school_id));
+                // console.log(Number(id), Number(academic_year_id), Number(refresh_token.school_id));
 
                 const temp = await prisma.fee.findFirst({
                     where: {

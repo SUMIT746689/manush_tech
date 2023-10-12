@@ -1,12 +1,6 @@
-import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
-import formidable from "formidable";
-import path from "path";
-import fs from "fs/promises";
-import { mySqlDateConverter } from 'utilities_api/mysqlDateConverter';
+import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
 const index = async (req, res,refresh_token) => {
     try {
         console.log({refresh_token});

@@ -37,37 +37,47 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
       },
       select: {
         id: true,
+        status: true,
       }
     });
-    console.log({ findAttendence_ });
+    let isAttend = findAttendence_?.status === "present" ? true : false;
 
     // create/update attendance for student
-    if (findAttendence_) {
+    if (!findAttendence_ || !findAttendence_?.status) {
+      console.log("calculating attendance for student")
 
-      //verify user had attended before
-      const isAttend = user_id ? await isUserAttend({ user_id, std_min_attend_date_wise, entry_time }) : false;
+      if (findAttendence_) {
 
-      // search for atttence record
-      await prisma.attendance.update({
-        where: { id: findAttendence_.id },
-        // data: { status: "present"}
-        data: { status: isAttend ? "present" : "late" }
-      })
-        .catch((error) => { console.log("error update attendance", error.message) });
+        //verify user had attended before
+        const isAttend = user_id ? await isUserAttend({ user_id, std_min_attend_date_wise, entry_time }) : false;
+
+        // search for atttence record
+        await prisma.attendance.update({
+          where: { id: findAttendence_.id },
+          // data: { status: "present"}
+          data: { status: isAttend ? "present" : "late" }
+        })
+          .catch((error) => { console.log("error update attendance", error.message) });
+      }
+      else {
+        prisma.attendance.create({
+          data: {
+            student_id: id,
+            date: new Date(last_time),
+            status: "late",
+            // status: "absent",
+            section_id,
+            school_id,
+          }
+        })
+          .catch((error) => { console.log("error create attendance", error) });
+      }
+
     }
-    else {
-      prisma.attendance.create({
-        data: {
-          student_id: id,
-          date: new Date(last_time),
-          status: "late",
-          // status: "absent",
-          section_id,
-          school_id,
-        }
-      })
-        .catch((error) => { console.log("error create attendance", error) });
-    }
+
+    // delete users attendences from 
+    prisma.tbl_attendance_queue.deleteMany({ where: { user_id } })
+      .catch((error) => { console.log("error tbl_attendance_queue", error.message) })
 
     // store user data to sent sms queue table 
     if (!guardian_phone) return;

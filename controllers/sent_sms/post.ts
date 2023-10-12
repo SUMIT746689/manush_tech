@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma_client';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
 
-const prisma = new PrismaClient();
 
 const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
   prisma.sentSmsDetail.create({
@@ -23,7 +22,7 @@ const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
   })
 };
 
-const sentSmsToUsers = async (user,sms_res_gatewayinfo, responseSentSms) => {
+const sentSmsToUsers = async (user, sms_res_gatewayinfo, responseSentSms) => {
   let status = "pending"
   try {
     const name = [user?.first_name, user?.middle_name, user?.last_name].join(' ');
@@ -52,7 +51,7 @@ const sentSmsHandler = async ({ sentSmsUsers, school_id, responseSentSms }) => {
   //individual user sent sms and insert response and data into sent sms details table
   sentSmsUsers.forEach((user) => {
     // if (user) 
-    sentSmsToUsers(user,sms_res_gatewayinfo, responseSentSms)
+    sentSmsToUsers(user, sms_res_gatewayinfo, responseSentSms)
   })
 };
 
@@ -160,29 +159,14 @@ async function post(req, res, refresh_token) {
         break;
 
       case "CLASS":
-        // const responseAllUSer = await prisma.student.findMany({
-        //   where: {
-        //     section: {
-        //       class_id: class_id || 1,
-        //     }
-        //     // id: Number(refresh_token.school_id) 
-        //   },
-        //   select: {
-        //     student_info: {
-        //       select: {
-        //         phone: true
-        //       }
-        //     }
-        //   }
-        // });
-
-        sentSmsUsers = await prisma.$queryRawUnsafe(`
-        SELECT phone, student_informations.user_id as id,student_informations.first_name as first_name,student_informations.middle_name as middle_name,student_informations.last_name as last_name FROM students
-        JOIN student_informations ON student_informations.id = students.student_information_id
-        JOIN sections ON students.section_id = sections.id
-        WHERE class_id = ${class_id} AND school_id = ${refresh_token.school_id} ${(Array.isArray(section_id) && section_id.length > 0) ? `AND section_id IN (${section_id})` : ''}
-  `);
-
+        let sections = (Array.isArray(section_id) && section_id.length > 0) ? prisma.$queryRaw`AND section_id IN (${section_id})` : prisma.$queryRaw``;
+        sentSmsUsers = await prisma.$queryRaw`
+          SELECT phone, student_informations.user_id as id,student_informations.first_name as first_name,student_informations.middle_name as middle_name,student_informations.last_name as last_name FROM students
+          JOIN student_informations ON student_informations.id = students.student_information_id
+          JOIN sections ON students.section_id = sections.id
+          WHERE class_id = ${class_id} AND school_id = ${refresh_token.school_id} ${sections}
+        `
+        console.log({sentSmsUsers})
         break;
 
       case "INDIVIDUAL":
@@ -205,6 +189,7 @@ async function post(req, res, refresh_token) {
     return res.json({ message: 'success' });
 
   } catch (err) {
+    console.log({err: err.message})
     res.status(404).json({ error: err.message });
   }
 }

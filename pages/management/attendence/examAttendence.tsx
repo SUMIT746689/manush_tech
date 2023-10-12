@@ -395,9 +395,9 @@ function Attendence() {
                 />
                 :
                 <EmptyAutoCompleteWrapper
-                  options={examlist}
-                  value={selectedExam}
-                  handleChange={(e, value) => setSelectedExam(value)}
+                  options={[]}
+                  value={null}
+                  handleChange={() => {}}
                   label={'Select Exams'}
                   placeholder={'Exam...'}
                 />
@@ -430,7 +430,7 @@ function Attendence() {
                 <EmptyAutoCompleteWrapper
                   label={'Select For Everyone'}
                   placeholder={'Everyone...'}
-                  value={undefined}
+                  value={null}
                   options={[]}
 
                 />

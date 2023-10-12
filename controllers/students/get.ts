@@ -30,28 +30,17 @@ async function get(req, res, refresh_token) {
           }
         }
       },
-      select: {
-        id: true,
-        student_photo: true,
-        section_id: true,
-        class_registration_no: true,
-        student_present_address: true,
-        discount: true,
+      include: {
         student_info: {
-          // select: {
-          //   first_name: true,
-          //   middle_name: true,
-          //   last_name: true,
-          //   school: {
-          //     select: {
-          //       name: true
-          //     }
-          //   }
-          // }
           include: {
             school: {
               select: {
                 name: true
+              }
+            },
+            user:{
+              select:{
+                username:true
               }
             }
           }
@@ -71,9 +60,11 @@ async function get(req, res, refresh_token) {
           }
 
         },
-        guardian_phone: true,
-        class_roll_no: true,
-        waiver_fees: true
+        group: {
+          select: {
+            title: true
+          }
+        }
       }
     });
 

@@ -44,7 +44,7 @@ import DiscountIcon from '@mui/icons-material/Discount';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import dayjs from 'dayjs';
 import axios from 'axios';
-
+import Image from 'next/image';
 import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
 
 const DialogWrapper = styled(Dialog)(
@@ -139,7 +139,7 @@ const applyPagination = (
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ users, refetch, discount, idCard ,fee}) => {
+const Results = ({ users, refetch, discount, idCard, fee }) => {
 
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
@@ -153,6 +153,7 @@ const Results = ({ users, refetch, discount, idCard ,fee}) => {
   });
 
   const [discountModal, setDiscountModal] = useState(false);
+  const [studentProfileModal, setStudentProfileModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const handlePageChange = (_event: any, newPage: number): void => {
@@ -213,9 +214,156 @@ const Results = ({ users, refetch, discount, idCard ,fee}) => {
   const handleConfirmDelete = (id) => {
     setOpenConfirmDelete(id)
   }
+  console.log(selectedStudent);
 
   return (
     <>
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        open={studentProfileModal}
+        onClose={() => {
+          setStudentProfileModal(false);
+        }}
+        sx={{ paddingX: { xs: 3, md: 0 } }}
+      >
+        <Grid sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            md: '25% 75%',
+            sm: 'auto'
+          },
+          p: 2
+        }}>
+          <Grid sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            gap: 2,
+            p: 2
+          }}>
+            <Image src={`/api/get_file/${selectedStudent?.student_photo?.replace(/\\/g, '/')}`}
+              height={150}
+              width={150}
+              alt='Student photo'
+              loading='lazy'
+              style={{
+                borderRadius: '50%'
+              }}
+            />
+            <Typography variant='h3' align='center'>{[selectedStudent?.student_info?.first_name, selectedStudent?.student_info?.middle_name, selectedStudent?.student_info?.last_name]?.join(' ')}</Typography>
+            <Typography variant='h4' align='center'>Class registration no : {selectedStudent?.class_registration_no}</Typography>
+
+            <Grid sx={{
+              display: 'grid',
+              gridTemplateColumns: 'auto auto',
+              gap: 3
+            }}>
+              <Typography variant='h6'>Group : <br /> {selectedStudent?.group?.title}</Typography>
+              <Typography variant='h6'>Admission date : <br /> {dayjs(selectedStudent?.created_at).format('DD/MM/YYYY')}</Typography>
+              <Typography variant='h6'>Academic year : <br /> {selectedStudent?.academic_year?.title}</Typography>
+              <Typography variant='h6'>Roll : <br /> {selectedStudent?.class_roll_no}</Typography>
+              <Typography variant='h6'>Class : <br /> {selectedStudent?.section?.class?.name}</Typography>
+              <Typography variant='h6'>Section : <br /> {selectedStudent?.section?.name}</Typography>
+              <Typography variant='h6'>Date of birth : <br /> {dayjs(selectedStudent?.student_info?.date_of_birth).format('DD/MM/YYYY')}</Typography>
+              <Typography variant='h6'>Blood group : <br /> {selectedStudent?.student_info?.blood_group}</Typography>
+
+            </Grid>
+            <Typography variant='h5'>First admission date : {dayjs(selectedStudent?.student_info?.admission_date).format('DD/MM/YYYY')}</Typography>
+
+          </Grid>
+
+          <Grid sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            p: 2,
+            borderLeft: {
+              md: '1px solid lightgrey'
+            }
+          }}>
+            <Grid>
+              <Typography align='center' variant='h3' p={2} borderBottom={'1px dashed lightgrey'}>Basic Information</Typography>
+              <Grid sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  md: 'auto auto',
+                  sm: 'auto'
+                },
+                gap: 2
+              }}>
+                <Grid sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  pt: 2
+                }}>
+                  <Typography variant='h6'>User name :<br /><Typography variant='h5'> {selectedStudent?.student_info?.user?.username}</Typography> </Typography>
+                  <Typography variant='h6'>Gender :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.gender}</Typography></Typography>
+                  <Typography variant='h6'>Phone :<br /> <Typography variant='h5'> {selectedStudent?.student_info?.phone}</Typography></Typography>
+                  <Typography variant='h6'>Religion :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.religion}</Typography></Typography>
+                </Grid>
+                <Grid borderLeft={'1px dashed lightgrey'} pl={2} sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  pt: 2
+                }}>
+                  <Typography variant='h6'>Email :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.email}</Typography></Typography>
+                  <Typography variant='h6'>Birth certificate or NID :<br /><Typography variant='h5'> {selectedStudent?.student_info?.national_id}</Typography> </Typography>
+                  <Typography variant='h6'>Previous school :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.previous_school}</Typography></Typography>
+                  <Typography variant='h6'>Present address :<br /><Typography variant='h5'>{selectedStudent?.student_present_address} </Typography> </Typography>
+                  <Typography variant='h6'>Permanent address :<br /><Typography variant='h5'>  {selectedStudent?.student_info?.student_permanent_address}</Typography></Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid>
+              <Typography align='center' variant='h3' p={2} borderBottom={'1px dashed lightgrey'}>Guardian Information</Typography>
+              <Grid sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  md: 'auto auto',
+                  sm: 'auto'
+                },
+                gap: 2
+              }}>
+                <Grid sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  pt: 2
+                }}>
+                  <Typography variant='h6'>Guardian name :<br /><Typography variant='h5'> {selectedStudent?.guardian_name}</Typography></Typography>
+                  <Typography variant='h6'>Relation with guardian :<br /><Typography variant='h5'> {selectedStudent?.relation_with_guardian}</Typography></Typography>
+                  <Typography variant='h6'>Guardian phone :<br /><Typography variant='h5'> {selectedStudent?.guardian_phone}</Typography></Typography>
+                  <Typography variant='h6'>Guardian profession :<br /><Typography variant='h5'> {selectedStudent?.guardian_profession}</Typography></Typography>
+                </Grid>
+                <Grid borderLeft={'1px dashed lightgrey'} pl={2} sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  pt: 2
+                }}>
+                  <Typography variant='h6'>Father's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_name}</Typography></Typography>
+                  <Typography variant='h6'>Father's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_phone}</Typography></Typography>
+                  <Typography variant='h6'>Father's profession :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.father_profession}</Typography></Typography>
+                  
+                  <Typography variant='h6'>Mother's name :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_name}</Typography></Typography>
+                  <Typography variant='h6'>Mother's phone :<br /> <Typography variant='h5'>{selectedStudent?.student_info?.mother_phone}</Typography></Typography>
+                  <Typography variant='h6'>Mother's profession :<br /> <Typography variant='h5'>  {selectedStudent?.student_info?.mother_profession}</Typography></Typography>
+
+                </Grid>
+              </Grid>
+            </Grid>
+
+          </Grid>
+        </Grid>
+      </Dialog>
+
+
+      {/* Discount and waiver fee section */}
       <Dialog
         fullWidth
         maxWidth="md"
@@ -374,7 +522,10 @@ const Results = ({ users, refetch, discount, idCard ,fee}) => {
                           <Tooltip title={t('View Profile')} arrow>
                             <IconButton
                               color="primary"
-
+                              onClick={() => {
+                                setSelectedStudent(i)
+                                setStudentProfileModal(true)
+                              }}
                             >
                               <VisibilityIcon fontSize="small" />
                             </IconButton>

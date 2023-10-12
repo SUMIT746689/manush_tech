@@ -4,7 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Box, Button, Card, Checkbox, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
+import { Avatar, Box, Button, Card, Checkbox, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
 import PageHeader from 'src/content/Management/Attendence/PageHeader';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import axios from 'axios';
@@ -12,6 +12,8 @@ import { useTranslation } from 'next-i18next';
 import { ClassAndSectionSelect } from '@/components/Attendence';
 import ReactToPrint from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { useAuth } from '@/hooks/useAuth';
 
 const tableStyle: object = {
     border: '1px solid black',
@@ -29,7 +31,7 @@ function Managementschools() {
 
     const { t }: { t: any } = useTranslation();
     const theme = useTheme();
-
+    const { user } = useAuth();
     const [academicYear, setAcademicYear] = useContext(AcademicYearContext)
 
     const [classes, setClasses] = useState([]);
@@ -59,6 +61,7 @@ function Managementschools() {
         setLimit(parseInt(event.target.value));
     };
     const handleSelectOneUser = (_event, row) => {
+        setFinalResultList(null)
         if (selectedItems.findIndex(i => i == row.id) == -1) {
             setSelectedItems((prevSelected) => [...prevSelected, row.id]);
         } else {
@@ -81,6 +84,7 @@ function Managementschools() {
 
 
     const handleSelectAllUsers = (event): void => {
+        setFinalResultList(null)
         setSelectedItems(event.target.checked ? students.map(i => { return i.id }) : []);
     };
 
@@ -118,71 +122,86 @@ function Managementschools() {
     return (
         <>
             <Head>
-                <title>progress Report Section</title>
+                <title>Progress Report Section</title>
             </Head>
-            <Card sx={{ minHeight: '78vh' }}>
-                <PageTitleWrapper >
 
-                    <PageHeader title={'Progress Report Section'} />
+            <PageTitleWrapper >
 
-                </PageTitleWrapper>
+                <PageHeader title={'Progress Report Section'} />
 
-                <Grid p={2}>
-                    <Grid item container>
-                        <Grid item  >
-                            <Box p={1}>
-                                <ClassAndSectionSelect
-                                    selectedClass={selectedClass}
-                                    setSelectedClass={setSelectedClass}
-                                    classes={classes}
-                                    selectedDate={null}
-                                    selectedSection={selectedSection}
-                                    setSelectedSection={setSelectedSection}
-                                    flag={true}
+            </PageTitleWrapper>
 
-                                />
+            <Grid
+                justifyContent="center"
+                alignItems="stretch"
+                spacing={3}
+                sx={{ px: { xs: 2, sm: 4 } }}
+            >
+                <Grid item xs={12}>
+                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr 1fr" }, columnGap: 1 }}>
+
+                        <ClassAndSectionSelect
+                            selectedClass={selectedClass}
+                            setSelectedClass={setSelectedClass}
+                            classes={classes}
+                            selectedDate={null}
+                            selectedSection={selectedSection}
+                            setSelectedSection={setSelectedSection}
+                            flag={true}
+
+                        />
+
+
+                        {
+                            selectedSection && <ButtonWrapper handleClick={handleFindStudents}>Find</ButtonWrapper>
+                        }
+                        {
+                            selectedBulkActions && <ButtonWrapper handleClick={handleFinalResultGenerate}>Generate</ButtonWrapper>
+                        }
+                        {
+                            selectedBulkActions && finalResultList &&
+                            <ReactToPrint
+                                content={() => progressReportPrint.current}
+                                // pageStyle={`{ size: 2.5in 4in }`}
+                                trigger={() => (
+                                    <ButtonWrapper
+                                        startIcon={<LocalPrintshopIcon />}
+                                        handleClick={undefined} >{t('Print')}</ButtonWrapper>
+                                )}
+                            // pageStyle="@page { size: A4; }"
+                            // pageStyle={` .printable-item { page-break-after: always; }`}
+                            />
+
+                        }
+                    </Card>
+                </Grid>
+                <Divider />
+                <Card sx={{ minHeight: 'calc(100vh - 413px)' }}>
+
+                    {!selectedBulkActions && (
+                        <Box
+                            p={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Box>
+                                <Typography component="span" variant="subtitle1">
+                                    {t('Showing')}:
+                                </Typography>{' '}
+                                <b>{paginatedResults.length}</b> <b>{t('Result')}</b>
                             </Box>
-                        </Grid>
-
-                        {
-                            selectedSection && <Grid item xs={2} sm={4} md={2} >
-                                <Box p={1}>
-                                    <Button variant="contained"
-                                        size="medium" onClick={handleFindStudents}>Find</Button>
-                                </Box>
-                            </Grid>
-                        }
-                        {
-                            selectedBulkActions && <Grid item xs={2} sm={4} md={2} >
-                                <Box p={1}>
-                                    <Button variant="contained"
-                                        size="medium" onClick={handleFinalResultGenerate}>Generate</Button>
-
-                                </Box>
-                            </Grid>
-                        }
-                        {
-                            finalResultList && <Grid item xs={2} sm={4} md={2} >
-                                <Box p={1}>
-
-                                    <ReactToPrint
-                                        content={() => progressReportPrint.current}
-                                        // pageStyle={`{ size: 2.5in 4in }`}
-                                        trigger={() => (
-                                            <Button variant="contained"
-                                                startIcon={<LocalPrintshopIcon />}
-                                                size="medium" >{t('print')}</Button>
-                                        )}
-                                    // pageStyle="@page { size: A4; }"
-                                    // pageStyle={` .printable-item { page-break-after: always; }`}
-                                    />
-                                </Box>
-                            </Grid>
-                        }
-
-                    </Grid>
-                    <Divider />
-
+                            <TablePagination
+                                component="div"
+                                count={paginatedResults.length}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleLimitChange}
+                                page={page}
+                                rowsPerPage={limit}
+                                rowsPerPageOptions={[5, 10, 15]}
+                            />
+                        </Box>
+                    )}
 
                     {paginatedResults.length === 0 ? (
                         <>
@@ -203,34 +222,7 @@ function Managementschools() {
                     ) : (
 
                         <>
-
-                            {
-                                !selectedAllUsers && <Box
-                                    p={2}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <Box>
-                                        <Typography component="span" variant="subtitle1">
-                                            {t('Showing')}:
-                                        </Typography>{' '}
-                                        <b>{paginatedResults.length}</b> <b>{t('result')}</b>
-                                    </Box>
-                                    <TablePagination
-                                        component="div"
-                                        count={paginatedResults.length}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleLimitChange}
-                                        page={page}
-                                        rowsPerPage={limit}
-                                        rowsPerPageOptions={[5, 10, 15]}
-                                    />
-                                </Box>
-                            }
-
-                            <TableContainer component={Paper}>
+                            <TableContainer>
                                 <Table aria-label="collapsible table">
                                     <TableHead>
                                         <TableRow>
@@ -288,8 +280,9 @@ function Managementschools() {
 
                         </>
                     )}
-                </Grid>
-            </Card>
+                </Card>
+            </Grid>
+
             {/* progressReportPrint */}
             <Grid sx={{
                 display: 'none'
@@ -300,24 +293,47 @@ function Managementschools() {
                             p: '15px',
                             pageBreakAfter: 'always'
                         }}>
-                            <Grid
-                                container
-                                spacing={0}
-                                direction="column"
-                                alignItems="center"
-                                justifyContent="center"
-                            >
-                                <h1>Final result</h1>
+                            <Grid py={2} spacing={2} sx={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 2.75fr 1fr'
+                            }} px={7}>
 
-                                <h2>Student name : {finalResult?.student?.student_info?.first_name} {finalResult?.student?.student_info?.middle_name} {finalResult?.student?.student_info?.last_name}</h2>
-                                <h2>Class : {finalResult?.student?.section?.class?.name}</h2>
-                                <h2>Section : {finalResult?.student?.section?.name}</h2>
-                                <h2>Class roll : {finalResult?.student?.class_roll_no}</h2>
+                                <Grid item>
+                                    <Avatar variant="rounded"  >
+                                        {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                                    </Avatar>
+                                </Grid>
+
+                                <Grid item>
+                                    <Typography
+                                        variant="h3"
+                                        align="center"
+                                    >
+                                        {user?.school?.name}
+                                    </Typography>
+                                    <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                                        {user?.school?.address}, {user?.school?.phone}
+                                    </Typography>
+                                    <Typography variant="h6" align="center" >
+                                        Class : {selectedClass?.label}, Section : {selectedSection?.label}
+                                    </Typography>
+                                    <Typography variant="h6" align="center">Final result</Typography>
+                                    <Typography variant="h6" align="center">Student name : {finalResult?.student?.student_info?.first_name} {finalResult?.student?.student_info?.middle_name} {finalResult?.student?.student_info?.last_name}</Typography>
+                                    <Typography variant="h6" align="center">Class roll : {finalResult?.student?.class_roll_no}</Typography>
+                                    <Typography variant="h6" align="center">Total mark: {finalResult?.termWiseTotalMark?.reduce(
+                                        (accumulator, currentValue) => accumulator + currentValue?.calculatedTotalMark, 0
+                                    ).toFixed(2)}</Typography>
+                                </Grid>
+
+                                <Grid item>
+                                    <Typography variant="h4" >
+                                        Progress Report
+                                    </Typography>
+                                </Grid>
+
+
                             </Grid>
 
-                            <h2 className=' text-center font-bold'>Total mark: {finalResult?.termWiseTotalMark?.reduce(
-                                (accumulator, currentValue) => accumulator + currentValue?.calculatedTotalMark, 0
-                            ).toFixed(2)}</h2>
                             <Grid container sx={{
                                 display: 'flex',
                                 justifyContent: 'left'

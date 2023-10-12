@@ -4,7 +4,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
+import { Avatar, Box, Button, Card, Divider, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, useTheme } from '@mui/material';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
@@ -125,9 +125,15 @@ function Managementschools() {
             </PageTitleWrapper>
 
             {/* filter part */}
-            <Card sx={{ maxWidth: 900, mx: "auto", pt: 1, px: 1, display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr auto" }, gap: 1, justifyContent: "center" }}>
-                <Grid item  >
-                    <Box p={1}>
+            <Grid
+                justifyContent="center"
+                alignItems="stretch"
+                spacing={3}
+                sx={{ px: { xs: 2, sm: 4 } }}
+            >
+                <Grid item xs={12}>
+                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "2fr 1fr 1fr 1fr" }, gap: 1, justifyContent: "center" }}>
+
                         <ClassAndSectionSelect
                             selectedClass={selectedClass}
                             setSelectedClass={setSelectedClass}
@@ -138,67 +144,66 @@ function Managementschools() {
                             flag={true}
 
                         />
-                    </Box>
-                </Grid>
-                {
-                    selectedSection && exams && <Grid item>
 
-                        {/* <Box p={1}>
-                <Autocomplete
-                    id="tags-outlined"
-                    options={exams}
-                    value={selectedExam}
-                    filterSelectedOptions
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label="Select exam"
-                            placeholder="exam"
-                        />
-                    )}
-                    onChange={(e, newvalue) => {
-                        setSelectedExam(newvalue)
-                    }}
-                />
-            </Box> */}
-                        <AutoCompleteWrapper
-                            options={exams}
-                            value={selectedExam}
-                            label="Select Exam"
-                            placeholder="input an exam..."
-                            handleChange={(e, newvalue) => { setSelectedExam(newvalue) }}
-                        />
-
-                    </Grid>
-                }
-                {
-                    selectedExam && <ButtonWrapper handleClick={handleSearchResult}> Search</ButtonWrapper>
-                }
-                {
-                    selectedBulkActions && <Grid item xs={2} sm={4} md={1} >
-                        <Box p={1}>
+                        {
+                            selectedSection && exams &&
+                            <AutoCompleteWrapper
+                                options={exams}
+                                value={selectedExam}
+                                label="Select Exam"
+                                placeholder="input an exam..."
+                                handleChange={(e, newvalue) => { setSelectedExam(newvalue) }}
+                            />
 
 
+                        }
+                        {
+                           selectedSection && selectedExam && <ButtonWrapper handleClick={handleSearchResult}> Search</ButtonWrapper>
+                        }
+                        {
+                            selectedBulkActions &&
                             <ReactToPrint
                                 content={() => tabulation_sheet_Print.current}
                                 // pageStyle={`{ size: 2.5in 4in }`}
 
                                 trigger={() => (
-                                    <Button variant="contained"
+                                    <ButtonWrapper handleClick={undefined}
                                         startIcon={<LocalPrintshopIcon />}
-                                        size="medium">{t('print')}</Button>
+                                        size="medium">{t('print')}</ButtonWrapper>
                                 )}
                             // pageStyle={"@page { size: landscape; }"}
                             />
+
+                        }
+                    </Card>
+                </Grid>
+                <Divider />
+                {/* result */}
+                <Card sx={{ minHeight: 'calc(100vh - 418px)' }}>
+                    {!selectedBulkActions && (
+                        <Box
+                            p={2}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Box>
+                                <Typography component="span" variant="subtitle1">
+                                    {t('Showing')}:
+                                </Typography>{' '}
+                                <b>{paginatedResults.length}</b> <b>{t('Result')}</b>
+                            </Box>
+                            <TablePagination
+                                component="div"
+                                count={paginatedResults.length}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleLimitChange}
+                                page={page}
+                                rowsPerPage={limit}
+                                rowsPerPageOptions={[5, 10, 15]}
+                            />
                         </Box>
-                    </Grid>
-                }
-            </Card>
-
-            {/* result */}
-            <Card sx={{ minHeight: '78vh', mt: 1 }}>
-                <Grid p={2}>
-
+                    )}
                     {paginatedResults.length === 0 ? (
                         <>
                             <Typography
@@ -218,33 +223,7 @@ function Managementschools() {
                     ) : (
 
                         <>
-                            {
-                                paginatedResults &&
-                                <Box
-                                    p={2}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <Box>
-                                        <Typography component="span" variant="subtitle1">
-                                            {t('Showing')}:
-                                        </Typography>{' '}
-                                        <b>{paginatedResults.length}</b> <b>{t('result')}</b>
-                                    </Box>
-                                    <TablePagination
-                                        component="div"
-                                        count={paginatedResults.length}
-                                        onPageChange={handlePageChange}
-                                        onRowsPerPageChange={handleLimitChange}
-                                        page={page}
-                                        rowsPerPage={limit}
-                                        rowsPerPageOptions={[5, 10, 15]}
-                                    />
-                                </Box>
-                            }
-                            < TableContainer component={Paper}>
+                            <TableContainer>
                                 <Table aria-label="collapsible table">
                                     <TableHead>
                                         <TableRow>
@@ -283,8 +262,8 @@ function Managementschools() {
                                                             }
                                                         })
                                                     }
-                                                    <TableCell >{tableHeaderLength == resultDetailsLength ? i?.total_marks_obtained : 'not inserted'}</TableCell>
-                                                    <TableCell >{tableHeaderLength == resultDetailsLength ? i?.calculated_point : 'not inserted'}</TableCell>
+                                                    <TableCell >{tableHeaderLength == resultDetailsLength ? i?.total_marks_obtained?.toFixed(2) : 'not inserted'}</TableCell>
+                                                    <TableCell >{tableHeaderLength == resultDetailsLength ? i?.calculated_point?.toFixed(2) : 'not inserted'}</TableCell>
                                                     <TableCell >{tableHeaderLength == resultDetailsLength ? i?.calculated_grade : 'not inserted'}</TableCell>
                                                 </TableRow>
                                             }
@@ -299,75 +278,106 @@ function Managementschools() {
                         </>
                     )}
 
-                </Grid>
-            </Card>
-
+                </Card>
+            </Grid>
 
             {/* pdf  */}
             <Grid sx={{
-                display: 'none'
+                 display: 'none'
             }}>
-                <Grid container sx={{ p: 2 }} ref={tabulation_sheet_Print}>
+                <Grid sx={{ p: 2 }} ref={tabulation_sheet_Print}>
 
-                    <Grid sx={{
-                        textAlign: 'center',
-                        paddingBottom: 2
-                    }}>
-                        <h1>Tabulation sheet</h1>
+                    <Grid py={2} spacing={2} sx={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 2.75fr 1fr'
+                    }} px={7}>
 
-                        <h3>Section :{selectedSection?.label}</h3>
+                        <Grid item>
+                            <Avatar variant="rounded"  >
+                                {/* {user?.school?.image && <img src={`/${user.school.image}`} />} */}
+                            </Avatar>
+                        </Grid>
+
+                        <Grid item>
+                            <Typography
+                                variant="h3"
+                                align="center"
+                            >
+                                {user?.school?.name}
+                            </Typography>
+                            <Typography variant="h6" align="center" sx={{ borderBottom: 1 }}>
+                                {user?.school?.address}, {user?.school?.phone}
+                            </Typography>
+                            <Typography variant="h6" align="center" >
+                                Class : {selectedClass?.label}, Section : {selectedSection?.label}
+                            </Typography>
+                        </Grid>
+
+                        <Grid item>
+                            <Typography variant="h4" >
+                                Tabulation Sheet
+                            </Typography>
+                        </Grid>
+
+
                     </Grid>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style={tableStyle}>{t('Sl')}</th>
-                                <th style={tableStyle}>{t('Students')}</th>
-                                <th style={tableStyle}>{t('Roll')}</th>
+                    <Grid item sx={{
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style={tableStyle}>{t('Sl')}</th>
+                                    <th style={tableStyle}>{t('Students')}</th>
+                                    <th style={tableStyle}>{t('Roll')}</th>
+                                    {
+                                        tableHeader.map(j => <th style={tableStyle}>{t(`${j.name}\n(${j.subject_total})`)}</th>)
+                                    }
+
+                                    <th style={tableStyle}>{t('Total marks')}</th>
+                                    <th style={tableStyle}>{t('GPA')}</th>
+                                    <th style={tableStyle}>{t('Result')}</th>
+                                </tr>
+                            </thead>
+                            <tbody style={{
+                                overflowX: 'auto',
+                                overflowY: 'auto'
+                            }}>
+
                                 {
-                                    tableHeader.map(j => <th style={tableStyle}>{t(`${j.name}\n(${j.subject_total})`)}</th>)
+                                    result.map((i, index) => {
+                                        const resultDetailsLength = i?.result_details?.length
+                                        return <tr>
+
+                                            <td style={tableStyle} >{index + 1}</td>
+                                            <td style={tableStyle} >{i.student.student_info.first_name}</td>
+                                            <td style={tableStyle} >{i.student.class_roll_no}</td>
+                                            {
+                                                tableHeader?.map(j => {
+                                                    const found = i.result_details.find(sub => sub.exam_details.subject.id == j.id)
+                                                    console.log(found);
+
+                                                    if (found) {
+                                                        return <td style={tableStyle} >{found.mark_obtained}</td>
+                                                    } else {
+                                                        return <td style={tableStyle} >not taken</td>
+                                                    }
+                                                })
+                                            }
+                                            <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.total_marks_obtained?.toFixed(2) : 'not inserted'}</td>
+                                            <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.calculated_point?.toFixed(2) : 'not inserted'}</td>
+                                            <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.calculated_grade : 'not inserted'}</td>
+                                        </tr>
+                                    }
+
+                                    )
                                 }
+                            </tbody>
+                        </table>
+                    </Grid>
 
-                                <th style={tableStyle}>{t('Total marks')}</th>
-                                <th style={tableStyle}>{t('GPA')}</th>
-                                <th style={tableStyle}>{t('Result')}</th>
-                            </tr>
-                        </thead>
-                        <tbody style={{
-                            overflowX: 'auto',
-                            overflowY: 'auto'
-                        }}>
-
-                            {
-                                result.map((i, index) => {
-                                    const resultDetailsLength = i?.result_details?.length
-                                    return <tr>
-
-                                        <td style={tableStyle} >{index + 1}</td>
-                                        <td style={tableStyle} >{i.student.student_info.first_name}</td>
-                                        <td style={tableStyle} >{i.student.class_roll_no}</td>
-                                        {
-                                            tableHeader?.map(j => {
-                                                const found = i.result_details.find(sub => sub.exam_details.subject.id == j.id)
-                                                console.log(found);
-
-                                                if (found) {
-                                                    return <td style={tableStyle} >{found.mark_obtained}</td>
-                                                } else {
-                                                    return <td style={tableStyle} >not taken</td>
-                                                }
-                                            })
-                                        }
-                                        <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.total_marks_obtained : 'not inserted'}</td>
-                                        <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.calculated_point : 'not inserted'}</td>
-                                        <td style={tableStyle} >{tableHeaderLength == resultDetailsLength ? i?.calculated_grade : 'not inserted'}</td>
-                                    </tr>
-                                }
-
-                                )
-                            }
-                        </tbody>
-                    </table>
                 </Grid >
 
 

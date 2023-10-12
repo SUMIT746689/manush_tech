@@ -469,7 +469,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
                                 <TextField
                                   {...params}
                                   size="small"
-                                  label="filterSelectedOptions"
+                                  label="Select subjects"
                                   placeholder="selecet multiple subject"
                                   error={Boolean(
                                     touched?.subject_id_list &&

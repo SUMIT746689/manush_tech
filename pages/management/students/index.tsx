@@ -18,8 +18,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useRef } from 'react';
-import { Autocomplete } from '@mui/material';
-import { TextField } from '@mui/material';
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { useAuth } from '@/hooks/useAuth';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
@@ -27,6 +26,8 @@ import { ExportData } from '@/content/Management/Students/ExportData';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 function ManagementClasses() {
 
@@ -155,200 +156,114 @@ function ManagementClasses() {
       </Head>
 
       <PageTitleWrapper>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item md={6}>
-            <Typography variant="h3" component="h3" gutterBottom>
-              {t('Student Management')}
-            </Typography>
-            <Typography variant="subtitle2">
-              {t(
-                'All aspects related to the students can be managed from this page'
-              )}
-            </Typography>
-            <Button
-              sx={{ mt: 1 }}
-              onClick={handleSendToRegistrationPage}
-              variant="contained"
-            >
-              {t('Registration student')}
-            </Button>
-          </Grid>
 
-          <Grid
-            item
-            display='flex'
-            justifyContent="flex-end"
-            sx={{ textAlign: { md: 'right' }, mt: 1 }}
+        <Grid item >
+          <Typography variant="h3" component="h3" gutterBottom>
+            {t('Student Management')}
+          </Typography>
+          <Typography variant="subtitle2">
+            {t(
+              'All aspects related to the students can be managed from this page'
+            )}
+          </Typography>
 
-          >
-            <Grid container gap={2}>
-              <Grid item>
-                <Button
-                  size='small'
-                  variant="contained"
-                  href={`/student.xlsx`}
-                >
-                  Download Excel format
-
-                </Button>
-              </Grid>
-
-
-
-              {/* <TextField
-              label="select Excel file"
-              name="select Excel file"
-              type="file"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                if (e.target.files[0]) {
-                  setExcelFileUpload(e.target.files[0]);
-                } else {
-                  setExcelFileUpload(null);
-                }
-              }}
-            /> */}
-              <Grid item>
-                <FileUploadFieldWrapper
-                  htmlFor="excelUpload"
-                  label="select Excel file"
-                  name="excelUpload"
-                  accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-                  value={excelFileUpload?.name || ''}
-                  handleChangeFile={(e) => {
-                    if (e.target?.files?.length && e.target.files[0].type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-                      setExcelFileUpload(e.target.files[0])
-                    }
-                  }}
-                  handleRemoveFile={(e) => { setExcelFileUpload(null) }}
-                />
-              </Grid>
-              <Button
-                sx={{
-                  m: '10px'
-                }}
-                disabled={excelFileUpload ? false : true}
-                onClick={handleExcelUpload}
-                variant="contained"
-                size='small'
-              >
-                {t('Bulk admission')}
-              </Button>
-            </Grid>
-
-
-          </Grid>
         </Grid>
       </PageTitleWrapper>
+      <Card sx={{mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr auto 1fr" }, columnGap: 1 }}
+      >
 
-      <Card sx={{ mx: 4, mb: 1, p: 1 }}>
-        {/* select class */}
-        <Grid
-          container
-          direction="row"
-          justifyContent="left"
-          alignItems="stretch"
-          spacing={1}
+        <ButtonWrapper
+          handleClick={handleSendToRegistrationPage}
         >
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={2}
-            justifyContent="flex-end"
-            textAlign={{ sm: 'right' }}
-          >
-            <Autocomplete
-              size="small"
-              id="tags-outlined"
-              options={classes?.map((i) => {
-                return {
-                  label: i.name,
-                  id: i.id,
-                  has_section: i.has_section
-                };
-              }) || []}
-              filterSelectedOptions
-              renderInput={(params) => (
-                <TextField
-                  fullWidth
-                  {...params}
-                  label={t('Select class')}
-                  placeholder="Name"
-                />
-              )}
-              onChange={handleClassSelect}
-            />
-          </Grid>
+          {t('Registration student')}
+        </ButtonWrapper>
 
-          {selectedClass && selectedClass.has_section && sections && (
-            <>
-              <Grid
-                item
-                xs={6}
-                sm={4}
-                md={2}
-                justifyContent="flex-end"
-                textAlign={{ sm: 'right' }}
-              >
-                <Autocomplete
-                  size="small"
-                  id="tags-outlined"
-                  options={sections}
-                  value={selectedSection}
-                  filterSelectedOptions
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="select section"
-                      placeholder="Name"
-                    />
-                  )}
-                  onChange={(e, v) => {
-                    setSelectedSection(v);
-                  }}
-                />
-              </Grid>
-            </>
-          )}
-          {
-            selectedSection && <Grid
-              item
-              xs={6}
-              sm={4}
-              md={2}
-            >
-              <Button
+        <ButtonWrapper
+          handleClick={undefined}
+          href={`/student.xlsx`}
+        >
+          Download Excel format
 
-                variant="contained" onClick={handleStudentList}> Find</Button>
-            </Grid>
-          }
-          {students.length > 0 && (
-            <Grid
-              item
-              justifyContent="flex-end"
-              textAlign={{ sm: 'right' }}
-              xs={6}
-              sm={4}
-              md={2}
-            >
-              <Button
-                fullWidth
-                sx={{ height: '100%' }}
-                variant="contained"
-                onClick={handlePrint}
-              >
-                Print Id Card
-              </Button>
-            </Grid>
-          )}
-          <Grid pt={1} pl={1}>
-            <ExportData students={students} />
-          </Grid>
+        </ButtonWrapper>
+
+
+        <Grid >
+          <FileUploadFieldWrapper
+            htmlFor="excelUpload"
+            label="select Excel file"
+            name="excelUpload"
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+            value={excelFileUpload?.name || ''}
+            handleChangeFile={(e) => {
+              if (e.target?.files?.length && e.target.files[0].type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+                setExcelFileUpload(e.target.files[0])
+              }
+            }}
+            handleRemoveFile={(e) => { setExcelFileUpload(null) }}
+          />
         </Grid>
+        <ButtonWrapper
+          disabled={excelFileUpload ? false : true}
+          handleClick={handleExcelUpload}
+        >
+          {t('Bulk admission')}
+        </ButtonWrapper>
+
+      </Card>
+
+      <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 1, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr auto" }, columnGap: 1 }}>
+        {/* select class */}
+
+        <AutoCompleteWrapper
+          label="Select class"
+          placeholder="Class..."
+          options={classes?.map((i) => {
+            return {
+              label: i.name,
+              id: i.id,
+              has_section: i.has_section
+            };
+          }) || []}
+          value={selectedClass}
+          handleChange={handleClassSelect}
+        />
+
+
+        {selectedClass && selectedClass.has_section && sections && (
+          <AutoCompleteWrapper
+            label="Select section"
+            placeholder="Section..."
+            options={sections}
+            value={selectedSection}
+            handleChange={(e, v) => {
+              setSelectedSection(v);
+            }}
+          />
+
+        )}
+        {
+          selectedSection &&
+          <ButtonWrapper handleClick={handleStudentList}> Find</ButtonWrapper>
+
+        }
+        {students.length > 0 && (
+
+          <ButtonWrapper
+            handleClick={handlePrint}
+            startIcon={<LocalPrintshopIcon />}
+          >
+            Print Id Card
+          </ButtonWrapper>
+
+        )}
+        <Grid>
+          <ExportData students={students} />
+        </Grid>
+
       </Card>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 1 }}
         container
         direction="row"
         justifyContent="center"

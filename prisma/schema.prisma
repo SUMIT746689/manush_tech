@@ -240,6 +240,7 @@ model Student {
   guardian_photo          String?
   relation_with_guardian  String?
   student_present_address String?
+  created_at              DateTime?          @default(now())
   academic_year           AcademicYear       @relation(fields: [academic_year_id], references: [id])
   student_info            StudentInformation @relation(fields: [student_information_id], references: [id])
   section                 Section            @relation(fields: [section_id], references: [id])
@@ -914,7 +915,6 @@ model Leave {
 
   approved_by User? @relation("approved_by", fields: [approved_by_id], references: [id])
   user        User  @relation(fields: [user_id], references: [id])
-
 }
 
 enum LeaveStatus {

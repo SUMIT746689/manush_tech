@@ -15,6 +15,7 @@ import useNotistick from '@/hooks/useNotistick';
 import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
+import axios from 'axios';
 
 function RegistrationSecondPart({
   totalFormData,
@@ -34,6 +35,7 @@ function RegistrationSecondPart({
   const [student_photo, setStudent_photo] = useState(null)
 
   const [classesOptions, setClassesOptions] = useState(null)
+  const [group, setGroup] = useState([])
 
   useEffect(() => {
     setClassesOptions(classes?.map((i) => {
@@ -48,6 +50,14 @@ function RegistrationSecondPart({
   useEffect(() => {
     if (classesOptions && student) {
       setselectedClass(classesOptions?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id)))
+      axios.get(`/api/group?class_id=${student?.section?.class_id}`).then(res => {
+        console.log("res?.data__", res?.data);
+
+        setGroup(res?.data?.map(i => ({
+          label: i.title,
+          id: i.id
+        })))
+      }).catch(err => console.log(err))
     }
   }, [classesOptions, student])
 
@@ -56,9 +66,16 @@ function RegistrationSecondPart({
     if (student) {
       console.log("student__", student);
 
-      const targetClassSections = classes?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id ))
-      console.log("targetClassSections__",targetClassSections);
-      
+      const targetClassSections = classes?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id))
+      console.log("targetClassSections__", targetClassSections);
+
+      // axios.get(`/api/group?class_id=${value.id}`).then(res =>{
+      //   setGroup(res?.data?.map(i => ({
+      //     label: i.name,
+      //     id: i.id
+      //   })))
+      // }).catch(err => console.log(err))
+
       setSectionsForSelectedClass(targetClassSections?.sections?.map(i => {
         return {
           label: i.name,
@@ -86,6 +103,16 @@ function RegistrationSecondPart({
     setFieldValue("class_id", value?.id)
     setselectedClass(value);
     if (value) {
+      axios.get(`/api/group?class_id=${value.id}`)
+        .then(res => {
+          console.log("res?.data__", res?.data);
+          setGroup(res?.data?.map(i => ({
+            label: i.title,
+            id: i.id
+          })))
+        })
+        .catch(err => console.log(err))
+
       const targetClassSections = classes?.find(i => i.id == value.id)
       console.log(targetClassSections);
 
@@ -108,24 +135,24 @@ function RegistrationSecondPart({
 
   }
 
-
   const password = unique_password_generate()
   return (
     <>
       <Formik
         initialValues={{
           username: student ? (student?.student_info?.user?.username || student?.username) : generateUsername(totalFormData.first_name),
-          password: student ? (student?.password || "" ) : password,
-          confirm_password: student ? ( student?.password || "") : password,
-          class_id: student ? ( student?.class_id ? Number(student?.class_id) : student?.section?.class_id) : undefined,
+          password: student ? (student?.password || "") : password,
+          confirm_password: student ? (student?.password || "") : password,
+          class_id: student ? (student?.class_id ? Number(student?.class_id) : student?.section?.class_id) : undefined,
           section_id: student ? (student?.section_id ? Number(student?.section_id) : student?.section?.id) : undefined,
+          group_id: student ? (student?.group_id ? Number(student?.group_id) : student?.group?.id) : undefined,
           academic_year_id: student ? Number(student?.academic_year_id) : undefined,
           roll_no: student ? student?.class_roll_no : undefined,
           registration_no: student?.class_registration_no || registration_no_generate(),
           student_photo: null,
           student_present_address: student ? student?.student_present_address : '',
-          student_permanent_address: student ? ( student?.student_permanent_address || student?.student_info?.student_permanent_address || '') : '',
-          previous_school: student ? ( student?.previous_school || student?.student_info?.previous_school  || '') : ''
+          student_permanent_address: student ? (student?.student_permanent_address || student?.student_info?.student_permanent_address || '') : '',
+          previous_school: student ? (student?.previous_school || student?.student_info?.previous_school || '') : ''
         }}
         validationSchema={Yup.object().shape({
           username: Yup.string()
@@ -190,7 +217,7 @@ function RegistrationSecondPart({
           values,
           setFieldValue
         }) => {
-          // console.log("T__values__", errors, values);
+          //  console.log("T__values__", errors, values);
 
           return (
             <form onSubmit={handleSubmit}>
@@ -344,6 +371,39 @@ function RegistrationSecondPart({
                         />
                       )}
                     </Grid>
+                    {/* Group  */}
+                    <Grid item xs={12} md={6}>
+                      {selectedClass && selectedClass.has_section && (
+                        <Autocomplete
+                          size="small"
+                          disablePortal
+                          options={group}
+                          value={group?.find(i => i.id == values?.group_id) || null}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              required
+                              size="small"
+                              sx={{
+                                '& fieldset': {
+                                  borderRadius: '3px'
+                                }
+                              }}
+                              fullWidth
+                              error={Boolean(
+                                touched.group_id && errors.group_id
+                              )}
+                              helperText={touched.group_id && errors.group_id}
+                              onBlur={handleBlur}
+                              label={t('Select group')}
+                            />
+                          )}
+                          onChange={(event, value) => {
+                            setFieldValue('group_id', value?.id);
+                          }}
+                        />
+                      )}
+                    </Grid>
 
                     {/* academicYears */}
                     <Grid item xs={12} md={6}>
@@ -351,7 +411,7 @@ function RegistrationSecondPart({
                         size="small"
                         disablePortal
                         options={academicYears}
-                        value={academicYears?.find(i => i.id == student?.academic_year_id || null)}
+                        value={academicYears?.find(i => i.id == values?.academic_year_id || null)}
                         renderInput={(params) => (
                           <TextField
                             required
@@ -415,7 +475,7 @@ function RegistrationSecondPart({
                         helperText={
                           touched.registration_no && errors.registration_no
                         }
-                        
+
                         label={t('Provide an unique Registration number')}
                         name="registration_no"
                         onBlur={handleBlur}

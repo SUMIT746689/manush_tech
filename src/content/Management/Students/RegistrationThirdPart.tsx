@@ -75,21 +75,22 @@ function RegistrationFirstPart({
             const formData = new FormData();
 
             for (let i in _values) {
-              if (i == 'filePathQuery') {
-                formData.append(`${i}`, JSON.stringify(_values[i]));
-              }
-              else formData.append(`${i}`, _values[i]);
+              if (i == 'filePathQuery') formData.append(`${i}`, JSON.stringify(_values[i]));
+              else if (_values[i]) formData.append(`${i}`, _values[i]);
+            }
+            const handleSubmitSuccess = () => {
+              resetForm();
+              setTotalFormData({})
+              setStatus({ success: true });
+              setSubmitting(false);
+              setUsersFlag(true);
+              setActiveStep(0);
             }
 
             if (student && !onlineAdmission_id) {
               const res = await axios.patch(`/api/student/${router.query.id}`, formData)
               if (res.data.success) {
-                resetForm();
-                setTotalFormData({})
-                setStatus({ success: true });
-                setSubmitting(false);
-                setUsersFlag(true);
-                setActiveStep(0);
+                handleSubmitSuccess();
                 showNotification('Student updated Successfully');
                 router.push('/management/students');
               }
@@ -98,12 +99,7 @@ function RegistrationFirstPart({
               const res = await axios.post(`/api/student`, formData)
 
               if (res.data.success) {
-                resetForm();
-                setTotalFormData({})
-                setStatus({ success: true });
-                setSubmitting(false);
-                setUsersFlag(true);
-                setActiveStep(0);
+                handleSubmitSuccess();
                 showNotification(res.data.success);
                 if (onlineAdmission_id) {
                   await axios.delete(`/api/onlineAdmission/${onlineAdmission_id}`)

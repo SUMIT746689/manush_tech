@@ -1,7 +1,9 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const get = async (_, res, refresh_token) => {
+
+const get = async (req, res, refresh_token) => {
+  
   const sections = await prisma.section.findMany({
     where: {
       class: {

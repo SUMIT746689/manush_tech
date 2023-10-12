@@ -53,7 +53,6 @@ const HeaderWrapper = styled(Box)(
 
 function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
-  const theme = useTheme();
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);

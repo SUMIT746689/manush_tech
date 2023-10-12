@@ -30,7 +30,6 @@ function RegistrationFirstPart({
 }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-  const [gender, setGender] = useState('male');
   
   return (
     <>
@@ -243,15 +242,9 @@ function RegistrationFirstPart({
                         inputFormat='dd/MM/yyyy'
                         value={values.date_of_birth}
                         onChange={(n) => {
-                          // console.log("start time__hour",newValue.$H);
-                          // console.log("start time__hour",newValue.$m);
                           if (n) {
-                            // setFieldValue("date_of_birth", `1970-05-02 ${newValue.$H}:${newValue.$m}:00+0000`)
                             // @ts-ignore
                             const newValue = dayjs(n)
-
-                            // dayjs(newValue).format('H:m:ss')
-                            //@ts-ignore
                             setFieldValue('date_of_birth', newValue);
 
                           }
@@ -279,19 +272,19 @@ function RegistrationFirstPart({
 
                     {/* Gender */}
                     <Grid item xs={12}>
-                      <FormControl>
+                      <FormControl required>
                         <FormLabel id="demo-row-radio-buttons-group-label">
-                          Select Gender *
+                          Select Gender 
                         </FormLabel>
                         <RadioGroup
                           aria-labelledby="demo-controlled-radio-buttons-group"
                           name="gender"
                           row
-                          value={gender}
+                          value={values.gender}
                           onChange={(event) => {
-                            setGender(event.target.value);
                             setFieldValue('gender', event.target.value);
                           }}
+                          
                         >
                           <FormControlLabel
                             value="male"

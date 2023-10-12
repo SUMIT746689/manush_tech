@@ -33,7 +33,7 @@ const SMSSettings = () => {
         }}
         validationSchema={Yup.object().shape({
           title: Yup.string().max(255).required(t('The title field is required')),
-          sms_gateway: Yup.string().max(255).required(t('The sms_gateway field is required')),
+          // sms_gateway: Yup.string().max(255).required(t('The sms_gateway field is required')),
           sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
           sender_id: Yup.string().max(255).required(t('The sender_id field is required')),
         })}
@@ -49,7 +49,7 @@ const SMSSettings = () => {
               id: _values.id,
               title: _values.title,
               details: {
-                sms_gateway: _values.sms_gateway,
+                // sms_gateway: _values.sms_gateway,
                 sms_api_key: _values.sms_api_key,
                 sender_id: _values.sender_id
               }
@@ -105,7 +105,7 @@ const SMSSettings = () => {
                       <DialogContent sx={{ minWidth: '100%', display: "grid", gap: 2 }} >
                         <Grid />
                         {/* sms_gateway */}
-                        <TextFieldWrapper
+                        {/* <TextFieldWrapper
                           label="Sms Gateway"
                           errors={errors?.sms_gateway}
                           touched={touched?.sms_gateway}
@@ -114,7 +114,7 @@ const SMSSettings = () => {
                           handleBlur={handleBlur}
                           handleChange={handleChange}
                           value={values?.sms_gateway}
-                        />
+                        /> */}
 
                         {/* sms_api_key */}
                         <TextFieldWrapper

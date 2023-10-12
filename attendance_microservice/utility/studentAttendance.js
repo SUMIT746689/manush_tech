@@ -44,7 +44,7 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
 
     // create/update attendance for student
     if (!findAttendence_ || !findAttendence_?.status) {
-      console.log("hi....")
+      console.log("calculating attendance for student")
 
       if (findAttendence_) {
 

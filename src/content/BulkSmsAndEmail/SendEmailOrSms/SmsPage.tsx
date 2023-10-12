@@ -9,8 +9,6 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
-
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -63,7 +61,7 @@ const TypeClass = () => {
   const handleClassSelect = (e) => {
     setSelecteSectionList(() => []);
     setFieldValue("section_id", []);
-    const findSelectedTemplate = classes.find(data => data.id === e.target.value)
+    const findSelectedTemplate = classes ? classes.find(data => data.id === e.target.value) : false;
     if (!findSelectedTemplate) return;
     setFieldValue("class_id", e.target.value);
     if (!findSelectedTemplate.has_section) return;
@@ -94,13 +92,15 @@ const TypeGroup = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-
+  console.log({roles})
   useEffect(() => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
+    return ()=> setFieldValue("role_id", [])
   }, [roles])
 
   const handleRoleSelect = (e) => {
+    console.log({e})
     // if (e.target.value <= 0) return;
     // const findSelectedTemplate = roles.find(data => data.id === e.target.value)
     // if (!findSelectedTemplate) return;
@@ -192,6 +192,7 @@ function PageHeader() {
 
   const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
+
       const successResponse = (message) => {
         showNotification('send sms ' + message + ' successfully');
         resetForm();

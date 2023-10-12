@@ -100,8 +100,9 @@ const TypeGroup = () => {
 
   useEffect(() => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
-    console.log({ customize_select_roleList });
+    // console.log({ customize_select_roleList });
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
+    return ()=>setFieldValue("role_id", [])
   }, [roles])
 
   const handleRoleSelect = (e) => {

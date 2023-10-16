@@ -270,8 +270,8 @@ const Results = ({
             </Typography>
           </>
         ) : (
-          <>
-            <TableContainer>
+          <TableContainer>
+           
               <Table>
                 <TableHead>
                   <TableRow>
@@ -282,13 +282,13 @@ const Results = ({
                         onChange={handleSelectAllschools}
                       />
                     </TableCell>
-                    <TableCell>{t('ID')}</TableCell>
-                    <TableCell>{t('Exam title')}</TableCell>
-                    <TableCell>{t('Class')}</TableCell>
-                    <TableCell>{t('Section')}</TableCell>
-                    <TableCell>{t('Final percentage')}</TableCell>
-                    <TableCell>{t('Subject list')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    <td>{t('ID')}</td>
+                    <td>{t('Exam title')}</td>
+                    <td>{t('Class')}</td>
+                    <td>{t('Section')}</td>
+                    <td>{t('Final percentage')}</td>
+                    <td>{t('Subject list')}</td>
+                    <td align="center">{t('Actions')}</td>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -304,7 +304,7 @@ const Results = ({
                         key={exam.id}
                         selected={isExamselected}
                       >
-                        <TableCell padding="checkbox">
+                        <td>
                           <Checkbox
                             checked={isExamselected}
                             onChange={(event) =>
@@ -312,41 +312,41 @@ const Results = ({
                             }
                             value={isExamselected}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
+                        </td>
+                        <td>
+                          <Typography noWrap variant="h5" py={0}>
                             {exam.id}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
+                        </td>
+                        <td>
+                          <Typography noWrap variant="h5" py={0}>
                             {exam?.title}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
+                        </td>
+                        <td>
+                          <Typography noWrap variant="h5" py={0}>
                             {exam?.section?.class?.name}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
+                        </td>
+                        <td>
+                          <Typography noWrap variant="h5" py={0}>
                             {exam.section?.class?.has_section ? exam?.section?.name : '(This class has no section !)'}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
+                        </td>
+                        <td>
+                          <Typography noWrap variant="h5" py={0}>
                             {exam.final_percent ? exam?.final_percent : 'No percentage'}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
+                        </td>
+                        <td>
+                          <Typography variant="h5" py={0}>
                             {exam?.exam_details?.map(i => i?.subject?.name).join(", ")}
                           </Typography>
-                        </TableCell>
+                        </td>
 
 
-                        <TableCell align="center">
-                          <Typography noWrap>
+                        <td align="center">
+                          <Typography noWrap py={0}>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 onClick={() => handleEdit(exam)}
@@ -366,13 +366,13 @@ const Results = ({
                                 </IconButton>
                               </Tooltip> */}
                           </Typography>
-                        </TableCell>
+                        </td>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
-            </TableContainer>
+           
             {/* <Box p={2}>
                 <TablePagination
                   component="div"
@@ -384,7 +384,7 @@ const Results = ({
                   rowsPerPageOptions={[5, 10, 15]}
                 />
               </Box> */}
-          </>
+          </TableContainer>
         )}
       </Card>
 

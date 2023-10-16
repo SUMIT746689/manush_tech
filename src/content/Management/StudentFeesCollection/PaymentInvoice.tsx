@@ -7,6 +7,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
   Typography
@@ -17,17 +18,36 @@ import dayjs from 'dayjs';
 import { useState, useEffect } from 'react';
 
 function PaymentInvoice({ printFees, student }) {
+
+
   const { user } = useAuth();
   const [word, setWord] = useState('');
-  const [totalNumber, setTotalNumber] = useState(0);
+  const [totalFeeamount, setTotalFeeamount] = useState(0);
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
+  const [selectedFees, setSelectedFees] = useState([]);
 
   useEffect(() => {
-    const totalAmount = printFees.reduce((prev, curr) => prev + curr.amount, 0) || 0;
-    setTotalNumber(totalAmount);
-    const totalPaidAmount_ = printFees.reduce((prev, curr) => ["paid", "partial paid"].includes(curr?.status) ? prev + (curr.paidAmount || curr.amount) : prev, 0) || 0;
+
+    const temp = printFees.map(payment => {
+      const last_date = new Date(payment.last_date)
+      const today = new Date()
+      let payableAmount = payment.amount
+
+      if ((payment?.status !== 'paid' || payment?.status !== 'paid late') && today > last_date) {
+        payableAmount += (payment.late_fee ? payment.late_fee : 0)
+      }
+      payment['payableAmount'] = payableAmount
+      return payment
+    })
+
+    const totalAmount = temp.reduce((prev, curr) => prev + curr.payableAmount, 0) || 0;
+    setTotalFeeamount(totalAmount);
+
+    const totalPaidAmount_ = temp.reduce((prev, curr) => prev + (curr.paidAmount || 0), 0);
     setTotalPaidAmount(totalPaidAmount_);
     setWord(numberToWordConverter(totalPaidAmount_));
+
+    setSelectedFees(temp)
   }, [printFees])
 
   return (
@@ -95,29 +115,39 @@ function PaymentInvoice({ printFees, student }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {printFees?.map((payment, index) => (
-                <TableRow
+              {selectedFees?.map((payment, index) =>  <TableRow
                   key={payment.id}
                   sx={{ p: 1 }}
                 // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{dayjs(payment.last_payment_date).format('YYYY-MM-DD HH:MM')}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.last_payment_date}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment.amount)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
                   <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.status === 'unpaid' ? 0 : formatNumber(payment.paidAmount || payment.amount)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.paidAmount ? formatNumber(payment.paidAmount) : 0}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
+            <TableFooter>
+              <TableRow >
+                <TableCell colSpan={3}></TableCell>
+                <TableCell align='right' sx={{ fontWeight: 'bold' }}>Total Collected amount</TableCell>
+                <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">{totalFeeamount}</TableCell>
+                <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">Total paid:</TableCell>
+                <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">{totalPaidAmount}</TableCell>
+                {/* <TableCell>{t('Total')}</TableCell> */}
+                {/* <TableCell>{datas?.sumTotal}</TableCell> */}
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableContainer>
       </Grid>
 
       <Grid container mt={1} px={1} justifyContent="space-between">
         <Grid sx={{ textTransform: 'capitalize' }}>IN WORD: <b>{word} {user?.school?.currency} only</b></Grid>
-        <Grid>Total: <b>{formatNumber(totalPaidAmount)}</b></Grid>
+        <Grid>Total paid: <b>{formatNumber(totalPaidAmount)}</b></Grid>
       </Grid>
 
       <Grid container mt={10} justifyContent="space-between">

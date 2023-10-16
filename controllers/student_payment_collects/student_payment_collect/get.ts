@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 export const get = async (req, res) => {
   try {
     const { id, fromDate, toDate, academic_year_id } = req.query;
+    console.log("req.query__", req.query);
 
     if (!id) throw new Error('provide student_id');
 
@@ -68,7 +69,7 @@ export const get = async (req, res) => {
     const fees = all_fees.section.class.fees?.filter(i => !waiver_fee.includes(i.id))?.map((fee) => {
 
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
-
+      const late_fee = fee.late_fee ? fee.late_fee : 0;
       // console.log("fee", fee);
       // console.log("findStudentFee__", findStudentFee);
       const findStudentFeeSize = findStudentFee.length
@@ -88,16 +89,15 @@ export const get = async (req, res) => {
 
         const last_date = dayjs(fee.last_date).valueOf()
         const last_trnsation_date = dayjs(findStudentFee[findStudentFeeSize - 1].created_at).valueOf()
-        const late_fee = fee.late_fee ? fee.late_fee : 0;
 
 
-        if (last_trnsation_date > last_date && feeAmount == paidAmount) {
-          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'Fine unpaid', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
-        }
-        else if (last_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) {
+
+        if (last_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid late', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
-
+        else if (last_trnsation_date > last_date && feeAmount == paidAmount && late_fee > 0) {
+          return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'fine unpaid', paidAmount, collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
+        }
         else if (last_date >= last_trnsation_date && feeAmount == paidAmount) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid', collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }

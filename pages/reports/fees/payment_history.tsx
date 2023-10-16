@@ -93,7 +93,7 @@ function FeesPaymentReport() {
 
             axios
                 // @ts-ignore
-                .get(`/api/student_payment_collect/${selectedStudent.id}?${fromDate ? `fromDate=${fromDate}` : ''}${toDate ? `&toDate=${toDate}` : ''}`)
+                .get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}&${fromDate ? `fromDate=${fromDate}` : ''}${toDate ? `&toDate=${toDate}` : ''}`)
                 .then((res) => {
                     console.log("re_____", res.data);
 

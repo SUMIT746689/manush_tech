@@ -66,7 +66,7 @@ export interface MenuItems {
   // heading: string;
 }
 
-const menuItems: MenuItems[] = [
+export const menuItems: MenuItems[] = [
   {
     items: [
       {
@@ -253,9 +253,7 @@ const menuItems: MenuItems[] = [
           },
 
         ]
-      }
-      ,
-
+      },
       {
         name: 'Reports',
         icon: AssessmentIcon,
@@ -391,7 +389,7 @@ const menuItems: MenuItems[] = [
         ]
       },
       {
-        name:'Office Accounting',
+        name: 'Office Accounting',
         icon: AccountBalanceIcon,
         items: [
           {
@@ -404,7 +402,7 @@ const menuItems: MenuItems[] = [
             link: '/management/accounting/voucher_head',
             icon: PaidIcon
           },
-          
+
           {
             name: 'New Deposit',
             link: '/management/accounting/voucher_deposit',

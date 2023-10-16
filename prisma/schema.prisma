@@ -28,14 +28,15 @@ model User {
   student      StudentInformation?
 
   // admin_school School? @relation(name: "AdminUserSchool")
-  SentSmsDetail        SentSmsDetail[]
-  EmployeeAttendance   EmployeeAttendance[]
-  StudentFee           StudentFee[]
-  Leave                Leave[]
-  SentEmailDetail      SentEmailDetail[]
-  tbl_attendence_queue tbl_attendance_queue[]
+  smsCampaignDetails      SmsCampaignDetails[]
+  EmployeeAttendance      EmployeeAttendance[]
+  StudentFee              StudentFee[]
+  Leave                   Leave[]
+  emailCampaignDetails    EmailCampaignDetails[]
+  tbl_attendence_queue    tbl_attendance_queue[]
   // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
-  approved_user        Leave[]                @relation("approved_by")
+  approved_user           Leave[]                   @relation("approved_by")
+  tbl_sms_campaign_queued tbl_sms_campaign_queued[]
 
   @@map("users")
 }
@@ -69,13 +70,13 @@ model School {
   RequestPackage                     RequestPackage[]
   SmsGateway                         SmsGateway[]
   SmsTemplate                        SmsTemplate[]
-  SentSms                            SentSms[]
+  smsCampaign                        SmsCampaigns[]
   CertificateTemplate                CertificateTemplate[]
   Transaction                        Transaction[]
   GradingSystem                      GradingSystem[]
   Notice                             Notice[]
   EmailTemplate                      EmailTemplate[]
-  SentEmail                          SentEmail[]
+  emailCampaignDetails               EmailCampaignDetails[]
   OnlineAdmission                    OnlineAdmission[]
   tbl_attendence_queue               tbl_attendance_queue[]
   tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
@@ -83,6 +84,9 @@ model School {
   Voucher                            Voucher[]
   Department                         Department[]
   TeacherRecruitment                 TeacherRecruitment[]
+  EmailCampaigns                     EmailCampaigns[]
+  tbl_sms_campaign_queued            tbl_sms_campaign_queued[]
+  SmsCampaignDetails                 SmsCampaignDetails[]
 
   // routines Routine[]
   @@map("schools")
@@ -641,8 +645,8 @@ model SmsTemplate {
   school_id  Int
   created_at DateTime @default(now())
 
-  school  School    @relation(fields: [school_id], references: [id])
-  SentSms SentSms[]
+  school       School         @relation(fields: [school_id], references: [id])
+  smsCampaigns SmsCampaigns[]
 
   @@map("sms_templates")
 }
@@ -654,13 +658,13 @@ model SmsGateway {
   is_active Boolean
   school_id Int
 
-  school  School    @relation(fields: [school_id], references: [id])
-  SentSms SentSms[]
+  school       School         @relation(fields: [school_id], references: [id])
+  smsCampaigns SmsCampaigns[]
 
   @@map("sms_gateway")
 }
 
-model SentSms {
+model SmsCampaigns {
   id              Int            @id @default(autoincrement())
   name            String
   recipient_type  RecipientType?
@@ -671,12 +675,12 @@ model SentSms {
   custom_body     String?
   created_at      DateTime       @default(now())
 
-  school        School          @relation(fields: [school_id], references: [id])
-  smsTemplate   SmsTemplate?    @relation(fields: [sms_template_id], references: [id])
-  smsGateway    SmsGateway      @relation(fields: [sms_gateway_id], references: [id])
-  sentSmsDetail SentSmsDetail[]
+  school             School               @relation(fields: [school_id], references: [id])
+  smsTemplate        SmsTemplate?         @relation(fields: [sms_template_id], references: [id])
+  smsGateway         SmsGateway           @relation(fields: [sms_gateway_id], references: [id])
+  smsCampaignDetails SmsCampaignDetails[]
 
-  @@map("sent_sms")
+  @@map("sms_campaings")
 }
 
 enum RecipientType {
@@ -685,19 +689,25 @@ enum RecipientType {
   individual
 }
 
-model SentSmsDetail {
-  id          Int        @id @default(autoincrement())
-  sent_sms_id Int
-  name        String
-  phone       String
-  user_id     Int
-  status      SentStatus
-  created_at  DateTime   @default(now())
+model SmsCampaignDetails {
+  id            Int        @id @default(autoincrement())
+  name          String
+  campaign_name String
+  body          String
+  phone         String
+  status        SentStatus @default(pending)
+  api_key       String
+  sender_id     String
+  user_id       Int
+  school_id     Int
+  campaign_id   Int
+  created_at    DateTime   @default(now())
 
-  sentSms SentSms @relation(fields: [sent_sms_id], references: [id])
-  user    User    @relation(fields: [user_id], references: [id])
+  school      School       @relation(fields: [school_id], references: [id])
+  smsCampaign SmsCampaigns @relation(fields: [campaign_id], references: [id])
+  user        User         @relation(fields: [user_id], references: [id])
 
-  @@map("sent_sms_details")
+  @@map("sms_campaign_details")
 }
 
 enum SentStatus {
@@ -713,13 +723,13 @@ model EmailTemplate {
   school_id  Int
   created_at DateTime @default(now())
 
-  school    School      @relation(fields: [school_id], references: [id])
-  SentEmail SentEmail[]
+  school         School           @relation(fields: [school_id], references: [id])
+  emailCampaigns EmailCampaigns[]
 
   @@map("email_templates")
 }
 
-model SentEmail {
+model EmailCampaigns {
   id                Int            @id @default(autoincrement())
   name              String
   recipient_type    RecipientType?
@@ -730,26 +740,28 @@ model SentEmail {
   custom_body       String?
   created_at        DateTime       @default(now())
 
-  school          School            @relation(fields: [school_id], references: [id])
-  emailTemplate   EmailTemplate?    @relation(fields: [email_template_id], references: [id])
-  sentEmailDetail SentEmailDetail[]
+  school               School                 @relation(fields: [school_id], references: [id])
+  emailTemplate        EmailTemplate?         @relation(fields: [email_template_id], references: [id])
+  emailCampaignDetails EmailCampaignDetails[]
 
-  @@map("sent_email")
+  @@map("email_campaigns")
 }
 
-model SentEmailDetail {
-  id            Int        @id @default(autoincrement())
-  sent_email_id Int
-  name          String
-  phone         String
-  user_id       Int
-  status        SentStatus
-  created_at    DateTime   @default(now())
+model EmailCampaignDetails {
+  id          Int        @id @default(autoincrement())
+  campaign_id Int
+  name        String
+  phone       String
+  user_id     Int
+  status      SentStatus
+  created_at  DateTime   @default(now())
 
-  sentEmail SentEmail @relation(fields: [sent_email_id], references: [id])
-  user      User      @relation(fields: [user_id], references: [id])
+  emailCampaign EmailCampaigns @relation(fields: [campaign_id], references: [id])
+  user          User           @relation(fields: [user_id], references: [id])
+  School        School?        @relation(fields: [schoolId], references: [id])
+  schoolId      Int?
 
-  @@map("sent_email_details")
+  @@map("email_campaign_details")
 }
 
 model CertificateTemplate {
@@ -967,6 +979,24 @@ enum DiscountType {
 
 //   user User @relation(fields: [user_id], references: [id])
 // }
+
+model tbl_sms_campaign_queued {
+  id            Int      @id @default(autoincrement())
+  name          String
+  campaign_name String
+  body          String
+  phone         String
+  sender_id     String
+  api_key       String
+  user_id       Int
+  school_id     Int
+  created_at    DateTime @default(now())
+
+  school School @relation(fields: [school_id], references: [id])
+  user   User   @relation(fields: [user_id], references: [id])
+
+  @@map("tbl_sms_campaign_queued")
+}
 
 model tbl_manual_student_attendace_queue {
   id               Int      @id @default(autoincrement())

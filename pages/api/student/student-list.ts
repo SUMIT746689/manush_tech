@@ -40,7 +40,9 @@ const index = async (req, res) => {
                                 middle_name: true,
                                 last_name: true
                             }
-                        }
+                        },
+                        guardian_name: true,
+                        guardian_phone: true
                     }
                 })
                 res.status(200).json(students)

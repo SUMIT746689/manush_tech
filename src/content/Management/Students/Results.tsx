@@ -569,7 +569,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         )}
       </Card>
       <div style={{ display: 'none', visibility: 'hidden' }}>
-        <Grid ref={idCard}>
+        <Grid ref={idCard} display={'grid'} gridTemplateColumns={'auto auto'} container gap={2} p={2}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i) => {
 
@@ -585,9 +585,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                 phone: i?.phone,
                 birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
 
-                photo: i?.student_photo ? `/api/get_file/${i?.student_photo}` : '/dumy_student.png'
+                photo: i?.student_photo ? `/api/get_file/${i?.student_photo?.replace(/\\/g, '/')}` : '/dumy_student.png'
               };
-              return <IdentityCard user={user} />;
+              return <IdentityCard user={user} />
             }
           )}
         </Grid>
@@ -703,6 +703,7 @@ const SingleFee = ({ singleFee, selectedUser }) => {
 };
 
 const SingleDiscount = ({ singleDiscount, selectedUser }) => {
+  console.log(singleDiscount, selectedUser);
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.discount?.length > 0

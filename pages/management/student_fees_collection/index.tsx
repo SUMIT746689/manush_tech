@@ -14,10 +14,10 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 function Managementschools() {
   const [datas, setDatas] = useState<Project[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [students, setStudents] = useState<[object?]>([]);
   const [printFees, setPrintFees] = useState<[object?]>([]);
   const [filteredFees, setFilteredFees] = useState<any>([]);
   const [selectedFees, setSelectedFees] = useState<any[]>([]);
+  
   
   const { data: accounts } = useClientFetch(`/api/account`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
@@ -38,7 +38,6 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-
 
   return (
     <>
@@ -65,8 +64,6 @@ function Managementschools() {
             classes={classData}
             sessions={datas}
             setSessions={setDatas}
-            students={students}
-            setStudents={setStudents}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
             setPrintFees={setPrintFees}

@@ -105,8 +105,6 @@ const Results = ({
   classes,
   sessions,
   setSessions,
-  students,
-  setStudents,
   selectedStudent,
   setSelectedStudent,
   setPrintFees,
@@ -117,10 +115,10 @@ const Results = ({
   accountsOption
 }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [students, setStudents] = useState<[object?]>([]);
 
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filter, setFilter] = useState<string>('all');

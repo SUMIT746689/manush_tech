@@ -1,8 +1,4 @@
-html, body {
-	font-size: 14px;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-  }
-  
+ 
   strong {
 	font-weight: 600;
 	color: #083d9b;
@@ -32,14 +28,9 @@ html, body {
 	font-family: Georgia, "Times New Roman", Times, serif;
 	background-color: #133f86;
   }
-  .identityCard__profile {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-  }
+ 
   .identityCard__identity {
 	width: 100%;
-	font-size: 12px;
 	padding: 10px;
 	text-transform: uppercase;
   }
@@ -50,7 +41,6 @@ html, body {
 	display: block;
 	width: 100%;
 	filter: none;
-	-webkit-filter: grayscale(100%);
 	-moz-filter: grayscale(100%);
 	-ms-filter: grayscale(100%);
 	-o-filter: grayscale(100%);

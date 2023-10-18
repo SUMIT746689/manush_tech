@@ -178,10 +178,7 @@ function FeesPaymentReport() {
 
     useEffect(() => {
         if (selectedSection && academicYear) {
-            axios
-                .get(
-                    `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`
-                )
+            axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`)
                 .then((res) => {
                     console.log("students__", res.data);
 
@@ -375,7 +372,7 @@ function FeesPaymentReport() {
                         <Divider />
                         {
                             paginatedTransection.length !== 0 && <>
-                                <Table >
+                                <Table>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>{t('Fee Title')}</TableCell>
@@ -478,9 +475,7 @@ function FeesPaymentReport() {
 
             </Grid>
 
-            <Grid sx={{
-                display: 'none',
-            }} >
+            <Grid sx={{ display: 'none' }} >
                 <Grid ref={printPageRef} sx={{
                     p: 1,
                 }}>
@@ -564,7 +559,6 @@ function FeesPaymentReport() {
                     </Grid>
 
                 </Grid>
-
             </Grid >
             <Footer />
 

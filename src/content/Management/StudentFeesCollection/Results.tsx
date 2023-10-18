@@ -293,7 +293,7 @@ const Results = ({
       .then((res) => {
 
         if (res.data.err) throw new Error(res.data.err);
-        setPrintFees((prev) => [...prev, fee]);
+        setPrintFees((prev) => [...prev, { fee_id, collected_amount: amount }]);
         handleStudentPaymentCollect();
         showNotification('The payment has been collected successfully');
       })

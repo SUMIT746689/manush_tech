@@ -39,11 +39,15 @@ function PaymentInvoice({ printFees, student }) {
       payment['payableAmount'] = payableAmount
       return payment
     })
+    console.log("temp__", temp);
 
-    const totalAmount = temp.reduce((prev, curr) => prev + curr.payableAmount, 0) || 0;
+    const totalAmount = temp.reduce((prev, curr) => prev + Number(curr.payableAmount), 0) || 0;
+
     setTotalFeeamount(totalAmount);
 
-    const totalPaidAmount_ = temp.reduce((prev, curr) => prev + (curr.paidAmount || 0), 0);
+    const totalPaidAmount_ = temp.reduce((prev, curr) => prev + (Number(curr.paidAmount) || 0), 0) || 0;
+    console.log("totalPaidAmount___", totalPaidAmount_);
+
     setTotalPaidAmount(totalPaidAmount_);
     setWord(numberToWordConverter(totalPaidAmount_));
 
@@ -115,25 +119,25 @@ function PaymentInvoice({ printFees, student }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {selectedFees?.map((payment, index) =>  <TableRow
-                  key={payment.id}
-                  sx={{ p: 1 }}
-                // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.last_payment_date}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
-                  <TableCell sx={{ p: 1 }} align="right">{payment.paidAmount ? formatNumber(payment.paidAmount) : 0}</TableCell>
-                </TableRow>
+              {selectedFees?.map((payment, index) => <TableRow
+                key={payment.id}
+                sx={{ p: 1 }}
+              // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{payment.last_payment_date}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{payment.paidAmount ? formatNumber(payment.paidAmount) : 0}</TableCell>
+              </TableRow>
               )}
             </TableBody>
             <TableFooter>
               <TableRow >
                 <TableCell colSpan={3}></TableCell>
-                <TableCell align='right' sx={{ fontWeight: 'bold' }}>Total Collected amount</TableCell>
+                <TableCell align='right' sx={{ fontWeight: 'bold' }}>Total Amount</TableCell>
                 <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">{totalFeeamount}</TableCell>
                 <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">Total paid:</TableCell>
                 <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">{totalPaidAmount}</TableCell>

@@ -7,10 +7,11 @@ const strongStyle = { fontWeight: 600, color: '#083d9b' }
 const IdentityCard = ({ user }) => {
     return (
 
-        <Card key={user.id} sx={{ p: 1, backgroundColor: '#f2f2f2',
-        // boxShadow:'0px 10px 10px #86b2f9'
-        border:'1.5px dotted'
-         }}>
+        <Card key={user.id} sx={{
+            p: 1, backgroundColor: '#f2f2f2',
+            // boxShadow:'0px 10px 10px #86b2f9'
+            border: '1.5px dotted'
+        }}>
 
             <Header
                 title={user.schoolName}
@@ -69,7 +70,7 @@ const Profile = ({ user }) => {
                 gridTemplateColumns: '20% 80%',
                 gap: 2,
             }}>
-               <Grid  display={'flex'} justifyContent={'center'} flexDirection={'column'}> 
+                <Grid display={'flex'} justifyContent={'center'} flexDirection={'column'}>
 
                     <Image src={photo}
                         height={80}
@@ -78,14 +79,14 @@ const Profile = ({ user }) => {
                         loading='eager'
                         objectFit={'cover'}
                         style={{
-                            objectPosition:'center',
-                            width:"100%",
-                            height:"50%",
-                            borderRadius:'10%'
+                            objectPosition: 'center',
+                            width: "100%",
+                            height: "50%",
+                            borderRadius: '10%'
                         }}
                     />
-               
-               </Grid>
+
+                </Grid>
                 <ul
                     style={{
                         textAlign: 'left',

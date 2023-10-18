@@ -39,7 +39,6 @@ function PaymentInvoice({ printFees, student }) {
       payment['payableAmount'] = payableAmount
       return payment
     })
-    console.log("temp__", temp);
 
     const totalAmount = temp.reduce((prev, curr) => prev + Number(curr.payableAmount), 0) || 0;
 

@@ -130,9 +130,7 @@ const Results = ({
 
   const handleStudentPaymentCollect = () => {
     if (selectedStudent && academicYear) {
-      axios
-        // @ts-ignore
-        .get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
+      axios.get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
         .then((res) => {
           if (res.data?.success) {
             console.log("res.data.data__", res.data);

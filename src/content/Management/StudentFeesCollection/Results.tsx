@@ -110,6 +110,7 @@ const Results = ({
   setPrintFees,
   filteredFees,
   setFilteredFees,
+
   setSelectedFees,
   accounts,
   accountsOption
@@ -193,10 +194,16 @@ const Results = ({
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedItems(
-      // @ts-ignore
-      event.target.checked ? sessions?.map((project) => project.id) : []
-    );
+    if (event.target.checked) {
+      const temp = sessions?.map((project) => project.id)
+      setSelectedFees(sessions);
+      setSelectedItems(temp);
+    }
+    else {
+      setSelectedFees([]);
+      setSelectedItems([]);
+    }
+
   };
 
   const handleSelectOneProject = (

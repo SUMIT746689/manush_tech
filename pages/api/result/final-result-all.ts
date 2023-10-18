@@ -24,17 +24,18 @@ const FinalResultAll = async (req, res) => {
                     throw new Error('section_id or student_id_list missing !');
                 }
 
-                let termWiseTotalMark = [];
+               
                 const examList = await prisma.exam.findMany({
                     where: {
                         section_id: parseInt(section_id),
+                        academic_year_id: parseInt(academic_year_id),
                         final_percent: {
                             not: null
                         }
                     },
 
                 })
-
+                // console.log({ examList });
                 const valid = await prisma.student.findMany({
                     where: {
                         id: {
@@ -97,6 +98,7 @@ const FinalResultAll = async (req, res) => {
                     //     throw new Error('')
                     // }
 
+                    const termWiseTotalMark = [];
                     for (const exam of examList) {
 
                         const data = await prisma.exam.findUnique({
@@ -112,7 +114,7 @@ const FinalResultAll = async (req, res) => {
                                                 name: true
                                             }
                                         },
-                                        subject_total:true
+                                        subject_total: true
                                     }
                                 },
                                 student_results: {
@@ -136,10 +138,8 @@ const FinalResultAll = async (req, res) => {
                                 }
                             }
                         })
-                        //  return res.status(200).json(data);
-                        // console.log( data.student_results );
 
-                        let allSubjectCalculatedMark = []
+                        const allSubjectCalculatedMark = []
                         let totalMark = 0
                         for (const studetGivenExam of data.exam_details) {
 
@@ -149,13 +149,15 @@ const FinalResultAll = async (req, res) => {
                             if (flag) {
                                 // @ts-ignore
                                 singleSubjectCalculetedMark = (flag.mark_obtained * parseFloat(exam?.final_percent)) / 100;
+                                // console.log(exam?.final_percent,"   ",flag.mark_obtained,"    ",singleSubjectCalculetedMark);
+                                
                             } else {
                                 singleSubjectCalculetedMark = 0
                             }
                             allSubjectCalculatedMark.push({
                                 subject_id: studetGivenExam.subject.id,
                                 subject_name: studetGivenExam.subject.name,
-                                subject_total:studetGivenExam.subject_total,
+                                subject_total: studetGivenExam.subject_total,
                                 singleSubjectCalculetedMark: singleSubjectCalculetedMark
                             })
                             totalMark += singleSubjectCalculetedMark;
@@ -164,6 +166,7 @@ const FinalResultAll = async (req, res) => {
                             exam_id: exam?.id, title: exam?.title, calculatedTotalMark: totalMark, result: allSubjectCalculatedMark
                         })
                     }
+                    // console.log({ student: student, termWiseTotalMark: termWiseTotalMark });
 
                     allFinalResult.push({ student: student, termWiseTotalMark: termWiseTotalMark })
                 }

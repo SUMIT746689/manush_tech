@@ -27,6 +27,7 @@ function PaymentInvoice({ printFees, student }) {
   const [selectedFees, setSelectedFees] = useState([]);
 
   useEffect(() => {
+console.log({printFees});
 
     const temp = printFees.map(payment => {
       const last_date = new Date(payment.last_date)

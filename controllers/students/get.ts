@@ -47,6 +47,7 @@ async function get(req, res, refresh_token) {
         },
         academic_year: true,
         discount: true,
+        waiver_fees: true,
         section: {
           select: {
             id: true,

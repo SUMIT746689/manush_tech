@@ -401,6 +401,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
           </Grid>
         </Grid>
       </Dialog>
+
       <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
 
         {selectedBulkActions && (
@@ -655,6 +656,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 };
 
 const SingleFee = ({ singleFee, selectedUser }) => {
+  console.log({ singleFee, selectedUser });
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.waiver_fees?.length > 0
@@ -705,7 +707,7 @@ const SingleFee = ({ singleFee, selectedUser }) => {
 };
 
 const SingleDiscount = ({ singleDiscount, selectedUser }) => {
-  console.log(singleDiscount, selectedUser);
+  // console.log(singleDiscount, selectedUser);
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.discount?.length > 0

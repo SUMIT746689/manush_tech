@@ -62,7 +62,7 @@ export const get = async (req, res) => {
       }
     });
 
-    console.log("all_fees__", all_fees);
+    // console.log("all_fees__", all_fees);
 
     const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map(i => i.id) : [];
 
@@ -72,6 +72,7 @@ export const get = async (req, res) => {
       const late_fee = fee.late_fee ? fee.late_fee : 0;
       // console.log("fee", fee);
       // console.log("findStudentFee__", findStudentFee);
+      
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
         // console.log("findStudentFee__",findStudentFee);
@@ -101,7 +102,7 @@ export const get = async (req, res) => {
         else if (last_date >= last_trnsation_date && feeAmount == paidAmount) {
           return ({ ...fee, last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at, status: 'paid', collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username })
         }
-        else {
+        else if (paidAmount > 0) {
           return ({
             ...fee,
             last_payment_date: findStudentFee[findStudentFeeSize - 1].created_at,
@@ -109,6 +110,9 @@ export const get = async (req, res) => {
             status: 'partial paid',
             collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
           })
+        }
+        else {
+          return ({ ...fee, status: 'unpaid' })
         }
 
       }

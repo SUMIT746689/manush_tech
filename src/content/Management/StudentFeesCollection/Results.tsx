@@ -105,26 +105,25 @@ const Results = ({
   classes,
   sessions,
   setSessions,
-  students,
-  setStudents,
   selectedStudent,
   setSelectedStudent,
   setPrintFees,
   filteredFees,
   setFilteredFees,
+
   setSelectedFees,
   accounts,
   accountsOption
 }) => {
-  const [selectedItems, setSelectedschools] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [students, setStudents] = useState<[object?]>([]);
 
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [filter, setFilter] = useState<string>('all');
-  const [paginatedfees, setPaginatedSchool] = useState<any>([]);
+  const [paginatedfees, setPaginatedfees] = useState<any>([]);
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -132,11 +131,56 @@ const Results = ({
 
   const handleStudentPaymentCollect = () => {
     if (selectedStudent && academicYear) {
-      axios
-        // @ts-ignore
-        .get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
+      axios.get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
         .then((res) => {
-          if (res.data?.success) setSessions(res.data.data);
+          if (res.data?.success) {
+            console.log("res.data.data__", res.data);
+
+            setSessions(res.data.data?.fees?.map((fee, index) => {
+
+              const last_payment_date = fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format('DD/MM/YYYY, h:mm a') : ''
+              const last_date = new Date(fee.last_date)
+              const today = new Date()
+              const status_color = { p: 0.5 };
+              let due, total_payable_amt;
+
+              if (fee?.status == 'paid' || fee?.status === 'paid late') {
+                due = 0
+                total_payable_amt = ""
+              }
+              else {
+                const late_fee = fee.late_fee ? fee.late_fee : 0
+                total_payable_amt = late_fee && today > last_date ? `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(Number(fee?.amount) + Number(fee?.late_fee)).toFixed(2)}` : ""
+
+                due = (fee?.amount + late_fee - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
+
+                console.log(fee.title, "due__", due, today < last_date);
+
+                if (today < last_date) {
+                  due -= late_fee
+                }
+              }
+
+
+              if (fee?.status === 'paid' || fee?.status === 'paid late') {
+                status_color['color'] = 'green'
+              }
+              else if (fee?.status === 'partial paid') {
+                status_color['color'] = 'blue'
+              }
+              else {
+                status_color['color'] = 'red'
+              }
+
+
+              fee['last_payment_date'] = last_payment_date
+              fee['due'] = due
+              fee['total_payable_amt'] = total_payable_amt
+              fee['status_color'] = status_color
+              fee['sl'] = index + 1
+              return fee
+            }));
+          }
         })
         .catch((err) => {
           console.log(err.message);
@@ -150,10 +194,16 @@ const Results = ({
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
-    setSelectedschools(
-      // @ts-ignore
-      event.target.checked ? sessions?.fees?.map((project) => project.id) : []
-    );
+    if (event.target.checked) {
+      const temp = sessions?.map((project) => project.id)
+      setSelectedFees(sessions);
+      setSelectedItems(temp);
+    }
+    else {
+      setSelectedFees([]);
+      setSelectedItems([]);
+    }
+
   };
 
   const handleSelectOneProject = (
@@ -163,51 +213,49 @@ const Results = ({
   ): void => {
     if (!selectedItems.includes(projectId)) {
       setSelectedFees((prevSelected) => [...prevSelected, project]);
-      setSelectedschools((prevSelected) => [...prevSelected, projectId]);
+      setSelectedItems((prevSelected) => [...prevSelected, projectId]);
     } else {
       setSelectedFees((prevSelected) => prevSelected.filter(({ id }) => id !== projectId));
-      setSelectedschools((prevSelected) => prevSelected.filter((id) => id !== projectId));
+      setSelectedItems((prevSelected) => prevSelected.filter((id) => id !== projectId));
     }
   };
 
   const handlePageChange = (_event: any, newPage: number): void => {
+
     setPage(newPage);
   };
 
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-  // @ts-ignore
+
   useEffect(() => {
-    const filterFees_ = filterFees(sessions?.fees || [], filter)
+    console.log("page__", page);
+
+    const filterFees_ = filterFees(sessions || [], filter)
     setFilteredFees(() => filterFees_ || [])
 
     const paginatedschools = applyPagination(filterFees_ || [], page, limit);
-    setPaginatedSchool(paginatedschools);
+    setPaginatedfees(paginatedschools);
 
-  }, [sessions, filter, page])
+  }, [sessions, filter, page, limit])
 
-  const selectedBulkActions = selectedItems.length > 0;
+  useEffect(() => { console.log(paginatedfees, filter, page); }, [paginatedfees, filter, page])
+
   // @ts-ignore
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions?.fees?.length;
+  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions?.length;
   // @ts-ignore
-  const selectedAllschools = selectedItems.length === sessions?.fees?.length;
+  const selectedAllschools = selectedItems.length === sessions?.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
   const [sections, setSections] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
   useEffect(() => {
-    //  axios.get(`/api/student`).then((res) => setStudents(res.data));
-
     if (selectedSection && academicYear && user) {
-      axios
-        .get(
-          `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`
-        )
+      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`)
         .then((res) => {
           setStudents(res.data);
         })
@@ -250,7 +298,7 @@ const Results = ({
       .then((res) => {
 
         if (res.data.err) throw new Error(res.data.err);
-        setPrintFees((prev) => [...prev, fee]);
+        setPrintFees((prev) => [...prev, { fee_id, collected_amount: amount }]);
         handleStudentPaymentCollect();
         showNotification('The payment has been collected successfully');
       })
@@ -264,8 +312,9 @@ const Results = ({
     let payment = { paid: 0, remaining: 0, due: 0 };
 
     const filterPayment = fees.reduce((prev, curr) => {
-      const last_date = dayjs(curr.last_date).valueOf()
-      const today = curr.last_payment_date ? dayjs(curr.last_payment_date).valueOf() : 0;
+      const last_date = new Date(curr.last_date)
+      const today = new Date()
+
 
       if (curr?.status !== 'paid' && curr?.status !== 'paid late') {
         prev.due += (curr?.amount + (curr.late_fee ? curr.late_fee : 0) - (curr.paidAmount ? curr.paidAmount : ((curr?.status == 'unpaid') ? 0 : curr?.amount)));
@@ -287,7 +336,9 @@ const Results = ({
     );
   };
   const handleClassSelect = (event, newValue) => {
-    setSelectedClass(newValue);
+    setSessions([])
+    setSelectedFees([]);
+    setSelectedItems([])
     if (newValue) {
       const targetClassSections = classes.find((i) => i.id == newValue.id);
       setSections(
@@ -345,8 +396,11 @@ const Results = ({
             placeholder="section"
             handleChange={(e, v) => {
               setSelectedSection(v);
+              setStudents(() => []);
+              setSessions([])
               setSelectedStudent(null);
-              setStudents(() => [])
+              setSelectedFees([]);
+              setSelectedItems([])
             }}
           />
 
@@ -360,7 +414,11 @@ const Results = ({
             }
             getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
             // @ts-ignore
-            handleChange={(e: any, value: any) => { setSelectedStudent(value) }}
+            handleChange={(e: any, value: any) => {
+              setSelectedStudent(value);
+              setSelectedFees([]);
+              setSelectedItems([]);
+            }}
           />
         </Grid>
       </Card >
@@ -421,7 +479,7 @@ const Results = ({
               direction={'row'}
               sx={{ p: 1, mx: 'auto' }}
             >
-              {sessions?.fees?.length > 0 && handlePaymentStatus(sessions.fees)}
+              {sessions?.length > 0 && handlePaymentStatus(sessions)}
             </Grid>
           </Grid>
         </Card>
@@ -504,7 +562,7 @@ const Results = ({
           <TableContainer>
 
             <table>
-              <thead>
+              <TableHead >
                 <TableRow>
                   <TableCell padding="checkbox" align="center">
                     <Checkbox
@@ -513,48 +571,25 @@ const Results = ({
                       onChange={handleSelectAllschools}
                     />
                   </TableCell>
-                  <TableCell align="center">{t('SL')}</TableCell>
-                  <TableCell align="center">{t('Fee Title')}</TableCell>
-                  <TableCell align="center">{t('Pay Amount')}</TableCell>
-                  <TableCell align="center">{t('Status')}</TableCell>
-                  <TableCell align="center">{t('Due')}</TableCell>
-                  <TableCell align="center">{t('Last payment date')}</TableCell>
-                  <TableCell align="center">{t('Total payable amount')}</TableCell>
+                  <TableCell align="center" >
+                    <Typography noWrap variant="h5">
+                      {t('SL')}</Typography>
+                  </TableCell>
 
-                  <TableCell align="center">{t('Actions')}</TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Title')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Amount')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Status')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Due')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Last date')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Last payment date')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Total payable amount')}</Typography></TableCell>
+                  <TableCell align="center"><Typography noWrap variant="h5">{t('Actions')}</Typography></TableCell>
+
                 </TableRow>
-              </thead>
+              </TableHead>
               <TableBody>
-                {paginatedfees.map((fee,index) => {
-
-                  const last_date = dayjs(fee.last_date).valueOf()
-                  const today = fee.last_payment_date ? dayjs(fee.last_payment_date).valueOf() : 0;
-                  const changeColor = today > last_date ? {
-                    color: 'red'
-                  } : {}
+                {paginatedfees.map((fee, index) => {
                   const isschoolselected = selectedItems.includes(fee.id);
-
-                  let due;
-                  if (fee?.status == 'paid' || fee?.status === 'paid late') {
-                    due = 0
-                  }
-                  else {
-                    due = (fee?.amount + (fee.late_fee ? fee.late_fee : 0) - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
-                    if (today < last_date) {
-                      due -= (fee.late_fee ? fee.late_fee : 0)
-                    }
-                  }
-                  const status_color = { p: 0.5 };
-                  if (fee?.status === 'paid' || fee?.status === 'paid late') {
-                    status_color['color'] = 'green'
-                  }
-                  else if (fee?.status === 'partial paid') {
-                    status_color['color'] = 'blue'
-                  }
-                  else {
-                    status_color['color'] = 'red'
-                  }
-
 
                   return (
                     <TableRow
@@ -573,7 +608,7 @@ const Results = ({
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {index+1}
+                          {fee?.sl}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
@@ -583,39 +618,36 @@ const Results = ({
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {formatNumber(fee?.amount.toFixed(1))}
+                          {(fee?.amount.toFixed(2))}
                         </Typography>
                       </TableCell>
 
-                      <TableCell
-                        sx={status_color}
-                        align="center"
-                      >
+                      <TableCell sx={fee?.status_color} align="center">
                         <Typography noWrap variant="h5">
-                          {/* @ts-ignore */}
-
-                          {fee?.status.toUpperCase()}
+                          {fee?.status?.toUpperCase()}
                         </Typography>
                       </TableCell>
 
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {formatNumber(due)}
+                          {formatNumber(fee?.due)}
                         </Typography>
                       </TableCell>
 
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {
-                            fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format(
-                              'DD/MM/YYYY,h:mm a'
-                            ) : ''}
+                          {dayjs(fee?.last_date).format('DD/MM/YYYY')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ p: 0.5 }} align="center">
+                        <Typography noWrap variant="h5">
+                          {fee?.last_payment_date}
                         </Typography>
                       </TableCell>
 
                       <TableCell sx={{ p: 0.5 }} align="center">
-                        <Typography noWrap variant="h5" sx={changeColor}>
-                          {(today <= last_date || fee?.status === 'paid late') ? "" : `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(Number(fee?.amount) + Number(fee?.late_fee)).toFixed(2)}`}
+                        <Typography noWrap variant="h5" sx={{ color: 'red' }}>
+                          {fee?.total_payable_amt}
                         </Typography>
                       </TableCell>
 
@@ -624,7 +656,7 @@ const Results = ({
                           <AmountCollection
                             accounts={accounts}
                             accountsOption={accountsOption}
-                            due={due}
+                            due={fee?.due}
                             project={fee}
                             handleCollection={handleCollection}
                             student_id={selectedStudent?.id}

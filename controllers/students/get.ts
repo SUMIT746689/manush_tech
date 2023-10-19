@@ -38,14 +38,15 @@ async function get(req, res, refresh_token) {
                 name: true
               }
             },
-            user:{
-              select:{
-                username:true
+            user: {
+              select: {
+                username: true
               }
             }
           }
         },
         academic_year: true,
+        discount: true,
         section: {
           select: {
             id: true,
@@ -64,7 +65,7 @@ async function get(req, res, refresh_token) {
           select: {
             title: true
           }
-        }
+        },
       }
     });
 

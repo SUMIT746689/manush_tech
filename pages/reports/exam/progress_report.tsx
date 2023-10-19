@@ -85,7 +85,7 @@ function Managementschools() {
 
     const handleSelectAllUsers = (event): void => {
         setFinalResultList(null)
-        setSelectedItems(event.target.checked ? students.map(i => { return i.id }) : []);
+        setSelectedItems(event.target.checked ? students.map(i => i.id) : []);
     };
 
 
@@ -336,7 +336,7 @@ function Managementschools() {
 
                             <Grid container sx={{
                                 display: 'flex',
-                                justifyContent: 'left'
+                                justifyContent: 'left',
                             }}>
 
 

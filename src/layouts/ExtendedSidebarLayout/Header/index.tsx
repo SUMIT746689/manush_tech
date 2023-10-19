@@ -31,6 +31,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { customBorder } from '@/utils/mui_style';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
+import menuItems from '../Sidebar/SidebarMenu/items';
+import { useRouter } from 'next/router';
+import useNotistick from '@/hooks/useNotistick';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -56,9 +59,10 @@ function Header() {
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-
-  const { user } = useAuth();
-
+  const auth = useAuth();
+  const [menulist, setMenulist] = useState([])
+  const router = useRouter();
+  const { showNotification } = useNotistick();
   const handleFetchAcademicYear = () => {
     axios
       .get(`/api/academic_years`)
@@ -98,8 +102,32 @@ function Header() {
 
   useEffect(() => {
     // @ts-ignore
-    user?.role?.title !== 'SUPER_ADMIN' && handleFetchAcademicYear();
-  }, [user]);
+    if (auth?.user?.role?.title !== 'SUPER_ADMIN') {
+      const tempMenu = []
+      for (const i of menuItems[0]?.items) {
+        if (i.items) {
+          for (const j of i.items) {
+
+            j.link && tempMenu.push({
+              label: j.name,
+              value: j.link
+            })
+          }
+        } else {
+          tempMenu.push({
+            label: i.name,
+            value: i.link
+          })
+        }
+      }
+      console.log({ tempMenu });
+
+      setMenulist(tempMenu)
+
+      handleFetchAcademicYear();
+
+    }
+  }, [auth?.user]);
 
   useEffect(() => {
     if (selectedAcademicYear) {
@@ -117,7 +145,10 @@ function Header() {
       setSelectedAcademicYear(newValue);
     }
   }
-
+  const permissionsArray = auth?.user?.permissions?.length > 0
+    ? auth?.user?.permissions?.map((permission: any) => permission.group)
+    : [];
+ 
   return (
     <HeaderWrapper
       display="flex"
@@ -128,47 +159,41 @@ function Header() {
       }}
     >
 
-      {/* search section */}
-      <Grid sx={{ display: { xs: "none", md: "block" } }}>
-        <TextField
-          size='small'
-          id="search"
-          type="search"
-          // label="Search"
-          placeholder='search here...'
-          color='primary'
-          // value={""}
-          // onChange={() => { }}
-          // fontColor="primary"
-          sx={{
-            [`& fieldset`]: {
-              borderRadius: 0.6
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: 'red'
-            },
-            display: { xs: "hidden", sm: "block" },
-            maxWidth: 600,
-          }}
-          InputProps={{
-            style: {
-              color: "#FFFFFF",
-              borderColor: "white",
-              border: "2px solid #FFFFFF",
-              borderRadius: "6px"
-            },
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchTwoToneIcon sx={{ color: "#FFFFFF" }} />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Grid>
+      {/* <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Select route</Grid> */}
+      
+      {/* <CustomAutoCompleteWrapper
+        minWidth={'200px'}
+        label="Select route"
+        placeholder="Route..."
+        value={undefined}
+        options={menulist}
+        handleChange={(e, v) => {
+          console.log(v,permissionsArray);
+          if (v) {
+            if (!router.isReady) {
+              return;
+            }
+            if (auth?.error) showNotification(auth?.error, 'error');
+
+            if (!auth.isAuthenticated) {
+              router.push({
+                pathname: '/login',
+                query: { backTo: router.asPath }
+              });
+            } else if (!permissionsArray.includes(v?.label)) {
+              router.back();
+            } else {
+              router.push(v?.value)
+            }
+          }
+        }}
+      /> */}
+
+
 
 
       {/* @ts-ignore */}
-      {user?.role?.title !== 'SUPER_ADMIN' &&
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
         <Box sx={{ display: { xs: "none", sm: "block" }, backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.5, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
@@ -176,7 +201,7 @@ function Header() {
       }
 
       {/* @ts-ignore */}
-      {user?.role?.title !== 'SUPER_ADMIN' && (
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
         <Grid pt={1} minWidth={150} sx={{ display: { xs: "block", sm: "none" } }}>
           <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
           <CustomAutoCompleteWrapper
@@ -192,8 +217,8 @@ function Header() {
 
       <Box display="flex" alignItems="center">
         {/* @ts-ignore */}
-        {user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid pt={1} minWidth={150} sx={{ pr:2, display: { xs: "none", sm: "block" } }}>
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
+          <Grid pt={1} minWidth={150} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
               // label="Academic Year"

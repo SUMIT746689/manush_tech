@@ -1,61 +1,25 @@
 
 import React from 'react';
-import './style.css';
 import { Card, Grid } from '@mui/material';
+import Image from 'next/image';
 
+const strongStyle = { fontWeight: 600, color: '#083d9b' }
 const IdentityCard = ({ user }) => {
     return (
 
-        <Card
-            key={user.id}
+        <Card key={user.id} sx={{
+            p: 1, backgroundColor: '#f2f2f2',
+            // boxShadow:'0px 10px 10px #86b2f9'
+            border: '1.5px dotted'
+        }}>
 
-            sx={{
-                width: '100%',
-                height: '100vh',
-                // pt: `${template.top_space}px`,
-                // pb: `${template.bottom_space}px`,
-                // pl: `${template.left_space}px`,
-                // pr: `${template.right_space}px`,
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                backgroundImage: `url(/certificate_images/idcard.png)`,
-                backgroundPosition: 'center',
-                // backgroundSize: '100%',
-                // backgroundSize: 'contain',
-                // breakAfter: true,
-                // mt: 4,
-                boxShadow: 'none',
-                p: '15px',
-                pageBreakAfter: 'always',
+            <Header
+                title={user.schoolName}
+            />
+            <Profile
+                user={user}
+            />
 
-            }} >
-            <Grid
-                display="flex"
-                flexDirection="column"
-                alignContent={"space-between"}
-                justifyContent={"space-between"}
-                sx={{
-                    textAlign: 'left',
-                    height: "100%",
-                    // border: '1px solid black'
-                }}
-                container
-            >
-
-
-                <Header
-                    title={user.schoolName}
-                />
-                <Profile
-                    user={user}
-                />
-                {/* <Footer
-                        name={user.name}
-                        id={user.id} /> */}
-
-
-
-            </Grid>
         </Card>
 
 
@@ -65,11 +29,20 @@ const IdentityCard = ({ user }) => {
 const Header = ({ title }) => {
     return (
         <header
-            className="identityCard__header"
             style={{
-                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px',
+                textTransform: 'uppercase',
+                color: 'white',
                 letterSpacing: '0px',
-                wordSpacing: '10px'
+                fontFamily: 'Times New Roman',
+                backgroundColor: '#133f86',
+                width: '100%',
+                wordSpacing: '5px',
+                borderRadius: 5,
+                fontWeight: 800
             }}
         >
             {title}
@@ -80,52 +53,60 @@ const Header = ({ title }) => {
 const Profile = ({ user }) => {
     const { id, photo, name, birthDate, roll, section, blood_group, academicYear, phone } = user;
     return (
-        <div className="identityCard__profile">
-            <div className="identityCard__identity"
-            style={{
-                // border:'1px solid black',
-                textAlign:'center'
+        <>
+            <Grid sx={{
+                textAlign: 'center',
+                width: '100%',
+                p: '5px',
+                textTransform: 'uppercase',
+                fontWeight: 900,
+                color: '#083d9b'
             }}
             >
-                <strong>Name :</strong> {name}
-            </div>
-            <div className="identityCard__visual">
-                <img src={photo} alt=""
-                    style={{
-                        maxHeight: '300px',
-                        maxWidth: '300PX',
-                        padding: '15px'
-                    }}
-                />
-            </div>
-            <ul className="identityCard__list" style={{
-                textAlign: 'left',
-                // display:'grid',
-                // gridTemplateColumns:'auto auto'
+                {name}
+            </Grid>
+            <Grid sx={{
+                display: 'grid',
+                gridTemplateColumns: '20% 80%',
+                gap: 2,
             }}>
-                
-                <li><strong>Class :</strong> {user.class}</li>
-                <li><strong>Section :</strong> {section}</li>
-                <li><strong>Class roll :</strong> {roll}</li>
-                <li><strong>Blood group:</strong> {blood_group}</li>
-                <li><strong>Academic Year:</strong> {academicYear}</li>
-                <li><strong>Phone:</strong> {phone}</li>
-                <li><strong>Date of birth :</strong> {birthDate}</li>
-            </ul>
+                <Grid display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+
+                    <Image src={photo}
+                        height={80}
+                        width={80}
+                        alt={`${name}'s photo`}
+                        loading='eager'
+                        objectFit={'cover'}
+                        style={{
+                            objectPosition: 'center',
+                            width: "100%",
+                            height: "50%",
+                            borderRadius: '10%'
+                        }}
+                    />
+
+                </Grid>
+                <ul
+                    style={{
+                        textAlign: 'left',
+                    }}>
+
+                    <li><strong style={strongStyle}>Class :</strong> {user.class}</li>
+                    <li><strong style={strongStyle}>Section :</strong> {section}</li>
+                    <li><strong style={strongStyle}>Class roll :</strong> {roll}</li>
+                    <li><strong style={strongStyle}>Blood group:</strong> {blood_group}</li>
+                    <li><strong style={strongStyle}>Academic Year:</strong> {academicYear}</li>
+                    <li><strong style={strongStyle}>Phone:</strong> {phone}</li>
+                    <li><strong style={strongStyle}>Date of birth :</strong> {birthDate}</li>
+                </ul>
 
 
-        </div>
+            </Grid>
+        </>
     );
 };
 
-const Footer = ({ name, id }) => {
-    return (
-        <footer className="identityCard__footer">
-            <div className="filled"><span>IDF{name}</span></div>
-            <div className="filled"><span>{id}{name}</span></div>
-        </footer>
-    );
-};
 
 
 export default IdentityCard;

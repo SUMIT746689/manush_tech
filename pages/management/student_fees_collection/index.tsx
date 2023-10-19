@@ -12,15 +12,31 @@ import { useReactToPrint } from 'react-to-print';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 function Managementschools() {
-  const [datas, setDatas] = useState<Project[]>([]);
+  const [datas, setDatas] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [students, setStudents] = useState<[object?]>([]);
-  const [printFees, setPrintFees] = useState<[object?]>([]);
+  const [printFees, setPrintFees] = useState([]);
+  const [prinCollectedtFees, setPrinCollectedtFees] = useState([]);
   const [filteredFees, setFilteredFees] = useState<any>([]);
   const [selectedFees, setSelectedFees] = useState<any[]>([]);
-  
+
+
   const { data: accounts } = useClientFetch(`/api/account`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
+
+  useEffect(() => {
+    const temp = datas.filter(i => {
+      const got = printFees.find(j => j.fee_id == i.id)
+      if (got) {
+        i['paidAmount'] = got.collected_amount
+        return true;
+      }
+
+      return false
+
+
+    })
+    setPrinCollectedtFees(temp)
+  }, [printFees])
 
 
   const printPageRef = useRef();
@@ -38,7 +54,6 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-
 
   return (
     <>
@@ -65,8 +80,6 @@ function Managementschools() {
             classes={classData}
             sessions={datas}
             setSessions={setDatas}
-            students={students}
-            setStudents={setStudents}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
             setPrintFees={setPrintFees}
@@ -119,8 +132,8 @@ function Managementschools() {
       </Grid>
       <Grid sx={{ display: 'none' }}>
         <Grid ref={printPageRef}>
-          <PaymentInvoice printFees={printFees} student={selectedStudent} />
-          <PaymentInvoice printFees={printFees} student={selectedStudent} />
+          <PaymentInvoice printFees={prinCollectedtFees} student={selectedStudent} />
+          <PaymentInvoice printFees={prinCollectedtFees} student={selectedStudent} />
         </Grid>
 
         <Grid ref={printSelectedPageRef}>

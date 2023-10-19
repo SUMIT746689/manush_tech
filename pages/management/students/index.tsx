@@ -52,6 +52,10 @@ function ManagementClasses() {
   const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
 
   useEffect(() => {
+    if (selectedClass && academicYear && selectedSection) handleStudentList()
+  }, [selectedClass, academicYear, selectedSection])
+
+  useEffect(() => {
     if (students?.selectedClass) {
       setSelectedClass(students?.selectedClass)
       axios.get(`/api/class/${students?.selectedClass?.id}`)
@@ -164,11 +168,11 @@ function ManagementClasses() {
   };
   const handlePrint = useReactToPrint({
     content: () => idCard.current,
-    pageStyle: `@media print {
-      @page {
-        size: 235mm 115mm;
-      }
-    }`
+    // pageStyle: `@media print {
+    //   @page {
+    //     size: 210mm 115mm;
+    //   }
+    // }`
   });
   // size: 85.725mm 53.975mm;
   console.log("students__", students, selectedClass, selectedSection);

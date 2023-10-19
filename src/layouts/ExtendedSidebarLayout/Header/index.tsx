@@ -202,7 +202,7 @@ function Header() {
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-        <Grid pt={1} minWidth={150} sx={{ display: { xs: "block", sm: "none" } }}>
+        <Grid pt={1} minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
           <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
           <CustomAutoCompleteWrapper
             // label="Academic Year"
@@ -218,7 +218,7 @@ function Header() {
       <Box display="flex" alignItems="center">
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid pt={1} minWidth={150} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
+          <Grid pt={1} minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
               // label="Academic Year"

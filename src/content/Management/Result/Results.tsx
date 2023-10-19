@@ -598,20 +598,22 @@ function Row(props) {
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
+        setSelectedSection(null)
+        setSelectedUpgradeClass(null)
         setOpen(false)
       };
-     
-      _values['student_information_id'] = row.student.student_information?.id;
-      
-      if(!row.student.student_information?.id) throw new Error("failed to get student information id")
-      
-      const res = await axios.post(`/api/student/${row.student.student_information_id}/upgradeStudent`, _values)
+      const student_infoId = row?.student?.student_info?.id;
+
+      if (!student_infoId) throw new Error("Failed to get student information")
+
+      const res = await axios.post(`/api/student/${student_infoId}/upgradeStudent`, _values)
 
       showNotification(res.data.message)
       successProcess();
     } catch (err) {
+      console.log(err);
 
-      showNotification(err?.response?.data?.message, 'error');
+      showNotification(err?.response?.data?.message || err?.message, 'error');
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -643,7 +645,6 @@ function Row(props) {
             section_id: undefined,
             academic_year_id: undefined,
             class_registration_no: registration_no_generate(),
-            discount: 0,
             class_roll_no: undefined,
             submit: null
           }}
@@ -653,7 +654,6 @@ function Row(props) {
             academic_year_id: Yup.number().required(t('academic_year_id field is required')).nullable(false),
             class_registration_no: Yup.string().required(t('class_registration_no field is required')).nullable(false),
             class_roll_no: Yup.string().required(t('class_roll_no field is required')).nullable(false),
-            discount: Yup.number().required(t('discount is required')).nullable(false),
 
           })}
           onSubmit={handleSubmit}
@@ -678,7 +678,7 @@ function Row(props) {
                 <Grid container spacing={0}>
 
                   {/* select new academic year */}
-                 
+
                   <AutoCompleteWrapper
                     minWidth="100%"
                     required={true}
@@ -757,19 +757,6 @@ function Row(props) {
                     handleBlur={handleBlur}
                     handleChange={handleChange}
                     value={values.class_registration_no}
-                  />
-
-                  {/* discount */}
-
-                  <TextFieldWrapper
-                    errors={errors.discount}
-                    touched={touched.discount}
-                    name="discount"
-                    label={t('Discount')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.discount}
-                    type='number'
                   />
 
                 </Grid>

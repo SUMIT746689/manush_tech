@@ -36,6 +36,7 @@ const index = async (req, res, refresh_token) => {
                                 },
                                 student_info: {
                                     select: {
+                                        id: true,
                                         first_name: true,
                                         middle_name: true,
                                         last_name: true,

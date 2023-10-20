@@ -62,8 +62,7 @@ function RegistrationFirstPart({
           religion: Yup.string().nullable(true),
           phone: Yup.string().required(t('Phone number is required!'))
             .min(11, 'Phone number must be greater then or equals 11 character'),
-          email: Yup.string(),
-          national_id: Yup.string()
+    
         })}
         onSubmit={async (
           _values,

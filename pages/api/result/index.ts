@@ -89,6 +89,7 @@ const index = async (req, res, refresh_token) => {
                     select: {
                         exam_details: {
                             select: {
+                                id: true,
                                 subject: true,
                                 subject_total: true
                             }
@@ -96,7 +97,20 @@ const index = async (req, res, refresh_token) => {
                     }
                 })
 
-                res.status(200).json({ sections_result, subject_list });
+                const highestMark = await prisma.studentResultDetails.groupBy({
+                    where: {
+                        result: {
+                            exam_id: parseInt(req.query.exam_id)
+                        }
+                    },
+                    by: 'exam_details_id',
+                    _max: {
+                        mark_obtained: true,
+                    },
+
+                })
+
+                res.status(200).json({ sections_result, subject_list, highestMark });
                 break;
 
             case 'POST':

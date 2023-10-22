@@ -166,7 +166,7 @@ function Managementschools() {
                 sx={{ px: { xs: 2, sm: 4 } }}
             >
                 <Grid item xs={12}>
-                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { md: "1fr 1fr 1fr" }, columnGap: 1 }}>
+                    <Card sx={{ p: 1, pb: 0, mb: 3, display: "grid", gridTemplateColumns: { md: "1fr 1fr 1fr 1fr 1fr" }, columnGap: 1 }}>
 
                         <ClassAndSectionSelect
                             selectedClass={selectedClass}
@@ -203,7 +203,7 @@ function Managementschools() {
                             selectedBulkActions && <AutoCompleteWrapper
                                 label="Select Templeate"
                                 placeholder="Templeate..."
-                                options={['default', 'new given']}
+                                options={['Default', 'New given']}
                                 value={selectedTempleate}
                                 filterSelectedOptions
                                 handleChange={(e, v) => {
@@ -226,13 +226,13 @@ function Managementschools() {
 
                                         }}>{t('print')}</ButtonWrapper>
                                 )}
-                            // pageStyle="@page { size: A4; }"
-                             pageStyle={
-                                selectedTempleate == 'default' ? 
-                                `@page { size: landscape; } .printable-item { page-break-after: always; }`
-                                :
-                                "@page { size: A4; }"
-                            }
+                                // pageStyle="@page { size: A4; }"
+                                pageStyle={
+                                    selectedTempleate == 'default' ?
+                                        `@page { size: landscape; } .printable-item { page-break-after: always; }`
+                                        :
+                                        "@page { size: A4; }"
+                                }
                             />
 
                         }
@@ -343,7 +343,8 @@ function Managementschools() {
             }}>
                 <Grid ref={reportCardPrint}>
                     {
-                        selectedTempleate && selectedTempleate == 'default' ?
+                        selectedTempleate && 
+                        (selectedTempleate == 'Default' ?
                             <>
                                 {/* Your content here */}
                                 {
@@ -619,7 +620,7 @@ function Managementschools() {
                                     )
                                 }
                             </>
-                            : 
+                            :
                             <>
                                 {/* <ReportCardDesign /> */}
 
@@ -634,7 +635,7 @@ function Managementschools() {
                                             {/* header */}
                                             <Grid sx={{
                                                 display: 'flex',
-                                                justifyContent: 'space-around',
+                                                justifyContent: 'center',
                                                 gap: '5%',
                                                 pb: 1
                                             }}>
@@ -749,7 +750,7 @@ function Managementschools() {
                                                             subjectList?.map((j, index) => {
                                                                 const found = i?.result_details?.find(a => a?.exam_details?.subject?.id == j.id)
                                                                 const highest = highestMarks?.find(hi => hi.exam_details_id == j.exam_details_id)?._max?.mark_obtained
-                                                                const subjectTableStyle = {...tableStyle,maxWidth: '30px',padding:'3px'}
+                                                                const subjectTableStyle = { ...tableStyle, maxWidth: '30px', padding: '3px' }
                                                                 if (found) {
                                                                     return <tr>
                                                                         <td style={subjectTableStyle}>{found?.exam_details?.subject?.name}</td>
@@ -820,33 +821,33 @@ function Managementschools() {
                                                     }}>
                                                         <tr>
                                                             <th rowSpan={5} style={{ ...tableStyle, transform: 'rotate(-90deg)' }}>মন্তব্য</th>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;পড়ালেখা উন্নয়নের জন্য চেষ্টা করছে। </td>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;সম্পূর্ণ ক্লাস ব্যাপী মনোযোগ ধরে রাখতে পারে না। </td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;পড়ালেখা উন্নয়নের জন্য চেষ্টা করছে। </td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;সম্পূর্ণ ক্লাস ব্যাপী মনোযোগ ধরে রাখতে পারে না। </td>
                                                             <th style={{ ...tableStyle, textAlign: 'left' }}>অবস্থান </th>
                                                             <th style={{ ...tableStyle, textAlign: 'left' }}>পূর্ববর্তী পরীক্ষায় অবস্থান </th>
                                                         </tr>
                                                         <tr>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;পড়ালেখার উন্নতি দৃশ্যমান।</td>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;হাতের লেখা আরও ভাল করতে হবে।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;পড়ালেখার উন্নতি দৃশ্যমান।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;হাতের লেখা আরও ভাল করতে হবে।</td>
                                                             <td rowSpan={4} style={tableStyle}></td>
                                                             <td rowSpan={4} style={tableStyle}></td>
                                                         </tr>
                                                         <tr>
 
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত স্কুলের পোষাক পরিধান করে না।</td>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত পড়া শিখে আসে না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত স্কুলের পোষাক পরিধান করে না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত পড়া শিখে আসে না।</td>
 
                                                         </tr>
                                                         <tr>
 
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত বাড়ির কাজ করে না।</td>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;সময়মত ক্লাসে উপস্থিত হয় না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত বাড়ির কাজ করে না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;সময়মত ক্লাসে উপস্থিত হয় না।</td>
 
                                                         </tr>
                                                         <tr>
 
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত হাতের লেখা লেখে আনে না।</td>
-                                                            <td style={{ ...tableStyle, textAlign: 'left',fontSize:'11px'  }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত কোচিং এ আসে না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত হাতের লেখা লেখে আনে না।</td>
+                                                            <td style={{ ...tableStyle, textAlign: 'left', fontSize: '11px' }}>*&nbsp;&nbsp;&nbsp;&nbsp;নিয়মিত কোচিং এ আসে না।</td>
 
                                                         </tr>
 
@@ -875,6 +876,7 @@ function Managementschools() {
                                 }
 
                             </>
+                            )
                     }
 
                 </Grid>

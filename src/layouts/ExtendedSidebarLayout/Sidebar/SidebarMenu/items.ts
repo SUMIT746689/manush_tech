@@ -320,6 +320,11 @@ export const menuItems: MenuItems[] = [
                 link: '/reports/exam/progress_report',
                 icon: DescriptionIcon
               },
+              {
+                name: 'Result sheet',
+                link: '/reports/exam/result_sheet',
+                icon: DescriptionIcon
+              },
 
             ]
           },

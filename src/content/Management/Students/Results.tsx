@@ -573,9 +573,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         <Grid ref={idCard} display={'grid'} gridTemplateColumns={'1fr 1fr'} container gap={1.5}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i, index) => {
-
               const user = {
                 id: i?.class_roll_no,
+                class_registration_no:i?.class_registration_no,
                 name: `${i?.student_info?.first_name ? i?.student_info?.first_name : ''} ${i?.student_info?.middle_name ? i?.student_info?.middle_name : ''} ${i?.student_info?.last_name ? i?.student_info?.last_name : ''}`,
                 schoolName: i?.student_info?.school?.name,
                 class: i?.section?.class?.name,

@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 
-const FinalResultAll = async (req, res) => {
+const FinalResultAll = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -34,17 +34,8 @@ const FinalResultAll = async (req, res) => {
                     },
                     select: {
                         id: true,
-                        exam_details: {
-                            select: {
-                                subject_total: true,
-                                subject: {
-                                    select: {
-                                        id: true,
-                                        name: true
-                                    }
-                                }
-                            }
-                        }
+                        title: true,
+                        final_percent: true,
                     }
 
                 })
@@ -71,12 +62,18 @@ const FinalResultAll = async (req, res) => {
                                 OR: examList
                             },
                             include: {
+                                exam: {
+                                    select: {
+                                        final_percent: true,
+                                    }
+                                },
                                 result_details: {
                                     include: {
                                         grade: {
                                             select: {
                                                 id: true,
-                                                grade: true
+                                                grade: true,
+                                                point: true
                                             }
                                         }
                                     }
@@ -86,7 +83,34 @@ const FinalResultAll = async (req, res) => {
                     }
                 })
 
-                res.status(200).json({ examList: exams, student_result_list });
+                const temp = student_result_list.map(i => {
+                    let total_counted_mark = 0
+                    let total_counted_point = 0
+
+                    const result = i.results.map(j => {
+                        let termTotalCountedMark = 0;
+                        let termTotalCountedPoint = 0;
+
+                        for (const k of j.result_details) {
+                            termTotalCountedPoint += (k.grade.point * j.exam.final_percent) / 100;
+                            termTotalCountedMark += (k.mark_obtained * j.exam.final_percent) / 100;
+                        }
+
+                        total_counted_mark += termTotalCountedMark
+                        total_counted_point += termTotalCountedPoint
+
+                        j['termTotalCountedMark'] = termTotalCountedMark
+                        j['termTotalCountedPoint'] = termTotalCountedPoint
+                         delete j['result_details']
+                        return j
+                    })
+                    i['total_counted_mark'] = total_counted_mark
+                    i['total_counted_point'] = total_counted_point
+                    i['results'] = result
+                    return i
+                })
+
+                res.status(200).json({ examList: exams, student_result_list: temp });
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);

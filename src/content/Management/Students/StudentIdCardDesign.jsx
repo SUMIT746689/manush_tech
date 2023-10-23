@@ -51,7 +51,7 @@ const Header = ({ title }) => {
 };
 
 const Profile = ({ user }) => {
-    const { id, photo, name, birthDate, roll, section, blood_group, academicYear, phone } = user;
+    const { id, photo, name, birthDate, roll, section, blood_group, academicYear, phone,class_registration_no } = user;
     return (
         <>
             <Grid sx={{
@@ -67,10 +67,10 @@ const Profile = ({ user }) => {
             </Grid>
             <Grid sx={{
                 display: 'grid',
-                gridTemplateColumns: '20% 80%',
+                gridTemplateColumns: '30% 70%',
                 gap: 2,
             }}>
-                <Grid display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                <Grid display={'flex'} justifyContent={'center'} flexDirection={'column'} p={0.5}>
 
                     <Image src={photo}
                         height={80}
@@ -81,7 +81,7 @@ const Profile = ({ user }) => {
                         style={{
                             objectPosition: 'center',
                             width: "100%",
-                            height: "50%",
+                            height: "70%",
                             borderRadius: '10%'
                         }}
                     />
@@ -90,14 +90,16 @@ const Profile = ({ user }) => {
                 <ul
                     style={{
                         textAlign: 'left',
+                        paddingLeft: '2%'
                     }}>
 
                     <li><strong style={strongStyle}>Class :</strong> {user.class}</li>
                     <li><strong style={strongStyle}>Section :</strong> {section}</li>
                     <li><strong style={strongStyle}>Class roll :</strong> {roll}</li>
+                    <li><strong style={strongStyle}>Registration no :</strong> {class_registration_no}</li>
                     <li><strong style={strongStyle}>Blood group:</strong> {blood_group}</li>
-                    <li><strong style={strongStyle}>Academic Year:</strong> {academicYear}</li>
                     <li><strong style={strongStyle}>Phone:</strong> {phone}</li>
+                    <li><strong style={strongStyle}>Academic Year:</strong> {academicYear}</li>
                     <li><strong style={strongStyle}>Date of birth :</strong> {birthDate}</li>
                 </ul>
 

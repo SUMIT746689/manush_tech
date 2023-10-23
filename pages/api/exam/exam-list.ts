@@ -3,7 +3,6 @@ import { authenticate } from 'middleware/authenticate';
 
 const index = async (req, res,refresh_token) => {
     try {
-        console.log({refresh_token});
         
         const { method } = req;
 

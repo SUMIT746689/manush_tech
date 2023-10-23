@@ -10,7 +10,7 @@ const id = async (req, res) => {
         }
         switch (method) {
             case 'POST':
-                const { academic_year_id, class_registration_no, class_roll_no, discount, section_id } = req.body;
+                const { academic_year_id, class_registration_no, class_roll_no, section_id } = req.body;
 
                 const reqValidityCheck = await prisma.student.findFirst({
                     where: {
@@ -25,7 +25,6 @@ const id = async (req, res) => {
                         class_registration_no,
                         academic_year_id,
                         class_roll_no,
-                        discount,
                         section_id,
                         student_information_id
                     }

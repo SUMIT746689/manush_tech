@@ -224,7 +224,7 @@ const Results = ({ setEditSubject, users, classList }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">

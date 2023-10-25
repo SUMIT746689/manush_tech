@@ -256,7 +256,7 @@ const Results = ({ users,setEditClass }) => {
           ) : (
             <>
               <TableContainer>
-                <Table>
+                <Table size='small'>
                   <TableHead>
                     <TableRow>
                       <TableCell align='center'>{t('Account name')}</TableCell>

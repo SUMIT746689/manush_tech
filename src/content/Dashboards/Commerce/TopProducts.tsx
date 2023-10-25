@@ -62,7 +62,7 @@ function TopProducts() {
       />
       <Divider />
       <TableContainer>
-        <Table>
+        <Table size='small'>
           <TableHead>
             <TableRow>
               <TableCell>{t('Product')}</TableCell>

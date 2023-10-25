@@ -121,7 +121,7 @@ function Block2() {
       >
         <Scrollbar>
           <TableContainer>
-            <Table>
+            <Table size="small">
               <TableBody>
                 <TableRow hover>
                   <TableCell padding="checkbox">

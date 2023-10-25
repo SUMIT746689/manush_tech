@@ -164,7 +164,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
 
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(5);
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -182,7 +182,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   useEffect(() => {
     if (searchToken) {
       getNsetOptions();
-    }else{
+    } else {
       reFetchData()
     }
   }, [searchToken]);
@@ -342,6 +342,17 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
         </Grid>
 
         <Divider />
+        <Box p={2}>
+          <TablePagination
+            component="div"
+            count={filteredUsers.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
 
         {paginatedUsers.length === 0 ? (
           <>
@@ -361,16 +372,9 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllUsers}
-                        indeterminate={selectedSomeUsers}
-                        onChange={handleSelectAllUsers}
-                      />
-                    </TableCell> */}
                     <TableCell>{t('Username')}</TableCell>
                     <TableCell>{t('Role')}</TableCell>
                     <TableCell>{t('School name')}</TableCell>
@@ -386,15 +390,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     const isUserSelected = selectedItems.includes(user.id);
                     return (
                       <TableRow hover key={user.id} selected={isUserSelected}>
-                        {/* <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isUserSelected}
-                            onChange={(event) =>
-                              handleSelectOneUser(event, user.id)
-                            }
-                            value={isUserSelected}
-                          />
-                        </TableCell> */}
                         <TableCell>
                           <Typography variant="h5">{user?.username}</Typography>
                         </TableCell>
@@ -510,17 +505,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box p={2}>
-              <TablePagination
-                component="div"
-                count={filteredUsers.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
           </>
         )}
       </Card>

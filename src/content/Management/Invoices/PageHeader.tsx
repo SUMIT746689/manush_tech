@@ -321,7 +321,7 @@ function PageHeader() {
                 </Grid>
               </DialogContent>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('Item')}</TableCell>

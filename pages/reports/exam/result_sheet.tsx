@@ -19,18 +19,6 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 import dayjs from 'dayjs';
 import { TableHeadWrapper } from '@/components/TableWrapper';
 
-
-const applyPagination = (array, page, limit) => {
-    return array.slice(page * limit, page * limit + limit);
-};
-const tableStyle: object = {
-    border: '1px solid black',
-    borderCollapse: 'collapse',
-    // textAlign: 'center',
-    padding: '2px',
-    fontSize: '0.8em',
-    // backgroundColor: '#cccccc'
-};
 const gradeTableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -41,6 +29,9 @@ const gradeTableStyle: object = {
     padding: '3px'
     // backgroundColor: '#cccccc'
 };
+const applyPagination = (array, page, limit) => {
+    return array.slice(page * limit, page * limit + limit);
+};
 
 function Managementschools() {
     const theme = useTheme();
@@ -50,7 +41,7 @@ function Managementschools() {
     const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
     const [classes, setClasses] = useState([]);
     const [page, setPage] = useState<number>(0);
-    const [limit, setLimit] = useState<number>(5);
+    const [limit, setLimit] = useState<number>(10);
     const [result, setResult] = useState([]);
     const [examList, setExamList] = useState([])
 
@@ -60,7 +51,8 @@ function Managementschools() {
     const [grade, setGrade] = useState([])
 
     const paginatedResults = applyPagination(result, page, limit);
-    const tabulation_sheet_Print = useRef()
+
+    const result_sheet_Print = useRef()
 
 
     const handlePageChange = (_event: any, newPage: number): void => {
@@ -96,11 +88,14 @@ function Managementschools() {
         setResult([])
         setExamList([])
     }, [selectedClass, selectedSection, academicYear]);
-    useEffect(() => {
-        axios.get(`/api/grade?academic_year_id=${academicYear?.id}`)
-            .then(res => setGrade(res.data))
-            .catch(err => console.log(err));
 
+    useEffect(() => {
+        if (academicYear?.id) {
+            axios.get(`/api/grade?academic_year_id=${academicYear?.id}`)
+                .then(res => setGrade(res.data))
+                .catch(err => console.log(err));
+
+        }
     }, [academicYear]);
 
 
@@ -141,7 +136,7 @@ function Managementschools() {
                         {
                             // selectedBulkActions &&
                             <ReactToPrint
-                                content={() => tabulation_sheet_Print.current}
+                                content={() => result_sheet_Print.current}
                                 // pageStyle={`{ size: 2.5in 4in }`}
 
                                 trigger={() => (
@@ -192,15 +187,14 @@ function Managementschools() {
 
                         <>
                             <TableContainer>
-                                <Table aria-label="collapsible table">
+                                <Table size="small" >
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell rowSpan={2} >{t('Roll')}</TableCell>
                                             <TableCell rowSpan={2} >{t('Name')}</TableCell>
                                             {
                                                 examList.map(j =>
                                                     <>
-                                                        <TableCell colSpan={3} >{t(`${j?.title} (counted ${j?.final_percent}%)`)}</TableCell>
+                                                        <TableCell align='center' colSpan={3} >{t(`${j?.title} (counted ${j?.final_percent}%)`)}</TableCell>
 
                                                     </>
                                                 )
@@ -279,7 +273,7 @@ function Managementschools() {
             <Grid sx={{
                 display: 'none'
             }}>
-                <Grid ref={tabulation_sheet_Print}>
+                <Grid ref={result_sheet_Print}>
 
                     <Grid sx={{
                         height: 'auto',
@@ -318,7 +312,7 @@ function Managementschools() {
 
                         <Grid display={'grid'} gridTemplateColumns={'auto 30%'} gap={2}>
                             {/* student info  */}
-                            <table>
+                            <Table size='small'>
                                 <thead>
                                     <tr>
                                         <th style={gradeTableStyle}>Date</th>
@@ -359,9 +353,9 @@ function Managementschools() {
                                         <td style={gradeTableStyle}></td>
                                     </tr>
                                 </tbody>
-                            </table>
+                            </Table>
                             {/* Grading */}
-                            <table>
+                            <Table size='small'>
                                 <thead>
                                     <tr>
                                         <td colSpan={3} style={gradeTableStyle}>Grading Scale</td>
@@ -384,7 +378,7 @@ function Managementschools() {
 
 
                                 </tbody>
-                            </table>
+                            </Table >
                         </Grid>
 
                         <Typography variant="h3" align='center' py={1}>
@@ -399,7 +393,7 @@ function Managementschools() {
                             gap: 1,
 
                         }}>
-                            <table style={{ width: '100%' }}>
+                            <Table style={{ width: '100%' }}>
 
                                 <tbody style={{
                                     overflowX: 'auto',
@@ -470,9 +464,9 @@ function Managementschools() {
                                     }
 
                                 </tbody>
-                            </table>
+                            </Table>
                             <br />
-                            <table style={{ width: '100%' }}>
+                            <Table style={{ width: '100%' }}>
                                 <tbody style={{
                                     overflowX: 'auto',
                                     overflowY: 'auto'
@@ -523,7 +517,7 @@ function Managementschools() {
                                     </tr>
 
                                 </tbody>
-                            </table>
+                            </Table>
                         </Grid>
 
                     </Grid >

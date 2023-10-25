@@ -302,7 +302,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade,editGrade }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">

@@ -39,6 +39,9 @@ const FinalResultAll = async (req, res, refresh_token) => {
                     }
 
                 })
+                const examsLenght = exams.length;
+                if (!examsLenght) throw new Error('No exam found !!')
+
                 const examList = exams.map(i => ({ exam_id: i.id }))
 
                 const student_result_list = await prisma.student.findMany({
@@ -105,7 +108,7 @@ const FinalResultAll = async (req, res, refresh_token) => {
                         return j
                     })
                     i['total_counted_mark'] = total_counted_mark
-                    i['total_counted_point'] = total_counted_point
+                    i['total_counted_point'] = total_counted_point/examsLenght
                     i['results'] = result
                     return i
                 })

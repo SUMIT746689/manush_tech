@@ -561,7 +561,7 @@ const Results = ({
         ) : (
           <TableContainer>
 
-            <table>
+            <Table size='small'>
               <TableHead >
                 <TableRow>
                   <TableCell padding="checkbox" align="center">
@@ -689,7 +689,7 @@ const Results = ({
                   );
                 })}
               </TableBody>
-            </table>
+            </Table>
 
           </TableContainer>
         )}

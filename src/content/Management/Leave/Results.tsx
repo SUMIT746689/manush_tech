@@ -455,7 +455,7 @@ const Results = ({ users, reFetchData }) => {
               // @ts-ignore
               user?.role?.title === 'ADMIN' ?
                 <TableContainer>
-                  <Table>
+                  <Table size='small'>
                     <TableHead>
                       <TableRow>
                         <TableCell align='center'>{t('ID')}</TableCell>
@@ -529,7 +529,7 @@ const Results = ({ users, reFetchData }) => {
                 :
 
                 <TableContainer>
-                  <Table>
+                  <Table size='small'>
                     <TableHead>
                       <TableRow>
                         <TableCell align='center'>{t('ID')}</TableCell>

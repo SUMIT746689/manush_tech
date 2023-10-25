@@ -204,7 +204,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
       )}
       <Divider />
       <TableContainer>
-        <Table>
+        <Table size='small'>
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">

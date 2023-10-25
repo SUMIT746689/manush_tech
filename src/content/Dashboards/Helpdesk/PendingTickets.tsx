@@ -151,7 +151,7 @@ function PendingTickets() {
       <Divider />
       <Box>
         <TableContainer>
-          <Table>
+          <Table size='small'>
             <TableHead>
               <TableRow>
                 <TableCell>{t('Details')}</TableCell>

@@ -272,7 +272,7 @@ function Managementschools() {
                                 </Grid>
 
 
-                                <Table>
+                                <Table size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>{t('Subject Name')}</TableCell>
@@ -330,7 +330,7 @@ function Managementschools() {
                                         <Box sx={{ fontWeight: 'bold' }}>
                                             Total mark counted from {i?.title} exam : {i?.calculatedTotalMark?.toFixed(2)}
                                         </Box>
-                                        <Table>
+                                        <Table size='small'>
                                             <TableHead>
                                                 <TableRow>
                                                     <TableCell>{t('Subject Name')}</TableCell>

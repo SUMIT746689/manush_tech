@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Card, Grid, TableHead, TextField, Paper, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Card, Grid, TableHead, TextField, Paper, RadioGroup, FormControlLabel, Radio, Table } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { forwardRef, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
@@ -50,7 +50,7 @@ const VirtuosoTableComponents = {
     <div component={Paper} {...props} ref={ref} />
   )),
   Table: (props) => (
-    <table {...props} style={{ borderCollapse: 'separate', width: '100%' }} />
+    <Table {...props} style={{ borderCollapse: 'separate', width: '100%' }} />
   ),
   TableHead,
   TableRow: ({ item: _item, ...props }) => <tr {...props} />,

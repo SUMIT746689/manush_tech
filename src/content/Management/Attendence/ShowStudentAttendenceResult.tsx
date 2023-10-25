@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Card, Grid, Divider, TextField, Button } from '@mui/material';
+import { Autocomplete, Box, Card, Grid, Divider, TextField, Button, Table } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -156,7 +156,7 @@ function ShowStudentAttendence({ data }) {
             {
               targetsectionStudents && <div ref={attendenceRef}>
 
-                <table style={tableStyle}>
+                <Table size='small' style={tableStyle}>
                   <thead>
                     <tr>
 
@@ -224,7 +224,7 @@ function ShowStudentAttendence({ data }) {
                     </tr>
                     )}
                   </tbody>
-                </table>
+                </Table>
               </div>
             }
 

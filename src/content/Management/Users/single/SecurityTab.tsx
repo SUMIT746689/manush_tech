@@ -280,7 +280,7 @@ function SecurityTab() {
           />
           <Divider />
           <TableContainer>
-            <Table>
+            <Table size='small'>
               <TableHead>
                 <TableRow>
                   <TableCell>{t('Browser')}</TableCell>

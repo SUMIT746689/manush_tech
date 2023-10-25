@@ -47,7 +47,7 @@ export const TableContainerWrapper = ({ tableHead, tableBody, tableFooter = <></
 
   return (
     <TableContainer>
-      <Table>
+      <Table size="small">
         <TableHead>
           {tableHead}
         </TableHead>

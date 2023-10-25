@@ -429,7 +429,7 @@ const Results = ({ result, classes, selectClasses, setSelectClasses, setSections
               }
 
               <TableContainer component={Paper}>
-                <Table aria-label="collapsible table">
+                <Table aria-label="collapsible table" size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell padding="checkbox">

@@ -223,7 +223,7 @@ function FeesPaymentReport() {
                                 </>
                             ) : (<>
                                 <TableContainer  >
-                                    <Table >
+                                    <Table size="small">
                                         <TableHead>
                                             <TableRow>
 
@@ -378,7 +378,7 @@ function FeesPaymentReport() {
 
 
                     </Grid>
-                    <table>
+                    <Table size='small'>
                         <thead>
                             <tr>
                                 <th style={tableStyle}>{t('Invoice no')}</th>
@@ -437,7 +437,7 @@ function FeesPaymentReport() {
                             </tr>
                         </tbody>
 
-                    </table>
+                    </Table>
 
                 </Grid>
 

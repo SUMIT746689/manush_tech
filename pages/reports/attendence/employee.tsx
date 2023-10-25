@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Card, Grid, Divider, TextField, Button } from '@mui/material';
+import { Autocomplete, Box, Card, Grid, Divider, TextField, Button, Table } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -241,7 +241,7 @@ function Attendence() {
                             targetRoleEmployees && students ?
                              <div ref={attendenceRef}>
 
-                                <table style={tableStyle}>
+                                <Table style={tableStyle}>
                                     <thead>
                                         <tr>
                                             {[-1, ...Array(32).keys()].map((i) => (
@@ -334,7 +334,7 @@ function Attendence() {
                                             );
                                         })}
                                     </tbody>
-                                </table>
+                                </Table>
                             </div>
                             :
                             <TableEmptyWrapper title="employee attendance" />

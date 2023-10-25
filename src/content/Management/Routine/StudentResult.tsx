@@ -139,7 +139,7 @@ console.log("routine__",routine);
         <>
           {
             routine ? <TableContainer sx={{ p: 1 }} ref={routineRef} >
-              <Table>
+              <Table size='small'>
                 <TableHead sx={{
                   border: '1px solid darkgrey',
                   borderCollapse: 'collapse'

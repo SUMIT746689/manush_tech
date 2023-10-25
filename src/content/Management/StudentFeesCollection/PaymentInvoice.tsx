@@ -106,7 +106,7 @@ console.log({printFees});
 
       <Grid container pt={4}>
         <TableContainer sx={{ border: 1, borderColor: 'gray', borderRadius: 0.5 }}>
-          <Table aria-label="simple table" sx={{ b: 1 }}>
+          <Table aria-label="simple table" sx={{ b: 1 }} size="small">
             <TableHead>
               <TableRow sx={{ p: 1 }}>
                 <TableCell sx={{ p: 1 }}>SN</TableCell>

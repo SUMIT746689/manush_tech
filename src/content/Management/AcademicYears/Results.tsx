@@ -271,7 +271,7 @@ const Results: FC<ResultsProps> = ({
           ) : (
             <>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell align="center">{t('Academic year Id')}</TableCell>

@@ -193,7 +193,7 @@ function FeesPaymentReport({ data }) {
                         {
                             paginatedTransection.length !== 0 && <>
                                 <TableContainer  >
-                                    <Table >
+                                    <Table size="small">
                                         <TableHead>
                                             <TableRow>
 
@@ -349,7 +349,7 @@ function FeesPaymentReport({ data }) {
                         <h2>Discount : {data?.discount}</h2>
 
                     </Grid>
-                    <table>
+                    <Table size='small'>
                         <thead>
                             <tr>
                                 <th style={tableStyle}>{t('Fee Title')}</th>
@@ -441,7 +441,7 @@ function FeesPaymentReport({ data }) {
                                 );
                             })}
                         </tbody>
-                    </table>
+                    </Table>
 
                 </Grid>
 

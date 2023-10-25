@@ -1,4 +1,4 @@
-import { Card, Grid, Divider, TextField, Button, Typography, Avatar } from '@mui/material';
+import { Card, Grid, Divider, TextField, Button, Typography, Avatar, Table } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -311,7 +311,7 @@ function Attendence() {
                     <Grid>Bunk = B</Grid>
                     <Grid>Late = L</Grid>
                   </Card>
-                  <table style={{ ...tableStyle, width: '100%' }}>
+                  <Table style={{ ...tableStyle, width: '100%' }}>
                     <thead>
                       <tr>
                         {[-1, ...Array(32).keys()].map((i) => (
@@ -408,7 +408,7 @@ function Attendence() {
               <td>$180</td>
             </tr>
           </tfoot> */}
-                  </table>
+                  </Table>
                 </div>
                 :
                 <TableEmptyWrapper title="attendance" />

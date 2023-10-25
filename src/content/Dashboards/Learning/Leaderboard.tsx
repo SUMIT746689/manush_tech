@@ -116,7 +116,7 @@ function Leaderboard() {
         title={t('Leaderboard')}
       />
       <Divider />
-      <Table>
+      <Table size='small'>
         <TableHead>
           <TableRow>
             <TableCell>{t('Ranking')}</TableCell>

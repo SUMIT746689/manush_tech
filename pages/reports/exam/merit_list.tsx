@@ -230,7 +230,7 @@ function Managementschools() {
 
                         <>
                             < TableContainer>
-                                <Table aria-label="collapsible table">
+                                <Table aria-label="collapsible table" size="small">
                                     <TableHead>
                                         <TableRow>
 
@@ -324,7 +324,7 @@ function Managementschools() {
                         justifyContent: 'center'
                     }}>
                         < TableContainer sx={{ marginX: 1, p: 0.5 }}>
-                            <Table aria-label="collapsible table">
+                            <Table aria-label="collapsible table" size="small">
                                 <TableHead>
                                     <TableRow>
 

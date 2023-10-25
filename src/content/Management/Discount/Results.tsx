@@ -250,7 +250,7 @@ const Results = ({ setEditDiscount, discount }) => {
                           <Typography variant="h5">{i?.type}</Typography>
                         </TableCell>
 
-                        <TableCell align="center">
+                        <TableCell align="center" >
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton

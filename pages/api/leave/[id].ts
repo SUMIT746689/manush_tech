@@ -8,8 +8,23 @@ const id = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'PATCH':
-                const { from_date, to_date, status, remarks, Leave_type } = req.body;
-                
+                const { from_date, to_date, status, remarks, Leave_type, academic_year_id } = req.body;
+
+                const user_role = await prisma.user.findFirstOrThrow({
+                    where: {
+                        id: Number(id)
+                    },
+                    select: {
+                        role: {
+                            select: {
+                                title: true
+                            }
+                        }
+                    }
+                })
+
+
+
                 const prev = await prisma.leave.findFirst({
                     where: {
                         id: Number(id),
@@ -40,6 +55,101 @@ const id = async (req, res, refresh_token) => {
                     },
                     data
                 })
+
+                if (user_role.role.title === 'STUDENT') {
+
+                    const student = await prisma.student.findFirstOrThrow({
+                        where: {
+                            student_info: {
+                                user_id: Number(id),
+                                school_id: refresh_token.school_id
+                            },
+
+                            academic_year_id: Number(academic_year_id),
+                        },
+                        select: {
+                            id: true,
+                            section_id: true,
+                        }
+                    })
+
+                    const prev_attendance = await prisma.attendance.findMany({
+                        where: {
+                            section_id: student.section_id,
+                            date: {
+                                gte: new Date(new Date(from_date).setUTCHours(0, 0, 0, 0)),
+                                lte: new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
+                            }
+
+                        },
+                        distinct: ['date'],
+                        select: {
+                            date: true
+                        }
+
+                    })
+                    const query = {}
+                    if (status === 'approved') {
+                        query['status'] = 'present'
+                    }
+                    else if (status == 'declined') {
+                        query['status'] = 'absent'
+                    }
+                    //@ts-ignore
+                    if (query?.status) {
+                        await prisma.attendance.updateMany({
+                            where: {
+                                student_id: student.id
+                            },
+                            data: prev_attendance.map(i => ({
+                                date: new Date(new Date(i.date).setUTCHours(0, 0, 0, 0)),
+                                ...query
+                            }))
+                        })
+                    }
+
+                }
+                else {
+                    const query = {}
+                    if (status === 'approved') {
+                        query['status'] = 'present'
+                    }
+                    else if (status == 'declined') {
+                        query['status'] = 'absent'
+                    }
+                    //@ts-ignore
+                    if (query?.status) {
+                        const from = new Date(from_date);
+                        const to = new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
+                        console.log(from, "  ", to);
+
+                        while (from <= to) {
+                            await prisma.employeeAttendance.upsert({
+                                where: {
+                                    id: Number(id),
+                                    date: new Date(from.setUTCHours(0, 0, 0, 0)),
+                                },
+                                update: {
+                                    status: 'present'
+                                },
+                                create: {
+                                    date: new Date(from.setUTCHours(0, 0, 0, 0)),
+                                    status: 'present',
+                                    school_id: refresh_token.school_id,
+                                    user: {
+                                        connect: {
+                                            id: Number(id)
+                                        }
+                                    }
+                                },
+                            })
+
+                            from.setDate(from.getDate() + 1);
+                            console.log("change__", from)
+                        }
+                    }
+
+                }
 
                 res.status(200).json({ message: 'Leave application  updated!' })
                 break;

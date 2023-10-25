@@ -514,7 +514,7 @@ enum AttendenceStatus {
 
 model EmployeeAttendance {
   id        Int                      @id @default(autoincrement())
-  date      DateTime                 @db.Date
+  date      DateTime            
   status    EmployeeAttendenceStatus
   remark    String?
   school_id Int

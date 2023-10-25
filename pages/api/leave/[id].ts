@@ -124,25 +124,39 @@ const id = async (req, res, refresh_token) => {
                         console.log(from, "  ", to);
 
                         while (from <= to) {
-                            await prisma.employeeAttendance.upsert({
+                            const attendence = await prisma.employeeAttendance.findFirst({
                                 where: {
-                                    id: Number(id),
-                                    date: new Date(from.setUTCHours(0, 0, 0, 0)),
-                                },
-                                update: {
-                                    status: 'present'
-                                },
-                                create: {
-                                    date: new Date(from.setUTCHours(0, 0, 0, 0)),
-                                    status: 'present',
-                                    school_id: refresh_token.school_id,
-                                    user: {
-                                        connect: {
-                                            id: Number(id)
-                                        }
+                                    user_id: Number(id),
+                                    date: {
+                                        gte: new Date(from.setUTCHours(0, 0, 0, 0)),
+                                        lte: new Date(from.setUTCHours(23, 59, 59, 999))
                                     }
-                                },
+                                }
                             })
+                            if (attendence) {
+                                await prisma.employeeAttendance.update({
+                                    where: {
+                                        id: attendence.id
+                                    },
+                                    data: {
+                                        status: 'present'
+                                    },
+                                })
+                            }
+                            else {
+                                await prisma.employeeAttendance.create({
+                                    data: {
+                                        date: new Date(from.setUTCHours(0, 0, 0, 0)),
+                                        status: 'present',
+                                        school_id: refresh_token.school_id,
+                                        user: {
+                                            connect: {
+                                                id: Number(id)
+                                            }
+                                        }
+                                    },
+                                })
+                            }
 
                             from.setDate(from.getDate() + 1);
                             console.log("change__", from)

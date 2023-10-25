@@ -269,7 +269,7 @@ const ThemeSettings: FC = (_props) => {
               >
                 Extended Sidebar
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 sx={{ fontWeight: 'bold' }}
                 component={Link}
                 href="/blueprints/accent-header/dashboards/reports"
@@ -310,7 +310,7 @@ const ThemeSettings: FC = (_props) => {
                 href="/blueprints/top-navigation/dashboards/reports"
               >
                 Top Navigation
-              </MenuItem>
+              </MenuItem> */}
             </Menu>
           </Box>
           <Divider />

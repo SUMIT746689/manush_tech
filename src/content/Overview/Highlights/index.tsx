@@ -414,7 +414,7 @@ function Highlights() {
                 )}
               </TypographySubHeading>
             </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <LayoutImgButton
                 target="_blank"
                 rel="noopener"
@@ -426,7 +426,7 @@ function Highlights() {
                   alt="Accent Header"
                 />
               </LayoutImgButton>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <LayoutImgButton
                 target="_blank"
@@ -440,7 +440,7 @@ function Highlights() {
                 />
               </LayoutImgButton>
             </Grid>
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <LayoutImgButton
                 target="_blank"
                 rel="noopener"
@@ -504,7 +504,7 @@ function Highlights() {
                   alt="Bottom Navigation"
                 />
               </LayoutImgButton>
-            </Grid>
+            </Grid> */}
           </Grid>
         </BoxLayoutsContent>
         <BoxWaveAlt>

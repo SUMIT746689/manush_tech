@@ -68,7 +68,7 @@ function RecentPatients() {
       />
       <Divider />
       <TableContainer>
-        <Table>
+        <Table size='small'>
           <TableHead>
             <TableRow>
               <TableCell>{t('Patient Name')}</TableCell>

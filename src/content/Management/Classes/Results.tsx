@@ -257,7 +257,7 @@ const Results: FC<ResultsProps> = ({ users,setEditClass }) => {
           ) : (
             <>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell align='center'>{t('class Id')}</TableCell>

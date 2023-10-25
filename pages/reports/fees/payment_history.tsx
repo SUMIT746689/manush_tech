@@ -47,7 +47,7 @@ function FeesPaymentReport() {
     const printPageRef = useRef();
 
     const [page, setPage] = useState<number>(0);
-    const [limit, setLimit] = useState<number>(5);
+    const [limit, setLimit] = useState<number>(10);
     const [filter, setFilter] = useState<string>('all');
     const [paginatedTransection, setPaginatedTransection] = useState<any>([]);
 
@@ -176,7 +176,7 @@ function FeesPaymentReport() {
         setFilteredFees(filteredfeesdata);
         const paginatedTransaction = applyPagination(filteredfeesdata, page, limit);
         setPaginatedTransection(paginatedTransaction);
-    }, [datas, filter, page])
+    }, [datas, filter, page,limit])
 
     const [sections, setSections] = useState(null);
     const [selectedClass, setSelectedClass] = useState(null);
@@ -379,7 +379,7 @@ function FeesPaymentReport() {
                         <Divider />
                         {
                             paginatedTransection.length !== 0 && <>
-                                <Table>
+                                <Table size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center" >
@@ -393,7 +393,7 @@ function FeesPaymentReport() {
                                             <TableCell align="center"><Typography noWrap variant="h5">{t('Last date')}</Typography></TableCell>
                                             <TableCell align="center"><Typography noWrap variant="h5">{t('Last payment date')}</Typography></TableCell>
                                             <TableCell align="center"><Typography noWrap variant="h5">{t('Total payable amount')}</Typography></TableCell>
-                                            <TableCell align="center"><Typography noWrap variant="h5">{t('Actions')}</Typography></TableCell>
+                                            
 
                                         </TableRow>
                                     </TableHead>
@@ -477,11 +477,11 @@ function FeesPaymentReport() {
                         <h2>Class registration no : {selectedStudent?.class_registration_no}</h2>
 
                     </Grid>
-                    <Grid sx={{
+                    <TableContainer sx={{
                         display: 'flex',
                         justifyContent: 'center',
                     }}>
-                        <table>
+                        <Table size='small'>
                             <thead>
                                 <tr>
                                     <th style={tableStyle}>{t('SL')}</th>
@@ -526,8 +526,8 @@ function FeesPaymentReport() {
                                     );
                                 })}
                             </tbody>
-                        </table>
-                    </Grid>
+                        </Table>
+                    </TableContainer>
 
                 </Grid>
             </Grid >

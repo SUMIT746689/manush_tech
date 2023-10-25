@@ -285,7 +285,7 @@ function Managementschools() {
                     ) : (
 
                         <TableContainer >
-                            <Table aria-label="collapsible table">
+                            <Table aria-label="collapsible table" size="small">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell padding="checkbox">
@@ -467,7 +467,7 @@ function Managementschools() {
                                                             <Grid sx={{
                                                                 height: 'auto',
                                                             }}>
-                                                                <table>
+                                                                <Table size='small'>
                                                                     <thead>
                                                                         <tr>
                                                                             <td colSpan={3} style={gradeTableStyle}>Grading Scale</td>
@@ -490,7 +490,7 @@ function Managementschools() {
 
 
                                                                     </tbody>
-                                                                </table>
+                                                                </Table>
                                                             </Grid>
 
                                                         </Grid>
@@ -503,7 +503,7 @@ function Managementschools() {
                                                             <Table sx={{
                                                                 width: '97.5%',
                                                                 p: 2
-                                                            }}>
+                                                            }} size="small">
                                                                 <thead>
                                                                     <tr>
                                                                         <th style={tableStyle}>Subject</th>
@@ -558,7 +558,7 @@ function Managementschools() {
                                                             <Table sx={{
                                                                 width: '40vh',
                                                                 paddingLeft: 5
-                                                            }}>
+                                                            }} size="small">
                                                                 <thead>
                                                                     <tr>
                                                                         <th style={tableStyle}>GPA</th>
@@ -587,7 +587,7 @@ function Managementschools() {
                                                             <Grid sx={{
                                                                 px: 2
                                                             }}>
-                                                                <Table>
+                                                                <Table size="small">
                                                                     <thead>
                                                                         <tr>
                                                                             <td colSpan={2} style={{ ...tableStyle, fontWeight: 'bold' }}>Attendence</td>
@@ -658,7 +658,7 @@ function Managementschools() {
                                             </Grid>
                                             <Grid display={'grid'} gridTemplateColumns={'auto 30%'} gap={2}>
                                                 {/* student info  */}
-                                                <table>
+                                                <Table size='small'>
                                                     <thead>
                                                         <tr>
                                                             <td style={{ ...gradeTableStyle, width: '50%' }}>ছাত্র-ছাত্রীর নাম</td>
@@ -690,9 +690,9 @@ function Managementschools() {
                                                             <td style={gradeTableStyle}>{i?.student?.section?.name}</td>
                                                         </tr>
                                                     </tbody>
-                                                </table>
+                                                </Table>
                                                 {/* Grading */}
-                                                <table>
+                                                <Table size='small'>
                                                     <thead>
                                                         <tr>
                                                             <td colSpan={3} style={gradeTableStyle}>Grading Scale</td>
@@ -715,7 +715,7 @@ function Managementschools() {
 
 
                                                     </tbody>
-                                                </table>
+                                                </Table>
                                             </Grid>
 
                                             <Typography variant="h4" align='center' gutterBottom py={1}>
@@ -729,7 +729,7 @@ function Managementschools() {
                                                 justifyContent: 'center',
                                                 height: 'auto'
                                             }}>
-                                                <table>
+                                                <Table size='small'>
 
                                                     <tbody style={{
                                                         overflowX: 'auto',
@@ -812,9 +812,9 @@ function Managementschools() {
                                                             {sixElementArray}
                                                         </tr>
                                                     </tbody>
-                                                </table>
+                                                </Table>
                                                 <br />
-                                                <table>
+                                                <Table size='small'>
                                                     <tbody style={{
                                                         overflowX: 'auto',
                                                         overflowY: 'auto'
@@ -866,7 +866,7 @@ function Managementschools() {
 
                                                         <tr></tr>
                                                     </tbody>
-                                                </table>
+                                                </Table>
                                             </Grid>
 
 

@@ -201,7 +201,7 @@ const InvoiceBody: FC<InvoiceBodyProps> = ({ invoice }) => {
 
         <TableWrapper>
           <TableContainer>
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>{t('Item')}</TableCell>

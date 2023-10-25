@@ -224,7 +224,7 @@ function Managementschools() {
 
                         <>
                             <TableContainer>
-                                <Table aria-label="collapsible table">
+                                <Table aria-label="collapsible table" size="small">
                                     <TableHead>
                                         <TableRow>
 
@@ -326,7 +326,7 @@ function Managementschools() {
                         display: 'flex',
                         justifyContent: 'center'
                     }}>
-                        <table>
+                        <Table size='small'>
                             <thead>
                                 <tr>
                                     <th style={tableStyle}>{t('Sl')}</th>
@@ -375,7 +375,7 @@ function Managementschools() {
                                     )
                                 }
                             </tbody>
-                        </table>
+                        </Table>
                     </Grid>
 
                 </Grid >

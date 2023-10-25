@@ -256,7 +256,7 @@ const Results = ({ users, setEditClass, VoucherTypes }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell >{t('Title')}</TableCell>

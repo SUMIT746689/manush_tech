@@ -215,7 +215,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
   const handleConfirmDelete = (id) => {
     setOpenConfirmDelete(id)
   }
-  console.log(selectedStudent);
+  // console.log(selectedStudent);
 
   return (
     <>
@@ -451,7 +451,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
           </>
         ) : (
           <TableContainer>
-            <Table>
+            <Table size='small'>
               <TableHead>
                 <TableRow>
                   <TableCell padding="checkbox">

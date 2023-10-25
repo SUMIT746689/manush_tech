@@ -30,95 +30,95 @@ const menuItems: MenuItems[] = [
         link: '/',
         icon: DesignServicesTwoToneIcon
       },
-      {
-        name: 'Blueprints',
-        icon: BackupTableTwoToneIcon,
-        badge: 'v3',
-        items: [
-          {
-            name: 'Extended Sidebar',
-            link: '/dashboards/reports'
-          },
-          {
-            name: 'Accent Header',
-            link: '/blueprints/accent-header/dashboards/reports',
-            badge: ''
-          },
-          {
-            name: 'Accent Sidebar',
-            link: '/blueprints/accent-sidebar/dashboards/reports'
-          },
-          {
-            name: 'Boxed Sidebar',
-            link: '/blueprints/boxed-sidebar/dashboards/reports'
-          },
-          {
-            name: 'Collapsed Sidebar',
-            link: '/blueprints/collapsed-sidebar/dashboards/reports'
-          },
-          {
-            name: 'Bottom Navigation',
-            link: '/blueprints/bottom-navigation/dashboards/reports'
-          },
-          {
-            name: 'Top Navigation',
-            link: '/blueprints/top-navigation/dashboards/reports'
-          }
-        ]
-      },
-      {
-        name: 'Dashboards',
-        icon: SmartToyTwoToneIcon,
-        link: '/blueprints/top-navigation/dashboards',
-        items: [
-          {
-            name: 'Reports',
-            link: '/blueprints/top-navigation/dashboards/reports',
-            badge: ''
-          },
-          {
-            name: 'Expenses',
-            link: '/blueprints/top-navigation/dashboards/expenses',
-            badge: ''
-          },
-          {
-            name: 'Products',
-            link: '/blueprints/top-navigation/dashboards/products'
-          },
-          {
-            name: 'Statistics',
-            link: '/blueprints/top-navigation/dashboards/statistics'
-          },
-          {
-            name: 'Automation',
-            link: '/blueprints/top-navigation/dashboards/automation'
-          },
-          {
-            name: 'Analytics',
-            link: '/blueprints/top-navigation/dashboards/analytics'
-          },
-          {
-            name: 'Banking',
-            link: '/blueprints/top-navigation/dashboards/banking'
-          },
-          {
-            name: 'Commerce',
-            link: '/blueprints/top-navigation/dashboards/commerce'
-          },
-          {
-            name: 'Crypto',
-            link: '/blueprints/top-navigation/dashboards/crypto'
-          },
-          {
-            name: 'Finance',
-            link: '/blueprints/top-navigation/dashboards/finance'
-          },
-          {
-            name: 'Fitness',
-            link: '/blueprints/top-navigation/dashboards/fitness'
-          }
-        ]
-      },
+      // {
+      //   name: 'Blueprints',
+      //   icon: BackupTableTwoToneIcon,
+      //   badge: 'v3',
+      //   items: [
+      //     {
+      //       name: 'Extended Sidebar',
+      //       link: '/dashboards/reports'
+      //     },
+      //     {
+      //       name: 'Accent Header',
+      //       link: '/blueprints/accent-header/dashboards/reports',
+      //       badge: ''
+      //     },
+      //     {
+      //       name: 'Accent Sidebar',
+      //       link: '/blueprints/accent-sidebar/dashboards/reports'
+      //     },
+      //     {
+      //       name: 'Boxed Sidebar',
+      //       link: '/blueprints/boxed-sidebar/dashboards/reports'
+      //     },
+      //     {
+      //       name: 'Collapsed Sidebar',
+      //       link: '/blueprints/collapsed-sidebar/dashboards/reports'
+      //     },
+      //     {
+      //       name: 'Bottom Navigation',
+      //       link: '/blueprints/bottom-navigation/dashboards/reports'
+      //     },
+      //     {
+      //       name: 'Top Navigation',
+      //       link: '/blueprints/top-navigation/dashboards/reports'
+      //     }
+      //   ]
+      // },
+      // {
+      //   name: 'Dashboards',
+      //   icon: SmartToyTwoToneIcon,
+      //   link: '/blueprints/top-navigation/dashboards',
+      //   items: [
+      //     {
+      //       name: 'Reports',
+      //       link: '/blueprints/top-navigation/dashboards/reports',
+      //       badge: ''
+      //     },
+      //     {
+      //       name: 'Expenses',
+      //       link: '/blueprints/top-navigation/dashboards/expenses',
+      //       badge: ''
+      //     },
+      //     {
+      //       name: 'Products',
+      //       link: '/blueprints/top-navigation/dashboards/products'
+      //     },
+      //     {
+      //       name: 'Statistics',
+      //       link: '/blueprints/top-navigation/dashboards/statistics'
+      //     },
+      //     {
+      //       name: 'Automation',
+      //       link: '/blueprints/top-navigation/dashboards/automation'
+      //     },
+      //     {
+      //       name: 'Analytics',
+      //       link: '/blueprints/top-navigation/dashboards/analytics'
+      //     },
+      //     {
+      //       name: 'Banking',
+      //       link: '/blueprints/top-navigation/dashboards/banking'
+      //     },
+      //     {
+      //       name: 'Commerce',
+      //       link: '/blueprints/top-navigation/dashboards/commerce'
+      //     },
+      //     {
+      //       name: 'Crypto',
+      //       link: '/blueprints/top-navigation/dashboards/crypto'
+      //     },
+      //     {
+      //       name: 'Finance',
+      //       link: '/blueprints/top-navigation/dashboards/finance'
+      //     },
+      //     {
+      //       name: 'Fitness',
+      //       link: '/blueprints/top-navigation/dashboards/fitness'
+      //     }
+      //   ]
+      // },
       {
         name: 'Auth Pages',
         icon: VpnKeyTwoToneIcon,
@@ -171,37 +171,37 @@ const menuItems: MenuItems[] = [
           }
         ]
       },
-      {
-        name: '',
-        icon: MenuTwoToneIcon,
-        link: '',
-        items: [
-          {
-            name: 'Doctors',
-            link: '/blueprints/top-navigation/dashboards/healthcare/doctor'
-          },
-          {
-            name: 'Hospital',
-            link: '/blueprints/top-navigation/dashboards/healthcare/hospital'
-          },
-          {
-            name: 'Helpdesk',
-            link: '/blueprints/top-navigation/dashboards/helpdesk'
-          },
-          {
-            name: 'Learning',
-            link: '/blueprints/top-navigation/dashboards/learning'
-          },
-          {
-            name: 'Monitoring',
-            link: '/blueprints/top-navigation/dashboards/monitoring'
-          },
-          {
-            name: 'Tasks',
-            link: '/blueprints/top-navigation/dashboards/tasks'
-          }
-        ]
-      }
+      // {
+      //   name: '',
+      //   icon: MenuTwoToneIcon,
+      //   link: '',
+      //   items: [
+      //     {
+      //       name: 'Doctors',
+      //       link: '/blueprints/top-navigation/dashboards/healthcare/doctor'
+      //     },
+      //     {
+      //       name: 'Hospital',
+      //       link: '/blueprints/top-navigation/dashboards/healthcare/hospital'
+      //     },
+      //     {
+      //       name: 'Helpdesk',
+      //       link: '/blueprints/top-navigation/dashboards/helpdesk'
+      //     },
+      //     {
+      //       name: 'Learning',
+      //       link: '/blueprints/top-navigation/dashboards/learning'
+      //     },
+      //     {
+      //       name: 'Monitoring',
+      //       link: '/blueprints/top-navigation/dashboards/monitoring'
+      //     },
+      //     {
+      //       name: 'Tasks',
+      //       link: '/blueprints/top-navigation/dashboards/tasks'
+      //     }
+      //   ]
+      // }
     ]
   }
 ];

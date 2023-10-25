@@ -69,7 +69,7 @@ const PrintComponent = ({ title, exportData,tableFooter = <></> }) => {
         {' '}
         <h2> Title: {title}</h2>
         <Grid sx={{ marginX: 1, p: 0.5, border: 1, borderColor: 'lightgrey', }}>
-          <Table sx={{ fontSize: '1em' }} aria-label="table">
+          <Table size="small" sx={{ fontSize: '1em' }} aria-label="table">
             <TableHead>
               <TableRow >
                 {exportData.length > 0 &&

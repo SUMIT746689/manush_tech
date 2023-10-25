@@ -286,7 +286,7 @@ function Block1() {
       </Box>
       <Divider />
       <TableContainer>
-        <Table>
+        <Table size='small'>
           <TableBody>
             <TableRow hover>
               <TableCell padding="checkbox">

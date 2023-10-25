@@ -223,7 +223,7 @@ function Managementschools() {
 
                         <>
                             <TableContainer>
-                                <Table aria-label="collapsible table">
+                                <Table aria-label="collapsible table" size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell padding="checkbox">
@@ -347,7 +347,7 @@ function Managementschools() {
                                         <Box sx={{ fontWeight: 'bold' }}>
                                             Total mark counted from {i?.title} exam : {i?.calculatedTotalMark?.toFixed(2)}
                                         </Box>
-                                        <table>
+                                        <Table size='small'>
                                             <thead>
                                                 <tr>
                                                     <th style={tableStyle}>{t('Subject Name')}</th>
@@ -379,7 +379,7 @@ function Managementschools() {
 
                                                 )}
                                             </tbody>
-                                        </table>
+                                        </Table>
 
                                     </Grid>)
                                 }

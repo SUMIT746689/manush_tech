@@ -299,7 +299,7 @@ const Results = () => {
         ) : (
           <>
             <TableContainer >
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell align={'center'}>{t('Class')}</TableCell>

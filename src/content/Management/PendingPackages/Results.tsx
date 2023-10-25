@@ -317,7 +317,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">

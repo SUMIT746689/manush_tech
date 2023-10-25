@@ -241,7 +241,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell padding="checkbox">

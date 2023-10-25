@@ -385,7 +385,7 @@ const Results: FC<ResultsProps> = ({ invoices }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell>{t('#')}</TableCell>

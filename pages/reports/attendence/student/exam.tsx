@@ -7,7 +7,8 @@ import {
     TextField,
     Button,
     Avatar,
-    Typography
+    Typography,
+    Table
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -293,7 +294,7 @@ function Attendence() {
 
                                     </Grid>
                                 </Grid>
-                                <table style={tableStyle}>
+                                <Table style={tableStyle}>
                                     <thead>
                                         <tr>
 
@@ -368,7 +369,7 @@ function Attendence() {
                 <td>$180</td>
               </tr>
             </tfoot> */}
-                                </table>
+                                </Table>
                             </div>
                             :
                             <TableEmptyWrapper title="exam attendance" />

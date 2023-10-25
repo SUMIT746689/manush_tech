@@ -131,7 +131,7 @@ const applyPagination = (users, page, limit) => {
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results = ({ setEditDiscount,discount }) => {
+const Results = ({ setEditDiscount, discount }) => {
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -180,32 +180,17 @@ const Results = ({ setEditDiscount,discount }) => {
   return (
     <>
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-        {/* <Box p={2}>
-          {!selectedBulkActions && (
-            <TextField
-              sx={{
-                m: 0
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchTwoToneIcon />
-                  </InputAdornment>
-                )
-              }}
-              onChange={handleQueryChange}
-              placeholder={t('Search by name, classname or group name...')}
-              value={query}
-              size="small"
-              fullWidth
-              margin="normal"
-              variant="outlined"
-            />
-          )}
-          {selectedBulkActions && <BulkActions />}
+        <Box p={2}>
+          <TablePagination
+            component="div"
+            count={filteredClasses.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
         </Box>
-
-        <Divider /> */}
 
         {paginatedClasses.length === 0 ? (
           <>
@@ -225,7 +210,7 @@ const Results = ({ setEditDiscount,discount }) => {
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell >{t('Title')}</TableCell>
@@ -292,17 +277,7 @@ const Results = ({ setEditDiscount,discount }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box p={2}>
-              <TablePagination
-                component="div"
-                count={filteredClasses.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
+
           </>
         )}
       </Card>

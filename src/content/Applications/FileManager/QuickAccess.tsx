@@ -313,7 +313,7 @@ function QuickAccess() {
           <Grid item xs={12}>
             <Card>
               <TableContainer>
-                <Table>
+                <Table size='small'>
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('Filename')}</TableCell>

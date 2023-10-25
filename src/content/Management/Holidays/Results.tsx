@@ -261,7 +261,7 @@ const Results: FC<ResultsProps> = ({
         ) : (
           <>
             <TableContainer>
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
 

@@ -276,16 +276,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
             <Divider />
 
             <TableContainer>
-              <Table>
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedAllschools}
-                          indeterminate={selectedSomeschools}
-                          onChange={handleSelectAllschools}
-                        />
-                      </TableCell> */}
                     <TableCell align="center">{t('ID')}</TableCell>
                     <TableCell>{t('Name')}</TableCell>
                     <TableCell>{t('UserName')}</TableCell>
@@ -313,15 +306,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                         key={project.id}
                         selected={isschoolselected}
                       >
-                        {/* <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={isschoolselected}
-                              onChange={(event) =>
-                                handleSelectOneProject(event, project.id)
-                              }
-                              value={isschoolselected}
-                            />
-                          </TableCell> */}
                         <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {project.id}
@@ -368,91 +352,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                             {project.user?.school?.name}
                           </Typography>
                         </TableCell>
-
-                        {/* <TableCell>
-                            {project.tags?.map((value) => {
-                              return (
-                                <span key={value}>
-                                  <Link href="#">{value}</Link>,{' '}
-                                </span>
-                              );
-                            })}
-                          </TableCell> */}
-                        {/* <TableCell>
-                            <Typography
-                              noWrap
-                              variant="subtitle1"
-                              color="text.primary"
-                            >
-                              {t('Due')}
-                              <b>
-                                {' '}
-                                {formatDistance(
-                                  project.startDate,
-                                  project.dueDate,
-                                  {
-                                    addSuffix: true
-                                  }
-                                )}
-                              </b>
-                            </Typography>
-                            <Typography noWrap color="text.secondary">
-                              {t('Started')}:{' '}
-                              {format(project.dueDate, 'MMMM dd yyyy')}
-                            </Typography>
-                          </TableCell> */}
-                        {/* <TableCell>
-                            <Box display="flex" justifyContent="flex-start">
-                              {project.memberIds.length > 0 && (
-                                <AvatarGroup max={4}>
-                                  {project.memberIds.map((member) => (
-                                    <Tooltip
-                                      arrow
-                                      placement="top"
-                                      key={member.id}
-                                      title={member.name}
-                                    >
-                                      <Avatar
-                                        sx={{
-                                          width: 30,
-                                          height: 30
-                                        }}
-                                        key={member.id}
-                                        src={member.avatar}
-                                      />
-                                    </Tooltip>
-                                  ))}
-                                </AvatarGroup>
-                              )}
-                            </Box>
-                          </TableCell> */}
-                        {/* <TableCell align="center">
-                            <Box
-                              sx={{
-                                minWidth: 175
-                              }}
-                              display="flex"
-                              alignItems="center"
-                            >
-                              <LinearProgress
-                                sx={{
-                                  flex: 1,
-                                  mr: 1
-                                }}
-                                value={project.progress}
-                                color="primary"
-                                variant="determinate"
-                              />
-                              <Typography variant="subtitle1">
-                                {project.progress}%
-                              </Typography>
-                            </Box>
-                          </TableCell> */}
-                        {/* <TableCell>
-                            <Typography noWrap>
-                              {getschoolstatusLabel(project.status)}
-                            </Typography>
-                          </TableCell> */}
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>

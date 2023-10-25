@@ -114,7 +114,7 @@ const SingleStudentExamResult = ({ data }) => {
                   </Grid>
                 </Grid>
                 <TableContainer sx={{ p: 1 }}  >
-                  <Table>
+                  <Table size='small'>
                     <TableHead sx={{
                       border: '1px solid darkgrey',
                       borderCollapse: 'collapse'

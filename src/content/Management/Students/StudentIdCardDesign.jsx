@@ -100,7 +100,7 @@ const Profile = ({ user }) => {
                     <li><strong style={strongStyle}>Blood group:</strong> {blood_group}</li>
                     <li><strong style={strongStyle}>Phone:</strong> {phone}</li>
                     <li><strong style={strongStyle}>Academic Year:</strong> {academicYear}</li>
-                    <li><strong style={strongStyle}>Date of birth :</strong> {birthDate}</li>
+                    {/* <li><strong style={strongStyle}>Date of birth :</strong> {birthDate}</li> */}
                 </ul>
 
 

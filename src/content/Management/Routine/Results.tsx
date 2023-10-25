@@ -212,7 +212,7 @@ const Results = () => {
                 </Grid>
               </Grid>
               <TableContainer sx={{ p: 1, mt: 3 }}  >
-                <Table>
+                <Table size='small'>
                   <TableHead sx={{
                     border: '1px solid darkgrey',
                     borderCollapse: 'collapse'

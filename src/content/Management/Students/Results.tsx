@@ -79,6 +79,10 @@ const ButtonError = styled(Button)(
      }
     `
 );
+
+const ActionStyle : object = {
+  height: '20px'
+}
 interface Filters {
   role?: string;
 }
@@ -502,26 +506,19 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
                         </Typography>
                       </TableCell>
-                      {/*<TableCell align="center">*/}
-                      {/*  <Typography noWrap>*/}
-                      {/*    /!* <Tooltip title={t('Edit')} arrow>*/}
-                      {/*      <IconButton*/}
-                      {/*        color="primary"*/}
-                      {/*      >*/}
-                      {/*        <LaunchTwoToneIcon fontSize="small" />*/}
-                      {/*      </IconButton>*/}
-                      {/*    </Tooltip> *!/*/}
 
-
-
-                      {/*  </Typography>*/}
-                      {/*</TableCell>*/}
-                      <TableCell align={'center'} sx={{
-                        display: 'grid',
-                        gridTemplateColumns: 'auto auto auto auto'
-                      }}>
-                        <Tooltip title={t('View Profile')} arrow>
+                      <TableCell align={'center'}
+                        sx={{
+                          display: 'flex',
+                          flexDirection:'row',
+                          gap:2,
+                          justifyContent:'center'
+                          
+                        }}
+                      >
+                        <Tooltip title={t('View Profile')} arrow >
                           <IconButton
+                            sx={ActionStyle}
                             color="primary"
                             onClick={() => {
                               setSelectedStudent(i)
@@ -535,6 +532,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                         <Tooltip title={t('Edit')} arrow>
                           <IconButton
                             color="primary"
+                            sx={ActionStyle}
                           >
                             <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
                           </IconButton>
@@ -542,6 +540,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
                         <Tooltip title={t('Discount')} arrow>
                           <IconButton
+                            sx={ActionStyle}
                             color="primary"
                             onClick={() => {
                               setSelectedStudent(i)
@@ -554,6 +553,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
                         <Tooltip title={t('Delete')} arrow>
                           <IconButton
+                            sx={ActionStyle}
                             onClick={() => handleConfirmDelete(i.id)}
                             color="primary"
                           >
@@ -575,7 +575,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
             (i, index) => {
               const user = {
                 id: i?.class_roll_no,
-                class_registration_no:i?.class_registration_no,
+                class_registration_no: i?.class_registration_no,
                 name: `${i?.student_info?.first_name ? i?.student_info?.first_name : ''} ${i?.student_info?.middle_name ? i?.student_info?.middle_name : ''} ${i?.student_info?.last_name ? i?.student_info?.last_name : ''}`,
                 schoolName: i?.student_info?.school?.name,
                 class: i?.section?.class?.name,

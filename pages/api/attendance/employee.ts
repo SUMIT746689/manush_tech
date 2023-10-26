@@ -82,7 +82,7 @@ const index = async (req, res) => {
                     else {
                         await prisma.employeeAttendance.create({
                             data: {
-                                date: new Date(date),
+                                date: new Date(new Date(date).setUTCHours(0, 0, 0, 0)),
                                 status,
                                 school_id: parseInt(school_id),
                                 user: {
@@ -101,16 +101,19 @@ const index = async (req, res) => {
                 break;
             case 'PATCH':
 
-                const user = await prisma.employeeAttendance.findFirst({
+                const prev_att = await prisma.employeeAttendance.findFirst({
                     where: {
                         school_id: parseInt(req.query.school_id),
-                        date: new Date(req.query.date),
+                        date: {
+                            gte: new Date(new Date(req.query.date).setUTCHours(0, 0, 0, 0)),
+                            lte: new Date(new Date(req.query.date).setUTCHours(23, 59, 59, 999))
+                        },
                         user_id: parseInt(req.query.user_id),
                     }
                 })
 
 
-                if (user) {
+                if (prev_att) {
                     const data = {
                         status: req.body.status ? req.body.status : req.query.status
                     }
@@ -119,7 +122,7 @@ const index = async (req, res) => {
                     }
                     await prisma.employeeAttendance.update({
                         where: {
-                            id: user.id
+                            id: prev_att.id
 
                         },
                         data
@@ -128,10 +131,9 @@ const index = async (req, res) => {
                 else {
                     const data = {
                         user_id: parseInt(req.query.user_id),
-                        date: new Date(req.body.exam_id ? '0' : req.query.date),
+                        date: new Date(new Date(req.query.date).setUTCHours(0, 0, 0, 0)),
                         status: req.body.status ? req.body.status : req.query.status,
                         school_id: parseInt(req.query.school_id),
-
                     }
 
                     if (req.body.remark) {

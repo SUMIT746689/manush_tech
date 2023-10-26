@@ -8,22 +8,34 @@ const id = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'PATCH':
-                const { from_date, to_date, status, remarks, Leave_type } = req.body;
-                
+                const { from_date, to_date, status, remarks, Leave_type, academic_year_id } = req.body;
+
+                const user_role = await prisma.leave.findFirstOrThrow({
+                    where: {
+                        id: Number(id)
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                role: {
+                                    select: {
+                                        title: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+
+                console.log("user_role__", user_role);
+
                 const prev = await prisma.leave.findFirst({
                     where: {
                         id: Number(id),
-                        OR: [
-                            {
-                                status: 'approved'
-                            },
-                            {
-                                status: 'declined'
-                            }
-                        ]
                     }
                 })
-                if (prev) throw new Error('Leave Already approved or declined');
+                if (prev.status === 'approved' || prev.status === 'declined') throw new Error('Leave Already approved or declined');
 
                 const data = {
                     approved_by_id: refresh_token.id,
@@ -34,12 +46,167 @@ const id = async (req, res, refresh_token) => {
                 if (remarks) data['remarks'] = remarks
                 if (Leave_type) data['Leave_type'] = Leave_type
 
-                await prisma.leave.update({
-                    where: {
-                        id: Number(id)
-                    },
-                    data
-                })
+
+                if (user_role.user.role.title === 'STUDENT') {
+                    const query = {}
+                    if (status === 'approved') {
+                        query['status'] = 'present'
+                    }
+                    else if (status == 'declined') {
+                        query['status'] = 'absent'
+                    }
+                    //@ts-ignore
+                    if (query?.status) {
+                        const student = await prisma.student.findFirstOrThrow({
+                            where: {
+                                student_info: {
+                                    user_id: prev.user_id,
+                                    school_id: refresh_token.school_id
+                                },
+
+                                academic_year_id: Number(academic_year_id),
+                            },
+                            select: {
+                                id: true,
+                                section_id: true,
+                            }
+                        })
+
+                        // console.log("student__", student);
+
+                        const section_attendance = await prisma.attendance.findMany({
+                            where: {
+                                section_id: student.section_id,
+                                date: {
+                                    gte: new Date(from_date),
+                                    lte: new Date(to_date)
+                                },
+
+                            },
+                            select: {
+                                student_id: true,
+                                date: true
+                            },
+
+                        })
+
+                        // console.log("section_attendance___", section_attendance);
+
+                        const needToUpdate = section_attendance.filter(i => i.student_id === student.id)
+                        // console.log("needToUpdate__", needToUpdate);
+
+                        const prev_attendance = await prisma.attendance.findMany({
+                            where: {
+                                student_id: student.id,
+                                OR: needToUpdate.map(i => ({ date: i.date }))
+                            },
+                            select: {
+                                id: true
+                            }
+                        })
+                        await prisma.$transaction(async (trans) => {
+                            await trans.leave.update({
+                                where: {
+                                    id: Number(id)
+                                },
+                                data
+                            })
+
+                            for (const i of prev_attendance) {
+                                await trans.attendance.update({
+                                    where: {
+                                        id: i.id
+                                    },
+                                    data: {
+                                        //@ts-ignore
+                                        status: query?.status
+                                    }
+                                })
+                            }
+
+                            const needTocreate = [...new Set(section_attendance.filter(i => i.student_id !== student.id).map(j => j.date.toLocaleDateString()))]
+                            // console.log("needTocreate__", needTocreate);
+
+                            for (const i of needTocreate) {
+                                await trans.attendance.create({
+                                    data: {
+                                        student_id: student.id,
+                                        date: new Date(i),
+                                        school_id: refresh_token.school_id,
+                                        section_id: student.section_id,
+                                        //@ts-ignore
+                                        status: query?.status
+                                    }
+                                })
+                            }
+                        })
+                    }
+
+                }
+                else {
+                    const query = {}
+                    if (status === 'approved') {
+                        query['status'] = 'present'
+                    }
+                    else if (status == 'declined') {
+                        query['status'] = 'absent'
+                    }
+                    //@ts-ignore
+                    if (query?.status) {
+                        const from = new Date(from_date);
+                        const to = new Date(to_date)
+                        console.log(from, "  ", to);
+
+                        await prisma.$transaction(async (trans) => {
+                            await trans.leave.update({
+                                where: {
+                                    id: Number(id)
+                                },
+                                data
+                            })
+
+                            while (from <= to) {
+                                const attendence = await trans.employeeAttendance.findFirst({
+                                    where: {
+                                        user_id: user_role.user.id,
+                                        date: from
+                                    }
+                                })
+                                if (attendence) {
+                                    await trans.employeeAttendance.update({
+                                        where: {
+                                            id: attendence.id
+                                        },
+                                        data: {
+                                            //@ts-ignore
+                                            status: query?.status
+                                        },
+                                    })
+                                }
+                                else {
+                                    await trans.employeeAttendance.create({
+                                        data: {
+                                            date: new Date(from),
+                                            //@ts-ignore
+                                            status: query?.status,
+                                            school_id: refresh_token.school_id,
+                                            user: {
+                                                connect: {
+                                                    id: user_role.user.id
+                                                }
+                                            }
+                                        },
+                                    })
+                                }
+
+                                from.setDate(from.getDate() + 1);
+                                // console.log("change__", from)
+                            }
+                        })
+
+                    }
+
+                }
 
                 res.status(200).json({ message: 'Leave application  updated!' })
                 break;

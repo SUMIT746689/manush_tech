@@ -290,7 +290,7 @@ async function seed() {
   // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
   const studentPermissions = []
   for (const i of permissions) {
-    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine') {
+    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine' || i.value =='create_leave') {
       studentPermissions.push({ id: i.id })
     }
   }

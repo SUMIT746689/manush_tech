@@ -491,7 +491,7 @@ model Attendance {
   class_name       String?
   section_name     String?
   class_roll_no    String?
-  date             DateTime
+  date             DateTime         @db.Date()
   status           AttendenceStatus
   remark           String?
   section_id       Int
@@ -518,7 +518,7 @@ enum AttendenceStatus {
 
 model EmployeeAttendance {
   id        Int                      @id @default(autoincrement())
-  date      DateTime                 @db.Date
+  date      DateTime                 @db.Date()
   status    EmployeeAttendenceStatus
   remark    String?
   school_id Int

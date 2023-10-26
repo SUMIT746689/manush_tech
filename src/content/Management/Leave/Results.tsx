@@ -7,7 +7,8 @@ import {
   ReactElement,
   Ref,
   forwardRef,
-  useEffect
+  useEffect,
+  useContext
 } from 'react';
 
 import PropTypes from 'prop-types';
@@ -61,6 +62,7 @@ import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import ApprovalIcon from '@mui/icons-material/Approval';
 import { useAuth } from '@/hooks/useAuth';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -112,27 +114,40 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
+function accessNestedProperty(obj, array) {
+  let currentObject = obj;
 
+  for (const key of array) {
+    if (currentObject && currentObject.hasOwnProperty(key)) {
+      currentObject = currentObject[key];
+    } else {
+      return undefined;
+    }
+  }
+  return currentObject;
+}
 
 const applyFilters = (
   users,
   query,
   filters
 ) => {
-  return users.filter((user) => {
+  return users.filter((i) => {
     let matches = true;
 
     if (query) {
-      const properties = ['name', 'code'];
+      const properties = ['name', 'user.role.title','user.username','Leave_type'];
       let containsQuery = false;
+      for (const property of properties) {
 
-      properties.forEach((property) => {
-        if (user[property]?.toLowerCase().includes(query.toLowerCase())) {
+        const queryString = accessNestedProperty(i, property.split('.'))
+
+        if (queryString?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
-      });
+      }
 
-      if (filters.role && user.role !== filters.role) {
+      if (filters.role && i.role !== filters.role) {
         matches = false;
       }
 
@@ -144,7 +159,7 @@ const applyFilters = (
     Object.keys(filters).forEach((key) => {
       const value = filters[key];
 
-      if (value && user[key] !== value) {
+      if (value && i[key] !== value) {
         matches = false;
       }
     });
@@ -168,7 +183,7 @@ const Results = ({ users, reFetchData }) => {
 
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
-
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [query, setQuery] = useState<string>('');
@@ -212,15 +227,6 @@ const Results = ({ users, reFetchData }) => {
 
   const handleDeleteCompleted = () => {
     setOpenConfirmDelete(false);
-
-    // enqueueSnackbar(t('The class has been removed'), {
-    //   variant: 'success',
-    //   anchorOrigin: {
-    //     vertical: 'top',
-    //     horizontal: 'right'
-    //   },
-    //   TransitionComponent: Zoom
-    // });
   };
   const handleCreateClassClose = () => {
     setOpen(false);
@@ -232,7 +238,7 @@ const Results = ({ users, reFetchData }) => {
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
-
+      _values['academic_year_id'] = academicYear?.id
       const res = await axios.patch(`/api/leave/${selectedUser.id}`, _values)
       showNotification(res.data.message)
       resetForm();
@@ -250,7 +256,6 @@ const Results = ({ users, reFetchData }) => {
       setSubmitting(false);
     }
   };
-  console.log({ selectedUser });
 
   return (
     <>
@@ -431,7 +436,37 @@ const Results = ({ users, reFetchData }) => {
           }}
         </Formik>
       </Dialog>
-
+      <Card
+        sx={{
+          p: 1,
+          mb: 3
+        }}
+      >
+        <Grid container spacing={1}>
+          <Grid item xs={12}>
+            <Box p={0.5}>
+              <TextField
+                size='small'
+                sx={{
+                  m: 0
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchTwoToneIcon />
+                    </InputAdornment>
+                  )
+                }}
+                onChange={handleQueryChange}
+                placeholder={t('Search by User Name or Role or Leave type...')}
+                value={query}
+                fullWidth
+                variant="outlined"
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Card>
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
 
         {paginatedClasses.length === 0 ? (
@@ -451,6 +486,30 @@ const Results = ({ users, reFetchData }) => {
           </>
         ) : (
           <>
+
+            <Box
+              p={2}
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Box>
+                <Typography component="span" variant="subtitle1">
+                  {t('Showing')}:
+                </Typography>{' '}
+                <b>{paginatedClasses.length}</b> <b>{t('Leave')}</b>
+              </Box>
+              <TablePagination
+                component="div"
+                count={filteredClasses.length}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleLimitChange}
+                page={page}
+                rowsPerPage={limit}
+                rowsPerPageOptions={[5, 10, 15]}
+              />
+            </Box>
+
             {
               // @ts-ignore
               user?.role?.title === 'ADMIN' ?

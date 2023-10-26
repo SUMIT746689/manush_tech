@@ -10,18 +10,26 @@ const id = async (req, res, refresh_token) => {
             case 'PATCH':
                 const { from_date, to_date, status, remarks, Leave_type, academic_year_id } = req.body;
 
-                const user_role = await prisma.user.findFirstOrThrow({
+                const user_role = await prisma.leave.findFirstOrThrow({
                     where: {
                         id: Number(id)
                     },
                     select: {
-                        role: {
+                        user: {
                             select: {
-                                title: true
+                                id: true,
+                                role: {
+                                    select: {
+                                        title: true
+                                    }
+                                }
                             }
                         }
                     }
                 })
+
+                console.log("user_role__", user_role);
+
                 const prev = await prisma.leave.findFirst({
                     where: {
                         id: Number(id),
@@ -39,7 +47,7 @@ const id = async (req, res, refresh_token) => {
                 if (Leave_type) data['Leave_type'] = Leave_type
 
 
-                if (user_role.role.title === 'STUDENT') {
+                if (user_role.user.role.title === 'STUDENT') {
                     const query = {}
                     if (status === 'approved') {
                         query['status'] = 'present'
@@ -82,7 +90,6 @@ const id = async (req, res, refresh_token) => {
 
                         })
 
-
                         // console.log("section_attendance___", section_attendance);
 
                         const needToUpdate = section_attendance.filter(i => i.student_id === student.id)
@@ -111,7 +118,7 @@ const id = async (req, res, refresh_token) => {
                                         id: i.id
                                     },
                                     data: {
-                                         //@ts-ignore
+                                        //@ts-ignore
                                         status: query?.status
                                     }
                                 })
@@ -127,7 +134,7 @@ const id = async (req, res, refresh_token) => {
                                         date: new Date(i),
                                         school_id: refresh_token.school_id,
                                         section_id: student.section_id,
-                                         //@ts-ignore
+                                        //@ts-ignore
                                         status: query?.status
                                     }
                                 })
@@ -161,7 +168,7 @@ const id = async (req, res, refresh_token) => {
                             while (from <= to) {
                                 const attendence = await trans.employeeAttendance.findFirst({
                                     where: {
-                                        user_id: Number(id),
+                                        user_id: user_role.user.id,
                                         date: from
                                     }
                                 })
@@ -171,7 +178,7 @@ const id = async (req, res, refresh_token) => {
                                             id: attendence.id
                                         },
                                         data: {
-                                             //@ts-ignore
+                                            //@ts-ignore
                                             status: query?.status
                                         },
                                     })
@@ -180,12 +187,12 @@ const id = async (req, res, refresh_token) => {
                                     await trans.employeeAttendance.create({
                                         data: {
                                             date: new Date(from),
-                                             //@ts-ignore
+                                            //@ts-ignore
                                             status: query?.status,
                                             school_id: refresh_token.school_id,
                                             user: {
                                                 connect: {
-                                                    id: Number(id)
+                                                    id: user_role.user.id
                                                 }
                                             }
                                         },

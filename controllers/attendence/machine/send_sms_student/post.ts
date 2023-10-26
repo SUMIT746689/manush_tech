@@ -49,7 +49,7 @@ async function post(req, res, refresh_token) {
     //   })
     // })
 
-    await prisma.tbl_manual_student_attendace_queue.create({
+    await prisma.tbl_student_sent_sms_queue.create({
       data: {
         class_id: parseInt(class_id),
         section_id: section_id ? parseInt(section_id) : null,

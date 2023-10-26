@@ -102,7 +102,7 @@ const TypeGroup = () => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
     // console.log({ customize_select_roleList });
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
-    return ()=>setFieldValue("role_id", [])
+    return () => setFieldValue("role_id", [])
   }, [roles])
 
   const handleRoleSelect = (e) => {
@@ -297,14 +297,30 @@ function EmailPage() {
 
                     <DynamicSelectTemplate />
 
+
                     <TextAreaWrapper
+                      sx={{ pb: 0 }}
                       name="body"
                       value={values.body}
                       touched={touched.body}
                       errors={errors.body}
-                      handleChange={handleChange}
+                      handleChange={(v) => {
+                        if (v.target.value.length > 1000) return;
+                        handleChange(v)
+                      }
+                      }
                       handleBlur={handleBlur}
                     />
+                    {/* <Grid sx={{ pb: 1, ml: 'auto' }}>
+                      {`
+                      ${values.body?.length ?? 0} characters | 
+                      ${1000 - (values.body?.length ?? 0)} characters left |
+                      ${!values.body?.length || values.body?.length === 0 ?
+                          0
+                          :
+                          values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
+                      `}
+                    </Grid> */}
 
                     <TextFieldWrapper
                       label="Email Subject"

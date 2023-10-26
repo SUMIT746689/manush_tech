@@ -3,15 +3,18 @@ import prisma from "@/lib/prisma_client";
 export default async function patchSchool(req, res, refresh_token) {
   try {
     const { id } = req.query;
-    const { name, phone, email, address, admin_ids, currency,domain } = req.body;
-    console.log({ name, phone, email, address, admin_ids, currency });
+    const { name, phone, email, address, admin_ids, currency, domain, main_balance, sms_count, sms_masking_price, sms_non_masking_price } = req.body;
+
     let data = {};
     if (name) data['name'] = name;
     if (phone) data['phone'] = phone;
     if (email) data['email'] = email;
     if (address) data['address'] = address;
     if (currency) data['currency'] = currency;
-    if (domain) data['domain'] = domain;
+    if (domain) data['main_balance'] = main_balance;
+    if (domain) data['sms_count'] = sms_count;
+    if (domain) data['sms_masking_price'] = sms_masking_price;
+    if (domain) data['sms_non_masking_price'] = sms_non_masking_price;
 
     const existingSchoolIdList = await prisma.user.findMany({
       where: {
@@ -44,7 +47,7 @@ export default async function patchSchool(req, res, refresh_token) {
     if (connectIdList.length) {
       query['connect'] = connectIdList
     }
-    if(disconnectIdList.length){
+    if (disconnectIdList.length) {
       query['disconnect'] = disconnectIdList
     }
     if (admin_ids)

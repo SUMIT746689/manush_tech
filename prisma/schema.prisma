@@ -28,65 +28,66 @@ model User {
   student      StudentInformation?
 
   // admin_school School? @relation(name: "AdminUserSchool")
-  smsCampaignDetails      SmsCampaignDetails[]
-  EmployeeAttendance      EmployeeAttendance[]
-  StudentFee              StudentFee[]
-  Leave                   Leave[]
-  emailCampaignDetails    EmailCampaignDetails[]
-  tbl_attendence_queue    tbl_attendance_queue[]
+  EmployeeAttendance   EmployeeAttendance[]
+  StudentFee           StudentFee[]
+  Leave                Leave[]
+  tbl_attendence_queue tbl_attendance_queue[]
   // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
-  approved_user           Leave[]                   @relation("approved_by")
-  tbl_sms_campaign_queued tbl_sms_campaign_queued[]
+  approved_user        Leave[]                @relation("approved_by")
 
   @@map("users")
 }
 
 model School {
-  id       Int     @id @default(autoincrement())
-  name     String
-  address  String
-  phone    String
-  email    String
-  domain   String? @unique
-  /// school should not be created without an existing user
+  id                    Int     @id @default(autoincrement())
+  name                  String
+  address               String
+  phone                 String
+  email                 String
+  domain                String? @unique
+  currency              String?
+  main_balance          Float?
+  masking_sms_count     Int? //no_of_sms_available
+  non_masking_sms_count Int? //no_of_sms_available
+  masking_sms_price     Float?
+  non_masking_sms_price Float?
+  // school should not be created without an existing user
   // admin_id Int     @unique
-  currency String?
+  // sms_balance           Int? //no_of_sms
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
-  admins                             User[]                               @relation("AdminUserSchool")
-  teachers                           Teacher[]
-  classes                            Class[]
-  student_list                       StudentInformation[]
-  rooms                              Room[]
-  periods                            Period[]
-  fees                               Fee[]
-  exams                              Exam[]
-  holidays                           Holiday[]
-  academic_years                     AcademicYear[]
-  attendances                        Attendance[]
-  subscription                       Subscription[]
-  websiteui                          WebsiteUi[]
-  RequestPackage                     RequestPackage[]
-  SmsGateway                         SmsGateway[]
-  SmsTemplate                        SmsTemplate[]
-  smsCampaign                        SmsCampaigns[]
-  CertificateTemplate                CertificateTemplate[]
-  Transaction                        Transaction[]
-  GradingSystem                      GradingSystem[]
-  Notice                             Notice[]
-  EmailTemplate                      EmailTemplate[]
-  emailCampaignDetails               EmailCampaignDetails[]
-  OnlineAdmission                    OnlineAdmission[]
-  tbl_attendence_queue               tbl_attendance_queue[]
-  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
-  Accounts                           Accounts[]
-  Voucher                            Voucher[]
-  Department                         Department[]
-  TeacherRecruitment                 TeacherRecruitment[]
-  EmailCampaigns                     EmailCampaigns[]
-  tbl_sms_campaign_queued            tbl_sms_campaign_queued[]
-  SmsCampaignDetails                 SmsCampaignDetails[]
+  admins                     User[]                       @relation("AdminUserSchool")
+  teachers                   Teacher[]
+  classes                    Class[]
+  student_list               StudentInformation[]
+  rooms                      Room[]
+  periods                    Period[]
+  fees                       Fee[]
+  exams                      Exam[]
+  holidays                   Holiday[]
+  academic_years             AcademicYear[]
+  attendances                Attendance[]
+  subscription               Subscription[]
+  websiteui                  WebsiteUi[]
+  RequestPackage             RequestPackage[]
+  SmsGateway                 SmsGateway[]
+  SmsTemplate                SmsTemplate[]
+  smsCampaign                SmsCampaigns[]
+  CertificateTemplate        CertificateTemplate[]
+  Transaction                Transaction[]
+  GradingSystem              GradingSystem[]
+  Notice                     Notice[]
+  EmailTemplate              EmailTemplate[]
+  OnlineAdmission            OnlineAdmission[]
+  tbl_attendence_queue       tbl_attendance_queue[]
+  Accounts                   Accounts[]
+  Voucher                    Voucher[]
+  Department                 Department[]
+  TeacherRecruitment         TeacherRecruitment[]
+  EmailCampaigns             EmailCampaigns[]
+  tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
+  RequestBuySms              RequestBuySms[]
 
   // routines Routine[]
   @@map("schools")
@@ -161,12 +162,12 @@ model Class {
   has_section Boolean @default(false)
   school_id   Int
 
-  sections                           Section[]
-  subjects                           Subject[]
-  school                             School                               @relation(fields: [school_id], references: [id])
-  fees                               Fee[]
-  Group                              Group[]
-  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
+  sections                   Section[]
+  subjects                   Subject[]
+  school                     School                       @relation(fields: [school_id], references: [id])
+  fees                       Fee[]
+  Group                      Group[]
+  tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
 
   @@map("classes")
 }
@@ -180,15 +181,15 @@ model Section {
   std_entry_time   DateTime? @db.Time()
   std_exit_time    DateTime? @db.Time()
 
-  class                              Class                                @relation(fields: [class_id], references: [id])
-  class_teacher                      Teacher?                             @relation("class_teacher", fields: [class_teacher_id], references: [id])
-  students                           Student[]
-  teachers                           Teacher[]                            @relation("SectionToTeacher")
-  periods                            Period[]
-  attendaces                         Attendance[]
-  exams                              Exam[]
-  groups                             Group[]
-  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
+  class                      Class                        @relation(fields: [class_id], references: [id])
+  class_teacher              Teacher?                     @relation("class_teacher", fields: [class_teacher_id], references: [id])
+  students                   Student[]
+  teachers                   Teacher[]                    @relation("SectionToTeacher")
+  periods                    Period[]
+  attendaces                 Attendance[]
+  exams                      Exam[]
+  groups                     Group[]
+  tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
 
   @@map("sections")
 }
@@ -437,11 +438,11 @@ model AcademicYear {
 
   school School @relation(fields: [school_id], references: [id])
 
-  exams                              Exam[]
-  students                           Student[]
-  fees                               Fee[]
-  GradingSystem                      GradingSystem[]
-  tbl_manual_student_attendace_queue tbl_manual_student_attendace_queue[]
+  exams                      Exam[]
+  students                   Student[]
+  fees                       Fee[]
+  GradingSystem              GradingSystem[]
+  tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
 
   @@map("academic_years")
 }
@@ -491,7 +492,7 @@ model Attendance {
   class_name       String?
   section_name     String?
   class_roll_no    String?
-  date             DateTime         @db.Date()
+  date             DateTime
   status           AttendenceStatus
   remark           String?
   section_id       Int
@@ -518,7 +519,7 @@ enum AttendenceStatus {
 
 model EmployeeAttendance {
   id        Int                      @id @default(autoincrement())
-  date      DateTime                 @db.Date()
+  date      DateTime                 @db.Date
   status    EmployeeAttendenceStatus
   remark    String?
   school_id Int
@@ -675,10 +676,10 @@ model SmsCampaigns {
   custom_body     String?
   created_at      DateTime       @default(now())
 
-  school             School               @relation(fields: [school_id], references: [id])
-  smsTemplate        SmsTemplate?         @relation(fields: [sms_template_id], references: [id])
-  smsGateway         SmsGateway           @relation(fields: [sms_gateway_id], references: [id])
-  smsCampaignDetails SmsCampaignDetails[]
+  school      School       @relation(fields: [school_id], references: [id])
+  smsTemplate SmsTemplate? @relation(fields: [sms_template_id], references: [id])
+  smsGateway  SmsGateway   @relation(fields: [sms_gateway_id], references: [id])
+  // smsCampaignDetails SmsCampaignDetails[]
 
   @@map("sms_campaings")
 }
@@ -689,26 +690,26 @@ enum RecipientType {
   individual
 }
 
-model SmsCampaignDetails {
-  id            Int        @id @default(autoincrement())
-  name          String
-  campaign_name String
-  body          String
-  phone         String
-  status        SentStatus @default(pending)
-  api_key       String
-  sender_id     String
-  user_id       Int
-  school_id     Int
-  campaign_id   Int
-  created_at    DateTime   @default(now())
+// model SmsCampaignDetails {
+//   id            Int        @id @default(autoincrement())
+//   name          String
+//   campaign_name String
+//   body          String
+//   phone         String
+//   status        SentStatus @default(pending)
+//   api_key       String
+//   sender_id     String
+//   user_id       Int
+//   school_id     Int
+//   campaign_id   Int
+//   created_at    DateTime   @default(now())
 
-  school      School       @relation(fields: [school_id], references: [id])
-  smsCampaign SmsCampaigns @relation(fields: [campaign_id], references: [id])
-  user        User         @relation(fields: [user_id], references: [id])
+//   school      School       @relation(fields: [school_id], references: [id])
+//   smsCampaign SmsCampaigns @relation(fields: [campaign_id], references: [id])
+//   user        User         @relation(fields: [user_id], references: [id])
 
-  @@map("sms_campaign_details")
-}
+//   @@map("sms_campaign_details")
+// }
 
 enum SentStatus {
   pending
@@ -740,29 +741,28 @@ model EmailCampaigns {
   custom_body       String?
   created_at        DateTime       @default(now())
 
-  school               School                 @relation(fields: [school_id], references: [id])
-  emailTemplate        EmailTemplate?         @relation(fields: [email_template_id], references: [id])
-  emailCampaignDetails EmailCampaignDetails[]
+  school        School         @relation(fields: [school_id], references: [id])
+  emailTemplate EmailTemplate? @relation(fields: [email_template_id], references: [id])
 
   @@map("email_campaigns")
 }
 
-model EmailCampaignDetails {
-  id          Int        @id @default(autoincrement())
-  campaign_id Int
-  name        String
-  phone       String
-  user_id     Int
-  status      SentStatus
-  created_at  DateTime   @default(now())
+// model EmailCampaignDetails {
+//   id          Int        @id @default(autoincrement())
+//   campaign_id Int
+//   name        String
+//   phone       String
+//   user_id     Int
+//   status      SentStatus
+//   created_at  DateTime   @default(now())
 
-  emailCampaign EmailCampaigns @relation(fields: [campaign_id], references: [id])
-  user          User           @relation(fields: [user_id], references: [id])
-  School        School?        @relation(fields: [schoolId], references: [id])
-  schoolId      Int?
+//   emailCampaign EmailCampaigns @relation(fields: [campaign_id], references: [id])
+//   user          User           @relation(fields: [user_id], references: [id])
+//   School        School?        @relation(fields: [schoolId], references: [id])
+//   schoolId      Int?
 
-  @@map("email_campaign_details")
-}
+//   @@map("email_campaign_details")
+// }
 
 model CertificateTemplate {
   id               Int         @id @default(autoincrement())
@@ -980,25 +980,25 @@ enum DiscountType {
 //   user User @relation(fields: [user_id], references: [id])
 // }
 
-model tbl_sms_campaign_queued {
-  id            Int      @id @default(autoincrement())
-  name          String
-  campaign_name String
-  body          String
-  phone         String
-  sender_id     String
-  api_key       String
-  user_id       Int
-  school_id     Int
-  created_at    DateTime @default(now())
+// model tbl_sms_queued {
+//   id            Int      @id @default(autoincrement())
+//   name          String
+//   campaign_name String
+//   body          String
+//   phone         String
+//   sender_id     String
+//   api_key       String
+//   user_id       Int
+//   school_id     Int
+//   created_at    DateTime @default(now())
 
-  school School @relation(fields: [school_id], references: [id])
-  user   User   @relation(fields: [user_id], references: [id])
+//   school School @relation(fields: [school_id], references: [id])
+//   user   User   @relation(fields: [user_id], references: [id])
 
-  @@map("tbl_sms_campaign_queued")
-}
+//   @@map("tbl_sms_queued")
+// }
 
-model tbl_manual_student_attendace_queue {
+model tbl_student_sent_sms_queue {
   id               Int      @id @default(autoincrement())
   class_id         Int
   section_id       Int?
@@ -1011,7 +1011,7 @@ model tbl_manual_student_attendace_queue {
   school       School       @relation(fields: [school_id], references: [id])
   academicYear AcademicYear @relation(fields: [academic_year_id], references: [id])
 
-  @@map("tbl_manual_student_attendace_queue")
+  @@map("tbl_student_sent_sms_queue")
 }
 
 model tbl_attendance_queue {
@@ -1031,91 +1031,78 @@ model tbl_attendance_queue {
 model tbl_queued_sms {
   id                  Int       @id @default(autoincrement())
   sms_shoot_id        String // school_id-user_id-dateTime
+  school_id           Int
+  school_name         String
   user_id             Int
-  //campaign_id           Int?
   user_name           String?
-  sms_type            String
-  sms_text            String    @db.Text
-  //route_id              Int
-  //route_name            String?
-  //sender_id             Int
+  sender_id           String
   sender_name         String?
-  //coverage_id           Int
-  //coverage_network_name String?
-  submission_time     DateTime?
   contacts            String    @db.LongText
   pushed_via          String
-  //charges_per_sms       Float     @default(0)
+  charges_per_sms     Float     @default(0)
   number_of_sms_parts Int       @default(1)
   total_count         Int
-  //is_dlr_requested      Int       @default(0)
+  sms_type            String
+  sms_text            String    @db.Text
+  submission_time     DateTime?
   status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
   sms_gateway_status  String?
+  // fail_count          Int       @default(0)
+  // priority            Int       @default(5) // 1-> highest
+  //campaign_id           Int?
+  //route_id              Int
+  //route_name            String?
+  //coverage_id           Int
+  //coverage_network_name String?
+  //is_dlr_requested      Int       @default(0)
   //is_black_list         Int       @default(0)
-  fail_count          Int       @default(0)
-  priority            Int       @default(5) // 1-> highest
 
   @@unique([id, status])
   @@map("tbl_queued_sms")
 }
 
-model tbl_sms_history {
+model tbl_sent_sms {
   id                  Int       @id @default(autoincrement())
   sms_shoot_id        String // school_id-user_id-dateTime
+  school_id           Int
+  school_name         String
   user_id             Int
-  //campaign_id           Int?
   user_name           String?
-  sms_type            String
-  sms_text            String    @db.Text
-  //route_id              Int
-  //route_name            String?
-  //sender_id             Int
+  sender_id           String
   sender_name         String?
-  //coverage_id           Int
-  //coverage_network_name String?
-  submission_time     DateTime?
   contacts            String    @db.LongText
   pushed_via          String
-  //charges_per_sms       Float     @default(0)
+  charges_per_sms     Float     @default(0)
   number_of_sms_parts Int       @default(1)
   total_count         Int
-  //is_dlr_requested      Int       @default(0)
+  sms_type            String
+  sms_text            String    @db.Text
+  submission_time     DateTime?
   status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
   sms_gateway_status  String?
+  // fail_count          Int       @default(0)
+  // priority            Int       @default(5) // 1-> highest
+  //campaign_id           Int?
+  //route_id              Int
+  //route_name            String?
+  //coverage_id           Int
+  //coverage_network_name String?
+  //is_dlr_requested      Int       @default(0)
   //is_black_list         Int       @default(0)
-  fail_count          Int       @default(0)
-  priority            Int       @default(5) // 1-> highest
 
-  // id                    Int @id @default(autoincrement())
-  // sms_shoot_id String 
-  // user_id  
-  // user_name
-  // sms_type
-  // sms_text 
-  // sent_via //
-  // route_id 
-  // route_name
-  // sender_id
-  // sender_name
-  // coverage_id
-  // coverage_network_name
-  // submission_time
-  // sending_time
-  // last_reply_time
-  // msisdn 
-  // is_dlr_requested
-  // dlr
-  // dlr_received 
-  // vendor_sms_id
-  // vendor_dlr
-  // sms_status
-  // sms_status_str
-  // sms_gateway_status
-  // is_black_list
-  // number_of_sms_parts
-  // charges_per_sms
-  // retry_count
-  // next_retry_time
+  @@unique([id, status])
+  @@map("tbl_sent_sms")
+}
 
-  @@map("tbl_sms_history")
+model RequestBuySms {
+  id                Int                  @id @default(autoincrement())
+  masking_count     Int?
+  non_masking_count Int?
+  document_photo    String
+  school_id         Int
+  status            RequestPakcageStatus
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("requests_buy_sms")
 }

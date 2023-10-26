@@ -146,8 +146,8 @@ const SMSSettings = () => {
                         width: '100%',
                         justifyContent: 'center',
                         borderTop: '1px solid lightgray',
-                        px:3,
-                        pt:3
+                        px: 3,
+                        pt: 3
                       }}>
                         <ButtonWrapper
                           handleClick={undefined}
@@ -166,11 +166,12 @@ const SMSSettings = () => {
                   </Card >
                 </form>
               </Grid>
-              <Footer />
             </>
           );
         }}
       </Formik >
+
+      <Footer />
 
     </>
   );

@@ -4,8 +4,8 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Button, ButtonGroup, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
-import SmsPage from '@/content/BulkSmsAndEmail/SendEmailOrSms/SmsPage';
-import EmailPage from '@/content/BulkSmsAndEmail/SendEmailOrSms/EmailPage';
+import SmsPage from '@/content/BulkSmsAndEmail/SendSms/SmsPage';
+import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadSentSms';
 import { useState } from 'react';
 
 const Packages = () => {
@@ -13,7 +13,7 @@ const Packages = () => {
   return (
     <>
       <Head>
-        <title>Send Sms or Email</title>
+        <title>Send Sms</title>
       </Head>
       <PageBodyWrapper>
         <Grid
@@ -30,14 +30,14 @@ const Packages = () => {
               sx={{ borderRadius: 0.5, mt: 1 }}
             >
               <Button onClick={() => { setType("SMS") }} variant={type === "SMS" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> SENT SMS</Button>
-              <Button onClick={() => { setType("EMAIL") }} variant={type === "EMAIL" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> SENT EMAIL</Button>
+              <Button onClick={() => { setType("UPLOAD_FILE") }} variant={type === "UPLOAD_FILE" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> UPLOAD FILE</Button>
             </ButtonGroup>
           </Grid>
 
           {type === "SMS" ?
             <SmsPage />
             :
-            <EmailPage />
+            <FileUploadSentSmsPage />
           }
         </Grid>
 

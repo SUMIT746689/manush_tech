@@ -490,12 +490,17 @@ export const menuItems: MenuItems[] = [
         ]
       },
       {
-        name: 'Bulk Sms And Email',
+        name: 'Send Sms / Email',
         icon: NotificationsActiveIcon,
         items: [
           {
-            name: 'Send SMS / EMAIL',
-            link: '/bulk_sms_and_email/send_sms_or_email',
+            name: 'Send SMS ',
+            link: '/bulk_sms_and_email/send_sms',
+            icon: SendIcon
+          },
+          {
+            name: 'Send EMAIL',
+            link: '/bulk_sms_and_email/send_email',
             icon: SendIcon
           },
           {
@@ -522,6 +527,11 @@ export const menuItems: MenuItems[] = [
           {
             name: 'Package Request',
             link: '/settings/package_request',
+            icon: RequestQuoteIcon
+          },
+          {
+            name: 'Sms Request',
+            link: '/settings/sms_request',
             icon: RequestQuoteIcon
           },
           {

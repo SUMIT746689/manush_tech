@@ -3,7 +3,7 @@ import prisma from "./prisma_client.js";
 import { isUserAttend } from "./verifyUserAttend.js";
 
 
-export const studentAttendence = async ({ std_entry_time, class_id, student, last_time, school_id, section_id, index }) => {
+export const studentAttendence = async ({ std_entry_time, class_id, student, last_time, school_id, school_name, sender_id, section_id, index }) => {
 
   // console.log({ std_entry_time, last_time });
   const std_min_attend_date_wise = new Date(last_time);
@@ -26,7 +26,7 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
 
   try {
     const { id, guardian_phone, class_roll_no } = student;
-    const { student_info: { user_id } = {} } = student;
+    const { student_info: { user_id, gender } = {} } = student;
 
 
     // searching have any one attendance record selected date wise
@@ -82,11 +82,10 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
     // store user data to sent sms queue table 
     if (!guardian_phone) return;
 
-    const smsQueueHandlerParameters = { user_id, contacts: guardian_phone, submission_time: last_time, school_id, index };
-    smsQueueHandlerParameters["sms_text"] = `class: ${class_id}, roll: ${class_roll_no} is ${isAttend ? "present" : "late"} today `;
-
-    createSmsQueueTableHandler(smsQueueHandlerParameters)
-
+    const smsQueueHandlerParameters = { user_id, contacts: guardian_phone, submission_time: last_time, school_id, school_name, sender_id, index };
+    smsQueueHandlerParameters["sms_text"] = `Dear Parents, Your ${gender === "male" ? "son" : "daughter"}, Class-${class_id}, Sec-${section_id}, Roll-${class_roll_no} is absent ${new Date(last_time).toLocaleDateString('en-US')} in class. Principal, ${school_name}`;
+    
+    createSmsQueueTableHandler(smsQueueHandlerParameters);
   }
   catch (error) {
     console.log({ "attendance error": error })

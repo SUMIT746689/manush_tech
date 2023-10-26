@@ -291,8 +291,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
-    else if (item.name === 'Bulk Sms And Email') {
-      if (permissions.findIndex(i => i.group == 'bulk_sms_&_email') > -1) ev.push(
+    else if (item.name === 'Send Sms / Email') {
+      if (permissions.findIndex(i => i.group === 'bulk_sms_&_email') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}

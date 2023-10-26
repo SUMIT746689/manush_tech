@@ -7,7 +7,8 @@ import {
   ReactElement,
   Ref,
   forwardRef,
-  useEffect
+  useEffect,
+  useContext
 } from 'react';
 
 import PropTypes from 'prop-types';
@@ -61,6 +62,7 @@ import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import ApprovalIcon from '@mui/icons-material/Approval';
 import { useAuth } from '@/hooks/useAuth';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -168,7 +170,7 @@ const Results = ({ users, reFetchData }) => {
 
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
-
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [query, setQuery] = useState<string>('');
@@ -232,7 +234,7 @@ const Results = ({ users, reFetchData }) => {
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
-
+      _values['academic_year_id'] = academicYear?.id
       const res = await axios.patch(`/api/leave/${selectedUser.id}`, _values)
       showNotification(res.data.message)
       resetForm();

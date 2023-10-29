@@ -132,7 +132,7 @@ function PageHeader({ packages }) {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t('Request for Package')}
+            {t('Request for Buy Sms')}
           </Typography>
           <Typography variant="subtitle2">
             {t('Fill in the fields below to request for add a package')}

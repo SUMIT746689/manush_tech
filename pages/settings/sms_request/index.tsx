@@ -5,7 +5,7 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Grid } from '@mui/material';
 import Head from 'next/head';
 import Request from '@/content/SmsRequest/Request';
-import ActivePackage from '@/content/SmsRequest/ActivePackage';
+import ActiveSms from '@/content/SmsRequest/AvailableSms';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 
 const Packages = () => {
@@ -23,7 +23,7 @@ const Packages = () => {
           px={1}
         >
           <Grid sx={{ maxWidth: 500, pt: 4 }}>
-            <ActivePackage />
+            <ActiveSms />
           </Grid>
 
           <Grid sx={{ maxWidth: 500, pt: 4 }}>

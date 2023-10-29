@@ -446,6 +446,11 @@ export const menuItems: MenuItems[] = [
         link: '/pending_packages',
       },
       {
+        name: 'Pending Buy Sms',
+        icon: ShoppingBagIcon,
+        link: '/pending_sms_requests',
+      },
+      {
         name: 'Front End',
         icon: CameraFrontIcon,
         link: '/front_end',

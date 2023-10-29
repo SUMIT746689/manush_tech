@@ -47,8 +47,8 @@ model School {
   domain                String? @unique
   currency              String?
   main_balance          Float?
-  masking_sms_count     Int? //no_of_sms_available
-  non_masking_sms_count Int? //no_of_sms_available
+  masking_sms_count     Int @default(0) //no_of_sms_available
+  non_masking_sms_count Int @default(0) //no_of_sms_available
   masking_sms_price     Float?
   non_masking_sms_price Float?
   // school should not be created without an existing user
@@ -88,6 +88,7 @@ model School {
   EmailCampaigns             EmailCampaigns[]
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   RequestBuySms              RequestBuySms[]
+  SmsTransaction             SmsTransaction[]
 
   // routines Routine[]
   @@map("schools")
@@ -1105,4 +1106,17 @@ model RequestBuySms {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("requests_buy_sms")
+}
+
+model SmsTransaction {
+  id                     Int  @id @default(autoincrement())
+  masking_count          Int?
+  non_masking_count      Int?
+  prev_masking_count     Int
+  prev_non_masking_count Int
+  school_id              Int
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("sms_transactions")
 }

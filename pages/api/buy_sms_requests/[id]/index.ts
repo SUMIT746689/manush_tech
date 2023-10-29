@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types';
-import patch from 'controllers/buy_sms_requests/patch';
+import patch from 'controllers/buy_sms_requests/buy_sms_request/patch';
 
 const index = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;

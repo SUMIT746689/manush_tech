@@ -4,6 +4,7 @@ import { authenticate } from 'middleware/authenticate';
 const get = async (req: any, res: any, authenticate_user) => {
   try {
     const response = await prisma.requestBuySms.findMany({
+      where: { status: "pending" },
       include: { school: true }
     });
 

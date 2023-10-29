@@ -1,41 +1,10 @@
-import {
-  FC,
-  ChangeEvent,
-  MouseEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef
-} from 'react';
+import { FC, ChangeEvent, MouseEvent, useState, ReactElement, Ref, forwardRef, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  Zoom,
-  lighten,
-  styled,
-  Box,
-  Table
+  Avatar, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, MenuItem,
+  TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField,
+  Button, Typography, Dialog, Zoom, lighten, styled, Box, Table
 } from '@mui/material';
-
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
@@ -150,7 +119,7 @@ const applyPagination = (
   return sessions.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
+const Results: FC<ResultsProps> = ({ sessions, reFetchData }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -161,6 +130,13 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("jjjj....")
+  //   if (acptActionButtonRef.current) acptActionButtonRef.current.disabled = false;
+  //   if (dclActionButtonRef.current) dclActionButtonRef.current.disabled = false;
+  // }, [sessions])
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -212,25 +188,36 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/packages/${deleteSchoolId}`);
-  
+
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification ('The package has been deleted successfully');
+      showNotification('The package has been deleted successfully');
 
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification ('The fees falied to delete ','error');
+      showNotification('The fees falied to delete ', 'error');
     }
   };
 
   const handleAccept = async (value, status: string) => {
-    const { package_id, school_id, id } = value;
-    
-    const result = await axios.patch(`/api/buy_sms_requests/${id}?status=${status}`);
-    if (result.data.success) {
-      reFetchData();
+    const { id } = value;
+    if (!id) {
+      return;
     }
-
+    setIsLoading(true);
+    axios.patch(`/api/buy_sms_requests/${id}?status=${status}`)
+      .then((result) => {
+        if (result.data.success) {
+          reFetchData();
+          showNotification('request successfull ');
+        };
+      })
+      .catch((error) => {
+        showNotification('request failed ', 'error');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
@@ -329,7 +316,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                     <TableCell>{t('School')}</TableCell>
                     <TableCell>{t('Masking Count')}</TableCell>
                     <TableCell>{t('Non Masking Count')}</TableCell>
-                    
+
                     <TableCell>{t('Status')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
@@ -387,6 +374,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                           <Typography noWrap>
                             <Tooltip title={t('Approved')} arrow>
                               <IconButton
+                                disabled={isLoading}
                                 onClick={() => handleAccept(singlePackage, "approved")}
                                 color="primary"
                               >
@@ -395,6 +383,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                             </Tooltip>
                             <Tooltip title={t('Declined')} arrow>
                               <IconButton
+                                disabled={isLoading}
                                 onClick={() => handleAccept(singlePackage, "declined")}
                                 color="primary"
                               >

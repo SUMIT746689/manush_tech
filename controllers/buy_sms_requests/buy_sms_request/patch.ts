@@ -26,22 +26,31 @@ const patch = async (req: any, res: any, refresh_token) => {
       });
       return res.status(201).json({ success: `update status = ${status} successfully` })
     }
-
-    await prisma.$transaction([
-      prisma.requestBuySms.update({
+    await prisma.$transaction(async (tx) => {
+      await tx.requestBuySms.update({
         where: { id: parseInt(id) },
         data: {
           status
         }
-      }),
-      prisma.school.update({
-        where: { id: resBuySms.school_id },
-        data: {
-          masking_sms_count: { increment: resBuySms.masking_count || 0 },
-          non_masking_sms_count: { increment: resBuySms.non_masking_count || 0 }
-        }
       })
-    ])
+      const resSchool = await tx.school.update({
+          where: { id: resBuySms.school_id },
+          data: {
+            masking_sms_count: { increment: resBuySms.masking_count || 0 },
+            non_masking_sms_count: { increment: resBuySms.non_masking_count || 0 },
+          }
+        })
+        if(!resSchool) throw new Error("failed to find school")
+        await tx.smsTransaction.create({
+          data: {
+            masking_count: resSchool.masking_sms_count + (resBuySms.masking_count || 0),
+            non_masking_count: resSchool.non_masking_sms_count + (resBuySms.non_masking_count || 0),
+            prev_masking_count: resSchool.masking_sms_count,
+            prev_non_masking_count: resSchool.non_masking_sms_count,
+            school_id: resBuySms.school_id
+          }
+        })
+    })
     res.status(201).json({ success: 'created successfully' });
   } catch (err) {
     console.log(err.message);

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types';
 import get from 'controllers/buy_sms_requests/get';
 import post from 'controllers/buy_sms_requests/post';
-import patch from 'controllers/buy_sms_requests/patch';
+import patch from 'controllers/buy_sms_requests/buy_sms_request/patch';
 
 export const config = {
   api: {

@@ -226,7 +226,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const handleAccept = async (value, status: string) => {
     const { package_id, school_id, id } = value;
     
-    const result = await axios.patch(`/api/buy_sms_requests/${id}`, { id, package_id, school_id, status, });
+    const result = await axios.patch(`/api/buy_sms_requests/${id}?status=${status}`);
     if (result.data.success) {
       reFetchData();
     }

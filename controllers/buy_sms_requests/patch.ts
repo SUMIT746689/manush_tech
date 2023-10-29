@@ -1,52 +1,48 @@
 import { authenticate } from 'middleware/authenticate';
-import path from 'path';
-import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
-import { verifyNumber } from 'utilities_api/isNumber';
+import { verifyUser } from 'utilities_api/verify';
 
 
-const post = async (req: any, res: any, refresh_token) => {
+const patch = async (req: any, res: any, refresh_token) => {
   try {
 
     // if (!refresh_token.school_id) throw new Error('permission denied');
-    const findUser = {
+    const { user_id } = refresh_token;
+    const isEligibleUser = await verifyUser(user_id, ['SUPER_ADMIN']);
+    if (!isEligibleUser) throw new Error('permission denied');
 
+    const { id, status } = req.query;
+
+    const resBuySms = await prisma.requestBuySms.findFirst({
+      where: { id: parseInt(id) }
+    });
+
+    if (status !== "approved") {
+      await prisma.requestBuySms.update({
+        where: { id: parseInt(id) },
+        data: {
+          status
+        }
+      });
+      return res.status(201).json({ success: `update status = ${status} successfully` })
     }
-    console.log({params: req.query})
-    console.log({params: req.params})
-    // const uploadFolderName = "sms_requests";
 
-    // const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-    // const filterFiles = {
-    //   photo: fileType,
-    // }
-
-    // const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
-
-    // if (error) throw new Error(error);
-
-    // const { document_photo } = files;
-    // const { masking_count, non_masking_count } = fields;
-
-    // // if (!document_photo) return res.status(404).json({ message: 'file missing !!' });
-    // if (!masking_count && !non_masking_count)
-    //   return res.status(404).json({ message: 'field value missing !!' });
-    
-
-    // const upload_path = path.join(uploadFolderName, document_photo?.newFilename);
-    // const response = await prisma.requestBuySms.create({
-    //   data: {
-    //     school_id: verifyNumber(refresh_token.school_id),
-    //     masking_count: verifyNumber(masking_count),
-    //     non_masking_count: verifyNumber(non_masking_count),
-    //     document_photo: upload_path,
-    //     status: 'pending'
-    //   }
-    // });
-
-    // if (!response) throw new Error('failed to create');
+    await prisma.$transaction([
+      prisma.requestBuySms.update({
+        where: { id: parseInt(id) },
+        data: {
+          status
+        }
+      }),
+      prisma.school.update({
+        where: { id: resBuySms.school_id },
+        data: {
+          masking_sms_count: { increment: resBuySms.masking_count || 0 },
+          non_masking_sms_count: { increment: resBuySms.non_masking_count || 0 }
+        }
+      })
+    ])
     res.status(201).json({ success: 'created successfully' });
-    // });
   } catch (err) {
     console.log(err.message);
     res.status(404).json({ err: err.message });
@@ -54,6 +50,4 @@ const post = async (req: any, res: any, refresh_token) => {
 };
 
 
-
-
-export default authenticate(post);
+export default authenticate(patch);

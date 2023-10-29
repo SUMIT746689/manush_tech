@@ -2,7 +2,7 @@ import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
-import { verifyNumber } from 'utilities_api/isNumber';
+import { verifyNumber } from 'utilities_api/verify';
 
 export const config = {
   api: {

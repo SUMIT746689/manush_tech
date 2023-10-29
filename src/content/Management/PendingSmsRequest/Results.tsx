@@ -327,10 +327,9 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                       />
                     </TableCell>
                     <TableCell>{t('School')}</TableCell>
-                    <TableCell>{t('Package')}</TableCell>
-                    <TableCell>{t('Price')}</TableCell>
-                    <TableCell>{t('Duration')}</TableCell>
-                    <TableCell>{t('Maximum Student')}</TableCell>
+                    <TableCell>{t('Masking Count')}</TableCell>
+                    <TableCell>{t('Non Masking Count')}</TableCell>
+                    
                     <TableCell>{t('Status')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
@@ -360,24 +359,15 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {singlePackage.package?.title}
+                            {singlePackage.masking_count}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {singlePackage.package?.price}
+                            {singlePackage.non_masking_count}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singlePackage.package?.duration} - Days
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singlePackage.package?.student_count}
-                          </Typography>
-                        </TableCell>
+
                         <TableCell>
                           <Typography
                             noWrap

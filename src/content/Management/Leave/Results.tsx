@@ -136,7 +136,7 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['name', 'user.role.title','user.username','Leave_type'];
+      const properties = ['name', 'user.role.title', 'user.username', 'Leave_type'];
       let containsQuery = false;
       for (const property of properties) {
 
@@ -468,7 +468,28 @@ const Results = ({ users, reFetchData }) => {
         </Grid>
       </Card>
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-
+        <Box
+          p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedClasses.length}</b> <b>{t('Leave')}</b>
+          </Box>
+          <TablePagination
+            component="div"
+            count={filteredClasses.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
         {paginatedClasses.length === 0 ? (
           <>
             <Typography
@@ -487,28 +508,7 @@ const Results = ({ users, reFetchData }) => {
         ) : (
           <>
 
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Box>
-                <Typography component="span" variant="subtitle1">
-                  {t('Showing')}:
-                </Typography>{' '}
-                <b>{paginatedClasses.length}</b> <b>{t('Leave')}</b>
-              </Box>
-              <TablePagination
-                component="div"
-                count={filteredClasses.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
+
 
             {
               // @ts-ignore

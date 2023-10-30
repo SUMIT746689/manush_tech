@@ -98,12 +98,12 @@ const index = async (req, res, refresh_token) => {
                 })
 
                 const highestMark = await prisma.studentResultDetails.groupBy({
+                    by: ['exam_details_id'],
                     where: {
                         result: {
                             exam_id: parseInt(req.query.exam_id)
                         }
                     },
-                    by: 'exam_details_id',
                     _max: {
                         mark_obtained: true,
                     },

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { DisableTextWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
@@ -92,15 +92,15 @@ const TypeGroup = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  console.log({roles})
+  console.log({ roles })
   useEffect(() => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
-    return ()=> setFieldValue("role_id", [])
+    return () => setFieldValue("role_id", [])
   }, [roles])
 
   const handleRoleSelect = (e) => {
-    console.log({e})
+    console.log({ e })
     // if (e.target.value <= 0) return;
     // const findSelectedTemplate = roles.find(data => data.id === e.target.value)
     // if (!findSelectedTemplate) return;
@@ -274,16 +274,63 @@ function PageHeader() {
                       required={true}
                     />
 
-                    <DynamicSelectTemplate />
+
+                    <FileUploadFieldWrapper
+                      htmlFor="files"
+                      label="File File"
+                      name="file_upload"
+                      value={values.logo?.name || ''}
+
+                      handleChangeFile={(e) => {
+                        console.log({ file___: e.target.files[0] });
+                        const input = e.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                          // console.log({e})
+                          // const text = JSON.parse(e.target.result);
+                          // const splitText = text.split(",")
+                          console.log({eeeeee____: e.target.result.toString().split(/\r?\n/) });
+                        };
+                        reader.readAsText(input);
+                        if (e.target?.files?.length) setFieldValue("file_upload", e.target.files[0])
+                      }}
+                      handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
+                    />
+                    {/* {editData?.logo_url */}
+                    {/* && */}
+                    {/* // <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}> */}
+                    {/* <Image src={editData?.logo_url} width={100} height={100} alt="logo" /> */}
+                    {/* <img src={`/api/get_file${editData?.logo_url}`} className=" h-fit w-20" alt='logo' /> */}
+                    {/* </Avatar> */}
+                    {/* } */}
+
+
+                    {/* <DynamicSelectTemplate /> */}
 
                     <TextAreaWrapper
+                      sx={{ pb: 0 }}
                       name="body"
                       value={values.body}
                       touched={touched.body}
                       errors={errors.body}
-                      handleChange={handleChange}
+                      handleChange={(v) => {
+                        if (v.target.value.length > 1000) return;
+                        handleChange(v)
+                      }
+                      }
                       handleBlur={handleBlur}
                     />
+                    <Grid sx={{ pb: 1, ml: 'auto' }}>
+                      {`
+                      ${values.body?.length ?? 0} characters | 
+                      ${1000 - (values.body?.length ?? 0)} characters left |
+                      ${!values.body?.length || values.body?.length === 0 ?
+                          0
+                          :
+                          values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
+                      `}
+                    </Grid>
+
                     <GateWaySelect />
 
                     <DynamicTypeSelect />
@@ -313,19 +360,6 @@ function PageHeader() {
                     {t(`${'Send Sms'}`)}
                   </Button>
                 </DialogActions>
-
-                {/* <DialogActions sx={{ p: 3, pt: 0, width: "100%", display: "flex", flexDirection: "column", justifyContent: "end" }}>
-                  <ButtonWrapper
-                    sx={{ maxWidth: 250 }}
-                    type="submit"
-                    handleClick={undefined}
-                    startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
-                    //@ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
-                  >
-                    {t(`${'Send Sms'}`)}
-                  </ButtonWrapper>
-                </DialogActions> */}
               </form>
             );
           }}

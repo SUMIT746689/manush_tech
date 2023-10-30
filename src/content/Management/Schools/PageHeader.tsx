@@ -111,6 +111,10 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
+            main_balance: editSchool?.main_balance ? editSchool?.main_balance : null,
+            sms_count: editSchool?.sms_count ? editSchool?.sms_count : null,
+            sms_masking_price: editSchool?.sms_masking_price ? editSchool?.sms_masking_price : null,
+            sms_non_masking_price: editSchool?.sms_non_masking_price ? editSchool?.sms_non_masking_price : null,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -208,6 +212,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                     width={'100%'}
                     justifyContent="flex-end"
                     textAlign={{ sm: 'right' }}
+                    mb={1}
                   >
 
                     {/* <AdminSelect
@@ -223,7 +228,9 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                   <Grid
                     item
                     width="100%"
-                    my={1}
+                    gap={1}
+                    display="grid"
+                    gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }}
                   >
                     <Autocomplete
                       size='small'
@@ -245,6 +252,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                       renderInput={(params) => (
                         <TextField
                           sx={{
+                            // maxHeight:100,
                             [`& fieldset`]: {
                               borderRadius: 0.6,
                             }
@@ -262,6 +270,17 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                         setFieldValue('currency', value?.code || 0)
                       }
                     />
+
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors.main_balance}
+                      touched={touched.main_balance}
+                      name="main_balance"
+                      label={t('Balance Amount ')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.main_balance}
+                    />
                   </Grid>
 
 
@@ -274,6 +293,43 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                     handleChange={handleChange}
                     value={values.domain}
                   />
+
+                  <Grid container display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} columnGap={1}>
+
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors.sms_masking_price}
+                      touched={touched.sms_masking_price}
+                      name="sms_masking_price"
+                      label={t('Masking Sms Price')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.sms_masking_price}
+                    />
+
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors.sms_non_masking_price}
+                      touched={touched.sms_non_masking_price}
+                      name="sms_non_masking_price"
+                      label={t('Non Masking Sms Price')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.sms_non_masking_price}
+                    />
+
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors.sms_count}
+                      touched={touched.sms_count}
+                      name="sms_count"
+                      label={t('No Of Sms Available')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.sms_count}
+                    />
+                  </Grid>
+
 
                 </Grid>
               </DialogContent>

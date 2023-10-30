@@ -1,41 +1,10 @@
-import {
-  FC,
-  ChangeEvent,
-  MouseEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef
-} from 'react';
+import { FC, ChangeEvent, MouseEvent, useState, ReactElement, Ref, forwardRef, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  Zoom,
-  lighten,
-  styled,
-  Box,
-  Table
+  Avatar, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, MenuItem,
+  TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField,
+  Button, Typography, Dialog, Zoom, lighten, styled, Box, Table
 } from '@mui/material';
-
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
@@ -150,7 +119,7 @@ const applyPagination = (
   return sessions.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
+const Results: FC<ResultsProps> = ({ sessions, reFetchData }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -162,6 +131,13 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
     status: null
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("jjjj....")
+  //   if (acptActionButtonRef.current) acptActionButtonRef.current.disabled = false;
+  //   if (dclActionButtonRef.current) dclActionButtonRef.current.disabled = false;
+  // }, [sessions])
+
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
     setQuery(event.target.value);
@@ -198,8 +174,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const filteredschools = applyFilters(sessions, query, filters);
   const paginatedPackages = applyPagination(filteredschools, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools =
-    selectedItems.length > 0 && selectedItems.length < sessions.length;
+  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions.length;
   const selectedAllschools = selectedItems.length === sessions.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -225,20 +200,24 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   };
 
   const handleAccept = async (value, status: string) => {
-    const { package_id, school_id, id } = value;
+    const { id } = value;
+    if (!id) {
+      return;
+    }
     setIsLoading(true);
-    axios.patch(`/api/subscriptions/package_request`, { id, package_id, school_id, status, })
+    axios.patch(`/api/buy_sms_requests/${id}?status=${status}`)
       .then((result) => {
         if (result.data.success) {
           reFetchData();
-          showNotification("request sucessfully completed")
-        }
-        else throw new Error("request failed");
+          showNotification('request successfull ');
+        };
       })
-      .catch((error) => { showNotification("request failed") })
+      .catch((error) => {
+        showNotification('request failed ', 'error');
+      })
       .finally(() => {
         setIsLoading(false);
-      })
+      });
   }
 
   return (
@@ -335,10 +314,9 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                       />
                     </TableCell>
                     <TableCell>{t('School')}</TableCell>
-                    <TableCell>{t('Package')}</TableCell>
-                    <TableCell>{t('Price')}</TableCell>
-                    <TableCell>{t('Duration')}</TableCell>
-                    <TableCell>{t('Maximum Student')}</TableCell>
+                    <TableCell>{t('Masking Count')}</TableCell>
+                    <TableCell>{t('Non Masking Count')}</TableCell>
+
                     <TableCell>{t('Status')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
@@ -368,24 +346,15 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {singlePackage.package?.title}
+                            {singlePackage.masking_count}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {singlePackage.package?.price}
+                            {singlePackage.non_masking_count}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singlePackage.package?.duration} - Days
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singlePackage.package?.student_count}
-                          </Typography>
-                        </TableCell>
+
                         <TableCell>
                           <Typography
                             noWrap

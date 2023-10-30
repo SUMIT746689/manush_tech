@@ -2,7 +2,7 @@ import { get } from 'controllers/student_payment_collects/get';
 import { post } from 'controllers/student_payment_collects/post';
 import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res,refresh_token) => {
+const index = async (req, res, refresh_token) => {
   try {
     const { method } = req;
 
@@ -11,7 +11,7 @@ const index = async (req, res,refresh_token) => {
         get(req, res);
         break;
       case 'POST':
-        post(req, res,refresh_token);
+        post(req, res, refresh_token);
         break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);
@@ -23,4 +23,4 @@ const index = async (req, res,refresh_token) => {
   }
 };
 
-export default authenticate(index) ;
+export default authenticate(index);

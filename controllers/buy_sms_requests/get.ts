@@ -3,9 +3,9 @@ import { authenticate } from 'middleware/authenticate';
 
 const get = async (req: any, res: any, authenticate_user) => {
   try {
-    const response = await prisma.requestPackage.findMany({
-      where:{status:"pending"},
-      include: { school: true, package: true }
+    const response = await prisma.requestBuySms.findMany({
+      where: { status: "pending" },
+      include: { school: true }
     });
 
     if (!response) throw new Error('failed to update');

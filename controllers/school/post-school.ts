@@ -13,7 +13,7 @@ const postSchool = async (req, res, authenticate_user) => {
     if (authenticate_user_Info.role.title !== 'SUPER_ADMIN')
       throw new Error('Your role have no permissions');
 
-    const { name, phone, email, address, admin_ids, currency,domain } = req.body;
+    const { name, phone, email, address, admin_ids, currency, domain, main_balance, sms_count, sms_masking_price, sms_non_masking_price } = req.body;
 
     if (!name || !phone || !email || !address) throw new Error('provide valid data');
     const admins = admin_ids.map((id) => ({ id }));
@@ -25,6 +25,10 @@ const postSchool = async (req, res, authenticate_user) => {
         address,
         currency,
         domain,
+        main_balance: main_balance ?? undefined,
+        sms_count: sms_count ?? undefined,
+        sms_masking_price: sms_masking_price ?? undefined,
+        sms_non_masking_price: sms_non_masking_price ?? undefined,
         admins: { connect: admins }
       }
     });

@@ -10,7 +10,7 @@ const index = async (req, res) => {
         break;
         
       default:
-        res.setHeader('Allow', ['GET', 'POST']);
+        res.setHeader('Allow', ['POST']);
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {

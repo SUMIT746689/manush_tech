@@ -246,7 +246,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Attendence') {
-      if (permissions.findIndex(i => i.group == 'attendence') > -1 || permissionVerify(permissions,['show_student_exam_attendence'])) ev.push(
+      if (permissions.findIndex(i => i.group == 'attendence') > -1 || permissionVerify(permissions, ['show_student_exam_attendence'])) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -266,11 +266,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
 
       );
-      
+
 
     }
     else if (item.name === 'Certificate') {
-      
+
       if (permissionVerify(permissions, ['create_certificate_template', 'show_student_certificate', 'show_teacher_certificate', 'show_employee_certificate'])) ev.push(
         <SidebarMenuItem
           key={key}
@@ -291,8 +291,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
-    else if (item.name === 'Bulk Sms And Email') {
-      if (permissions.findIndex(i => i.group == 'bulk_sms_&_email') > -1) ev.push(
+    else if (item.name === 'Send Sms / Email') {
+      if (permissions.findIndex(i => i.group === 'bulk_sms_&_email') > -1) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -313,26 +313,26 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Result') {
-      if (permissionVerify(permissions,['create_result','show_section_wise_result','show_student_wise_result','show_student_result'])) 
-      ev.push(
-        <SidebarMenuItem
-          key={key}
-          active={partialMatch}
-          open={partialMatch}
-          name={item.name}
-          icon={item.icon}
-          link={item.link}
-          badge={item.badge}
-          badgeTooltip={item.badgeTooltip}
-        >
-          {/* @ts-ignore */}
-          {renderSidebarMenuItems({
-            permissions,
-            path,
-            items: item.items
-          })}
-        </SidebarMenuItem>
-      );
+      if (permissionVerify(permissions, ['create_result', 'show_section_wise_result', 'show_student_wise_result', 'show_student_result']))
+        ev.push(
+          <SidebarMenuItem
+            key={key}
+            active={partialMatch}
+            open={partialMatch}
+            name={item.name}
+            icon={item.icon}
+            link={item.link}
+            badge={item.badge}
+            badgeTooltip={item.badgeTooltip}
+          >
+            {/* @ts-ignore */}
+            {renderSidebarMenuItems({
+              permissions,
+              path,
+              items: item.items
+            })}
+          </SidebarMenuItem>
+        );
     }
     else if (item.name === 'Reports') {
       if (permissions.findIndex(i => i.group == 'report') > -1) ev.push(
@@ -420,7 +420,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'Routine') {
-      if (permissionVerify(permissions, ['show_class_routine','show_exam_routine'])) ev.push(
+      if (permissionVerify(permissions, ['show_class_routine', 'show_exam_routine'])) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -500,13 +500,14 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Package' ||
       item.name === 'Front End' ||
       item.name === 'Pending Package' ||
+      item.name === 'Pending Buy Sms' ||
       item.name === 'Users' ||
-      
+
       item.name === 'Students Attendence' ||
       item.name === 'Exam Attendence' ||
       item.name === 'Employee Attendence' ||
       item.name === 'Student Exam Attendence' ||
-      
+
       item.name === 'Notice' ||
 
       item.name === 'Certificate Template' ||
@@ -553,6 +554,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
 
       //validate using permissions values
+      if (item.name === 'Pending Buy Sms' && permissionVerify(permissions, ['pending_buy_sms'])) sub_menu();
 
       // attendence
       if (item.name === 'Student Exam Attendence' && permissionVerify(permissions, [item.value])) sub_menu();
@@ -562,7 +564,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Exam Routine' && permissionVerify(permissions, ['show_exam_routine'])) sub_menu();
 
       //result section 
-      if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['create_result','show_section_wise_result'])) sub_menu();
+      if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['create_result', 'show_section_wise_result'])) sub_menu();
       if (item.name === 'Student Wise Result' && permissionVerify(permissions, ['show_student_wise_result'])) sub_menu();
       if (item.name === 'Student Result' && permissionVerify(permissions, ['show_student_result'])) sub_menu();
 

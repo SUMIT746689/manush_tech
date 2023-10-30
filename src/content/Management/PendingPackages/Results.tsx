@@ -161,7 +161,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
     setQuery(event.target.value);
@@ -213,24 +213,27 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/packages/${deleteSchoolId}`);
-  
+
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification ('The package has been deleted successfully');
+      showNotification('The package has been deleted successfully');
 
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification ('The fees falied to delete ','error');
+      showNotification('The fees falied to delete ', 'error');
     }
   };
 
   const handleAccept = async (value, status: string) => {
     const { package_id, school_id, id } = value;
-    
-    const result = await axios.patch(`/api/subscriptions/package_request`, { id, package_id, school_id, status, });
-    if (result.data.success) {
-      reFetchData();
-    }
+    setIsLoading(true);
+    axios.patch(`/api/subscriptions/package_request`, { id, package_id, school_id, status, })
+      .then((result) => {
+        if (result.data.success) reFetchData();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
 
   }
 
@@ -398,6 +401,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                           <Typography noWrap>
                             <Tooltip title={t('Approved')} arrow>
                               <IconButton
+                                disabled={isLoading}
                                 onClick={() => handleAccept(singlePackage, "approved")}
                                 color="primary"
                               >
@@ -406,6 +410,7 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
                             </Tooltip>
                             <Tooltip title={t('Declined')} arrow>
                               <IconButton
+                                disabled={isLoading}
                                 onClick={() => handleAccept(singlePackage, "declined")}
                                 color="primary"
                               >

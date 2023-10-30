@@ -229,12 +229,16 @@ const Results: FC<ResultsProps> = ({ sessions, reFetchData, setEditData }) => {
     setIsLoading(true);
     axios.patch(`/api/subscriptions/package_request`, { id, package_id, school_id, status, })
       .then((result) => {
-        if (result.data.success) reFetchData();
+        if (result.data.success) {
+          reFetchData();
+          showNotification("request sucessfully completed")
+        }
+        else throw new Error("request failed");
       })
+      .catch((error) => { showNotification("request failed") })
       .finally(() => {
         setIsLoading(false);
       })
-
   }
 
   return (

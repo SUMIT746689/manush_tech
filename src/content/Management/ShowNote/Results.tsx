@@ -1,36 +1,9 @@
-import {
-  FC,
-  ChangeEvent,
-  MouseEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef
-} from 'react';
+import { FC, ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
-  Box,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  styled
+  Avatar, Box, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton,
+  InputAdornment, Table, TableBody, TableHead, TablePagination,
+  TableContainer, TableRow, TextField, Button, Typography, Dialog, styled
 } from '@mui/material';
 
 import { TransitionProps } from '@mui/material/transitions';
@@ -38,10 +11,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
-import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { ClassAndSectionSelect } from '@/components/Attendence';
+import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import axios from 'axios';
+import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
+import { customizeDate } from '@/utils/customizeDate';
+import { TableCellWrapper } from '@/components/Table/Table';
+
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -75,11 +53,10 @@ const ButtonError = styled(Button)(
 );
 
 
-
 interface ResultsProps {
-  grade: Project[];
-  editGrade: object;
-  setEditGrade: Function;
+  classes: any[];
+  notes: any[];
+  setNotes: (value: any) => void;
 }
 
 interface Filters {
@@ -141,7 +118,7 @@ const applyPagination = (
   return rooms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
+const Results: FC<ResultsProps> = ({ classes, notes, setNotes }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -149,9 +126,13 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
   const [query, setQuery] = useState<string>('');
-  const [filters, setFilters] = useState<Filters>({
-    status: null
-  });
+  const [filters, setFilters] = useState<Filters>({ status: null });
+
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+  const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [selectedSection, setSelectedSection] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -162,7 +143,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     setSelectedItems(
-      event.target.checked ? grade.map((project) => project.id) : []
+      event.target.checked ? notes.map((project) => project.id) : []
     );
   };
 
@@ -187,12 +168,12 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredGrades = applyFilters(grade, query, filters);
-  const paginatedGrades = applyPagination(filteredGrades, page, limit);
+  const filteredGrades = applyFilters(notes, query, filters);
+  const paginatedNotes = applyPagination(filteredGrades, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
   const selectedSomesGrades =
-    selectedItems.length > 0 && selectedItems.length < grade.length;
-  const selectedAllGrades = selectedItems.length === grade.length;
+    selectedItems.length > 0 && selectedItems.length < notes.length;
+  const selectedAllGrades = selectedItems.length === notes.length;
   ;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -206,7 +187,22 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  console.log({ deleteSchoolId });
+
+  const handleSearching = async () => {
+    setIsLoading(true)
+    try {
+      const { id: section_id } = selectedSection;
+      const result = await axios.get(`/api/notes?get_type=all&section_id=${section_id}&start_date=${startDate}&end_date=${endDate}`);
+      const { data } = result;
+      setNotes(() => data || [])
+    }
+    catch (err) {
+      showNotification("request failed", "error")
+    }
+    finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleDeleteCompleted = async () => {
     // try {
@@ -221,20 +217,41 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     //   showNotification('The school falied to delete ','error');
     // }
   };
-
+  // console.log({ classes })
+  // console.log({ selectedClass, selectedSection })
   return (
     <>
-      <Card
+      <Card sx={{ m: 1, pt: 1, px: 1, display: 'grid', gridTemplateColumns: { md: "2fr 2fr 1fr" }, columnGap: 1, maxWidth: 1200, mx: 'auto' }}>
+        <DateRangePickerWrapper
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
+        <ClassAndSectionSelect
+          flag={true}
+          classes={classes}
+          selectedDate={undefined}
+          selectedClass={selectedClass}
+          setSelectedClass={setSelectedClass}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+        />
+        <SearchingButtonWrapper disabled={!startDate || !endDate || !selectedSection} handleClick={handleSearching} isLoading={isLoading} >
+          Search
+        </SearchingButtonWrapper>
+      </Card>
+      {/* <Card
         sx={{
           p: 1,
-          mb: 2
+          mb: 3
         }}
       >
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box>
+            <Box p={1}>
               <TextField
-                size='small'
+              size='small'
                 sx={{
                   m: 0
                 }}
@@ -254,21 +271,24 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
             </Box>
           </Grid>
         </Grid>
-      </Card>
-      <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
+      </Card> */}
+
+
+      <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.5, p: 0.5 }}>
 
         {!selectedBulkActions && (
           <Box
-            p={2}
+            px={2}
             display="flex"
             alignItems="center"
             justifyContent="space-between"
+            borderRadius={0}
           >
             <Box>
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:
               </Typography>{' '}
-              <b>{paginatedGrades.length}</b> <b>{t('grades')}</b>
+              <b>{paginatedNotes.length}</b> <b>{t('notes')}</b>
             </Box>
             <TablePagination
               component="div"
@@ -281,9 +301,9 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
             />
           </Box>
         )}
-        <Divider />
+        {/* <Divider /> */}
 
-        {paginatedGrades.length === 0 ? (
+        {paginatedNotes.length === 0 ? (
           <>
             <Typography
               sx={{
@@ -296,82 +316,80 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
               align="center"
             >
               {t(
-                "We couldn't find any rooms matching your search criteria"
+                "We couldn't find any matching your search criteria"
               )}
             </Typography>
           </>
         ) : (
           <>
             <TableContainer>
-              <Table size="small">
+              <Table size="small" sx={{ py: 1 }}>
                 <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">
+                  <TableRow >
+                    {/* <TableCellWrapper padding="checkbox">
                       <Checkbox
                         checked={selectedAllGrades}
                         indeterminate={selectedSomesGrades}
                         onChange={handleSelectAllschools}
                       />
-                    </TableCell>
+                    </TableCellWrapper> */}
 
-                    <TableCell>{t('Lower mark')}</TableCell>
-                    <TableCell>{t('Upper mark')}</TableCell>
-                    <TableCell>{t('Point')}</TableCell>
-                    <TableCell>{t('Grade')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    <TableCellWrapper>{t('Id')}</TableCellWrapper>
+                    <TableCellWrapper>{t('Teacher')}</TableCellWrapper>
+                    <TableCellWrapper>{t('Subject')}</TableCellWrapper>
+                    <TableCellWrapper>{t('Date')}</TableCellWrapper>
+                    <TableCellWrapper>{t('Class Note')}</TableCellWrapper>
+                    {/* <TableCellWrapper>{t('Grade')}</TableCellWrapper> */}
+                    {/* <TableCellWrapper align="center">{t('Actions')}</TableCellWrapper> */}
 
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paginatedGrades.map((singleGrade) => {
+                  {paginatedNotes.map((note) => {
                     const isschoolselected = selectedItems.includes(
-                      singleGrade.id
+                      note.id
                     );
                     return (
                       <TableRow
                         hover
-                        key={singleGrade.id}
+                        key={note.id}
                         selected={isschoolselected}
                       >
-                        <TableCell padding="checkbox">
+                        {/* <TableCellWrapper padding="checkbox">
                           <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
-                              handleSelectOneProject(event, singleGrade.id)
+                              handleSelectOneProject(event, note.id)
                             }
                             value={isschoolselected}
                           />
-                        </TableCell>
+                        </TableCellWrapper> */}
 
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.lower_mark}
-                          </Typography>
-                        </TableCell>
+                        <TableCellWrapper>
+                          {note?.id || ''}
+                        </TableCellWrapper>
 
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.upper_mark}
-                          </Typography>
-                        </TableCell>
+                        <TableCellWrapper>
+                          {note?.period?.teacher?.first_name || ''}
+                        </TableCellWrapper>
 
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.point}
-                          </Typography>
-                        </TableCell>
+                        <TableCellWrapper>
+                          {note?.subject?.name || ''}
+                        </TableCellWrapper>
 
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.grade}
-                          </Typography>
-                        </TableCell>
+                        <TableCellWrapper>
+                          {customizeDate(note?.date)}
+                        </TableCellWrapper>
 
-                        <TableCell align="center">
+                        <TableCellWrapper>
+                          {note?.note}
+                        </TableCellWrapper>
+
+                        {/* <TableCellWrapper align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
-                                onClick={() => setEditGrade(singleGrade)}
+                                onClick={() => setEditGrade(note)}
                                 color="primary"
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
@@ -380,7 +398,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
-                                  handleConfirmDelete(singleGrade.id)
+                                  handleConfirmDelete(note.id)
                                 }
                                 color="primary"
                               >
@@ -388,7 +406,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
                               </IconButton>
                             </Tooltip>
                           </Typography>
-                        </TableCell>
+                        </TableCellWrapper> */}
                       </TableRow>
                     );
                   })}
@@ -474,11 +492,11 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
 };
 
 Results.propTypes = {
-  grade: PropTypes.array.isRequired
+  classes: PropTypes.array.isRequired
 };
 
 Results.defaultProps = {
-  grade: []
+  classes: []
 };
 
 export default Results;

@@ -77,7 +77,7 @@ const ButtonError = styled(Button)(
 
 
 interface ResultsProps {
-  grade: Project[];
+  periods: any[];
   editGrade: object;
   setEditGrade: Function;
 }
@@ -141,7 +141,7 @@ const applyPagination = (
   return rooms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
+const Results: FC<ResultsProps> = ({ periods, setEditGrade,editGrade }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -162,7 +162,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     setSelectedItems(
-      event.target.checked ? grade.map((project) => project.id) : []
+      event.target.checked ? periods.map((project) => project.id) : []
     );
   };
 
@@ -187,12 +187,12 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredGrades = applyFilters(grade, query, filters);
+  const filteredGrades = applyFilters(periods, query, filters);
   const paginatedGrades = applyPagination(filteredGrades, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
   const selectedSomesGrades =
-    selectedItems.length > 0 && selectedItems.length < grade.length;
-  const selectedAllGrades = selectedItems.length === grade.length;
+    selectedItems.length > 0 && selectedItems.length < periods.length;
+  const selectedAllGrades = selectedItems.length === periods.length;
   ;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -224,17 +224,17 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
 
   return (
     <>
-      <Card
+      {/* <Card
         sx={{
           p: 1,
-          mb: 2
+          mb: 3
         }}
       >
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box>
+            <Box p={1}>
               <TextField
-                size='small'
+              size='small'
                 sx={{
                   m: 0
                 }}
@@ -254,9 +254,11 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
             </Box>
           </Grid>
         </Grid>
-      </Card>
-      <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
+      </Card> */}
 
+      
+      <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
+       
         {!selectedBulkActions && (
           <Box
             p={2}
@@ -268,7 +270,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:
               </Typography>{' '}
-              <b>{paginatedGrades.length}</b> <b>{t('grades')}</b>
+              <b>{paginatedGrades.length}</b> <b>{t('periods')}</b>
             </Box>
             <TablePagination
               component="div"
@@ -296,7 +298,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
               align="center"
             >
               {t(
-                "We couldn't find any rooms matching your search criteria"
+                "We couldn't find any matching your search criteria"
               )}
             </Typography>
           </>
@@ -333,7 +335,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
                         key={singleGrade.id}
                         selected={isschoolselected}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell padding="checkbox">  
                           <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>

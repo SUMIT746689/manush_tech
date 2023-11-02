@@ -9,3 +9,13 @@ export const mySqlDateConverter = (e) => {
         ('00' + date.getUTCSeconds()).slice(-2);
     return date;
 }
+
+export const convertToDate = (date: string = null): Date => {
+
+    const date_ = new Date(date || Date.now());
+    date_.setUTCHours(0)
+    date_.setUTCMinutes(0);
+    date_.setUTCSeconds(0);
+    date_.setUTCMilliseconds(0);
+    return date_;
+} 

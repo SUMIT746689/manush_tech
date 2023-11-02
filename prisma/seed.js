@@ -125,6 +125,7 @@ async function seed() {
       { name: 'view holiday', value: 'view_holiday', group: 'holiday' },
       { name: 'create notice', value: 'create_notice', group: 'notice' },
       { name: 'create discount', value: 'create_discount', group: 'discount' },
+      { name: 'show note', value: 'show_note', group: 'note' },
     ]
   });
 
@@ -212,7 +213,13 @@ async function seed() {
     }
   });
 
-  const teacherPermissions = []
+  const teacherPermissions = await prisma.permission.createMany({
+    data: [
+      { name: 'create note', value: 'create_note', group: 'note' },
+      { name: 'update student', value: 'update_note', group: 'note' }
+    ]
+  });
+
   for (const i of permissions) {
     if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'show_class_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
       i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
@@ -243,9 +250,9 @@ async function seed() {
       joining_date: new Date(),
       resume: '',
       // school_id:  school.id,
-      school:{
-        connect:{
-          id:school.id
+      school: {
+        connect: {
+          id: school.id
         }
       },
       department: { connect: { id: createDepartment.id } },
@@ -294,7 +301,7 @@ async function seed() {
   // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
   const studentPermissions = []
   for (const i of permissions) {
-    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine' || i.value =='create_leave') {
+    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine' || i.value == 'create_leave') {
       studentPermissions.push({ id: i.id })
     }
   }
@@ -347,7 +354,7 @@ async function seed() {
   await prisma.student.create({
     data: {
       class_roll_no: '01',
-      class_registration_no: (Date.now().toString() + Math.random().toString()).substring(0,11),
+      class_registration_no: (Date.now().toString() + Math.random().toString()).substring(0, 11),
       section: {
         connect: { id: createSection.id }
       },
@@ -362,13 +369,13 @@ async function seed() {
 
   await prisma.gradingSystem.createMany({
     data: [
-      { lower_mark: 0, upper_mark: 32, point: 0, grade: 'F', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 33, upper_mark: 39, point: 1, grade: 'D', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 40, upper_mark: 49, point: 2, grade: 'C', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 50, upper_mark: 59, point: 3, grade: 'B', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 60, upper_mark: 69, point: 3.5, grade: 'A-', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 70, upper_mark: 79, point: 4, grade: 'A', school_id:  school.id, academic_year_id:  createAcademicYear.id },
-      { lower_mark: 80, upper_mark: 100, point: 5, grade: 'A+', school_id:  school.id, academic_year_id:  createAcademicYear.id },
+      { lower_mark: 0, upper_mark: 32, point: 0, grade: 'F', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 33, upper_mark: 39, point: 1, grade: 'D', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 40, upper_mark: 49, point: 2, grade: 'C', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 50, upper_mark: 59, point: 3, grade: 'B', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 60, upper_mark: 69, point: 3.5, grade: 'A-', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 70, upper_mark: 79, point: 4, grade: 'A', school_id: school.id, academic_year_id: createAcademicYear.id },
+      { lower_mark: 80, upper_mark: 100, point: 5, grade: 'A+', school_id: school.id, academic_year_id: createAcademicYear.id },
     ]
   })
 

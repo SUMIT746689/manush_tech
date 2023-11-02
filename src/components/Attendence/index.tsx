@@ -23,7 +23,6 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                 else setSelectedSection({ label: selectedClassSections?.sections[0].name, id: selectedClassSections?.sections[0].id });
             }
         }
-
     }
     return (
         <Grid columnGap={1} sx={{
@@ -38,7 +37,6 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                 flag ?
                     <Grid item sx={{
                         minWidth: '200px',
-
                     }}
                     >
                         {/* <Autocomplete

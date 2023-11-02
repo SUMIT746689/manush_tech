@@ -37,12 +37,12 @@ function Managementrooms() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: { xs: 1, sm: 3 } }}
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        spacing={3}
+        spacing={1}
       >
         <Grid item xs={12}>
           <Results

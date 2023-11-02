@@ -178,7 +178,7 @@ const Results: FC<ResultsProps> = ({ defauleRole, roles, templates }) => {
           <DynamicDropDownSelectWrapper value={selectedRole} label='Select Role' name='' handleChange={handleRoleChange} menuItems={roles?.map(role => ({ title: role.title, value: role.id }))} />
         </Grid>
         <Grid >
-          <DynamicDropDownSelectWrapper value={selectedTemplate} label='Select Template' name='' handleChange={handleTemplateChange} menuItems={templates.map(tmplt => ({ title: tmplt.name, value: tmplt.id }))} />
+          <DynamicDropDownSelectWrapper value={selectedTemplate} label='Select Template' name='' handleChange={handleTemplateChange} menuItems={templates?.map(tmplt => ({ title: tmplt.name, value: tmplt.id }))} />
         </Grid>
         <Grid item container justifyContent={"flex-end"} >
           <ButtonWrapper disabled={!selectedRole || !selectedTemplate} handleClick={handleSearchClick}>Search</ButtonWrapper>

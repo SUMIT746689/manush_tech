@@ -50,6 +50,9 @@ import AccountBalanceWalletSharpIcon from '@mui/icons-material/AccountBalanceWal
 import BorderBottomSharpIcon from '@mui/icons-material/BorderBottomSharp';
 import GradeIcon from '@mui/icons-material/Grade';
 import WifiTetheringErrorIcon from '@mui/icons-material/WifiTetheringError';
+import NotesIcon from '@mui/icons-material/Notes';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 export interface MenuItem {
   link?: string;
   icon?: ReactNode;
@@ -209,6 +212,22 @@ export const menuItems: MenuItems[] = [
         name: 'Period',
         icon: AccessTimeIcon,
         link: '/management/period'
+      },
+      {
+        name: 'Daily Notes',
+        icon: NotesIcon,
+        items: [
+          {
+            name: 'Entry Notes',
+            link: '/daily_notes/entry_notes',
+            icon: NoteAddIcon
+          },
+          {
+            name: 'Show Notes',
+            link: '/daily_notes/show_notes',
+            icon: FormatListBulletedIcon
+          },
+        ]
       },
       {
         name: 'Attendence',

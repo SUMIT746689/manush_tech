@@ -1,6 +1,6 @@
 import { Button, FormControl, Grid, InputLabel, TextField } from '@mui/material';
 
-export const TextFieldWrapper = ({ label, name, value, type = "string", touched, errors, handleChange, handleBlur, required = false, disabled = false }) => {
+export const TextFieldWrapper = ({ label, name, value, type = "string", touched, errors, handleChange, handleBlur, required = false, disabled = false, ...params }) => {
   return (
     <Grid item container pb={1}>
       <TextField
@@ -24,6 +24,7 @@ export const TextFieldWrapper = ({ label, name, value, type = "string", touched,
         value={value}
         required={required}
         disabled={disabled}
+        {...params}
       />
     </Grid>
   );
@@ -76,11 +77,11 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
   )
 }
 
-export const TextAreaWrapper = ({ name, value, touched, errors, handleChange, handleBlur, minRows = 6, required = false,sx ={} }) => {
+export const TextAreaWrapper = ({ name, value, touched, errors, handleChange, handleBlur, minRows = 6, required = false, sx = {} }) => {
   return (
     <Grid item container pb={1}>
       <TextField
-        sx={{maxlength:10}}
+        sx={{ maxlength: 10 }}
         id="outlined-multiline-static"
         label={name}
         variant="outlined"

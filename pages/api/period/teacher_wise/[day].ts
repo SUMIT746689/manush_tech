@@ -7,18 +7,21 @@ const Day = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'GET':
-                const { school_id } = refresh_token;
-                const { day, teacher_id } = req.query;
-                const where = {
-                    school_id: parseInt(school_id),
-                    day
-                };
-                if (teacher_id) where['teacher_id'] = parseInt(teacher_id);
+                const { id, school_id, role } = refresh_token;
+                
+                if(!id || !school_id || role?.title !== "TEACHER") throw new Error("unauthorized user ")
+                
+                const { day, section_id } = req.query;
+
+                if(!day || !section_id) throw new Error("required fields missing")
 
                 const schedule = await prisma.period.findMany({
-                    where:{
-                        section_id :1,
-                        
+                    where: {
+                        section_id: parseInt(section_id),
+                        school_id: parseInt(school_id),
+                        teacher: { user_id: parseInt(id) },
+                        day,
+
                     },
                     include: {
                         room: true,
@@ -43,7 +46,7 @@ const Day = async (req, res, refresh_token) => {
                 res.status(200).json(schedule);
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET']);
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {

@@ -440,6 +440,27 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+    else if (item.name === 'Daily Notes') {
+      if (permissionVerify(permissions, ['create_note', 'update_note', 'show_note'])) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
     else {
       ev.push(
         <SidebarMenuItem
@@ -513,7 +534,10 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Certificate Template' ||
       item.name === 'Student Certificate' ||
       item.name === 'Teacher Certificate' ||
-      item.name === 'Employee Certificate'
+      item.name === 'Employee Certificate' ||
+
+      item.name === 'Entry Notes' ||
+      item.name === 'Show Notes'
 
 
     ) {
@@ -554,6 +578,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
 
       //validate using permissions values
+      //bu sms
       if (item.name === 'Pending Buy Sms' && permissionVerify(permissions, ['pending_buy_sms'])) sub_menu();
 
       // attendence
@@ -579,6 +604,10 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Student Certificate' && permissionVerify(permissions, ['show_student_certificate'])) sub_menu();
       if (item.name === 'Teacher Certificate' && permissionVerify(permissions, ['show_teacher_certificate'])) sub_menu();
       if (item.name === 'Employee Certificate' && permissionVerify(permissions, ['show_employee_certificate'])) sub_menu();
+
+      if (item.name === 'Entry Notes' && permissionVerify(permissions, ['create_note', 'update_note'])) sub_menu();
+      if (item.name === 'Show Notes' && permissionVerify(permissions, ['show_note'])) sub_menu();
+
     }
     else sub_menu();
     // {

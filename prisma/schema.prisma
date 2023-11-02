@@ -47,8 +47,8 @@ model School {
   domain                String? @unique
   currency              String?
   main_balance          Float?
-  masking_sms_count     Int @default(0) //no_of_sms_available
-  non_masking_sms_count Int @default(0) //no_of_sms_available
+  masking_sms_count     Int     @default(0) //no_of_sms_available
+  non_masking_sms_count Int     @default(0) //no_of_sms_available
   masking_sms_price     Float?
   non_masking_sms_price Float?
   // school should not be created without an existing user
@@ -295,6 +295,7 @@ model Subject {
 
   exam_details ExamDetails[]
   Period       Period[]
+  DailyNote    DailyNote[]
 
   @@map("subjects")
 }
@@ -322,11 +323,12 @@ model Period {
   school_id  Int
   subject_id Int
 
-  subject Subject  @relation(fields: [subject_id], references: [id])
-  room    Room     @relation(fields: [room_id], references: [id])
-  teacher Teacher? @relation(fields: [teacher_id], references: [id])
-  section Section? @relation(fields: [section_id], references: [id])
-  school  School   @relation(fields: [school_id], references: [id])
+  subject   Subject     @relation(fields: [subject_id], references: [id])
+  room      Room        @relation(fields: [room_id], references: [id])
+  teacher   Teacher?    @relation(fields: [teacher_id], references: [id])
+  section   Section?    @relation(fields: [section_id], references: [id])
+  school    School      @relation(fields: [school_id], references: [id])
+  DailyNote DailyNote[]
 
   // routine Routine?
   @@map("periods")
@@ -1119,4 +1121,19 @@ model SmsTransaction {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("sms_transactions")
+}
+
+model DailyNote {
+  id         Int      @id @default(autoincrement())
+  note       String   @db.LongText
+  period_id  Int
+  subject_id Int
+  date       DateTime @db.Date
+  created_at DateTime @default(now())
+
+  period  Period  @relation(fields: [period_id], references: [id])
+  subject Subject @relation(fields: [subject_id], references: [id])
+
+  @@unique([period_id, date])
+  @@map("daily_notes")
 }

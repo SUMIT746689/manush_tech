@@ -536,6 +536,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Teacher Certificate' ||
       item.name === 'Employee Certificate' ||
 
+      item.name === 'Daily Notes' ||
       item.name === 'Entry Notes' ||
       item.name === 'Show Notes'
 

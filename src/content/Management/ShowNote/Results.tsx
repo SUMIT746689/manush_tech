@@ -18,7 +18,7 @@ import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import axios from 'axios';
 import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
 import { customizeDate } from '@/utils/customizeDate';
-import { TableCellWrapper } from '@/components/Table/Table';
+import { TableCellWrapper, TableRowWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -350,8 +350,10 @@ const Results: FC<ResultsProps> = ({ classes, notes, setNotes }) => {
                       note.id
                     );
                     return (
-                      <TableRow
-                        hover
+                    
+                      
+                      <TableRowWrapper
+                        
                         key={note.id}
                         selected={isschoolselected}
                       >
@@ -407,7 +409,7 @@ const Results: FC<ResultsProps> = ({ classes, notes, setNotes }) => {
                             </Tooltip>
                           </Typography>
                         </TableCellWrapper> */}
-                      </TableRow>
+                      </TableRowWrapper>
                     );
                   })}
                 </TableBody>

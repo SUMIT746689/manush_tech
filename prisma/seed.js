@@ -216,7 +216,7 @@ async function seed() {
   const teacherPermissions = await prisma.permission.createMany({
     data: [
       { name: 'create note', value: 'create_note', group: 'note' },
-      { name: 'update student', value: 'update_note', group: 'note' }
+      { name: 'update note', value: 'update_note', group: 'note' }
     ]
   });
 

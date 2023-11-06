@@ -20,12 +20,12 @@ export function onlyUnique(value, index, array) {
   return array.indexOf(value) === index;
 }
 export function registration_no_generate() {
-  return (Date.now().toString() + Math.random().toString()).substring(0,11);
+  return (Date.now().toString() + Math.random().toString()).substring(0, 11);
 }
-export function unique_password_generate(){
-  return Date.now().toString(36) + Math.random().toString(36).substring(0,8);
+export function unique_password_generate() {
+  return Date.now().toString(36) + Math.random().toString(36).substring(0, 8);
 }
 export function generateUsername(firstName) {
   const text = Date.now().toString()
-  return firstName?.split(' ').join('').toLowerCase() + text.substring(text.length - 5)
+  return firstName?.split(' ').join('').toLowerCase() + text.substring(text.length - 5) + Math.random().toString(36).substring(0, 8)
 }

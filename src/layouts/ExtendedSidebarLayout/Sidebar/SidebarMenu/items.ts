@@ -133,12 +133,23 @@ export const menuItems: MenuItems[] = [
       },
       {
         name: 'Exam',
-        link: '/management/exam',
-        icon: ArticleIcon
+        icon: AssignmentIcon,
+        items: [
+          {
+            name: 'Manage Exam',
+            link: '/management/exam',
+            icon: AssignmentIcon
+          },
+          {
+            name: 'Exam seat plan',
+            link: '/management/seat_plan',
+            icon: AssignmentIcon
+          },
+        ]
+
       },
       {
         name: 'Result',
-        link: '/management/result',
         icon: AssignmentTurnedInIcon,
         items: [
           {

@@ -20,19 +20,19 @@ import { TextFieldWrapper } from '@/components/TextFields';
 const columns = [
   {
     width: 30,
-    label: 'name',
+    label: 'Name',
     dataKey: 'name',
   },
   {
     width: 30,
-    label: 'class roll no',
+    label: 'Class roll no',
     dataKey: 'class_roll_no',
 
   },
 
   {
     width: 50,
-    label: 'attendence',
+    label: 'Attendence',
     dataKey: 'attendence',
 
   },
@@ -70,8 +70,9 @@ function fixedHeaderContent() {
           style={{
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-            padding: '10px 0px',
-            marginBottom: '1px solid black'
+            padding: '10px 2px',
+            marginBottom: '1px solid black',
+            backgroundColor:'white',
           }}
 
         >
@@ -427,7 +428,7 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
       </Card>
 
       <Grid container spacing={0} justifyContent={'flex-end'} >
-        <Paper style={{ height: 400, width: '100%' }}>
+        <Paper style={{ height: '55vh', width: '100%' }}>
           <TableVirtuoso
             data={students || []}
             // @ts-ignore

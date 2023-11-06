@@ -143,6 +143,7 @@ function PageHeader({
           successProcess(t('A teacher has been updated successfully'));
         else throw new Error('edit teacher failed');
       } else {
+        formData.append('username',_values.username)
         const res = await axios({
           method: 'POST',
           url: '/api/teacher',

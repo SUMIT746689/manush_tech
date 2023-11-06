@@ -59,7 +59,7 @@ import useNotistick from '@/hooks/useNotistick';
 import { fetchData } from '@/utils/post';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
-
+import dayjs from 'dayjs';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -376,10 +376,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell><Typography noWrap align='center'>{t('Username')}</Typography></TableCell>
-                    <TableCell><Typography noWrap align='center'>{t('Role')}</Typography></TableCell>
-                    <TableCell><Typography noWrap align='center'>{t('School name')}</Typography></TableCell>
-                    <TableCell><Typography noWrap align='center'>{t('Log in as Admin')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('Log in as Admin')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
@@ -392,7 +392,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     return (
                       <TableRow hover key={user.id} selected={isUserSelected}>
                         <TableCell>
-                          <Typography noWrap align='center' variant="h5">{user?.username}</Typography>
+                          <Typography noWrap  variant="h5">{user?.username}</Typography>
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
@@ -405,8 +405,8 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
-                          <Typography variant="h5" noWrap align='center'>
-                            {user?.school?.name}
+                          <Typography variant="h5" noWrap >
+                            {dayjs(user?.created_at).format('MMMM D, YYYY h:mm A')}
                           </Typography>
                         </TableCell>
 
@@ -423,7 +423,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                           >Log in</ButtonWrapper>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell align='center'>
                           {/* @ts-ignore */}
                           <Typography variant="h5" color={user?.is_enabled ? 'green' : 'red'}>
                             {/* {user?.is_enabled ? 'Enable' : 'Disable'} */}

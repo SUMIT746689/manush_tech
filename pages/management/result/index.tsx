@@ -43,16 +43,16 @@ function Managementschools() {
 
   useEffect(() => {
     axios
-      .get(`/api/class?school_id=${user?.school_id}`)
+      .get(`/api/class`)
       .then((res) => setClasses(res?.data))
       .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
-    if (selectedSection && academicYear && user) {
+    if (selectedSection && academicYear) {
       axios
         .get(
-          `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`
+          `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}`
         )
         .then((res) =>
           setStudentList(
@@ -68,7 +68,7 @@ function Managementschools() {
 
       axios
         .get(
-          `/api/exam/exam-list?school_id=${user?.school_id}&academic_year=${academicYear?.id}&section_id=${selectedSection.id}`
+          `/api/exam/exam-list?academic_year=${academicYear?.id}&section_id=${selectedSection.id}`
         )
         .then((res) =>
           setExams(
@@ -82,7 +82,7 @@ function Managementschools() {
         )
         .catch((err) => console.log(err));
     }
-  }, [selectedSection, academicYear, user]);
+  }, [selectedSection, academicYear]);
 
   const handleSearchResult = () => {
     axios

@@ -10,7 +10,7 @@ export const get = async (req, res) => {
     const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
     if (!refresh_token) throw new Error('invalid user');
-  
+
     const user = await prisma.user.findFirst({
       where: {
         id: refresh_token.id,
@@ -80,7 +80,8 @@ export const get = async (req, res) => {
         // @ts-ignore
         is_enabled: true,
         permissions: true,
-        user_photo: true
+        user_photo: true,
+        created_at: true
       }
     });
     res.status(200).json(users);

@@ -307,7 +307,8 @@ model Room {
 
   periods     Period[]
   school      School        @relation(fields: [school_id], references: [id])
-  ExamDetails ExamDetails[]
+  examDetails ExamDetails[] @relation("examRoom")
+  seatPlan    seatPlan[]
 
   @@map("rooms")
 }
@@ -402,7 +403,7 @@ model Fee {
 }
 
 model StudentFee {
-  id                Int     @id @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   student_id        Int
   fee_id            Int
   collected_amount  Float
@@ -410,9 +411,9 @@ model StudentFee {
   transID           String?
   account_id        Int?
   payment_method_id Int?
-
-  collected_by Int?
-  created_at   DateTime @default(now())
+  collected_by      Int?
+  created_at        DateTime @default(now())
+  // tracking_number   String   @unique
 
   account             Accounts?       @relation(fields: [account_id], references: [id])
   payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
@@ -476,14 +477,28 @@ model ExamDetails {
   subject_id    Int
   subject_total Float
   exam_date     DateTime
-  exam_room     Int?
 
   exam         Exam                   @relation(fields: [exam_id], references: [id])
   subject      Subject                @relation(fields: [subject_id], references: [id])
-  room         Room?                  @relation(fields: [exam_room], references: [id])
+  exam_room    Room[]                 @relation("examRoom")
   participants StudentResultDetails[]
+  seatPlan     seatPlan[]
 
   @@map("exam_details")
+}
+
+model seatPlan {
+  exam_details_id Int
+  class_roll_from String
+  class_roll_to   String
+  student_count   Int
+  room_id         Int
+
+  room         Room        @relation(fields: [room_id], references: [id])
+  exam_details ExamDetails @relation(fields: [exam_details_id], references: [id])
+
+  @@id([exam_details_id, room_id])
+  @@map("seat_plan")
 }
 
 model Attendance {

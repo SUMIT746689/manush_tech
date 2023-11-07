@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -8,15 +9,19 @@ const index = async (req, res) => {
             case 'GET':
                 const examSubjects = await prisma.examDetails.findMany({
                     where: {
-                       exam_id: parseInt(req.query.exam_id)
+                        exam: {
+                            id: parseInt(req.query.exam_id),
+                            school_id: refresh_token.school_id
+                        }
                     },
-                    include:{
-                        subject:true
+                    include: {
+                        subject: true,
+                        exam_room: true
                     }
                 });
                 res.status(200).json(examSubjects);
                 break;
-           
+
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
                 res.status(405).end(`Method ${method} Not Allowed`);
@@ -28,4 +33,4 @@ const index = async (req, res) => {
 };
 
 
-export default index;
+export default authenticate(index);

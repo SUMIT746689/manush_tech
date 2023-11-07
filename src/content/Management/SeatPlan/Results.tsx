@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Avatar, Box, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, Table, TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField, Button, Typography, Dialog, styled } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
@@ -6,11 +6,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
-import BulkActions from './BulkActions';
+
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { useReactToPrint } from 'react-to-print';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -106,10 +109,12 @@ const applyPagination = (
 };
 
 const Results = ({
-  exams,
-  // setTeachers,
-  setEditExam
+  seatPlan,
+  setEditSeatPlan,
+  handlePrint,
+  stickerLenght
 }) => {
+
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -121,19 +126,16 @@ const Results = ({
   });
   const { showNotification } = useNotistick();
 
-
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
     setQuery(event.target.value);
   };
 
-
-
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     setSelectedschools(
-      event.target.checked ? exams.map((project) => project.id) : []
+      event.target.checked ? seatPlan?.map((project) => project.sl) : []
     );
   };
 
@@ -141,6 +143,7 @@ const Results = ({
     _event: ChangeEvent<HTMLInputElement>,
     projectId: string
   ): void => {
+
     if (!selectedItems.includes(projectId)) {
       setSelectedschools((prevSelected) => [...prevSelected, projectId]);
     } else {
@@ -158,11 +161,11 @@ const Results = ({
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredExams = applyFilters(exams, query, filters);
+  const filteredExams = applyFilters(seatPlan || [], query, filters);
   const paginatedExams = applyPagination(filteredExams, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < exams.length;
-  const selectedAllschools = selectedItems.length === exams.length;
+  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < seatPlan?.length;
+  const selectedAllschools = selectedItems.length === seatPlan?.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -186,7 +189,7 @@ const Results = ({
   };
 
   const handleEdit = (data: object) => {
-    setEditExam(data)
+    setEditSeatPlan(data)
   };
 
   return (
@@ -222,11 +225,7 @@ const Results = ({
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 450px)' }}>
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
+
         {!selectedBulkActions && (
           <Box
             p={2}
@@ -234,11 +233,18 @@ const Results = ({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
               <Typography component="span" variant="subtitle1">
-                {t('Showing')}:
-              </Typography>{' '}
-              <b>{paginatedExams.length}</b> <b>{t('exams')}</b>
+                {t('Showing')}: {paginatedExams.length} {t('exams')}
+              </Typography>
+
+              <ButtonWrapper
+                handleClick={handlePrint}
+                startIcon={<LocalPrintshopIcon />}
+                disabled={stickerLenght ? false : true}
+              >
+                Seat Sticker
+              </ButtonWrapper>
             </Box>
             <TablePagination
               component="div"
@@ -275,79 +281,68 @@ const Results = ({
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <td>
+                  {/* <td>
                     <Checkbox
                       size='small'
                       checked={selectedAllschools}
                       indeterminate={selectedSomeschools}
                       onChange={handleSelectAllschools}
                     />
-                  </td>
-                  <td>{t('SL')}</td>
-                  <td>{t('Exam title')}</td>
-                  <td>{t('Class')}</td>
-                  <td>{t('Section')}</td>
-                  <td>{t('Final percentage')}</td>
-                  <td>{t('Subject list')}</td>
-                  <td align="center">{t('Actions')}</td>
+                  </td> */}
+                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Room</Typography></TableCell>
+                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Class roll from</Typography></TableCell>
+                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Class roll to</Typography></TableCell>
+                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Student count</Typography></TableCell>
+                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Actions</Typography></TableCell>
+
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedExams.map((exam, index) => {
-                  const isExamselected = selectedItems.includes(
-                    exam.id
-                  );
+                  // const isExamselected = selectedItems.includes(
+                  //   exam.sl
+                  // );
 
                   return (
                     <TableRow
                       hover
-                      key={exam.id}
-                      selected={isExamselected}
+                      key={exam.sl}
+                    // selected={isExamselected}
                     >
-                      <td>
+                      {/* <td>
                         <Checkbox
                           size='small'
                           checked={isExamselected}
                           onChange={(event) =>
-                            handleSelectOneProject(event, exam.id)
+                            handleSelectOneProject(event, exam.sl)
                           }
                           value={isExamselected}
                         />
-                      </td>
-                      <td>
-                        <Typography noWrap variant="h5" py={0}>
-                          {index + 1}
+                      </td> */}
+                      <TableCell>
+                        <Typography noWrap align='center' variant="h5" py={0}>
+                          {exam?.room?.name}
                         </Typography>
-                      </td>
-                      <td>
-                        <Typography noWrap variant="h5" py={0}>
-                          {exam?.title}
+                      </TableCell>
+                      <TableCell>
+                        <Typography noWrap align='center' variant="h5" py={0}>
+                          {exam?.class_roll_from}
                         </Typography>
-                      </td>
-                      <td>
-                        <Typography noWrap variant="h5" py={0}>
-                          {exam?.section?.class?.name}
+                      </TableCell>
+                      <TableCell>
+                        <Typography noWrap align='center' variant="h5" py={0}>
+                          {exam?.class_roll_to}
                         </Typography>
-                      </td>
-                      <td>
-                        <Typography noWrap variant="h5" py={0}>
-                          {exam.section?.class?.has_section ? exam?.section?.name : '(This class has no section !)'}
+                      </TableCell>
+                      <TableCell>
+                        <Typography noWrap align='center' variant="h5" py={0}>
+                          {exam?.student_count}
                         </Typography>
-                      </td>
-                      <td>
-                        <Typography noWrap variant="h5" py={0}>
-                          {exam.final_percent ? exam?.final_percent : 'No percentage'}
-                        </Typography>
-                      </td>
-                      <td>
-                        <Typography variant="h5" py={0}>
-                          {exam?.exam_details?.map(i => i?.subject?.name).join(", ")}
-                        </Typography>
-                      </td>
+                      </TableCell>
 
 
-                      <td align="center">
-                        <Typography noWrap py={0}>
+                      <TableCell align="center">
+                        <Typography noWrap align='center' py={0}>
                           <Tooltip title={t('Edit')} arrow>
                             <IconButton
                               onClick={() => handleEdit(exam)}
@@ -367,7 +362,7 @@ const Results = ({
                                 </IconButton>
                               </Tooltip> */}
                         </Typography>
-                      </td>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -387,6 +382,9 @@ const Results = ({
               </Box> */}
           </TableContainer>
         )}
+
+
+
       </Card >
 
 

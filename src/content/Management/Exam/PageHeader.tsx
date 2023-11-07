@@ -45,9 +45,6 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classList, setClassList] = useState([]);
 
-
-
-
   useEffect(() => {
     setClassList(classes?.map(i => {
       return {
@@ -86,11 +83,12 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
 
       let temp = [];
       for (const i of editExam?.exam_details) {
+
         for (const j of subjectList) {
           if (j.id == i.subject?.id) {
             j.mark = i.subject_total
             j.exam_date = i.exam_date
-            j.exam_room = i?.exam_room
+            j.exam_room = i?.exam_room?.map(k => k.id)
             temp.push(j);
             break;
           }
@@ -139,7 +137,8 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
               label: i.name,
               id: i.id,
               mark: 100,
-              exam_date: null
+              exam_date: null,
+              exam_room: []
             };
           })
         );
@@ -148,6 +147,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
         console.log(err);
       });
   };
+
   const gettingSections = (class_id, setFieldValue) => {
     const targetClass = classes?.find(i => i.id == class_id)
 
@@ -208,7 +208,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
           exam_date: i.exam_date,
         }
         if (i?.exam_room) {
-          temp['exam_room'] = parseInt(i?.exam_room)
+          temp['exam_room'] = i?.exam_room?.map(j => ({ id: j }))
         }
         subject_id_list.push(temp);
       }
@@ -269,37 +269,17 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
     }
   }
   const subjectLength = subject.length;
+
   return (
     <>
-      {/* <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Exams')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t('These are your Exams')}
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Button
-            sx={{
-              mt: { xs: 2, sm: 0 }
-            }}
-            onClick={handleCreateProjectOpen}
-            variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
-          >
-            {t('Create new exam')}
-          </Button>
-        </Grid>
-      </Grid> */}
+
       <PageHeaderTitleWrapper
         name={"Exam"}
         handleCreateClassOpen={handleCreateProjectOpen}
       />
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth='md'
         open={open}
         onClose={handleCreateProjectClose}
       >
@@ -493,138 +473,132 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
                               }}
                             />
 
-                            <Grid
-                              container
-                              justifyContent="flex-end"
-                              textAlign={{ sm: 'right', md: 'left' }}
-                            >
-                              {
-                                subject?.map((option, index) => (
-                                  <Grid container sx={{
-                                    display: 'grid',
-                                    gridTemplateColumns: {
-                                      sm: '1fr',
-                                      md: '95px 220px 180PX',
-                                    },
-                                    marginTop: '12px',
-                                    borderBottom: {
-                                      xs: subjectLength > 1 && index < subjectLength - 1 && '1px dotted red',
-                                      sm: '0px'
-                                    },
-                                    pb: {
-                                      xs: subjectLength > 1 && index < subjectLength - 1 && 2,
-                                      sm: '0px'
-                                    }
-                                  }}
-                                    gap={1}
+                            {
+                              subject?.map((option, index) => (
+                                <Grid container sx={{
+                                  display: 'grid',
+                                  gridTemplateColumns: {
+                                    sm: '1fr',
+                                    md: '0.6fr 1fr 2fr',
+                                  },
+                                  marginTop: '12px',
+                                  borderBottom: {
+                                    xs: subjectLength > 1 && index < subjectLength - 1 && '1px dotted red',
+                                    sm: '0px'
+                                  },
+                                  pb: {
+                                    xs: subjectLength > 1 && index < subjectLength - 1 && 2,
+                                    sm: '0px'
+                                  }
+                                }}
+                                  gap={1}
 
-                                  >
-                                    <Grid item>
-                                      <TextField
-                                        sx={{
-                                          '& fieldset': {
-                                            borderRadius: '3px'
-                                          },
-                                          minWidth: '100%'
-                                        }}
-                                        size='small'
-                                        key={option.label}
-                                        variant="outlined"
-                                        label={`Input ${option.label} mark`}
-                                        value={option.mark}
-                                        type="number"
-                                        required
-                                        onChange={(e) => {
-                                          const temp = [...subject];
-                                          temp[index].mark = e.target.value;
-                                          console.log(temp);
-                                          setSubject(temp);
-                                          setFieldValue('subject_id_list', temp);
-                                        }}
-                                      />
-                                    </Grid>
-                                    <Grid item>
-                                      <DateTimePicker
-                                        label="Exam Date"
-                                        value={option.exam_date}
-                                        onChange={(n: any) => {
-                                          const temp = [...subject];
-                                          temp[index].exam_date = n;
-                                          console.log(temp);
-                                          setSubject(temp);
-                                          setFieldValue('subject_id_list', temp);
-                                        }}
-                                        renderInput={(params) => (
-                                          <TextField
-                                            required
-                                            size="small"
-                                            sx={{
-                                              '& fieldset': {
-                                                borderRadius: '3px'
-                                              },
-                                              minWidth: '100%'
-                                            }}
-                                            {...params}
-                                          />
-                                        )}
-                                      />
-                                    </Grid>
-                                    <Grid item>
-                                      <AutoCompleteWrapper
-                                        label='Select exam room'
-                                        placeholder='Select exam rooom...'
-                                        options={rooms}
-                                        value={rooms?.find((i) => i.id == option?.exam_room) || null}
-                                        handleChange={(e, v) => {
-                                          if (v) {
-                                            const temp = [...subject];
-                                            temp[index].exam_room = v.id;
-                                            console.log(temp);
-                                            setSubject(temp);
-                                            setFieldValue('subject_id_list', temp);
-                                          }
-                                        }}
-                                      />
-
-
-
-                                    </Grid>
+                                >
+                                  <Grid item>
+                                    <TextField
+                                      sx={{
+                                        '& fieldset': {
+                                          borderRadius: '3px'
+                                        },
+                                        minWidth: '100%'
+                                      }}
+                                      size='small'
+                                      key={option.label}
+                                      variant="outlined"
+                                      label={`Input ${option.label} mark`}
+                                      value={option.mark}
+                                      type="number"
+                                      required
+                                      onChange={(e) => {
+                                        const temp = [...subject];
+                                        temp[index].mark = e.target.value;
+                                        console.log(temp);
+                                        setSubject(temp);
+                                        setFieldValue('subject_id_list', temp);
+                                      }}
+                                    />
                                   </Grid>
+                                  <Grid item>
+                                    <DateTimePicker
+                                      label="Exam Date"
+                                      value={option.exam_date}
+                                      onChange={(n: any) => {
+                                        const temp = [...subject];
+                                        temp[index].exam_date = n;
+                                        console.log(temp);
+                                        setSubject(temp);
+                                        setFieldValue('subject_id_list', temp);
+                                      }}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          required
+                                          size="small"
+                                          sx={{
+                                            '& fieldset': {
+                                              borderRadius: '3px'
+                                            },
+                                            minWidth: '100%'
+                                          }}
+                                          {...params}
+                                        />
+                                      )}
+                                    />
+                                  </Grid>
+                                  <Grid item>
+                                    <AutoCompleteWrapper
+                                      label='Select exam room'
+                                      placeholder='Select exam rooom...'
+                                      options={rooms}
+                                      multiple={true}
+                                      value={rooms?.filter((ii) => option?.exam_room?.includes(ii.id))}
+                                      handleChange={(e, v) => {
+                                        if (v) {
+                                          const temp = [...subject];
+                                          temp[index].exam_room = v.map(i => i.id);
+                                          setSubject(temp);
+                                          setFieldValue('subject_id_list', temp);
+                                        }
+                                      }}
+                                    />
 
-                                ))
-                              }
-                            </Grid>
+
+
+                                  </Grid>
+                                </Grid>
+                              ))
+                            }
                           </Grid>
                         </>
 
-                      )}
+                      )
+                    }
 
                     {/* Is add mark to final */}
                     {
                       subject.length > 0 &&
-                        <Grid
-                          container
-                          display={'grid'}
-                          gridTemplateColumns={'10% 90%'}
-                          gap={1}
-                        >
-                          <Checkbox
-                            sx={{ p: 0 }}
-                            checked={checked}
-                            onChange={(event) => {
-                              console.log(event.target.checked);
+                      <Grid
+                        container
+                        display={'grid'}
+                        gridTemplateColumns={'10% 90%'}
+                        gap={1}
+                      >
+                        <Checkbox
+                          sx={{ p: 0 }}
+                          checked={checked}
+                          onChange={(event) => {
+                            console.log(event.target.checked);
 
-                              setChecked(event.target.checked);
-                            }}
-                            inputProps={{ 'aria-label': 'controlled' }}
-                          />
-                          <>
-                            Will this exam add to the final grade?
-                          </>
+                            setChecked(event.target.checked);
+                          }}
+                          inputProps={{ 'aria-label': 'controlled' }}
+                        />
+                        <>
+                          Will this exam add to the final grade?
+                        </>
 
-                        </Grid>
+                      </Grid>
 
-                      
+
                     }
                     {
                       checked && <Grid pt={2} container>

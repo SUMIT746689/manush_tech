@@ -9,9 +9,9 @@ export const ExportData = ({ students }) => {
   const [exportData, setExportData] = useState([]);
   console.log({ students })
   console.log({ exportData })
+  
   useEffect(() => {
     setLoading(true);
-    const exportData = [];
     if (Array.isArray(students)) {
       const customizeStudentData = students.map(student => ({
         id: student.id,
@@ -34,7 +34,7 @@ export const ExportData = ({ students }) => {
 
   return (<>
     {
-      setLoading && <Grid display={"flex"} >
+      loading && <Grid display={"flex"} >
         <CsvFileExport exportData={exportData} />
         <PdfExport title="Stident List" exportData={exportData} />
       </Grid>

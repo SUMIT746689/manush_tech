@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
+import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -18,7 +19,7 @@ const index = async (req, res) => {
                 const exams = await prisma.exam.findMany({
                     where: {
                         school: {
-                            id: parseInt(req.query.school_id)
+                            id: refresh_token.school_id
                         },
                         ...query
                     },
@@ -72,10 +73,10 @@ const index = async (req, res) => {
                     */
 
 
-                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.school_id || !req.body.subject_id_list) {
+                if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.subject_id_list) {
                     return res.status(400).send({ message: "parameter missing" })
                 }
-                const { title, section_id, academic_year_id, school_id, subject_id_list, class_id, final_percent, exam_date } = req.body;
+                const { title, section_id, academic_year_id, subject_id_list, class_id, final_percent, exam_date } = req.body;
 
                 for (let i of subject_id_list) {
                     const temp = await prisma.subject.findFirst({
@@ -103,18 +104,16 @@ const index = async (req, res) => {
                             connect: { id: parseInt(academic_year_id) }
                         },
                         school: {
-                            connect: { id: parseInt(school_id) }
+                            connect: { id: refresh_token.school_id }
                         },
                         final_percent: final_percent ? parseInt(final_percent) : null
                     }
                 })
 
                 for (let i of subject_id_list) {
-                    const room = {}
+                    const exam_room = {}
                     if (i?.exam_room) {
-                        room['connect'] = {
-                            id: parseInt(i.exam_room)
-                        }
+                        exam_room['connect'] = i.exam_room
                     }
                     await prisma.examDetails.create({
                         data: {
@@ -127,7 +126,7 @@ const index = async (req, res) => {
                             },
                             subject_total: parseFloat(i.mark),
                             exam_date: new Date(i.exam_date),
-                            room
+                            exam_room
                         }
                     })
                 }
@@ -159,19 +158,21 @@ const index = async (req, res) => {
                                 // }
                             }
                         })
-                        let subject_id_list = [];
                         for (let i of req.body.subject_id_list) {
-                            subject_id_list.push({
-                                exam_id: parseInt(req.body.exam_id),
-                                subject_id: parseInt(i.id),
-                                subject_total: parseFloat(i.mark),
-                                exam_date: new Date(i.exam_date),
-                                exam_room: i.exam_room ? parseInt(i.exam_room) : null
+                            const query = {}
+                            if (i?.exam_room?.length > 0) {
+                                query['exam_room'] = { connect: i?.exam_room }
+                            }
+                            await prisma.examDetails.create({
+                                data: {
+                                    exam_id: parseInt(req.body.exam_id),
+                                    subject_id: parseInt(i.id),
+                                    subject_total: parseFloat(i.mark),
+                                    exam_date: new Date(i.exam_date),
+                                    ...query
+                                }
                             })
                         }
-                        await prisma.examDetails.createMany({
-                            data: subject_id_list
-                        })
                         await handleUpdate(req, res);
                         return res.status(200).json({ message: "updated!" })
                     }
@@ -186,7 +187,7 @@ const index = async (req, res) => {
                 else {
                     const temp = await handleUpdate(req, res);
                     if (temp) {
-                        return res.status(200).json({ message: "Only updated title or final percent! Can not Update exam details! This exam result is published" })
+                        return res.status(400).json({ message: "Only updated title or final percent! Can not Update exam details! This exam result is published" })
                     } else {
                         res.status(400).json({ message: "Can not Update exam details! This exam result is published" })
                     }
@@ -231,4 +232,4 @@ const handleUpdate = async (req, res) => {
     }
 
 }
-export default index;
+export default authenticate(index);

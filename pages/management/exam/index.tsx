@@ -31,8 +31,6 @@ function Managementschools() {
         `/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`
       )
       .then((res) => {
-        console.log("exam list__", res?.data[0], typeof (res?.data[0]?.exam_date));
-
         setExams(res.data)
       })
       .catch((err) => console.log(err));
@@ -44,9 +42,11 @@ function Managementschools() {
   }, [academicYear]);
 
   useEffect(() => {
+    
     axios.get(`/api/class?school_id=${user?.school_id}`)
       .then(res => setClasses(res.data))
       .catch(err => console.log(err));
+
     axios.get('/api/rooms').then(res => {
       setRooms(res.data.rooms.map(i => ({
         label: i.name,

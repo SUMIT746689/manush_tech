@@ -31,6 +31,7 @@ import { DatePicker, MobileDatePicker } from '@mui/lab';
 import dayjs from 'dayjs';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { generateUsername } from '@/utils/utilitY-functions';
 
 const BoxUploadWrapper = styled(Box)(
   ({ theme }) => `
@@ -112,7 +113,6 @@ function PageHeader({
       formData.append('present_address', _values.present_address);
       formData.append('permanent_address', _values.permanent_address);
 
-      formData.append('username', _values.username);
       if (_values.password !== '') {
         formData.append('password', _values.password);
       }
@@ -143,6 +143,7 @@ function PageHeader({
           successProcess(t('A teacher has been updated successfully'));
         else throw new Error('edit teacher failed');
       } else {
+        formData.append('username',_values.username)
         const res = await axios({
           method: 'POST',
           url: '/api/teacher',
@@ -192,8 +193,8 @@ function PageHeader({
         </DialogTitle>
         <Formik
           initialValues={{
-            username: editSchool?.user?.username || '',
-            password: '',
+            username: editSchool?.user?.username || undefined,
+            password:  undefined,
             first_name: editSchool?.first_name || '',
             middle_name: editSchool?.middle_name || '',
             last_name: editSchool?.last_name || '',
@@ -315,6 +316,16 @@ function PageHeader({
                         name="first_name"
                         placeholder={t('first name here...')}
                         onBlur={handleBlur}
+                        onBlurCapture={(v) => {
+                          if (v) {
+                            const temp = generateUsername(values.first_name)
+                            if(!editSchool?.user?.username){
+
+                              setFieldValue('password', temp)
+                            }
+                            setFieldValue('username', temp)
+                          }
+                        }}
                         onChange={handleChange}
                         value={values.first_name}
                         variant="outlined"
@@ -856,6 +867,7 @@ function PageHeader({
                         placeholder={t('Teacher username here...')}
                         onBlur={handleBlur}
                         onChange={handleChange}
+                        disabled
                         value={values.username}
                         variant="outlined"
                       />

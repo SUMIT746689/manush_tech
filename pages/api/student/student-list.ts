@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -21,7 +22,8 @@ const index = async (req, res) => {
                                 is: {
                                     deleted_at: null
                                 }
-                            }
+                            },
+                            school_id: refresh_token.school_id
                         }
                         // student_info: {
                         //     school_id: parseInt(req.query.school_id)
@@ -31,6 +33,18 @@ const index = async (req, res) => {
                         id: true,
                         student_information_id: true,
                         section_id: true,
+                        section: {
+                            select: {
+                                id: true,
+                                name: true,
+                                class: {
+                                    select: {
+                                        id: true,
+                                        name: true
+                                    }
+                                }
+                            }
+                        },
                         academic_year_id: true,
                         class_roll_no: true,
                         class_registration_no: true,
@@ -58,4 +72,4 @@ const index = async (req, res) => {
     }
 };
 
-export default index;
+export default authenticate(index);

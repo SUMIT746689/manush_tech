@@ -67,9 +67,9 @@ const post = async (req, res, refresh_token) => {
       !department_id ||
       !national_id
     )
-      return res.send(
-        'username || password || first_name || gender || date_of_birth || present_address || permanent_address'
-      );
+      return res.json({
+        message: 'username || password || first_name || gender || date_of_birth || present_address || permanent_address is missing'
+      });
 
     const encrypePassword = await bcrypt.hash(
       password,
@@ -100,7 +100,7 @@ const post = async (req, res, refresh_token) => {
     console.log("date_of_birth__", date_of_birth);
 
     const filePathQuery = {}
-    
+
     if (fields?.resume) filePathQuery['resume'] = fields?.resume
     if (fields?.photo) filePathQuery['photo'] = fields?.photo
 

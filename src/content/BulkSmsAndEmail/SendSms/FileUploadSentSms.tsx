@@ -9,6 +9,7 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
+import {read} from "xlsx";
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -214,6 +215,27 @@ function PageHeader() {
     }
   };
 
+  
+    // function handleFile(file /*:File*/) {
+    //   /* Boilerplate to set up FileReader */
+    //   const reader = new FileReader();
+    //   const rABS = !!reader.readAsBinaryString;
+    //   reader.onload = e => {
+    //     /* Parse data */
+    //     const bstr = e.target.result;
+    //     const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
+    //     /* Get first worksheet */
+    //     const wsname = wb.SheetNames[0];
+    //     const ws = wb.Sheets[wsname];
+    //     console.log(rABS, wb);
+    //     /* Convert array of arrays */
+    //     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+    //     /* Update state */
+    //     console.log({ data: data, cols: make_cols(ws["!ref"]) });
+    //   };
+    //   reader.readAsBinaryString(file)
+    // };
+
   return (
     <>
       <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
@@ -280,18 +302,36 @@ function PageHeader() {
                       label="File File"
                       name="file_upload"
                       value={values.logo?.name || ''}
-
                       handleChangeFile={(e) => {
-                        console.log({ file___: e.target.files[0] });
-                        const input = e.target.files[0];
                         const reader = new FileReader();
+                        console.log({ file___: e});
+
                         reader.onload = function (e) {
-                          // console.log({e})
-                          // const text = JSON.parse(e.target.result);
-                          // const splitText = text.split(",")
-                          console.log({eeeeee____: e.target.result.toString().split(/\r?\n/) });
-                        };
-                        reader.readAsText(input);
+                          const data = e.target.result;
+                          console.log({data})
+                          const workbook = read(data,{type:"array"});
+                          console.log({workbook})
+                          const {Sheets } = workbook ;
+                          console.log({Sheets})
+                          const {Sheet1:{A1} } = {} = Sheets || {};
+                          console.log({A1})
+                        }
+                        reader.readAsArrayBuffer(e.target.files[0]);
+
+                        // const input = e.target.files[0];
+                        // // handleFile(input)
+                        // // const parser = new DOMParser();
+                        // // const xmlDoc = parser.parseFromString(parser,"text/xml");
+                        // const reader = new FileReader();
+                        // reader.onload = function (e) {
+
+                        //   console.log({e})
+                        //   // const text = JSON.parse(e.target.result);
+                        //   // const splitText = text.split(",")
+                        //   console.log({eeeeee____: e.target.result.toString().split(/\r?\n/) });
+                        // };
+                        // reader.readAsText(input);
+
                         if (e.target?.files?.length) setFieldValue("file_upload", e.target.files[0])
                       }}
                       handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
@@ -371,3 +411,38 @@ function PageHeader() {
 
 export default PageHeader;
 
+
+const SheetJSFT = [
+  "xlsx",
+  "xlsb",
+  "xlsm",
+  "xls",
+  "xml",
+  "csv",
+  "txt",
+  "ods",
+  "fods",
+  "uos",
+  "sylk",
+  "dif",
+  "dbf",
+  "prn",
+  "qpw",
+  "123",
+  "wb*",
+  "wq*",
+  "html",
+  "htm"
+]
+  .map(function(x) {
+    return "." + x;
+  })
+  .join(",");
+
+/* generate an array of column objects */
+// const make_cols = refstr => {
+//   let o = [],
+//     C = XLSX.utils.decode_range(refstr).e.c + 1;
+//   for (var i = 0; i < C; ++i) o[i] = { name: XLSX.utils.encode_col(i), key: i };
+//   return o;
+// };

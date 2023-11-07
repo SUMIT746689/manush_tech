@@ -1,4 +1,4 @@
-import { createSmsQueueTableHandler } from "./utility/createSmsQueueTableHandler.js";
+// import { createSmsQueueTableHandler } from "./utility/createSmsQueueTableHandler.js";
 import { studentManualQueueHandle } from "./utility/manualQueueHandler.js";
 import prisma from "./utility/prisma_client.js";
 

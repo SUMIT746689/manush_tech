@@ -126,28 +126,37 @@ async function seed() {
       { name: 'create notice', value: 'create_notice', group: 'notice' },
       { name: 'create discount', value: 'create_discount', group: 'discount' },
       { name: 'show note', value: 'show_note', group: 'note' },
+      { name: 'create note', value: 'create_note', group: 'note' },
+      { name: 'update note', value: 'update_note', group: 'note' }
     ]
   });
 
   const permissions = await prisma.permission.findMany({
-    where: {
-      NOT: [
-        {
-          value: 'create_admin'
-        },
-        {
-          value: 'create_school'
-        },
-        {
-          value: 'list_package'
-        },
-        {
-          value: 'list_pending_packages'
-        },
-      ]
-    }
+    // where: {
+    //   NOT: [
+    //     {
+    //       value: 'create_admin'
+    //     },
+    //     {
+    //       value: 'create_school'
+    //     },
+    //     {
+    //       value: 'list_package'
+    //     },
+    //     {
+    //       value: 'list_pending_packages'
+    //     }      
+    //   ]
+    // }
   });
 
+  const adminPermission = [];
+  
+  for (const i of permissions) {
+    if (!["create_admin","create_school","list_package","list_pending_packages","create_note","update_note"].includes(i.value) ) {
+      adminPermission.push({ id: i.id })
+    }
+  }
 
   // Dummy Things create
   const hashPassword = await bcrypt.hash('admin', Number(process.env.SALTROUNDS));
@@ -156,9 +165,7 @@ async function seed() {
     data: {
       title: "ADMIN",
       permissions: {
-        connect: permissions.map((permission) => ({
-          id: permission.id
-        }))
+        connect: adminPermission
       }
     }
   })
@@ -213,17 +220,12 @@ async function seed() {
     }
   });
 
-  const teacherPermissions = await prisma.permission.createMany({
-    data: [
-      { name: 'create note', value: 'create_note', group: 'note' },
-      { name: 'update note', value: 'update_note', group: 'note' }
-    ]
-  });
+  const teacherPermissions =[];
 
   for (const i of permissions) {
     if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'show_class_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
       i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
-      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence' || i.value === 'show_teacher_certificate'
+      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence' || i.value === 'show_teacher_certificate' || i.value === 'create_note' || i.value === 'update_note'
     ) {
       teacherPermissions.push({ id: i.id })
     }

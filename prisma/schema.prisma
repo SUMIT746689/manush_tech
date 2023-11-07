@@ -296,6 +296,7 @@ model Subject {
   exam_details ExamDetails[]
   Period       Period[]
   DailyNote    DailyNote[]
+  Syllabus     Syllabus[]
 
   @@map("subjects")
 }
@@ -447,6 +448,7 @@ model AcademicYear {
   fees                       Fee[]
   GradingSystem              GradingSystem[]
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
+  Syllabus                   Syllabus[]
 
   @@map("academic_years")
 }
@@ -467,6 +469,7 @@ model Exam {
   exam_details    ExamDetails[]
   student_results StudentResult[]
   Attendance      Attendance[]
+  Syllabus        Syllabus[]
 
   @@map("exams")
 }
@@ -1151,4 +1154,26 @@ model DailyNote {
 
   @@unique([period_id, date])
   @@map("daily_notes")
+}
+
+model Syllabus {
+  id               Int @id @default(autoincrement())
+  exam_id          Int
+  subject_id       Int
+  academic_year_id Int
+
+  academicYear     AcademicYear       @relation(fields: [academic_year_id], references: [id])
+  subject          Subject            @relation(fields: [subject_id], references: [id])
+  exam             Exam               @relation(fields: [exam_id], references: [id])
+  Syllabus_details Syllabus_details[]
+
+  @@map("syllabus")
+}
+
+model Syllabus_details {
+  id          Int    @id @default(autoincrement())
+  syllabus_id Int
+  body        String
+
+  syllabus Syllabus @relation(fields: [syllabus_id], references: [id])
 }

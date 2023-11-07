@@ -378,7 +378,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                   <TableRow>
                     <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
-                    <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Log in as Admin')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>

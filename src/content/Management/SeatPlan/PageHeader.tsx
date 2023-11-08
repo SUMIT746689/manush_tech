@@ -150,12 +150,12 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
         .catch((err) => console.log(err));
 
       if (selectedSubject && open == false) {
-        fetch(selectedSection?.id, selectedSubject?.id)
+        fetchSeatPlan(selectedSection?.id, selectedSubject?.id)
       }
     }
   }, [selectedSection, academicYear, selectedSubject]);
 
-  const fetch = (section_id, exam_details_id) => {
+  const fetchSeatPlan = (section_id, exam_details_id) => {
     console.log({ selectedSection, selectedSubject });
 
     axios.get(`/api/exam/seat_plan?academic_year_id=${academicYear?.id}&section_id=${section_id}&exam_details_id=${exam_details_id}`)
@@ -186,6 +186,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       setFieldValue('exam_details_id', undefined)
     }
     if (newvalue) {
+      settingStudentList(selectedSection.id)
       axios.get(`/api/exam/exam-subject-list?exam_id=${newvalue.id}`)
         .then(res => {
           setSubjectList(res.data?.map(i => ({
@@ -198,13 +199,16 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
 
         .catch(err => console.log(err))
     }
+    else {
+      if (setSeatPlanSticker) setSeatPlanSticker([])
+    }
   }
   const handleClassSelect = (event, newValue, setFieldValue = null) => {
     setSelectedClass(newValue)
     setSelectedSection(null)
     setSelectedSubject(null)
     setSeatPlan([])
-    if(setSeatPlanSticker) setSeatPlanSticker([])
+    if (setSeatPlanSticker) setSeatPlanSticker([])
     console.log("class changed__");
     if (setFieldValue) {
       setFieldValue('section_id', undefined);
@@ -228,9 +232,6 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
     const targetClass = classes?.find(i => i.id == newValue?.id)
     if (targetClass) {
       if (targetClass.has_section == false) {
-
-        if (settingStudentList) settingStudentList(targetClass.sections[0].id)
-
         setSelectedSection(targetClass.sections[0])
         setFieldValue && setFieldValue('section_id', targetClass.sections[0].id);
 
@@ -265,7 +266,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
           .patch(`/api/exam/seat_plan`, _values)
           .then((res) => {
             console.log(res);
-            fetch(_values.section_id, _values.exam_details_id)
+            fetchSeatPlan(_values.section_id, _values.exam_details_id)
             successProcess(t(`${res?.data?.message ? res?.data?.message : 'Seat plan has been updated successfully'}`))
           })
           .catch((err) => {
@@ -276,7 +277,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       else {
         const res = await axios.post('/api/exam/seat_plan', _values);
         if (res.data?.success) {
-          fetch(_values.section_id, _values.exam_details_id)
+          fetchSeatPlan(_values.section_id, _values.exam_details_id)
           successProcess(t('Seat plan has been created successfully'))
         }
         else {
@@ -299,7 +300,6 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       gridTemplateColumns: {
         xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr'
       },
-      p: 2,
       columnGap: 2
     } : {}
 
@@ -372,11 +372,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
                           value={selectedSection}
                           handleChange={(e, v) => {
                             setSelectedSection(v)
-                            if (settingStudentList) {
-                              if (v) settingStudentList(v?.id)
-                              else setSeatPlanSticker([])
-                            }
-
+                            setSeatPlanSticker([])
                             setFieldValue('section_id', v?.id)
                             setFieldValue('exam_id', undefined)
                             setSelectedSubject(null);

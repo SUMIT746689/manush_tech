@@ -141,7 +141,7 @@ export const menuItems: MenuItems[] = [
           },
           {
             name: 'Exam seat plan',
-            link: '/management/seat_plan',
+            link: '/management/exam/seat-plan',
             icon: AssignmentIcon
           },
         ]

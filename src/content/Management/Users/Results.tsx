@@ -235,18 +235,28 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   const selectedAllUsers = selectedItems.length === allUsers.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-
+  const [userDeleteId, setUserDeleteId] = useState(null)
   const handleConfirmDelete = () => {
     setOpenConfirmDelete(true);
   };
 
   const closeConfirmDelete = () => {
+    setUserDeleteId(null)
     setOpenConfirmDelete(false);
   };
 
   const handleDeleteCompleted = () => {
-    setOpenConfirmDelete(false);
-    showNotification('The user has been removed');
+    if (userDeleteId) {
+      axios
+        .delete(`/api/user/${userDeleteId}`)
+        .then((res) => {
+          closeConfirmDelete()
+          reFetchData()
+          showNotification('The user has been removed');
+        })
+        .catch((err) => console.log(err));
+    }
+
   };
   const [permissionModal, setPermissionModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -392,7 +402,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     return (
                       <TableRow hover key={user.id} selected={isUserSelected}>
                         <TableCell>
-                          <Typography noWrap  variant="h5">{user?.username}</Typography>
+                          <Typography noWrap variant="h5">{user?.username}</Typography>
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
@@ -488,7 +498,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
-                                onClick={handleConfirmDelete}
+                                onClick={() => {
+                                  setUserDeleteId(user?.id)
+                                  handleConfirmDelete()
+                                }}
                                 sx={{ color: 'red' }}
                               >
                                 <DeleteTwoToneIcon fontSize="small" />

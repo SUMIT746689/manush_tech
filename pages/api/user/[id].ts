@@ -1,13 +1,14 @@
 
 import prisma from '@/lib/prisma_client';
 import { patch } from 'controllers/users/user/patch';
+import { authenticate } from 'middleware/authenticate';
 
 export const config = {
   api: {
     bodyParser: false
   }
 };
-const id = async (req, res) => {
+const id = async (req, res, refresh_token) => {
   try {
     const { method } = req;
     const id = parseInt(req.query.id);
@@ -44,6 +45,17 @@ const id = async (req, res) => {
       case 'PATCH':
         patch(req, res);
         break;
+      case 'DELETE':
+        await prisma.user.update({
+          where: {
+            id
+          },
+          data: {
+            deleted_at: new Date()
+          }
+        })
+        res.status(200).json({ message: 'User deleted successfully !!' })
+        break;
       default:
         res.setHeader('Allow', ['GET', 'PATCH']);
         res.status(405).end(`Method ${method} Not Allowed`);
@@ -54,4 +66,4 @@ const id = async (req, res) => {
   }
 };
 
-export default id;
+export default authenticate(id);

@@ -1,5 +1,6 @@
 import { get } from 'controllers/users/get';
 import { post } from 'controllers/users/post';
+import { authenticate } from 'middleware/authenticate';
 export const config = {
   api: {
     bodyParser: false
@@ -26,4 +27,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(index) ;

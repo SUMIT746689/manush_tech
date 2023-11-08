@@ -1173,7 +1173,7 @@ model Syllabus {
 model Syllabus_details {
   id          Int    @id @default(autoincrement())
   syllabus_id Int
-  body        String
+  body        String @db.MediumText
 
   syllabus Syllabus @relation(fields: [syllabus_id], references: [id])
 }

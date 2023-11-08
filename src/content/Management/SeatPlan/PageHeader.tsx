@@ -68,7 +68,7 @@ function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, clas
         handleCreateClassOpen={handleCreateProjectOpen}
       />
 
-      <FormContro
+      <FormControl
         seatPlan={seatPlan}
         pdf={pdf}
         setPdf={setPdf}
@@ -98,7 +98,7 @@ function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, clas
             {t('Use this dialog window to add a seat plan')}
           </Typography>
         </DialogTitle>
-        <FormContro
+        <FormControl
           seatPlan={seatPlan}
           rooms={rooms} setRooms={setRooms}
           open={open} editExam={editExam}
@@ -113,7 +113,7 @@ function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, clas
   );
 }
 
-const FormContro = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose }) => {
+const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose }) => {
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
 
@@ -204,7 +204,7 @@ const FormContro = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, roo
     setSelectedSection(null)
     setSelectedSubject(null)
     setSeatPlan([])
-    setSeatPlanSticker([])
+    if(setSeatPlanSticker) setSeatPlanSticker([])
     console.log("class changed__");
     if (setFieldValue) {
       setFieldValue('section_id', undefined);

@@ -35,7 +35,7 @@ import SendIcon from '@mui/icons-material/Send';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import TextsmsIcon from '@mui/icons-material/Textsms';
 import DraftsIcon from '@mui/icons-material/Drafts';
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import GroupIcon from '@mui/icons-material/Group';
@@ -125,7 +125,6 @@ export const menuItems: MenuItems[] = [
           },
         ]
       },
-
       {
         name: 'Schools',
         link: '/management/schools',
@@ -147,6 +146,11 @@ export const menuItems: MenuItems[] = [
           },
         ]
 
+      },
+      {
+        name: 'Syllabus',
+        link: '/management/syllabus',
+        icon:  SummarizeIcon
       },
       {
         name: 'Result',

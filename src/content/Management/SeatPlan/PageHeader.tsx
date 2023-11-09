@@ -122,6 +122,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
 
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [exams, setExams] = useState([]);
 
   // const [selectedExam, setSelectedExam] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
@@ -129,7 +130,6 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const seat_plan_print = useRef()
 
-  const [exams, setExams] = useState([]);
   const { showNotification } = useNotistick();
 
   useEffect(() => {
@@ -298,7 +298,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       width: "100%",
       display: "grid",
       gridTemplateColumns: {
-        xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr'
+        xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr 1fr'
       },
       columnGap: 2
     } : {}

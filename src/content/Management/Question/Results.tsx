@@ -6,11 +6,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
-import BulkActions from './BulkActions';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import Link from 'next/link';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -59,10 +59,10 @@ const Transition = forwardRef(function Transition(
 
 
 const applyFilters = (
-  schools: Project[],
-  query: string,
-  filters: Filters
-): Project[] => {
+  schools,
+  query,
+  filters
+) => {
   return schools.filter((project) => {
     let matches = true;
 
@@ -98,17 +98,16 @@ const applyFilters = (
 };
 
 const applyPagination = (
-  schools: Project[],
-  page: number,
-  limit: number
-): Project[] => {
+  schools,
+  page,
+  limit
+) => {
   return schools.slice(page * limit, page * limit + limit);
 };
 
 const Results = ({
-  exams,
-  // setTeachers,
-  setEditExam
+  question,
+  setEditQuestion
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -133,7 +132,7 @@ const Results = ({
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     setSelectedschools(
-      event.target.checked ? exams.map((project) => project.id) : []
+      event.target.checked ? question.map((project) => project.id) : []
     );
   };
 
@@ -158,11 +157,11 @@ const Results = ({
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredExams = applyFilters(exams, query, filters);
+  const filteredExams = applyFilters(question, query, filters);
   const paginatedExams = applyPagination(filteredExams, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < exams.length;
-  const selectedAllschools = selectedItems.length === exams.length;
+  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < question.length;
+  const selectedAllschools = selectedItems.length === question.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -174,7 +173,7 @@ const Results = ({
 
   const handleDeleteCompleted = async () => {
     try {
-      const result: any = await axios.delete(`/api/exam/${deleteSchoolId}`);
+      const result: any = await axios.delete(`/api/teacher/${deleteSchoolId}`);
       console.log({ result });
       if (!result.data?.success) throw new Error('unsuccessful delete');
       setOpenConfirmDelete(false);
@@ -186,7 +185,7 @@ const Results = ({
   };
 
   const handleEdit = (data: object) => {
-    setEditExam(data)
+    setEditQuestion(data)
   };
 
   return (
@@ -222,11 +221,7 @@ const Results = ({
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 450px)' }}>
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
+
         {!selectedBulkActions && (
           <Box
             p={2}
@@ -287,9 +282,9 @@ const Results = ({
                   <td>{t('Exam title')}</td>
                   <td>{t('Class')}</td>
                   <td>{t('Section')}</td>
-                  <td>{t('Final percentage')}</td>
-                  <td>{t('Subject list')}</td>
-                  <td align="center">{t('Actions')}</td>
+                  <td>{t('Subject title')}</td>
+                  <td>{t('Subject total')}</td>
+                  {/* <td align="center">{t('Actions')}</td> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -321,41 +316,49 @@ const Results = ({
                       </td>
                       <td>
                         <Typography noWrap variant="h5" py={0}>
-                          {exam?.title}
+                          {exam?.exam_details?.exam?.title}
                         </Typography>
                       </td>
                       <td>
                         <Typography noWrap variant="h5" py={0}>
-                          {exam?.section?.class?.name}
+                          {exam?.exam_details?.exam?.section?.class?.name}
                         </Typography>
                       </td>
                       <td>
                         <Typography noWrap variant="h5" py={0}>
-                          {exam.section?.class?.has_section ? exam?.section?.name : '(This class has no section !)'}
+                          {exam?.exam_details?.exam?.section?.class?.has_section ? exam?.exam_details?.exam?.section?.name : 'No section'}
                         </Typography>
                       </td>
                       <td>
                         <Typography noWrap variant="h5" py={0}>
-                          {exam.final_percent ? exam?.final_percent : 'No percentage'}
+                          {exam?.exam_details?.subject?.name}
                         </Typography>
                       </td>
                       <td>
-                        <Typography variant="h5" py={0}>
-                          {exam?.exam_details?.map(i => i?.subject?.name).join(", ")}
+                        <Typography noWrap variant="h5" py={0}>
+                          {exam?.exam_details?.subject_total}
                         </Typography>
                       </td>
 
 
                       <td align="center">
                         <Typography noWrap py={0}>
-                          <Tooltip title={t('Edit')} arrow>
+                          {/* <Tooltip title={t('Edit')} arrow>
                             <IconButton
                               onClick={() => handleEdit(exam)}
                               color="primary"
                             >
-                              <LaunchTwoToneIcon fontSize="small" />
+                              <Link
+                                href={{
+                                  pathname: '/management/exam/question/create',
+                                  query: exam
+                                }}
+                              >
+
+                                <LaunchTwoToneIcon fontSize="small" />
+                              </Link>
                             </IconButton>
-                          </Tooltip>
+                          </Tooltip> */}
                           {/* <Tooltip title={t('Delete')} arrow>
                                 <IconButton
                                   onClick={() =>

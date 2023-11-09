@@ -486,6 +486,7 @@ model ExamDetails {
   exam_room    Room[]                 @relation("examRoom")
   participants StudentResultDetails[]
   seatPlan     seatPlan[]
+  question     question[]
 
   @@map("exam_details")
 }
@@ -1176,4 +1177,16 @@ model Syllabus_details {
   body        String @db.MediumText
 
   syllabus Syllabus @relation(fields: [syllabus_id], references: [id])
+
+  @@map("syllabus_details")
+}
+
+model question {
+  id              Int         @id @default(autoincrement())
+  exam_details_id Int
+  content         String?     @db.LongText
+  file            String?
+  exam_details    ExamDetails @relation(fields: [exam_details_id], references: [id])
+
+  @@map("question")
 }

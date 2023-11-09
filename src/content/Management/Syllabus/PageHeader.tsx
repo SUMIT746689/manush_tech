@@ -271,7 +271,7 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
                 <ButtonWrapper
                   handleClick={undefined}
                   startIcon={<LocalPrintshopIcon />}
-                >{t(`Print ${selectedSubject?.label} Study Plan`)}</ButtonWrapper>
+                >{t(`Print ${selectedSubject?.label} Syllabus`)}</ButtonWrapper>
               )}
             // pageStyle={"@page { size: landscape; }"}
             />
@@ -279,7 +279,7 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
               axios.get(`/api/syllabus?exam_id=${selectedExam.id}&academic_year_id=${academicYear.id}`)
                 .then(res => setAllSyllabus(res.data))
                 .catch(err => console.log(err))
-            }}>Generate Full term study plan</ButtonWrapper>
+            }}>Generate Full term syllabus</ButtonWrapper>
             {
               allSyllabus.length > 0 && <ReactToPrint
                 content={() => allStudyPlan.current}
@@ -288,7 +288,7 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
                   <ButtonWrapper
                     handleClick={undefined}
                     startIcon={<LocalPrintshopIcon />}
-                  >{t(`Print Full term study plan`)}</ButtonWrapper>
+                  >{t(`Print Full term syllabus`)}</ButtonWrapper>
                 )}
               // pageStyle={"@page { size: landscape; }"}
               />
@@ -337,7 +337,7 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
 
             <Grid item>
               <Typography variant="h4" >
-                Study plan
+                Syllabus
               </Typography>
             </Grid>
 
@@ -350,15 +350,29 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
             < TableContainer sx={{ marginX: 1, p: 0.5 }}>
               <Table aria-label="collapsible table" size="small">
                 <TableHead>
-                  <TableRow>
-                    <TableCell align='center' >{t('Content')}</TableCell>
+                  <TableRow sx={{
+                      border:'1px solid'
+                    }}>
+                    <TableCell align='center' sx={{
+                      border:'1px solid'
+                    }}>{t('SL')}</TableCell>
+                    <TableCell align='center'sx={{
+                      border:'1px solid'
+                    }} >{t('Content')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
 
                   {
-                    syllabus?.map((exam, index) => <TableRow>
-                      <TableCell align='left'>{exam?.body}</TableCell>
+                    syllabus?.map((exam, index) => <TableRow sx={{
+                      border:'1px solid'
+                    }}>
+                      <TableCell align='left' sx={{
+                      border:'1px solid'
+                    }}>{index + 1}</TableCell>
+                      <TableCell align='left' sx={{
+                      border:'1px solid'
+                    }}>{exam?.body}</TableCell>
                     </TableRow>)
                   }
 

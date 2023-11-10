@@ -89,6 +89,7 @@ model School {
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   RequestBuySms              RequestBuySms[]
   SmsTransaction             SmsTransaction[]
+  addtionalMarkingCategories AddtionalMarkingCategories[]
 
   // routines Routine[]
   @@map("schools")
@@ -466,10 +467,11 @@ model Exam {
   academic_year AcademicYear @relation(fields: [academic_year_id], references: [id])
   school        School       @relation(fields: [school_id], references: [id])
 
-  exam_details    ExamDetails[]
-  student_results StudentResult[]
-  Attendance      Attendance[]
-  Syllabus        Syllabus[]
+  exam_details     ExamDetails[]
+  student_results  StudentResult[]
+  Attendance       Attendance[]
+  Syllabus         Syllabus[]
+  examAddtinalMark ExamAddtionalMark[]
 
   @@map("exams")
 }
@@ -1189,4 +1191,31 @@ model question {
   exam_details    ExamDetails @relation(fields: [exam_details_id], references: [id])
 
   @@map("question")
+}
+
+model AddtionalMarkingCategories {
+  id         Int      @id @default(autoincrement())
+  title      String
+  school_id  Int
+  created_at DateTime @default(now())
+  deleted_at DateTime?
+
+  school            School              @relation(fields: [school_id], references: [id])
+  examAddtionalMark ExamAddtionalMark[]
+
+  @@map("addtional_marking_categories")
+}
+
+model ExamAddtionalMark {
+  id                Int      @id @default(autoincrement())
+  total_mark        Float
+  addtional_mark_id Int
+  exam_id           Int
+  created_at        DateTime @default(now())
+  // deleted_at        DateTime
+  
+  addtionalMarkingCategorie AddtionalMarkingCategories @relation(fields: [addtional_mark_id], references: [id])
+  exam                      Exam                       @relation(fields: [exam_id], references: [id])
+
+  @@map("exam_addtional_marks")
 }

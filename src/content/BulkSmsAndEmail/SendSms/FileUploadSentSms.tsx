@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
+import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, Chip } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
@@ -10,6 +10,7 @@ import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import {read} from "xlsx";
+import { getSheetHeaders } from '@/utils/sheet';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -190,6 +191,7 @@ const DynamicTypeSelect = () => {
 function PageHeader() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
+  const [selectSheetHeaders,setSelectSheetHeaders ] = useState([]);
 
   const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
@@ -202,7 +204,23 @@ function PageHeader() {
         // reFetchData();
       };
 
-      const { data } = await axios.post(`/api/sent_sms`, _values);
+      const datas = new FormData()
+      // datas.set('file', "asss")
+
+      for (const [key, value] of Object.entries(_values)) {
+        console.log(`${key}: ${value}`);
+        if(value) datas.set(key,_values[key]);
+      }
+      console.log({datas})
+      // const {file_upload} = _values;
+      // const fileToBlob = new Blob([new Uint8Array(await file_upload.arrayBuffer())], {type: file_upload.type });
+      // _values.file_upload.arrayBuffer().then((arrayBuffer) => {
+      //   const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file_upload.type });
+      //   console.log({blob});
+      // }); 
+      // _values.file_upload = fileToBlob;
+      console.log({_values})
+      const { data } = await axios.post(`/api/sent_sms/dynamic`, datas);
       successResponse('created');
 
     } catch (err) {
@@ -246,13 +264,13 @@ function PageHeader() {
           initialValues={{
             campaign_name: undefined,
             sms_gateway_id: undefined,
-            template_id: undefined,
+            // template_id: undefined,
             body: undefined,
-            recipient_type: undefined,
-            class_id: undefined,
-            section_id: [],
-            role_id: [],
-            name: [],
+            // recipient_type: undefined,
+            // class_id: undefined,
+            // section_id: [],
+            // role_id: [],
+            // name: [],
             schedule_date: undefined,
             schedule_time: undefined,
             submit: null
@@ -264,12 +282,12 @@ function PageHeader() {
             body: Yup.string()
               .max(255)
               .required(t('The body field is required')),
-            sms_gateway_id: Yup.number()
-              .min(0)
-              .required(t('The sms gateway field is required')),
-            recipient_type: Yup.string()
-              .min(4)
-              .required(t('The type field is required')),
+            // sms_gateway_id: Yup.number()
+            //   .min(0)
+            //   .required(t('The sms gateway field is required')),
+            // recipient_type: Yup.string()
+            //   .min(4)
+            //   .required(t('The type field is required')),
           })}
           onSubmit={handleFormSubmit}
         >
@@ -303,18 +321,26 @@ function PageHeader() {
                       name="file_upload"
                       value={values.logo?.name || ''}
                       handleChangeFile={(e) => {
+                        if(!e.target.files[0]) return ;
                         const reader = new FileReader();
                         console.log({ file___: e});
 
+                
                         reader.onload = function (e) {
                           const data = e.target.result;
+                          // console.log({e})
+                          // const blob = new Blob([new Uint8Array(data)], {type: e.type });
+                          // console.log(blob);
                           console.log({data})
-                          const workbook = read(data,{type:"array"});
+                          const workbook = read(data, {type:"array"});
                           console.log({workbook})
                           const {Sheets } = workbook ;
                           console.log({Sheets})
+                          const {Sheet1 } = {} = Sheets || {};
                           const {Sheet1:{A1} } = {} = Sheets || {};
-                          console.log({A1})
+                          console.log({Sheet1})
+                          // setFieldValue("file_upload", e );
+                          setSelectSheetHeaders(()=>getSheetHeaders(Sheet1))
                         }
                         reader.readAsArrayBuffer(e.target.files[0]);
 
@@ -332,18 +358,24 @@ function PageHeader() {
                         // };
                         // reader.readAsText(input);
 
-                        if (e.target?.files?.length) setFieldValue("file_upload", e.target.files[0])
+                        if (e.target?.files?.length) setFieldValue("file_upload", e.target.files[0]);
                       }}
                       handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
                     />
-                    {/* {editData?.logo_url */}
-                    {/* && */}
-                    {/* // <Avatar variant="square" sx={{ border: '1px solid lightgray', background: 'none', mb: 1, width: 100, height: 100 }}> */}
-                    {/* <Image src={editData?.logo_url} width={100} height={100} alt="logo" /> */}
-                    {/* <img src={`/api/get_file${editData?.logo_url}`} className=" h-fit w-20" alt='logo' /> */}
-                    {/* </Avatar> */}
-                    {/* } */}
+                    {
+                    values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{borderRadius:0, height:40}}/><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{borderRadius:0,height:40}} /></Grid>}
 
+                    <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
+                    {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
+                    
+                    <Grid display={"flex"} justifyContent={"right"} flexWrap={"wrap"} gap={0.5}>
+                    {selectSheetHeaders.map((value,index)=><Chip key={index} color="primary" onClick={(e)=>{
+                      setFieldValue("body", (values.body || '') + ` #${value}#`)
+                    }} sx={{borderRadius:0.5,fontSize:13, fontWeight:700}} label={`#${value}#`} clickable/>)}
+                    </Grid>
+
+                    </Grid>
+                    
 
                     {/* <DynamicSelectTemplate /> */}
 
@@ -373,16 +405,11 @@ function PageHeader() {
 
                     <GateWaySelect />
 
-                    <DynamicTypeSelect />
+                    {/* <DynamicTypeSelect /> */}
 
-                    {values.recipient_type === "CLASS" && <TypeClass />}
-                    {values.recipient_type === "GROUP" && <TypeGroup />}
-                    {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />}
-                    {/* <DropDownSelectWrapper required={true} label="Type" menuItems={[]} />
-                    <DropDownSelectWrapper required={true} label="Role" menuItems={[]} /> */}
-                    {/* <DropDownSelectWrapper menuItems={[]} /> */}
-                    {/* <MobileDatePicker />
-                    <MobileDatePicker /> */}
+                    {/* {values.recipient_type === "CLASS" && <TypeClass />} */}
+                    {/* {values.recipient_type === "GROUP" && <TypeGroup />} */}
+                    {/* {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />} */}
 
                   </Grid>
                 </DialogContent>

@@ -1,12 +1,12 @@
 import { authenticate } from 'middleware/authenticate';
 import { fileUpload } from '@/utils/upload';
 import path from 'path';
-import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import fsP from 'fs/promises';
+import prisma from '@/lib/prisma_client';
 
 
-async function post(req, res, refresh_token) {
+async function patch(req, res, refresh_token) {
   try {
     const { id } = req.query;
     console.log({ id })
@@ -76,4 +76,4 @@ async function post(req, res, refresh_token) {
   }
 }
 
-export default authenticate(post)
+export default authenticate(patch)

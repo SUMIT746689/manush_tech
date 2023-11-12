@@ -372,7 +372,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
                           value={selectedSection}
                           handleChange={(e, v) => {
                             setSelectedSection(v)
-                            setSeatPlanSticker([])
+                            // setSeatPlanSticker([])
                             setFieldValue('section_id', v?.id)
                             setFieldValue('exam_id', undefined)
                             setSelectedSubject(null);

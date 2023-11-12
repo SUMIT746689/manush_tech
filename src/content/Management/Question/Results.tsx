@@ -7,7 +7,7 @@ import type { Project, ProjectStatus } from 'src/models/project';
 import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
-
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import Link from 'next/link';
@@ -107,7 +107,8 @@ const applyPagination = (
 
 const Results = ({
   question,
-  setEditQuestion
+  reFetch,
+  selectedSubject
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -126,7 +127,10 @@ const Results = ({
     setQuery(event.target.value);
   };
 
-
+  const handleConfirmDelete = (id: string) => {
+    setDeleteSchoolId(id);
+    setOpenConfirmDelete(true);
+  };
 
   const handleSelectAllschools = (
     event: ChangeEvent<HTMLInputElement>
@@ -172,20 +176,16 @@ const Results = ({
   };
 
   const handleDeleteCompleted = async () => {
-    try {
-      const result: any = await axios.delete(`/api/teacher/${deleteSchoolId}`);
-      console.log({ result });
-      if (!result.data?.success) throw new Error('unsuccessful delete');
-      setOpenConfirmDelete(false);
-      showNotification('The exam has been deleted successfully');
-    } catch (err) {
-      setOpenConfirmDelete(false);
-      showNotification('The school falied to delete ', 'error');
-    }
-  };
 
-  const handleEdit = (data: object) => {
-    setEditQuestion(data)
+    axios.delete(`/api/question/${deleteSchoolId}`).then(res => {
+      closeConfirmDelete()
+      showNotification(res.data.message);
+      // reFetch(selectedSubject?.id)
+    }).catch(err => {
+      setOpenConfirmDelete(false);
+      showNotification('Question falied to delete ', 'error');
+    })
+
   };
 
   return (
@@ -292,6 +292,7 @@ const Results = ({
                   const isExamselected = selectedItems.includes(
                     exam.id
                   );
+                  console.log({ exam });
 
                   return (
                     <TableRow
@@ -343,32 +344,26 @@ const Results = ({
 
                       <td align="center">
                         <Typography noWrap py={0}>
-                          {/* <Tooltip title={t('Edit')} arrow>
+                          <Tooltip title={t('Edit')} arrow>
                             <IconButton
-                              onClick={() => handleEdit(exam)}
                               color="primary"
                             >
                               <Link
-                                href={{
-                                  pathname: '/management/exam/question/create',
-                                  query: exam
-                                }}
+                                href={`/management/exam/question/${exam.id}`}
                               >
-
                                 <LaunchTwoToneIcon fontSize="small" />
                               </Link>
                             </IconButton>
-                          </Tooltip> */}
-                          {/* <Tooltip title={t('Delete')} arrow>
-                                <IconButton
-                                  onClick={() =>
-                                    handleConfirmDelete(exam.id)
-                                  }
-                                  color="primary"
-                                >
-                                  <DeleteTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip> */}
+                          </Tooltip>
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={() => handleConfirmDelete(exam.id)
+                              }
+                              color='error'
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                         </Typography>
                       </td>
                     </TableRow>

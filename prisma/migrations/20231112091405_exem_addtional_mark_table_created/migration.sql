@@ -4,7 +4,7 @@ CREATE TABLE `addtional_marking_categories` (
     `title` VARCHAR(191) NOT NULL,
     `school_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `deleted_at` DATETIME(3) NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -17,6 +17,7 @@ CREATE TABLE `exam_addtional_marks` (
     `exam_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `exam_addtional_marks_addtional_mark_id_exam_id_key`(`addtional_mark_id`, `exam_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

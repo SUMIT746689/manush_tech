@@ -39,7 +39,12 @@ function PageHeader({
   const [selectedAddlMarkingCats, setSelectedAddlMarkingCats] = useState([]);
 
   useEffect(() => {
-    if (editSubject) handleCreateClassOpen();
+    if (editSubject) {
+      setSelectedAddlMarkingCats(() => editSubject?.examAddtinalMark?.map((addlMark => {
+        return { ...addlMark?.addtionalMarkingCategorie, total_mark: addlMark.total_mark }
+      })) || []);
+      handleCreateClassOpen();
+    }
   }, [editSubject]);
 
   const handleCreateClassOpen = () => {
@@ -62,24 +67,19 @@ function PageHeader({
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
+      const addtional_marks = selectedAddlMarkingCats.map(({ id, total_mark }) => ({ addtional_mark_id: id, total_mark }))
+
       if (editSubject) {
-        await axios.patch(`/api/subject/${editSubject.id}`, _values)
+        await axios.patch(`/api/exam/addtional_marks`, { ..._values, addtional_marks })
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
         handleCreateUserSuccess(t('The subject was updated successfully'));
       }
       else {
+        if (addtional_marks.length === 0) throw new Error("no addtional marks ...")
 
-        // if (!_values?.class_id?.length) {
-        //   throw new Error('please select class')
-        // }
-        // const data = _values?.class_id?.map(i => ({
-        //   name: _values?.name,
-        //   class_id: i.value
-        // }))
-
-        await axios.post(`/api/exam/addtional_marks`, { ..._values, addtional_marks: addlmarkingCats })
+        await axios.post(`/api/exam/addtional_marks`, { ..._values, addtional_marks })
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
@@ -137,8 +137,8 @@ function PageHeader({
         <Formik
           initialValues={{
             // title: editSubject?.title || '',
-            exam_id: editSubject ? editSubject?.exam_id : undefined,
-            // addlmarkingCats: editSubject ? editSubject?.addtional_mark_ids : [],
+            exam_id: editSubject ? editSubject?.id : undefined,
+            addtional_mark_ids: editSubject ? editSubject?.examAddtinalMark?.map(v => ({ total_mark: v.total_mark, id: v.addtionalMarkingCategorie.id, label: v.addtionalMarkingCategorie.title })) : [],
           }}
           validationSchema={Yup.object().shape({
             // title: Yup.string()
@@ -166,7 +166,7 @@ function PageHeader({
             values,
             setFieldValue
           }) => {
-            console.log({ errors })
+            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -186,55 +186,38 @@ function PageHeader({
                       handleChange={(event, value) => setFieldValue('exam_id', value?.value || null)}
                     />
                     <AutoCompleteWrapper
-                      multiple={editSubject ? false : true}
+                      disabled={editSubject ? true : false}
+                      // multiple={editSubject ? false : true}
                       minWidth="100%"
-                      value={editSubject ? (addlmarkingCats.find((cls) => cls.value === values.addtional_mark_ids) || null) : selectedClass}
+                      multiple={true}
+                      // value={editSubject ? (addlmarkingCats.find((cls) => cls.value === values.addtional_mark_ids) || null) : selectedClass}
+                      // value={[{label:'Attendance',id:1}]}
+                      value={values.addtional_mark_ids}
                       options={addlmarkingCats}
                       label="Class"
                       placeholder={"select class..."}
                       // @ts-ignore
                       handleChange={(event, value) => {
                         console.log("value__", value);
-                        if (editSubject) {
-                          setFieldValue('addtional_mark_ids', value?.value || null)
-                        }
-                        else {
-                          setSelectedClass(value)
-                          setSelectedAddlMarkingCats((cats) => value?.map(v => {
-                            const category = cats.find(cat => cat.id === v.value);
-                            if (category) return category
-                            return { id: v.value }
-                          }))
-                          setFieldValue('addtional_mark_ids', value)
-                        }
+                        // if (editSubject) {
+                        //   setFieldValue('addtional_mark_ids', value?.value || null)
+                        // }
+                        // else {
+                        setSelectedClass(value);
+                        setSelectedAddlMarkingCats((cats) => value?.map(v => {
+                          const category = cats.find(cat => cat.id === v.value);
+                          if (category) return category
+                          return { id: v.value, title: v.label }
+                        }))
+                        setFieldValue('addtional_mark_ids', value)
+                        // }
 
                       }}
                     />
-
-
                     {
-                      values.addtional_mark_ids?.map((value) => <AddlMarkingCategories key={value.id} id={value} selectedAddlMarkingCats={selectedAddlMarkingCats} handleAddlMarkingCats={handleAddlMarkingCats} />)
+                      values?.addtional_mark_ids &&
+                      selectedAddlMarkingCats?.map((value) => <AddlMarkingCategories key={value.id} value={value} handleAddlMarkingCats={handleAddlMarkingCats} />)
                     }
-                    {/* <AutoCompleteWrapper
-                      multiple={editSubject ? false : true}
-                      minWidth="100%"
-                      value={editSubject ? (classList.find((cls) => cls.value === values.class_id) || null) : selectedClass}
-                      options={classList}
-                      label="Class"
-                      placeholder={"select class..."}
-                      // @ts-ignore
-                      handleChange={(event, value) => {
-                        console.log("value__", value);
-                        if (editSubject) {
-                          setFieldValue('class_id', value?.value || null)
-                        }
-                        else {
-                          setSelectedClass(value)
-                          setFieldValue('class_id', value)
-                        }
-
-                      }}
-                    /> */}
                   </Grid>
                 </DialogContent>
                 <DialogActionWrapper
@@ -256,8 +239,10 @@ function PageHeader({
 
 export default PageHeader;
 
-const AddlMarkingCategories = ({ id, handleAddlMarkingCats }) => {
-  console.log({ id })
+
+
+const AddlMarkingCategories = ({ value, handleAddlMarkingCats }) => {
+  console.log({ value })
   return (
     <Grid item width={"100%"} display="grid" gridTemplateColumns={"1fr 1fr"} columnGap={1}>
       {/* <TextFieldWrapper */}
@@ -271,15 +256,23 @@ const AddlMarkingCategories = ({ id, handleAddlMarkingCats }) => {
         id="outlined-basic"
         label={"Addtional Marking Category"}
         name={"addtinoal_marking_category"}
-        value={id.value}
+        value={value.title}
         disabled={true}
       />
-      <TextFieldWrapper
+      <TextField
+        size='small'
+        sx={{
+          [`& fieldset`]: {
+            borderRadius: 0.6,
+          }
+        }}
+        value={value.total_mark}
+        id='outlined-basic'
+        label={'Total Mark'}
+        name={'total_mark'}
         type='number'
-        min={0}
-        label={"Total Mark"}
-        name={"total_mark"}
-        handleChange={(e) => handleAddlMarkingCats(id.value, e.target.value)}
+        inputProps={{ min: 0 }}
+        onChange={(e) => handleAddlMarkingCats(value.id, e.target.value)}
       // value={values.total_mark}
       // handleChange={handleChange}
       // handleBlur={handleBlur}

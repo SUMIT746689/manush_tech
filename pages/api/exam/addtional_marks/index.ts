@@ -21,19 +21,21 @@ const index = async (req, res, refresh_token) => {
       case 'POST':
         const { school_id } = refresh_token;
         if (!school_id) throw new Error("permission denied")
-        console.log({ body: req.body })
-        const { exam_id, addtional_mark_id } = req.body;
-        console.log({ total_mark, exam_id })
-        if (!exam_id || !total_mark || !addtional_mark_id) throw new Error("required field missing")
-        const datas =
-          await prisma.examAddtionalMark.createMany({
-            data: {
-              addtional_mark_id,
-              total_mark,
-              exam_id,
-            }
-          });
+
+        const { exam_id, addtional_marks } = req.body;
+
+        if (!exam_id || !addtional_marks) throw new Error("required field missing")
+        const datas = addtional_marks?.map(({ addtional_mark_id, total_mark }) => {
+          if (!addtional_mark_id || !total_mark) throw new Error("addtional marks fields missing")
+          return ({ addtional_mark_id, total_mark, exam_id })
+        })
+
+        await prisma.examAddtionalMark.createMany({
+          data: datas
+        });
+
         res.status(200).json({ message: 'Addtional marking catagory created successfully' });
+
         break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);

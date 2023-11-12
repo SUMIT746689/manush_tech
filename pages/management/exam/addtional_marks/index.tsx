@@ -17,19 +17,19 @@ function ManagementClasses() {
 
   const { data: subjects, reFetchData: reFetchSubjects } = useClientFetch(`/api/exam/addtional_marks`);
   const { data: addlmarkingCats } = useClientFetch(`/api/addtional_marking_categories`);
-  const { data: exams } = useClientFetch(`/api/exam`);
+  const { data: exams } = useClientFetch(`/api/exam?with_addtional_mark=true`);
   const [selectedExam, setSelectedExam] = useState(null);
   const [selectedExamAddlMarks, setSelectedExamAddlMarks] = useState();
   const [isLoading, setIsLoading] = useState(false);
   console.log({ subjects, addlmarkingCats, exams })
-  const handleSearchAddlMarks = async () => {
-    setIsLoading(true);
-    console.log("hi.....")
-    const { value } = selectedExam;
-    const {data} = await axios.get(`/api/exam/addtional_marks?exam_id=${value}`);
-    console.log({data})
-    setTimeout(() => { setIsLoading(false) }, 2000)
-  }
+  // const handleSearchAddlMarks = async () => {
+  //   setIsLoading(true);
+  //   console.log("hi.....")
+  //   const { value } = selectedExam;
+  //   const {data} = await axios.get(`/api/exam/addtional_marks?exam_id=${value}`);
+  //   console.log({data})
+  //   setTimeout(() => { setIsLoading(false) }, 2000)
+  // }
   return (
     <>
       <Head>
@@ -62,7 +62,7 @@ function ManagementClasses() {
         />
       </PageTitleWrapper>
 
-      <Card sx={{ mb: 1, pt: 1, px: 1, maxWidth: 600, mx: 'auto', display: "grid", gridTemplateColumns: "1fr 100px", columnGap: 1 }} >
+      {/* <Card sx={{ mb: 1, pt: 1, px: 1, maxWidth: 600, mx: 'auto', display: "grid", gridTemplateColumns: "1fr 100px", columnGap: 1 }} >
         <AutoCompleteWrapper
           minWidth="100%"
           value={selectedExam}
@@ -77,7 +77,7 @@ function ManagementClasses() {
         <SearchingButtonWrapper disabled={!selectedExam || isLoading} handleClick={handleSearchAddlMarks} isLoading={isLoading}>
           Search
         </SearchingButtonWrapper>
-      </Card >
+      </Card > */}
 
 
       <Grid

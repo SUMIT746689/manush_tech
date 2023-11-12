@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef, Fragment } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -22,7 +22,8 @@ import {
   Button,
   Typography,
   Dialog,
-  styled
+  styled,
+  Collapse
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -242,57 +243,97 @@ const Results = ({ setEditSubject, users, classList }) => {
                       />
                     </TableCell>
                     <TableCell>{t('Exam Name')}</TableCell>
-                    <TableCell>{t('Class name')}</TableCell>
+                    <TableCell>{t('Addtional Categories( total mark )')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {paginatedSubjects.map((i) => {
+                    console.log({ i: i.examAddtinalMark })
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
-                      <TableRow hover key={i.id} selected={isUserSelected}>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isUserSelected}
-                            onChange={(event) =>
-                              handleSelectOneUser(event, i.id)
-                            }
-                            value={isUserSelected}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">{i.title}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {
-                              classList?.find((c) => c.value === i.class_id)
-                                ?.label
-                            }
-                          </Typography>
-                        </TableCell>
+                      <Fragment key={i.id}>
+                        <TableRow hover selected={isUserSelected}>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={isUserSelected}
+                              onChange={(event) =>
+                                handleSelectOneUser(event, i.id)
+                              }
+                              value={isUserSelected}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h5">{i.title}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h5">
+                              {
+                                i.examAddtinalMark?.map((cat =>`${cat.addtionalMarkingCategorie?.title}(${cat.total_mark})`)).join(' - ')
+                              }
+                            </Typography>
+                          </TableCell>
 
-                        <TableCell align="center">
-                          <Typography noWrap>
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() => setEditSubject(i)}
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={handleConfirmDelete}
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
+                          <TableCell align="center">
+                            <Typography noWrap>
+                              <Tooltip title={t('Edit')} arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => setEditSubject(i)}
+                                >
+                                  <LaunchTwoToneIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('Delete')} arrow>
+                                <IconButton
+                                  onClick={handleConfirmDelete}
+                                  color="primary"
+                                >
+                                  <DeleteTwoToneIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+
+
+                        {/* <TableRow>
+                          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                            <Collapse in={open} timeout="auto" unmountOnExit>
+                              <Box sx={{ margin: 1 }}>
+                                <Typography variant="h6" gutterBottom component="div">
+                                  History
+                                </Typography>
+                                <Table size="small" aria-label="purchases">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell>Date</TableCell>
+                                      <TableCell>Customer</TableCell>
+                                      <TableCell align="right">Amount</TableCell>
+                                      <TableCell align="right">Total price ($)</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {row.history.map((historyRow) => (
+                                      <TableRow key={historyRow.date}>
+                                        <TableCell component="th" scope="row">
+                                          {historyRow.date}
+                                        </TableCell>
+                                        <TableCell>{historyRow.customerId}</TableCell>
+                                        <TableCell align="right">{historyRow.amount}</TableCell>
+                                        <TableCell align="right">
+                                          {Math.round(historyRow.amount * row.price * 100) / 100}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow> */}
+
+                      </Fragment>
                     );
                   })}
                 </TableBody>
@@ -311,7 +352,7 @@ const Results = ({ setEditSubject, users, classList }) => {
             </Box>
           </>
         )}
-      </Card>
+      </Card >
 
       <DialogWrapper
         open={openConfirmDelete}

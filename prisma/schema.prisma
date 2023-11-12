@@ -1194,10 +1194,10 @@ model question {
 }
 
 model AddtionalMarkingCategories {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   title      String
   school_id  Int
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
   deleted_at DateTime?
 
   school            School              @relation(fields: [school_id], references: [id])
@@ -1213,9 +1213,10 @@ model ExamAddtionalMark {
   exam_id           Int
   created_at        DateTime @default(now())
   // deleted_at        DateTime
-  
+
   addtionalMarkingCategorie AddtionalMarkingCategories @relation(fields: [addtional_mark_id], references: [id])
   exam                      Exam                       @relation(fields: [exam_id], references: [id])
 
+  @@unique([addtional_mark_id, exam_id])
   @@map("exam_addtional_marks")
 }

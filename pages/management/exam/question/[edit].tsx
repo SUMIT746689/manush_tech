@@ -20,23 +20,70 @@ import useNotistick from '@/hooks/useNotistick';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import ExamSubjectSelection from '@/components/ExamSubjectSelection';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import prisma from '@/lib/prisma_client';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 
-function Managementschools() {
+export async function getServerSideProps(context) {
+
+    try {
+        const refresh_token_varify: any = serverSideAuthentication(context)
+        if (!refresh_token_varify) return { props: { editQuestion: {} } };
+        const question = await prisma.question.findFirst({
+            where: {
+                id: Number(context.query.edit),
+                exam_details: {
+                    exam: {
+                        school_id: refresh_token_varify.school_id
+                    }
+                }
+            },
+            include: {
+                exam_details: {
+                    select: {
+                        subject_total: true,
+                        exam: {
+                            select: {
+                                id: true,
+                                title: true,
+                                section: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        class: {
+                                            select: {
+                                                id: true,
+                                                name: true,
+                                                has_section: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        subject: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        return { props: { editQuestion: question } }
+
+    } catch (err) {
+        console.log({ err });
+        return { props: { editQuestion: {} } };
+    }
+}
+
+function Managementschools({ editQuestion }) {
     const { t }: { t: any } = useTranslation();
-    const router = useRouter();
 
     const [questionFileLink, setQuestionFileLink] = useState(null)
     const { showNotification } = useNotistick()
-
-    const [classes, setClasses] = useState([]);
-    const [classList, setClassList] = useState([]);
-
-
-    const [selectedClass, setSelectedClass] = useState(null);
-    const [selectedSection, setSelectedSection] = useState(null);
-    const [selectedExam, setSelectedExam] = useState(null);
-    const [selectedSubject, setSelectedSubject] = useState(null);
-
+    const router = useRouter()
 
     const handleFormSubmit = async (
         _values,
@@ -44,30 +91,28 @@ function Managementschools() {
     ) => {
         try {
             console.log(_values);
-            
+
             const successProcess = () => {
-                resetForm();
                 setStatus({ success: true });
                 setSubmitting(false);
-                // setSelectedClass(null)
-                // setSelectedSection(null)
-                // setSelectedExam(null)
-                // setSelectedSubject(null)
             };
-            if (!selectedSubject) throw new Error('Subject not selected !!')
             if (!_values?.content && !_values?.file) throw new Error('Question content not added !!')
 
             const formdata = new FormData();
 
-            formdata.append('exam_details_id', selectedSubject?.id)
-            if (_values?.content) formdata.append('content', _values?.content)
-            if (_values?.file) formdata.append('file', _values?.file)
+            for (const index in _values) {
+                if (_values[index]) formdata.append(index, _values[index])
+            }
+            if (editQuestion?.id) {
 
-            axios.post(`/api/question`, formdata).then(res => {
-                showNotification('Question created successfully')
-                successProcess()
-                router.back()
-            }).catch(err => console.log(err));
+                axios.patch(`/api/question/${editQuestion.id}`, formdata)
+                    .then(res => {
+                        showNotification(res.data.message)
+                        successProcess()
+                        router.back()
+                    })
+                    .catch(err => console.log(err));
+            }
 
         } catch (err) {
             console.error(err);
@@ -78,30 +123,16 @@ function Managementschools() {
         }
     }
 
-    useEffect(() => {
-        axios.get(`/api/class`)
-            .then(res => {
-                setClasses(res.data)
-                setClassList(res.data?.map(i => ({
-                    label: i.name,
-                    id: i.id,
-                    has_section: i.has_section
-                })
-                ))
-            })
-            .catch(err => console.log(err));
 
-    }, [])
     return (
         <>
             <Head>
-                <title>Exam - Question Creation</title>
+                <title>Exam - Question edit</title>
             </Head>
             <Grid sx={{ minHeight: 'calc(100vh - 220px)', px: 2 }}>
                 <Formik
                     initialValues={{
-                        content: '',
-                        file: undefined,
+                        content: editQuestion?.content,
                         submit: null
                     }}
 
@@ -120,7 +151,7 @@ function Managementschools() {
                             <form onSubmit={handleSubmit}>
                                 <PageTitleWrapper>
                                     <PageHeaderTitleWrapper
-                                        name="Exam - Question Creation"
+                                        name="Exam - Question edit"
                                         handleCreateClassOpen={undefined}
                                         actionButton={true}
                                     />
@@ -131,21 +162,6 @@ function Managementschools() {
                                     alignItems: 'center',
                                     gap: 2,
                                 }}>
-                                    <ExamSubjectSelection
-                                        classes={classes}
-                                        classList={classList}
-
-                                        selectedClass={selectedClass}
-                                        setSelectedClass={setSelectedClass}
-                                        selectedSection={selectedSection}
-                                        setSelectedSection={setSelectedSection}
-                                        selectedExam={selectedExam}
-                                        setSelectedExam={setSelectedExam}
-                                        selectedSubject={selectedSubject}
-                                        setSelectedSubject={setSelectedSubject}
-                                    />
-                                    <Divider />
-
 
                                     <RichTextEditorWrapper handleChange={(e) => setFieldValue('content', e)} value={values.content} />
                                     <Grid sx={{
@@ -159,7 +175,7 @@ function Managementschools() {
 
                                         {
 
-                                            questionFileLink &&
+                                            (questionFileLink || editQuestion?.file) &&
                                             <Grid
                                                 sx={{
                                                     p: 1,
@@ -172,9 +188,9 @@ function Managementschools() {
                                                 <a
                                                     style={{ width: '50px' }}
                                                     target="_blank"
-                                                    href={questionFileLink}
+                                                    href={questionFileLink || (editQuestion?.file ? `/api/get_file/${editQuestion?.file?.replace(/\\/g, '/')}` : '')}
                                                 >
-                                                    {questionFileLink}
+                                                    {questionFileLink || editQuestion?.file}
                                                 </a>
                                             </Grid>
 
@@ -191,6 +207,7 @@ function Managementschools() {
                                                     setQuestionFileLink(photoUrl)
                                                     setFieldValue('file', e.target.files[0])
                                                 } else {
+                                                    setQuestionFileLink(null);
                                                     setFieldValue('file', undefined)
                                                 }
                                             }}
@@ -203,7 +220,7 @@ function Managementschools() {
                                 </Card>
                                 <br />
                                 <ButtonWrapper type='submit' disabled={
-                                    (selectedSubject && (values?.file || values?.content)) ? (Boolean(errors.submit) || isSubmitting) : true
+                                    ((values?.file || values?.content) && editQuestion?.id ) ? (Boolean(errors.submit) || isSubmitting) : true
                                 } handleClick={undefined}>Submit</ButtonWrapper>
 
                             </form>

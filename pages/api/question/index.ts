@@ -28,6 +28,7 @@ const index = async (req, res, refresh_token) => {
                         }
                     },
                     select: {
+                        id: true,
                         exam_details: {
                             select: {
                                 subject_total: true,
@@ -92,10 +93,6 @@ const index = async (req, res, refresh_token) => {
                 res.status(200).json({ message: 'Question created successfully' });
                 break;
 
-            case 'PATCH':
-
-                res.status(200).json({ message: 'Question updated successfully' });
-                break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
                 res.status(405).end(`Method ${method} Not Allowed`);

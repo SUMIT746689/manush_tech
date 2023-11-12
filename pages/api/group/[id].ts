@@ -33,7 +33,7 @@ const section = async (req, res) => {
         await prisma.group.update({
           ...quries
         });
-        res.status(200).json({ success: 'successfully updated' });
+        res.status(200).json({ success: 'Group Successfully updated' });
         break;
 
       case 'DELETE':
@@ -42,6 +42,7 @@ const section = async (req, res) => {
             id: id
           }
         });
+        res.status(200).json({ success: 'Group deleted successfully!' });
         break;
 
       default:

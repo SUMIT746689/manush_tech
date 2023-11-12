@@ -26,7 +26,7 @@ function Managementschools() {
     const router = useRouter();
 
     const [question, setQuestion] = useState([]);
-    const [editQuestion, setEditQuestion] = useState(null);
+
 
     const [classes, setClasses] = useState([]);
     const [classList, setClassList] = useState([]);
@@ -50,15 +50,21 @@ function Managementschools() {
                 ))
             })
             .catch(err => console.log(err));
-        axios.get(`/api/question`).then(res => setQuestion(res.data)).catch(err => console.log(err));
-
+            
+            reFetch()
     }, [])
+
+    const reFetch = (id = null) => {
+
+        axios.get(`/api/question${id ? `?exam_details_id=${id}` : ''}`)
+            .then(res => setQuestion(res.data))
+            .catch(err => console.log(err));
+
+    }
 
     useEffect(() => {
         if (selectedSubject) {
-            axios.get(`/api/question?exam_details_id=${selectedSubject.id}`)
-                .then(res => setQuestion(res.data))
-                .catch(err => console.log(err));
+            reFetch(selectedSubject.id)
         }
 
     }, [selectedSubject])
@@ -105,7 +111,8 @@ function Managementschools() {
                 <Grid item xs={12}>
                     <Results
                         question={question}
-                        setEditQuestion={setEditQuestion}
+                        selectedSubject={selectedSubject}
+                        reFetch={reFetch}
                     />
                 </Grid>
             </Grid>

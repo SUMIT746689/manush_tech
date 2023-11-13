@@ -145,11 +145,11 @@ export const menuItems: MenuItems[] = [
             link: '/management/exam',
             icon: AssignmentIcon
           },
-          // {
-          //   name: 'Addtional Marks',
-          //   link: '/management/exam/addtional_marks',
-          //   icon: AssignmentIcon
-          // },
+          {
+            name: 'Addtional Marks',
+            link: '/management/exam/addtional_marks',
+            icon: AssignmentIcon
+          },
           {
             name: 'Exam seat plan',
             link: '/management/exam/seat-plan',

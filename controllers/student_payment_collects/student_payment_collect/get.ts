@@ -67,12 +67,13 @@ export const get = async (req, res) => {
     const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map(i => i.id) : [];
 
     const fees = all_fees.section.class.fees?.filter(i => !waiver_fee.includes(i.id))?.map((fee) => {
+      console.log(fee);
 
       const findStudentFee: any = student_fee.filter(pay_fee => pay_fee.fee.id === fee.id);
       const late_fee = fee.late_fee ? fee.late_fee : 0;
       // console.log("fee", fee);
       // console.log("findStudentFee__", findStudentFee);
-      
+
       const findStudentFeeSize = findStudentFee.length
       if (findStudentFeeSize) {
         // console.log("findStudentFee__",findStudentFee);
@@ -130,6 +131,24 @@ export const get = async (req, res) => {
       }
 
     })
+
+    for (const i of fees) {
+      const tr = await prisma.transaction.findFirst({
+        where: {
+          voucher: {
+            resource_id: i.id,
+            resource_type: 'fee'
+          }
+        },
+        select: {
+          tracking_number: true,
+          created_at: true,
+        }
+      })
+
+      i['tracking_number'] = tr.tracking_number
+      i['created_at'] = tr.created_at
+    }
     const data = {
       ...all_fees.student_info,
       class_registration_no: all_fees.class_registration_no,

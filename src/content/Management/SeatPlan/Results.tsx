@@ -111,8 +111,6 @@ const applyPagination = (
 const Results = ({
   seatPlan,
   setEditSeatPlan,
-  handlePrint,
-  stickerLenght
 }) => {
 
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
@@ -233,18 +231,12 @@ const Results = ({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <Box >
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}: {paginatedExams.length} {t('exams')}
               </Typography>
 
-              <ButtonWrapper
-                handleClick={handlePrint}
-                startIcon={<LocalPrintshopIcon />}
-                disabled={stickerLenght ? false : true}
-              >
-                Seat Sticker
-              </ButtonWrapper>
+           
             </Box>
             <TablePagination
               component="div"

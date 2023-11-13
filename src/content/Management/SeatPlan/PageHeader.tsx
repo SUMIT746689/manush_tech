@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import 'react-quill/dist/quill.snow.css';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Grid,
   Dialog,
@@ -30,14 +31,15 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
-import ReactToPrint from 'react-to-print';
+import ReactToPrint, { useReactToPrint } from 'react-to-print';
 
-function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, classes, setSeatPlan, seatPlan }): any {
+function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, seatPlan }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
   const [rooms, setRooms] = useState([]);
   const [pdf, setPdf] = useState(false)
+
 
   useEffect(() => {
     console.log('editExam__', editExam);
@@ -77,7 +79,8 @@ function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, clas
         classes={classes} classList={classList} setSeatPlan={setSeatPlan}
         handleOperationSuccess={handleCreateProjectSuccess}
         handleModalClose={handleCreateProjectClose}
-        setSeatPlanSticker={setSeatPlanSticker}
+
+
       />
 
       <Dialog
@@ -113,7 +116,7 @@ function PageHeader({ setSeatPlanSticker, editExam, setEditExam, classList, clas
   );
 }
 
-const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose }) => {
+const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose }) => {
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
 
@@ -124,11 +127,21 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
   const [selectedClass, setSelectedClass] = useState(null);
   const [exams, setExams] = useState([]);
 
-  // const [selectedExam, setSelectedExam] = useState(null);
+  const [selectedExam, setSelectedExam] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
 
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const seat_plan_print = useRef()
+  const seatPlanStickerRef = useRef()
+  const [seatPlanSticker, setSeatPlanSticker] = useState([])
+  const handlePrint = useReactToPrint({
+    content: () => seatPlanStickerRef.current,
+    // pageStyle: `@media print {
+    //   @page {
+    //     size: 210mm 115mm;
+    //   }
+    // }`
+  });
 
   const { showNotification } = useNotistick();
 
@@ -155,6 +168,10 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
     }
   }, [selectedSection, academicYear, selectedSubject]);
 
+  useEffect(() => {
+    if (!open && selectedSection && selectedSubject) fetchSeatPlan(selectedSection?.id, selectedSubject?.id)
+  }, [open])
+
   const fetchSeatPlan = (section_id, exam_details_id) => {
     console.log({ selectedSection, selectedSubject });
 
@@ -179,8 +196,9 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
     }
   }
   const handleExamSelect = (e, newvalue, setFieldValue = null) => {
+    setSelectedExam(newvalue)
     setSelectedSubject(null)
-    setSeatPlan([])
+    open == false && setSeatPlan([])
     if (setFieldValue) {
       setFieldValue("exam_id", newvalue?.id)
       setFieldValue('exam_details_id', undefined)
@@ -200,15 +218,16 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
         .catch(err => console.log(err))
     }
     else {
-      if (setSeatPlanSticker) setSeatPlanSticker([])
+      setSeatPlanSticker([])
     }
   }
   const handleClassSelect = (event, newValue, setFieldValue = null) => {
     setSelectedClass(newValue)
     setSelectedSection(null)
+    setSelectedExam(null)
     setSelectedSubject(null)
-    setSeatPlan([])
-    if (setSeatPlanSticker) setSeatPlanSticker([])
+    open == false && setSeatPlan([])
+    setSeatPlanSticker([])
     console.log("class changed__");
     if (setFieldValue) {
       setFieldValue('section_id', undefined);
@@ -277,7 +296,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       else {
         const res = await axios.post('/api/exam/seat_plan', _values);
         if (res.data?.success) {
-          fetchSeatPlan(_values.section_id, _values.exam_details_id)
+
           successProcess(t('Seat plan has been created successfully'))
         }
         else {
@@ -298,7 +317,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
       width: "100%",
       display: "grid",
       gridTemplateColumns: {
-        xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr 1fr'
+        xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr 0.5fr 0.5fr'
       },
       columnGap: 2
     } : {}
@@ -372,11 +391,12 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
                           value={selectedSection}
                           handleChange={(e, v) => {
                             setSelectedSection(v)
-                            // setSeatPlanSticker([])
+                            setSeatPlanSticker([])
                             setFieldValue('section_id', v?.id)
                             setFieldValue('exam_id', undefined)
                             setSelectedSubject(null);
-                            setSeatPlan([])
+                            setSelectedExam(null)
+                            open == false && setSeatPlan([])
                           }}
                         />
 
@@ -388,7 +408,7 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
                           label="Select exam"
                           placeholder="Exam"
                           options={exams}
-                          value={exams?.find(i => i.id == values?.exam_id) || null}
+                          value={selectedExam}
                           handleChange={(event, newValue) => handleExamSelect(event, newValue, setFieldValue)}
                         />
                       }
@@ -408,20 +428,70 @@ const FormControl = ({ setSeatPlanSticker = null, pdf = false, setPdf = null, ro
                         />
                       }
                       {
-                        open === false && selectedSubject && <ReactToPrint
-                          content={() => seat_plan_print.current}
-                          // pageStyle={`{ size: 2.5in 4in }`}
-                          onBeforeGetContent={() => setPdf(true)}
-                          // onBeforePrint={() => setPdf(true)}
-                          onAfterPrint={() => setPdf(false)}
-                          trigger={() => (
-                            <ButtonWrapper
-                              handleClick={undefined}
-                              startIcon={<LocalPrintshopIcon />}
-                            >{t('print')}</ButtonWrapper>
-                          )}
-                        // pageStyle={"@page { size: landscape; }"}
-                        />
+                        open === false && selectedSubject && <>
+
+                          {/* <ButtonWrapper
+                            handleClick={() => fetchSeatPlan(selectedSection?.id, selectedSubject?.id)}
+                            startIcon={<SearchIcon />}
+                          >
+                            Search
+                          </ButtonWrapper> */}
+
+                          <ReactToPrint
+                            content={() => seat_plan_print.current}
+                            // pageStyle={`{ size: 2.5in 4in }`}
+                            onBeforeGetContent={() => setPdf(true)}
+                            // onBeforePrint={() => setPdf(true)}
+                            onAfterPrint={() => setPdf(false)}
+                            trigger={() => (
+                              <ButtonWrapper
+                                handleClick={undefined}
+                                startIcon={<LocalPrintshopIcon />}
+                              >{t('print')}</ButtonWrapper>
+                            )}
+                          // pageStyle={"@page { size: landscape; }"}
+                          />
+                          <ButtonWrapper
+                            handleClick={handlePrint}
+                            startIcon={<LocalPrintshopIcon />}
+                          >
+                            Seat Sticker
+                          </ButtonWrapper>
+
+                          <Grid display={'none'}>
+                            <Grid ref={seatPlanStickerRef} container gap={1.5} sx={{
+                              p: 1.5,
+                              display: 'grid',
+                              gridTemplateColumns: '1fr 1fr',
+
+                            }}>
+                              {
+                                seatPlanSticker?.map(i => (<Grid sx={{
+                                  p: 3,
+                                  // boxShadow:'0px 10px 10px #86b2f9'
+                                  border: '1.5px dotted',
+
+                                }}>
+                                  <Typography align='center' pb={2} variant="h3">{selectedExam?.label}</Typography>
+                                  <Typography align='center' pb={2} variant="h4">{selectedSubject?.label}</Typography>
+                                  <Typography align='center' pb={2} variant="h4">{[i.student_info.first_name, i.student_info.middle_name, i.student_info.last_name].join(' ')}</Typography>
+                                  <Grid sx={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    fontSize: '50px'
+                                  }}>
+                                    <Typography align='center' variant="h4"> Registration no: {i.class_registration_no}</Typography>
+                                    <Typography align='center' variant="h4"> Roll no: {i.class_roll_no}</Typography>
+                                    <Typography align='center' variant="h4"> Class: {i.section.class.name}</Typography>
+                                    <Typography align='center' variant="h4"> Section: {i.section.name}</Typography>
+                                  </Grid>
+                                </Grid>))
+                              }
+
+                            </Grid>
+                          </Grid>
+                        </>
+
                       }
                     </>
                   }

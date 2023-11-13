@@ -15,9 +15,9 @@ import axios from 'axios';
 function ManagementClasses() {
   const [editSubject, setEditSubject] = useState(null);
 
-  const { data: subjects, reFetchData: reFetchSubjects } = useClientFetch(`/api/exam/addtional_marks`);
+  const { data: subjects } = useClientFetch(`/api/exam/addtional_marks`);
   const { data: addlmarkingCats } = useClientFetch(`/api/addtional_marking_categories`);
-  const { data: exams } = useClientFetch(`/api/exam?with_addtional_mark=true`);
+  const { data: exams,reFetchData } = useClientFetch(`/api/exam?with_addtional_mark=true`);
   const [selectedExam, setSelectedExam] = useState(null);
   const [selectedExamAddlMarks, setSelectedExamAddlMarks] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,7 @@ function ManagementClasses() {
           }) || []
           }
 
-          reFetchSubjects={reFetchSubjects}
+          reFetchSubjects={reFetchData}
         />
       </PageTitleWrapper>
 

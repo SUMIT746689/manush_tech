@@ -41,7 +41,7 @@ function PageHeader({
   useEffect(() => {
     if (editSubject) {
       setSelectedAddlMarkingCats(() => editSubject?.examAddtinalMark?.map((addlMark => {
-        return { ...addlMark?.addtionalMarkingCategorie, total_mark: addlMark.total_mark }
+        return { ...addlMark?.addtionalMarkingCategorie, total_mark: addlMark.total_mark, exam_addtional_mark_id: addlMark.id }
       })) || []);
       handleCreateClassOpen();
     }
@@ -55,6 +55,7 @@ function PageHeader({
     setOpen(false);
     setSelectedClass([])
     setEditSubject(null);
+    setSelectedAddlMarkingCats(() => [])
   };
 
   const handleCreateUserSuccess = (message) => {
@@ -67,9 +68,11 @@ function PageHeader({
     { resetForm, setErrors, setStatus, setSubmitting }
   ) => {
     try {
-      const addtional_marks = selectedAddlMarkingCats.map(({ id, total_mark }) => ({ addtional_mark_id: id, total_mark }))
-
+      // const addtional_marks = selectedAddlMarkingCats.map(({ id, total_mark }) => ({ addtional_mark_id: id, total_mark }))
+      // const { id: exam_id } = editSubject; exam_addtional_mark_id
       if (editSubject) {
+        const addtional_marks = selectedAddlMarkingCats.map(({ exam_addtional_mark_id, total_mark }) => ({ id: exam_addtional_mark_id, total_mark }))
+
         await axios.patch(`/api/exam/addtional_marks`, { ..._values, addtional_marks })
         resetForm();
         setStatus({ success: true });
@@ -77,6 +80,9 @@ function PageHeader({
         handleCreateUserSuccess(t('The subject was updated successfully'));
       }
       else {
+
+        const addtional_marks = selectedAddlMarkingCats.map(({ id, total_mark }) => ({ addtional_mark_id: id, total_mark }))
+
         if (addtional_marks.length === 0) throw new Error("no addtional marks ...")
 
         await axios.post(`/api/exam/addtional_marks`, { ..._values, addtional_marks })
@@ -99,7 +105,6 @@ function PageHeader({
   };
 
   const handleAddlMarkingCats = (id, total_mark) => {
-    console.log({ id, total_mark });
     setSelectedAddlMarkingCats((values) => {
       return values.map((value) => {
         if (value.id !== id) return value
@@ -108,7 +113,6 @@ function PageHeader({
       // values.find(v=>v.id === id)
     })
   }
-  console.log({ selectedAddlMarkingCats })
   return (
     <>
       <PageHeaderTitleWrapper
@@ -178,6 +182,7 @@ function PageHeader({
                   <Grid container spacing={1}>
 
                     <AutoCompleteWrapper
+                      disabled={editSubject}
                       minWidth="100%"
                       value={exams.find((exam) => exam.value === values.exam_id) || null}
                       options={exams}
@@ -194,8 +199,8 @@ function PageHeader({
                       // value={[{label:'Attendance',id:1}]}
                       value={values.addtional_mark_ids}
                       options={addlmarkingCats}
-                      label="Class"
-                      placeholder={"select class..."}
+                      label="Select Addtional Mark Categories"
+                      placeholder={"select addtional marking categories..."}
                       // @ts-ignore
                       handleChange={(event, value) => {
                         console.log("value__", value);

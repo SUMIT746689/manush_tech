@@ -25,7 +25,7 @@ const index = async (req, res, refresh_token) => {
                         ...query
                     },
                     include: {
-                        examAddtinalMark: with_addtional_mark === "true" ? { select: { total_mark:true, addtionalMarkingCategorie: { select: { id:true, title: true } } } } : false,
+                        examAddtinalMark: with_addtional_mark === "true" ? { select: { id: true, total_mark: true, addtionalMarkingCategorie: { select: { id: true, title: true } } } } : false,
                         section: {
                             select: {
                                 id: true,

@@ -24,10 +24,15 @@ function Managementschools() {
   const { data: classData, error: classError } = useClientFetch('/api/class');
 
   useEffect(() => {
+
+
     const temp = datas.filter(i => {
+
       const got = printFees.find(j => j.fee_id == i.id)
       if (got) {
         i['paidAmount'] = got.collected_amount
+        i['tracking_number'] = got.tracking_number
+        i['created_at'] = got.created_at
         return true;
       }
 
@@ -35,6 +40,7 @@ function Managementschools() {
 
 
     })
+    
     setPrinCollectedtFees(temp)
   }, [printFees])
 

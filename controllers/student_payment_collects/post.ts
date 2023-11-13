@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { unique_tracking_number } from "@/utils/utilitY-functions";
 
 
 const handleTransaction = ({ data, account, voucher, refresh_token }) => {
@@ -8,7 +9,7 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
         const temp = await trans.studentFee.create({
           data
         });
-        await trans.transaction.create({
+        const tr = await trans.transaction.create({
           data: {
             amount: data.collected_amount,
             account_id: account.id,
@@ -17,15 +18,17 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
             transID: data.transID,
             school_id: refresh_token.school_id,
             created_at: temp.created_at,
-
             payment_method: account?.payment_method[0]?.title,
             account_name: account.title,
             acccount_number: account.account_number,
             voucher_type: voucher.type,
             voucher_name: voucher.title,
             voucher_amount: voucher.amount,
+            tracking_number: unique_tracking_number('st-')
           }
         })
+        console.log({ tr });
+
         const transaction_amount = data.collected_amount
 
         await trans.accounts.update({
@@ -36,8 +39,9 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
             balance: account.balance + transaction_amount
           }
         })
+        resolve({ tracking_number: tr.tracking_number, created_at: temp.created_at, })
       })
-      resolve("done")
+
     } catch (err) {
       reject(new Error(`${err.message}`))
     }
@@ -139,9 +143,13 @@ export const post = async (req, res, refresh_token) => {
       else if (totalPaidAmount < feeAmount + late_fee) {
         if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)
         else {
-          await handleTransaction({ data, account, voucher, refresh_token })
+          const tr = await handleTransaction({ data, account, voucher, refresh_token })
           res.status(200).json({
-            success: true
+            success: true,
+            // @ts-ignore
+            tracking_number: tr?.tracking_number,
+             // @ts-ignore
+            created_at: tr?.created_at
           })
         }
 
@@ -151,9 +159,13 @@ export const post = async (req, res, refresh_token) => {
       if (totalPaidAmount === feeAmount) throw new Error('Already Paid !')
       else if (totalPaidAmount + collected_amount > feeAmount) throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`)
       else {
-        await handleTransaction({ data, account, voucher, refresh_token })
+        const tr = await handleTransaction({ data, account, voucher, refresh_token })
         res.status(200).json({
-          success: true
+          success: true,
+          // @ts-ignore
+          tracking_number: tr?.tracking_number,
+           // @ts-ignore
+          created_at: tr?.created_at
         });
       }
     }

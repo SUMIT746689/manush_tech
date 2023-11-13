@@ -296,9 +296,10 @@ const Results = ({
       transID: transID
     })
       .then((res) => {
-
+        console.log("res.data__", res.data);
+        // setPrintFees([])
         if (res.data.err) throw new Error(res.data.err);
-        setPrintFees((prev) => [...prev, { fee_id, collected_amount: amount }]);
+        setPrintFees([{ fee_id, collected_amount: amount, tracking_number: res.data?.tracking_number,created_at:res.data?.created_at }]);
         handleStudentPaymentCollect();
         showNotification('The payment has been collected successfully');
       })

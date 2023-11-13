@@ -901,6 +901,7 @@ model Transaction {
   account_id        Int?
   payment_method_id Int?
   school_id         Int
+  tracking_number   String?
 
   account_name    String?
   acccount_number String?
@@ -919,6 +920,7 @@ model Transaction {
   payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
   school              School          @relation(fields: [school_id], references: [id])
 
+  @@unique([tracking_number, school_id])
   @@map("transactions")
 }
 

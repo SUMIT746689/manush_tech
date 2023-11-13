@@ -153,6 +153,7 @@ model Teacher {
   periods    Period[]
   school     School     @relation(fields: [school_id], references: [id])
   department Department @relation(fields: [department_id], references: [id])
+  seatPlans  seatPlan[] @relation("teacher_to_seat_plan")
 
   @@map("teachers")
 }
@@ -494,6 +495,7 @@ model ExamDetails {
 }
 
 model seatPlan {
+  id              Int    @id @default(autoincrement())
   exam_details_id Int
   class_roll_from String
   class_roll_to   String
@@ -502,9 +504,10 @@ model seatPlan {
 
   room         Room        @relation(fields: [room_id], references: [id])
   exam_details ExamDetails @relation(fields: [exam_details_id], references: [id])
+  teachers     Teacher[]   @relation("teacher_to_seat_plan")
 
-  @@id([exam_details_id, room_id])
-  @@map("seat_plan")
+  @@unique([exam_details_id, room_id])
+  @@map("seat_plans")
 }
 
 model Attendance {

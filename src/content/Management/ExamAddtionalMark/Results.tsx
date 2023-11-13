@@ -184,8 +184,6 @@ const Results = ({ setEditSubject, users, classList }) => {
     setOpenConfirmDelete(false);
   };
 
-  console.log({ selectedExam })
-
   return (
     <>
 
@@ -249,7 +247,6 @@ const Results = ({ setEditSubject, users, classList }) => {
                 </TableHead>
                 <TableBody>
                   {paginatedSubjects.map((i) => {
-                    console.log({ i: i.examAddtinalMark })
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
                       <Fragment key={i.id}>

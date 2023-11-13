@@ -170,7 +170,6 @@ function PageHeader({
             values,
             setFieldValue
           }) => {
-            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -203,7 +202,6 @@ function PageHeader({
                       placeholder={"select addtional marking categories..."}
                       // @ts-ignore
                       handleChange={(event, value) => {
-                        console.log("value__", value);
                         // if (editSubject) {
                         //   setFieldValue('addtional_mark_ids', value?.value || null)
                         // }
@@ -247,7 +245,6 @@ export default PageHeader;
 
 
 const AddlMarkingCategories = ({ value, handleAddlMarkingCats }) => {
-  console.log({ value })
   return (
     <Grid item width={"100%"} display="grid" gridTemplateColumns={"1fr 1fr"} columnGap={1}>
       {/* <TextFieldWrapper */}

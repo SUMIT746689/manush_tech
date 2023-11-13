@@ -8,9 +8,9 @@ import { Card, Grid } from '@mui/material';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import Results from 'src/content/Management/ExamAddtionalMark/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
-import axios from 'axios';
+// import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+// import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+// import axios from 'axios';
 
 function ManagementClasses() {
   const [editSubject, setEditSubject] = useState(null);
@@ -18,10 +18,10 @@ function ManagementClasses() {
   const { data: subjects } = useClientFetch(`/api/exam/addtional_marks`);
   const { data: addlmarkingCats } = useClientFetch(`/api/addtional_marking_categories`);
   const { data: exams,reFetchData } = useClientFetch(`/api/exam?with_addtional_mark=true`);
-  const [selectedExam, setSelectedExam] = useState(null);
-  const [selectedExamAddlMarks, setSelectedExamAddlMarks] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-  console.log({ subjects, addlmarkingCats, exams })
+  // const [selectedExam, setSelectedExam] = useState(null);
+  // const [selectedExamAddlMarks, setSelectedExamAddlMarks] = useState();
+  // const [isLoading, setIsLoading] = useState(false);
+ 
   // const handleSearchAddlMarks = async () => {
   //   setIsLoading(true);
   //   console.log("hi.....")

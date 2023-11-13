@@ -1,15 +1,14 @@
 import { get } from "controllers/teachers/get";
 import post from "controllers/teachers/post";
 import patch from "controllers/teachers/patch";
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: false,
+//   },
+// };
 const index = async (req, res) => {
     try {
         const { method } = req;
-
         switch (method) {
             case 'GET':
                 get(req,res);

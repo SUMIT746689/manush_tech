@@ -7,6 +7,7 @@ const index = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'GET':
+                const { with_addtional_mark } = req.query
                 let query = {}
                 if (req.query.academic_year) {
                     query = {
@@ -24,6 +25,7 @@ const index = async (req, res, refresh_token) => {
                         ...query
                     },
                     include: {
+                        examAddtinalMark: with_addtional_mark === "true" ? { select: { id: true, total_mark: true, addtionalMarkingCategorie: { select: { id: true, title: true } } } } : false,
                         section: {
                             select: {
                                 id: true,

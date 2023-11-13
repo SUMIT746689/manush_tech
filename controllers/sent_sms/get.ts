@@ -10,7 +10,7 @@ async function get(req, res, refresh_token) {
       },
       include: {
         smsGateway: true,
-        smsCampaignDetails: true
+        // smsCampaignDetails: true
       }
     })
 

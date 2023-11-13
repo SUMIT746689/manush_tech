@@ -53,6 +53,7 @@ import WifiTetheringErrorIcon from '@mui/icons-material/WifiTetheringError';
 import NotesIcon from '@mui/icons-material/Notes';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 export interface MenuItem {
   link?: string;
   icon?: ReactNode;
@@ -102,6 +103,11 @@ export const menuItems: MenuItems[] = [
             link: '/management/group',
             icon: GroupsIcon
           },
+          {
+            name: 'Addtional Marking Categories',
+            link: '/management/addtional_marking_categories',
+            icon: PostAddIcon
+          }
         ]
       },
       {
@@ -140,6 +146,11 @@ export const menuItems: MenuItems[] = [
             icon: AssignmentIcon
           },
           {
+            name: 'Addtional Marks',
+            link: '/management/exam/addtional_marks',
+            icon: AssignmentIcon
+          },
+          {
             name: 'Exam seat plan',
             link: '/management/exam/seat-plan',
             icon: AssignmentIcon
@@ -155,7 +166,7 @@ export const menuItems: MenuItems[] = [
       {
         name: 'Syllabus',
         link: '/management/syllabus',
-        icon:  SummarizeIcon
+        icon: SummarizeIcon
       },
       {
         name: 'Result',

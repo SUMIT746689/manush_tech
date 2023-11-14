@@ -26,8 +26,9 @@ function PaymentInvoice({ printFees, student }) {
   const [totalPaidAmount, setTotalPaidAmount] = useState(0);
   const [selectedFees, setSelectedFees] = useState([]);
 
+
   useEffect(() => {
-console.log({printFees});
+    console.log({ printFees });
 
     const temp = printFees.map(payment => {
       const last_date = new Date(payment.last_date)
@@ -38,6 +39,13 @@ console.log({printFees});
         payableAmount += (payment.late_fee ? payment.late_fee : 0)
       }
       payment['payableAmount'] = payableAmount
+      if (payment?.tracking_number) {
+        payment['tracking_number'] = payment.tracking_number
+      }
+      if (payment?.created_at) {
+        payment['created_at'] = payment.created_at
+      }
+
       return payment
     })
 
@@ -50,6 +58,7 @@ console.log({printFees});
 
     setTotalPaidAmount(totalPaidAmount_);
     setWord(numberToWordConverter(totalPaidAmount_));
+    console.log("created_at___", temp);
 
     setSelectedFees(temp)
   }, [printFees])
@@ -82,14 +91,14 @@ console.log({printFees});
         <Grid width={'20%'} item>Payment Receipt</Grid>
       </Grid>
 
-      <Grid container mt={4} spacing="2">
-        <Grid item width={'50%'} >
-          <Grid> {user?.school?.name}</Grid>
+      <Grid sx={{ display: 'grid', gridTemplateColumns: '1fr 0.75fr' }} mt={4} spacing="2">
+        <Grid   >
+          <Grid> Tracking number:  <span style={{ fontWeight: 'bold' }}>{selectedFees[0]?.tracking_number}</span></Grid>
           <Grid> Payment Received: </Grid>
-          <Grid> Receipt Created:{Date.now().toLocaleString()}</Grid>
+          <Grid> Receipt Created:  <span style={{ fontWeight: 'bold' }}>{selectedFees[0]?.created_at ? dayjs(selectedFees[0]?.created_at).format('MMM D, YYYY h:mm A') : ''}</span></Grid>
         </Grid>
 
-        <Grid item width='50%'>
+        <Grid  >
           <Grid>
             Student Name: <b>{[student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(" ")}
             </b>

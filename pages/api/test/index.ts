@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma_client';
+import { unique_tracking_number } from '@/utils/utilitY-functions';
 import { authenticate } from 'middleware/authenticate';
 
 const index = async (req, res, refresh_token) => {
@@ -7,19 +8,9 @@ const index = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'GET':
-                const singleStudentResult = await prisma.studentResultDetails.findMany({
-                    
-                    select: {
-                        mark_obtained: true,
-                        grade: {
-                            select: {
-                                point: true
-                            }
-                        }
-                    }
-                })
+                const singleStudentResult = unique_tracking_number()
 
-                res.status(200).json(singleStudentResult);
+                res.status(200).json({singleStudentResult,lenght:singleStudentResult.length});
                 break;
 
            

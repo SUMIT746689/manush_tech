@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 export const getOneCookies = (cname) => {
 
   let name = cname + "=";
@@ -28,4 +30,8 @@ export function unique_password_generate() {
 export function generateUsername(firstName) {
   const text = Date.now().toString()
   return firstName?.split(' ').join('').toLowerCase() + text.substring(text.length - 5) + Math.random().toString(36).substring(0, 8)
+}
+
+export function unique_tracking_number(str = '') {
+  return str + Date.now().toString() + crypto.randomBytes(5).toString("hex")
 }

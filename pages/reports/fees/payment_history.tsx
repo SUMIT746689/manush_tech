@@ -59,7 +59,7 @@ function FeesPaymentReport() {
         const customize_data = filteredFees.map((fee, index) => ({
             SL: index + 1,
             'Fee Title': fee?.title,
-            'Fee Amount': fee?.amount.toFixed(1),
+            'Fee Amount': fee?.amount?.toFixed(1),
             'Paid Amount': fee?.paidAmount?.toFixed(1),
             'Status': fee?.status.toUpperCase(),
             'Fine': fee?.late_fee?.toFixed(1),

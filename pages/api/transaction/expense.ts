@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { fileUpload } from "@/utils/upload";
+import { unique_tracking_number } from "@/utils/utilitY-functions";
 import { authenticate } from "middleware/authenticate";
 import path from "path";
 
@@ -64,7 +65,8 @@ const index = async (req, res, refresh_token) => {
                         payment_method_id: Number(payment_method_id),
                         account_name: account.title,
                         acccount_number: account.account_number,
-                        school_id: refresh_token?.school_id
+                        school_id: refresh_token?.school_id,
+                        tracking_number: unique_tracking_number()
                     }
                     if (Ref) data['Ref'] = Ref
                     if (description) data['description'] = description

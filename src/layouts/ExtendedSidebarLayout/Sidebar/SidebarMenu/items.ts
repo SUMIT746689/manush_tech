@@ -161,7 +161,11 @@ export const menuItems: MenuItems[] = [
             icon: AssignmentIcon
           },
         ]
-
+      },
+      {
+        name: 'Teacher Exam Routine',
+        link: '/management/teacher_exam_routine',
+        icon: SummarizeIcon
       },
       {
         name: 'Syllabus',

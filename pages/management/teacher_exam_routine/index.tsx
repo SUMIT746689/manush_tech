@@ -1,0 +1,131 @@
+import Head from 'next/head';
+import { useState, useEffect, useContext } from 'react';
+import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
+import { Authenticated } from 'src/components/Authenticated';
+import Footer from 'src/components/Footer';
+import PageTitleWrapper from 'src/components/PageTitleWrapper';
+import { Card, Grid } from '@mui/material';
+import Results from 'src/content/Management/TeacherExamRoutine/Results';
+import { useClientFetch } from 'src/hooks/useClientFetch';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import prisma from '@/lib/prisma_client';
+import SearchInputWrapper from '@/components/SearchInput';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+
+
+export async function getServerSideProps(context: any) {
+  let props: any = { exams: [] };
+
+  try {
+    const refresh_token: any = serverSideAuthentication(context);
+    if (!refresh_token) return { redirect: { destination: '/login' } };
+    const { id, role, school_id } = refresh_token ?? {};
+    // console.log({ role })
+
+    const exams = await prisma.exam.findMany({ where: { school_id } })
+    props["exams"] = exams;
+
+    const teachers = await prisma.teacher.findMany({ where: { school_id } })
+    props["teachers"] = JSON.parse(JSON.stringify(teachers));
+    // switch (role?.title) {
+    //   // case "ADMIN": 
+    //   //   const resExams = await prisma.exam.findFirst({where:{school_id}}) 
+
+    //   //   break;
+    //   case "TEACHER":
+    //     const resTeacherSyllabus = await prisma.teacher.findFirst({
+    //       where: { user_id: id },
+    //       select: {
+    //         seatPlans: {
+    //           include: {
+    //             room: {
+    //               select: { name: true }
+    //             },
+    //             exam_details: {
+    //               select: {
+    //                 exam: {
+    //                   select: {
+    //                     title: true,
+    //                     section: {
+    //                       select: {
+    //                         name: true,
+    //                         class: {
+    //                           select: {
+    //                             name: true
+    //                           }
+    //                         }
+    //                       }
+    //                     }
+    //                   }
+    //                 },
+    //                 subject: {
+    //                   select: {
+    //                     name: true
+    //                   }
+    //                 }
+    //               }
+    //             },
+    //           }
+    //         }
+    //       }
+    //     });
+    //     props["seat_plans"] = resTeacherSyllabus.seatPlans;
+    //     console.log({ resTeacherSyllabus })
+    //     break;
+    //   default:
+
+    // }
+
+  } catch {
+
+  }
+  return { props };
+}
+
+function ManagementDepartments({ exams, teachers }) {
+  // console.log({ exams })
+  // const [academicYear, _] = useContext(AcademicYearContext);
+  // console.log({ academicYear });
+  // const { datas } = useClientFetch(`/api/exam?academic_year=${academicYear?.id}`);
+  const [seatPlans, setSeatPlans] = useState([]);
+  console.log({teachers})
+  return (
+    <>
+      <Head>
+        <title>Teacher Exam Routine - Management</title>
+      </Head>
+      <PageTitleWrapper>
+        {/* @ts-ignore */}
+        <PageHeaderTitleWrapper
+          name="Teacher Exam Routine"
+          actionButton={true}
+          handleCreateClassOpen={0}
+        />
+      </PageTitleWrapper>
+
+      <Grid
+        sx={{ px: { xs: 1, sm: 3 } }}
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="stretch"
+        spacing={3}
+      >
+
+        <Grid item xs={12}>
+          <Results exams={exams || []} teachers={teachers || []} datas={seatPlans} setDatas={setSeatPlans} setEditData={() => { }} />
+        </Grid>
+      </Grid>
+      <Footer />
+    </>
+  );
+}
+
+ManagementDepartments.getLayout = (page) => (
+  <Authenticated name="holiday">
+    <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
+  </Authenticated>
+);
+
+export default ManagementDepartments;

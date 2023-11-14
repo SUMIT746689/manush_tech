@@ -89,8 +89,8 @@ export const get = async (req, res) => {
         fee['amount'] = feeAmount
         const paidAmount = findStudentFee.reduce((a, c) => a + c.collected_amount, 0)
 
-        const last_date = dayjs(fee.last_date).valueOf()
-        const last_trnsation_date = dayjs(findStudentFee[findStudentFeeSize - 1].created_at).valueOf()
+        const last_date = new Date(fee.last_date)
+        const last_trnsation_date = new Date(findStudentFee[findStudentFeeSize - 1].created_at)
 
 
 
@@ -132,23 +132,6 @@ export const get = async (req, res) => {
 
     })
 
-    for (const i of fees) {
-      const tr = await prisma.transaction.findFirst({
-        where: {
-          voucher: {
-            resource_id: i.id,
-            resource_type: 'fee'
-          }
-        },
-        select: {
-          tracking_number: true,
-          created_at: true,
-        }
-      })
-
-      i['tracking_number'] = tr.tracking_number
-      i['created_at'] = tr.created_at
-    }
     const data = {
       ...all_fees.student_info,
       class_registration_no: all_fees.class_registration_no,

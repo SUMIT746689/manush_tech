@@ -32,7 +32,7 @@ function PaymentInvoice({ printFees, student }) {
 
     const temp = printFees.map(payment => {
       const last_date = new Date(payment.last_date)
-      const today = new Date()
+      const today = printFees?.last_payment_date ? new Date(printFees?.last_payment_date) : new Date()
       let payableAmount = payment.amount
 
       if ((payment?.status !== 'paid' || payment?.status !== 'paid late') && today > last_date) {
@@ -135,7 +135,7 @@ function PaymentInvoice({ printFees, student }) {
               >
                 <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
                 <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{payment.last_payment_date}</TableCell>
+                <TableCell sx={{ p: 1 }} align="right">{ dayjs(payment.last_payment_date).format('MMM D, YYYY h:mm A')}</TableCell>
                 <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
                 <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
                 <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>

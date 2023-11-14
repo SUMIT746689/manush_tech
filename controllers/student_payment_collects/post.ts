@@ -7,39 +7,39 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
     try {
       await prisma.$transaction(async (trans) => {
         const temp = await trans.studentFee.create({
-          data
-        });
-        const tr = await trans.transaction.create({
           data: {
-            amount: data.collected_amount,
-            account_id: account.id,
-            payment_method_id: account?.payment_method[0]?.id,
-            voucher_id: voucher.id,
-            transID: data.transID,
-            school_id: refresh_token.school_id,
-            created_at: temp.created_at,
-            payment_method: account?.payment_method[0]?.title,
-            account_name: account.title,
-            acccount_number: account.account_number,
-            voucher_type: voucher.type,
-            voucher_name: voucher.title,
-            voucher_amount: voucher.amount,
-            tracking_number: unique_tracking_number('st-')
+            ...data,
+            transaction: {
+              create: {
+                amount: data.collected_amount,
+                account_id: account.id,
+                payment_method_id: account?.payment_method[0]?.id,
+                voucher_id: voucher.id,
+                transID: data.transID,
+                school_id: refresh_token.school_id,
+                created_at: data.created_at,
+                payment_method: account?.payment_method[0]?.title,
+                account_name: account.title,
+                acccount_number: account.account_number,
+                voucher_type: voucher.type,
+                voucher_name: voucher.title,
+                voucher_amount: voucher.amount,
+                tracking_number: unique_tracking_number('st-')
+              }
+            }
           }
-        })
-        console.log({ tr });
-
-        const transaction_amount = data.collected_amount
+        });
 
         await trans.accounts.update({
           where: {
             id: account.id
           },
           data: {
-            balance: account.balance + transaction_amount
+            balance: account.balance + data.collected_amount
           }
         })
-        resolve({ tracking_number: tr.tracking_number, created_at: temp.created_at, })
+        const tracking_number = await trans.transaction.findFirst({ where: { id: temp.transaction_id }, select: { tracking_number: true } })
+        resolve({ tracking_number: tracking_number, created_at: temp.created_at, })
       })
 
     } catch (err) {
@@ -148,7 +148,7 @@ export const post = async (req, res, refresh_token) => {
             success: true,
             // @ts-ignore
             tracking_number: tr?.tracking_number,
-             // @ts-ignore
+            // @ts-ignore
             created_at: tr?.created_at
           })
         }
@@ -164,7 +164,7 @@ export const post = async (req, res, refresh_token) => {
           success: true,
           // @ts-ignore
           tracking_number: tr?.tracking_number,
-           // @ts-ignore
+          // @ts-ignore
           created_at: tr?.created_at
         });
       }

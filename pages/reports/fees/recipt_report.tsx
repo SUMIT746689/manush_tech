@@ -3,19 +3,20 @@ import { useState, useEffect, useRef } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
-import { Autocomplete, Box, Button, Card, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Card, Dialog, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import dayjs from 'dayjs';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import PageHeader from 'src/content/Management/Attendence/PageHeader';
-import ReactToPrint from 'react-to-print';
+import ReactToPrint, { useReactToPrint } from 'react-to-print';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { MobileDatePicker } from '@mui/lab';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DateRangePickerWrapper } from '@/components/DatePickerWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -34,7 +35,7 @@ function FeesPaymentReport() {
     const { showNotification } = useNotistick();
 
     const [page, setPage] = useState<number>(0);
-    const [limit, setLimit] = useState<number>(5);
+    const [limit, setLimit] = useState<number>(15);
     const [filter, setFilter] = useState<string>('all');
     const [paginatedTransection, setPaginatedTransection] = useState<any>([]);
 
@@ -44,6 +45,10 @@ function FeesPaymentReport() {
     const [endDate, setEndDate] = useState(null)
     const [account, setAccount] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(null);
+
+    const [selectedInvoice, setSelectedInvoice] = useState([])
+    const [open, setOpen] = useState(false);
+    const selectedInvoiceRef = useRef()
 
     const handlePageChange = (_event: any, newPage: number): void => {
 
@@ -105,6 +110,21 @@ function FeesPaymentReport() {
 
     const bulkAction = datas?.data?.length;
 
+    const handleCreateClassOpen = () => {
+        setOpen(true);
+    };
+    const handleCreateClassClose = () => {
+        setOpen(false);
+        setSelectedInvoice([]);
+    };
+    const handlePrint = useReactToPrint({
+        content: () => selectedInvoiceRef.current,
+        // pageStyle: `@media print {
+        //   @page {
+        //     size: 210mm 115mm;
+        //   }
+        // }`
+    });
 
     return (
         <>
@@ -141,7 +161,7 @@ function FeesPaymentReport() {
                         />
                     </Grid>
                     <Grid item>
-                        <ButtonWrapper type='submit' handleClick={null}>
+                        <ButtonWrapper disabled={startDate && !endDate ? true : false} type='submit' handleClick={null}>
                             Search
                         </ButtonWrapper>
 
@@ -227,7 +247,7 @@ function FeesPaymentReport() {
                                         <TableHead>
                                             <TableRow>
 
-                                                <TableCell>{t('Invoice no')}</TableCell>
+                                                <TableCell>{t('Tracking no')}</TableCell>
                                                 <TableCell>{t('Student')}</TableCell>
                                                 <TableCell>{t('Registration no')}</TableCell>
                                                 <TableCell>{t('Class roll')}</TableCell>
@@ -248,16 +268,6 @@ function FeesPaymentReport() {
                                             {
                                                 paginatedTransection?.map((i) => {
 
-                                                    let name = i?.student?.student_info?.first_name;
-                                                    if (i?.student?.student_info?.middle_name) {
-                                                        name += i?.student?.student_info?.middle_name
-                                                    }
-                                                    if (i?.student?.student_info?.last_name) {
-                                                        name += i?.student?.student_info?.last_name
-                                                    }
-                                                    // const total = i?.collected_amount - i?.student?.discount
-                                                    const total = i?.collected_amount
-
                                                     return (
                                                         <TableRow
                                                             hover
@@ -265,13 +275,13 @@ function FeesPaymentReport() {
                                                         >
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {i?.id}
+                                                                    {i?.transaction?.tracking_number}
                                                                 </Typography>
                                                             </TableCell>
 
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {name}
+                                                                    {[i?.student?.student_info?.first_name,i?.student?.student_info?.middle_name,i?.student?.student_info?.last_name].join(' ')}
                                                                 </Typography>
                                                             </TableCell>
 
@@ -288,7 +298,7 @@ function FeesPaymentReport() {
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
                                                                     {dayjs(i?.created_at).format(
-                                                                        'MMMM D, YYYY h:mm A'
+                                                                        'MMM D, YYYY h:mm A'
                                                                     )}
                                                                 </Typography>
                                                             </TableCell>
@@ -323,11 +333,25 @@ function FeesPaymentReport() {
                                                                 </Typography>
                                                             </TableCell>
 
-                                                            {/* <TableCell>
+                                                            <TableCell align="center">
                                                                 <Typography noWrap variant="h5">
-                                                                   {i?.student?.discount} 
+                                                                    <ButtonWrapper handleClick={() => {
+                                                                        console.log("Invoice__", i);
+
+                                                                        setSelectedInvoice([{
+                                                                            ...i,
+                                                                            paidAmount: i.collected_amount,
+                                                                            collected_by_user: i.collected_by_user.username,
+                                                                            title: i.fee.title,
+                                                                            last_payment_date: i.created_at,
+                                                                            late_fee: i.fee.late_fee,
+                                                                            amount: i.fee.amount,
+                                                                            tracking_number: i.transaction.tracking_number
+                                                                        }])
+                                                                        handleCreateClassOpen()
+                                                                    }} startIcon={<LocalPrintshopIcon />}>Invoice</ButtonWrapper>
                                                                 </Typography>
-                                                            </TableCell> */}
+                                                            </TableCell>
 
                                                             {/* <TableCell>
                                                                 <Typography noWrap variant="h5">
@@ -361,6 +385,23 @@ function FeesPaymentReport() {
 
 
             </Grid>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={open}
+                onClose={handleCreateClassClose}
+            >
+                <Grid mt={1} position={'relative'}>
+                    <Grid position={'absolute'} top={'8px'} right={'16px'}>
+                        <ButtonWrapper handleClick={handlePrint} startIcon={<LocalPrintshopIcon />}>Print</ButtonWrapper>
+                    </Grid>
+                </Grid>
+
+                <Grid ref={selectedInvoiceRef}>
+                    <PaymentInvoice printFees={selectedInvoice} student={selectedInvoice[0]?.student} />
+                </Grid>
+
+            </Dialog>
             <Grid sx={{
                 display: 'none',
             }} >

@@ -9,7 +9,7 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
-import {read} from "xlsx";
+import { read } from "xlsx";
 import { getSheetHeaders } from '@/utils/sheet';
 
 const DynamicSelectTemplate = () => {
@@ -191,7 +191,7 @@ const DynamicTypeSelect = () => {
 function PageHeader() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-  const [selectSheetHeaders,setSelectSheetHeaders ] = useState([]);
+  const [selectSheetHeaders, setSelectSheetHeaders] = useState([]);
 
   const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
@@ -209,9 +209,9 @@ function PageHeader() {
 
       for (const [key, value] of Object.entries(_values)) {
         console.log(`${key}: ${value}`);
-        if(value) datas.set(key,_values[key]);
+        if (value) datas.set(key, _values[key]);
       }
-      console.log({datas})
+      console.log({ datas })
       // const {file_upload} = _values;
       // const fileToBlob = new Blob([new Uint8Array(await file_upload.arrayBuffer())], {type: file_upload.type });
       // _values.file_upload.arrayBuffer().then((arrayBuffer) => {
@@ -219,7 +219,7 @@ function PageHeader() {
       //   console.log({blob});
       // }); 
       // _values.file_upload = fileToBlob;
-      console.log({_values})
+      console.log({ _values })
       const { data } = await axios.post(`/api/sent_sms/dynamic`, datas);
       successResponse('created');
 
@@ -233,26 +233,26 @@ function PageHeader() {
     }
   };
 
-  
-    // function handleFile(file /*:File*/) {
-    //   /* Boilerplate to set up FileReader */
-    //   const reader = new FileReader();
-    //   const rABS = !!reader.readAsBinaryString;
-    //   reader.onload = e => {
-    //     /* Parse data */
-    //     const bstr = e.target.result;
-    //     const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
-    //     /* Get first worksheet */
-    //     const wsname = wb.SheetNames[0];
-    //     const ws = wb.Sheets[wsname];
-    //     console.log(rABS, wb);
-    //     /* Convert array of arrays */
-    //     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-    //     /* Update state */
-    //     console.log({ data: data, cols: make_cols(ws["!ref"]) });
-    //   };
-    //   reader.readAsBinaryString(file)
-    // };
+
+  // function handleFile(file /*:File*/) {
+  //   /* Boilerplate to set up FileReader */
+  //   const reader = new FileReader();
+  //   const rABS = !!reader.readAsBinaryString;
+  //   reader.onload = e => {
+  //     /* Parse data */
+  //     const bstr = e.target.result;
+  //     const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
+  //     /* Get first worksheet */
+  //     const wsname = wb.SheetNames[0];
+  //     const ws = wb.Sheets[wsname];
+  //     console.log(rABS, wb);
+  //     /* Convert array of arrays */
+  //     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+  //     /* Update state */
+  //     console.log({ data: data, cols: make_cols(ws["!ref"]) });
+  //   };
+  //   reader.readAsBinaryString(file)
+  // };
 
   return (
     <>
@@ -321,26 +321,26 @@ function PageHeader() {
                       name="file_upload"
                       value={values.logo?.name || ''}
                       handleChangeFile={(e) => {
-                        if(!e.target.files[0]) return ;
+                        if (!e.target.files[0]) return;
                         const reader = new FileReader();
-                        console.log({ file___: e});
+                        console.log({ file___: e });
 
-                
+
                         reader.onload = function (e) {
                           const data = e.target.result;
                           // console.log({e})
                           // const blob = new Blob([new Uint8Array(data)], {type: e.type });
                           // console.log(blob);
-                          console.log({data})
-                          const workbook = read(data, {type:"array"});
-                          console.log({workbook})
-                          const {Sheets } = workbook ;
-                          console.log({Sheets})
-                          const {Sheet1 } = {} = Sheets || {};
-                          const {Sheet1:{A1} } = {} = Sheets || {};
-                          console.log({Sheet1})
+                          console.log({ data })
+                          const workbook = read(data, { type: "array" });
+                          console.log({ workbook })
+                          const { Sheets } = workbook;
+                          console.log({ Sheets })
+                          const { Sheet1 } = {} = Sheets || {};
+                          const { Sheet1: { A1 } } = {} = Sheets || {};
+                          console.log({ Sheet1 })
                           // setFieldValue("file_upload", e );
-                          setSelectSheetHeaders(()=>getSheetHeaders(Sheet1))
+                          setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
                         }
                         reader.readAsArrayBuffer(e.target.files[0]);
 
@@ -363,19 +363,19 @@ function PageHeader() {
                       handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
                     />
                     {
-                    values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{borderRadius:0, height:40}}/><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{borderRadius:0,height:40}} /></Grid>}
+                      values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>}
 
                     <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
-                    {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
-                    
-                    <Grid display={"flex"} justifyContent={"right"} flexWrap={"wrap"} gap={0.5}>
-                    {selectSheetHeaders.map((value,index)=><Chip key={index} color="primary" onClick={(e)=>{
-                      setFieldValue("body", (values.body || '') + ` #${value}#`)
-                    }} sx={{borderRadius:0.5,fontSize:13, fontWeight:700}} label={`#${value}#`} clickable/>)}
-                    </Grid>
+                      {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
+
+                      <Grid display={"flex"} justifyContent={"right"} flexWrap={"wrap"} gap={0.5}>
+                        {selectSheetHeaders.map((value, index) => <Chip key={index} color="primary" onClick={(e) => {
+                          setFieldValue("body", (values.body || '') + ` #${value}#`)
+                        }} sx={{ borderRadius: 0.5, fontSize: 13, fontWeight: 700 }} label={`#${value}#`} clickable />)}
+                      </Grid>
 
                     </Grid>
-                    
+
 
                     {/* <DynamicSelectTemplate /> */}
 
@@ -461,7 +461,7 @@ const SheetJSFT = [
   "html",
   "htm"
 ]
-  .map(function(x) {
+  .map(function (x) {
     return "." + x;
   })
   .join(",");

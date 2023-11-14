@@ -309,7 +309,7 @@ const Results: FC<ResultsProps> = ({
       </Grid>
 
 
-      <Card sx={{ minHeight: 'calc(100vh - 420px) !important', borderRadius: 0.6 }}>
+      <Card sx={{ minHeight: 'calc(100vh - 393px) !important', borderRadius: 0.6 }}>
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />

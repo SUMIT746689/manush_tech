@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import { read } from "xlsx";
 import { getSheetHeaders } from '@/utils/sheet';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -264,6 +265,7 @@ function PageHeader() {
           initialValues={{
             campaign_name: undefined,
             sms_gateway_id: undefined,
+            contact_column:undefined,
             // template_id: undefined,
             body: undefined,
             // recipient_type: undefined,
@@ -362,8 +364,24 @@ function PageHeader() {
                       }}
                       handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
                     />
-                    {
-                      values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>}
+
+                    {values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>}
+
+                    <AutoCompleteWrapper
+                      minWidth="100%"
+                      label='Select Mobile Number Column'
+                      placeholder='select mobile number column... '
+                      options={selectSheetHeaders?.map(i => {
+                        return {
+                          label: i,
+                          id: i
+                        }
+                      }) || []}
+                      value={undefined}
+                      handleChange={(e, value) => {
+                        console.log("contact",value)
+                        setFieldValue("contact_column", value?.id)}}
+                    />
 
                     <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
                       {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
@@ -375,10 +393,7 @@ function PageHeader() {
                       </Grid>
 
                     </Grid>
-
-
                     {/* <DynamicSelectTemplate /> */}
-
                     <TextAreaWrapper
                       sx={{ pb: 0 }}
                       name="body"

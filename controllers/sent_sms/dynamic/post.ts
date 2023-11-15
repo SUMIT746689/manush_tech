@@ -8,13 +8,16 @@ import { fileUpload } from '@/utils/upload';
 import fs from "fs";
 import { read } from "xlsx";
 import * as XLSX from 'xlsx/xlsx.mjs';
-import { getSheetHeaders } from '@/utils/sheet';
+import { getSheetBodies, getSheetHeaders } from '@/utils/sheet';
 import { findMatches } from '@/utils/findMatches';
 
 
 async function post(req, res, refresh_token) {
   try {
 
+    const { id, school_id } = refresh_token;
+    console.log({ id });
+    const school = await prisma.school.findFirst({ where: { id: school_id }, select: { name: true } })
     const uploadFolderName = 'sent_sms';
 
     const fileType = ['text/csv', 'application/vnd.ms-excel'];
@@ -25,46 +28,65 @@ async function post(req, res, refresh_token) {
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
     const { file_upload } = files;
-  
+    console.log({ fields })
+    if(!fields.contact_column) throw new Error("required fields missing")
     if (!file_upload?.originalFilename) throw new Error("file not found")
-  
+
     const allMatchesArray = findMatches(fields.body);
-    // console.log(result);
-    // return res.status(400).json(result);
-    
 
     res.setHeader('Content-Type', 'application/json')
     const datas = fs.createReadStream(file_upload.filepath);
+    const sent_sms = [];
     datas.on("data", (buffer) => {
-      // const a = XLSX.readFile(file_upload.filepath)
-      // const {Sheets} = a;
-      // console.log({a});
-      var workbook = XLSX.read(buffer, { type: "buffer" });
-      // const {Workbook} = workbook;
-      const { Sheets } = workbook;
-      const { Sheet1 } = Sheets;
-      // console.log(JSON.stringify(Sheet1));
-      const headers = getSheetHeaders(Sheet1);
-      console.log({ headers });
 
-      
-      
-      // let a = 0;
-      // for (const property in Sheet1) {
-      //   // console.log(`${property}: ${Sheet1[property]}`);
-      //   if (a > 10) continue;
-      //   a += 1;
-      //   console.log(Sheet1[property]);
+      // @ts-ignore
+      const uint8 = new Uint8Array(buffer)
+      const workbook = XLSX.read(uint8, { type: 'array' })
+      /* DO SOMETHING WITH workbook HERE */
+      const firstSheetName = workbook.SheetNames[0]
+      /* Get worksheet */
+      const worksheet = workbook.Sheets[firstSheetName]
+      const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
 
-      // }
+      excelArrayDatas.forEach((value, index) => {
+        let body = fields.body;
+        let contacts = value[fields.contact_column];
 
-      res.status(404).write(JSON.stringify(Sheet1));
-      // console.log({ data })
-    })
-    // console.log("hello....");
-    datas.on("end", () => {
-      console.log({});
+        for (const element of allMatchesArray) {
+          body = body.replaceAll(`#${element}#`, value[element])
+        }
+        console.log({ contacts })
+        // console.log({ body });
+        sent_sms.push({
+          sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
+          user_id: parseInt(id),
+          school_id,
+          school_name: school.name,
+          sender_id: String(id),
+          sms_type: 'masking',
+          sms_text: body,
+          submission_time: new Date(Date.now()),
+          contacts: String(contacts),
+          pushed_via: '',
+          total_count: 1,
+        })
+      })
+      res.status(404)
+    });
+
+    datas.on("end", async () => {
+      await prisma.$transaction([
+        prisma.tbl_queued_sms.createMany({
+          data: sent_sms
+        }),
+        prisma.tbl_sent_sms.createMany({
+          data: sent_sms
+        })
+      ]);
       res.end();
+    });
+    datas.on("error", () => {
+      res.status(500).res.end();
     })
 
     // const a = XLSX.readFile(file_upload.filepath)
@@ -112,7 +134,7 @@ async function post(req, res, refresh_token) {
     // return res.status(404).end();
 
 
-    
+
 
     // await prisma.$transaction([
     //   prisma.tbl_queued_sms.create({

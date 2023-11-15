@@ -27,7 +27,8 @@ export const get = async (req, res) => {
           select: {
             username: true
           }
-        }
+        },
+        
       }
     });
 

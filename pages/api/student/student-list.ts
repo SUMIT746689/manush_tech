@@ -33,6 +33,7 @@ const index = async (req, res, refresh_token) => {
                         id: true,
                         student_information_id: true,
                         section_id: true,
+                        student_photo: true,
                         section: {
                             select: {
                                 id: true,
@@ -52,7 +53,7 @@ const index = async (req, res, refresh_token) => {
                             select: {
                                 first_name: true,
                                 middle_name: true,
-                                last_name: true
+                                last_name: true,
                             }
                         },
                         guardian_name: true,

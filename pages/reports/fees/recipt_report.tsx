@@ -267,6 +267,7 @@ function FeesPaymentReport() {
                                         <TableBody >
                                             {
                                                 paginatedTransection?.map((i) => {
+console.log({i});
 
                                                     return (
                                                         <TableRow
@@ -281,7 +282,7 @@ function FeesPaymentReport() {
 
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
-                                                                    {[i?.student?.student_info?.first_name,i?.student?.student_info?.middle_name,i?.student?.student_info?.last_name].join(' ')}
+                                                                    {[i?.student?.student_info?.first_name, i?.student?.student_info?.middle_name, i?.student?.student_info?.last_name].join(' ')}
                                                                 </Typography>
                                                             </TableCell>
 
@@ -345,8 +346,8 @@ function FeesPaymentReport() {
                                                                             title: i.fee.title,
                                                                             last_payment_date: i.created_at,
                                                                             late_fee: i.fee.late_fee,
-                                                                            amount: i.fee.amount,
-                                                                            tracking_number: i.transaction.tracking_number
+                                                                            amount: i.total_payable,
+                                                                            tracking_number: i?.transaction?.tracking_number
                                                                         }])
                                                                         handleCreateClassOpen()
                                                                     }} startIcon={<LocalPrintshopIcon />}>Invoice</ButtonWrapper>

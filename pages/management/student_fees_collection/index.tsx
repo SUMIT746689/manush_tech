@@ -30,9 +30,9 @@ function Managementschools() {
 
       const got = printFees.find(j => j.fee_id == i.id)
       if (got) {
-        i['paidAmount'] = got.collected_amount
-        i['tracking_number'] = got.tracking_number
-        i['created_at'] = got.created_at
+        for (const index in got) {
+          i[index] = got[index]
+        }
         return true;
       }
 
@@ -40,7 +40,8 @@ function Managementschools() {
 
 
     })
-    
+    console.log("printFees__", temp);
+
     setPrinCollectedtFees(temp)
   }, [printFees])
 
@@ -60,7 +61,7 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-console.log("prinCollectedtFees________",prinCollectedtFees);
+  console.log("prinCollectedtFees________", prinCollectedtFees);
 
   return (
     <>

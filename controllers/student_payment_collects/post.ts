@@ -2,13 +2,23 @@ import prisma from "@/lib/prisma_client";
 import { unique_tracking_number } from "@/utils/utilitY-functions";
 
 
-const handleTransaction = ({ data, account, voucher, refresh_token }) => {
+const handleTransaction = ({ data, status, account, voucher, refresh_token }) => {
   return new Promise(async (resolve, reject) => {
     try {
+
       await prisma.$transaction(async (trans) => {
+        const tracking_number = unique_tracking_number('st-')
+
         const temp = await trans.studentFee.create({
           data: {
-            ...data,
+            student: { connect: { id: data.student_id } },
+            fee: { connect: { id: data.fee_id } },
+            collected_amount: data.collected_amount,
+            payment_method: data.payment_method,
+            transID: data.transID,
+            account: { connect: { id: data.account_id } },
+            payment_method_list: { connect: { id: data.payment_method_id } },
+            collected_by_user: { connect: { id: data.collected_by } },
             transaction: {
               create: {
                 amount: data.collected_amount,
@@ -24,9 +34,11 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
                 voucher_type: voucher.type,
                 voucher_name: voucher.title,
                 voucher_amount: voucher.amount,
-                tracking_number: unique_tracking_number('st-')
+                tracking_number
               }
-            }
+            },
+            status,
+            total_payable: data?.total_payable
           }
         });
 
@@ -38,8 +50,16 @@ const handleTransaction = ({ data, account, voucher, refresh_token }) => {
             balance: account.balance + data.collected_amount
           }
         })
-        const tracking_number = await trans.transaction.findFirst({ where: { id: temp.transaction_id }, select: { tracking_number: true } })
-        resolve({ tracking_number: tracking_number, created_at: temp.created_at, })
+
+        resolve({
+          tracking_number,
+          created_at: temp.created_at,
+          last_payment_date: temp.created_at,
+          account_name: account.title,
+          transID: data.transID,
+          payment_method: account?.payment_method[0]?.title,
+          status: temp.status
+        })
       })
 
     } catch (err) {
@@ -53,7 +73,7 @@ export const post = async (req, res, refresh_token) => {
       account_id,
       payment_method_id,
       collected_by_user,
-      transID }: any = req.body;
+      transID, total_payable }: any = req.body;
     const collected_amount = parseFloat(req.body.collected_amount);
 
     if (!student_id || !fee_id || !collected_amount) throw new Error('provide valid informations');
@@ -123,19 +143,37 @@ export const post = async (req, res, refresh_token) => {
       payment_method_id,
       payment_method: account?.payment_method[0]?.title,
       transID,
-      collected_by: Number(collected_by_user)
+      collected_by: Number(collected_by_user),
+      total_payable: Number(total_payable)
     }
 
-    const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
 
     const last_date = new Date(fee.last_date)
 
+    const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
     const last_trnsation_date = isAlreadyAvaliable._max.created_at ? new Date(isAlreadyAvaliable._max.created_at) : new Date();
 
     const late_fee = fee.late_fee ? fee.late_fee : 0;
 
     // console.log(totalPaidAmount, '     ', collected_amount, '     ', feeAmount);
+    const paidAmount = totalPaidAmount + collected_amount
+    let status;
+    if (isAlreadyAvaliable._sum.collected_amount && isAlreadyAvaliable._sum.collected_amount > 0) {
 
+      const last_date = new Date(fee.last_date)
+      const new_trnsation_date = new Date()
+
+      if (new_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) status = 'paid late'
+      else if (new_trnsation_date > last_date && feeAmount == paidAmount && late_fee > 0) status = 'fine unpaid'
+      else if (last_date >= new_trnsation_date && feeAmount == paidAmount) status = 'paid'
+      else if (paidAmount > 0) status = 'partial paid'
+      else status = 'unpaid'
+
+    }
+    else {
+      if (paidAmount > 0) status = 'partial paid'
+      else status = 'unpaid'
+    }
     if (last_trnsation_date > last_date) {
 
       if (totalPaidAmount >= feeAmount + late_fee) throw new Error('Already Paid in Late');
@@ -143,13 +181,11 @@ export const post = async (req, res, refresh_token) => {
       else if (totalPaidAmount < feeAmount + late_fee) {
         if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)
         else {
-          const tr = await handleTransaction({ data, account, voucher, refresh_token })
+          const tr = await handleTransaction({ data, account, status, voucher, refresh_token })
           res.status(200).json({
             success: true,
             // @ts-ignore
-            tracking_number: tr?.tracking_number,
-            // @ts-ignore
-            created_at: tr?.created_at
+            ...tr
           })
         }
 
@@ -159,13 +195,11 @@ export const post = async (req, res, refresh_token) => {
       if (totalPaidAmount === feeAmount) throw new Error('Already Paid !')
       else if (totalPaidAmount + collected_amount > feeAmount) throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`)
       else {
-        const tr = await handleTransaction({ data, account, voucher, refresh_token })
+        const tr = await handleTransaction({ data, account, status, voucher, refresh_token })
         res.status(200).json({
           success: true,
           // @ts-ignore
-          tracking_number: tr?.tracking_number,
-          // @ts-ignore
-          created_at: tr?.created_at
+          ...tr
         });
       }
     }

@@ -28,7 +28,7 @@ function PaymentInvoice({ printFees, student }) {
 
 
   useEffect(() => {
-    console.log({ printFees });
+    // console.log({ printFees });
 
     const temp = printFees.map(payment => {
       const last_date = new Date(payment.last_date)
@@ -54,12 +54,12 @@ function PaymentInvoice({ printFees, student }) {
     setTotalFeeamount(totalAmount);
 
     const totalPaidAmount_ = temp.reduce((prev, curr) => prev + (Number(curr.paidAmount) || 0), 0) || 0;
-    console.log("totalPaidAmount___", totalPaidAmount_);
+    // console.log("totalPaidAmount___", totalPaidAmount_);
 
     setTotalPaidAmount(totalPaidAmount_);
     setWord(numberToWordConverter(totalPaidAmount_));
-    console.log("created_at___", temp);
 
+    console.log("selectedFees[0]", temp[0]);
     setSelectedFees(temp)
   }, [printFees])
 
@@ -91,19 +91,14 @@ function PaymentInvoice({ printFees, student }) {
         <Grid width={'20%'} item>Payment Receipt</Grid>
       </Grid>
 
-      <Grid sx={{ display: 'grid', gridTemplateColumns: '1fr 0.75fr' }} mt={4} spacing="2">
-        <Grid   >
-          <Grid> Tracking number:  <span style={{ fontWeight: 'bold' }}>{selectedFees[0]?.tracking_number}</span></Grid>
-          <Grid> Payment Received: </Grid>
-          <Grid> Receipt Created:  <span style={{ fontWeight: 'bold' }}>{selectedFees[0]?.created_at ? dayjs(selectedFees[0]?.created_at).format('MMM D, YYYY h:mm A') : ''}</span></Grid>
-        </Grid>
+      <Grid sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr ', gridGap: 2 }} mt={4}>
 
-        <Grid  >
+        <Grid>
           <Grid>
             Student Name: <b>{[student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(" ")}
             </b>
           </Grid>
-          <Grid>Roll: {student?.class_roll_no}</Grid>
+          <Grid>Roll: <b>{student?.class_roll_no}</b></Grid>
           <Grid>
             Gaurdian Number:{' '}
             <a href={`tel:${student?.guardian_phone}`}>
@@ -111,6 +106,22 @@ function PaymentInvoice({ printFees, student }) {
             </a>
           </Grid>
         </Grid>
+        <Grid   >
+          <Grid> Tracking number:  <b>{selectedFees[0]?.tracking_number}</b></Grid>
+          <Grid> Invoice Created:  <b>{selectedFees[0]?.created_at ? dayjs(selectedFees[0]?.created_at).format('DD/MM/YYYY, h:mm a') : selectedFees[0]?.last_payment_date}</b></Grid>
+          <Grid> Payment Collected by: <b>{selectedFees[0]?.collected_by_user}</b></Grid>
+
+        </Grid>
+      </Grid>
+
+      <Grid sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr ', gridGap: 2 }} mt={2}>
+        <Grid> Account: <b>{selectedFees[0]?.account?.title || selectedFees[0]?.account}</b></Grid>
+        {
+          selectedFees[0]?.transID && <>
+            <Grid> TrxID: <b>{selectedFees[0]?.transID}</b></Grid>
+            <Grid> Payment gateway: <b>{selectedFees[0]?.payment_method}</b></Grid>
+          </>
+        }
       </Grid>
 
       <Grid container pt={4}>
@@ -128,19 +139,22 @@ function PaymentInvoice({ printFees, student }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {selectedFees?.map((payment, index) => <TableRow
-                key={payment.id}
-                sx={{ p: 1 }}
-              // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{ dayjs(payment.last_payment_date).format('MMM D, YYYY h:mm A')}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
-                <TableCell sx={{ p: 1 }} align="right">{payment.paidAmount ? formatNumber(payment.paidAmount) : 0}</TableCell>
-              </TableRow>
+              {selectedFees?.map((payment, index) => {
+
+                return <TableRow
+                  key={payment.id}
+                  sx={{ p: 1 }}
+                // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell sx={{ p: 1 }}>{index + 1}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.title}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{dayjs(payment?.last_payment_date).format('DD/MM/YYYY, h:mm a')}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.late_fee)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{formatNumber(payment?.payableAmount)}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.status}</TableCell>
+                  <TableCell sx={{ p: 1 }} align="right">{payment.paidAmount ? formatNumber(payment.paidAmount) : 0}</TableCell>
+                </TableRow>
+              }
               )}
             </TableBody>
             <TableFooter>
@@ -165,7 +179,11 @@ function PaymentInvoice({ printFees, student }) {
 
       <Grid container mt={10} justifyContent="space-between">
         <Grid borderTop={1} sx={{ borderColor: 'gray' }}>Approved By</Grid>
-        <Grid borderTop={1} sx={{ borderColor: 'gray' }}>Received By</Grid>
+
+        <Grid display={'flex'} flexDirection={'column'} textAlign={'center'} sx={{ borderColor: 'gray' }}>
+          <b>{selectedFees[0]?.collected_by_user}</b>
+          <Typography borderTop={1}>Received By</Typography>
+        </Grid>
       </Grid>
     </Box>
   );
@@ -219,6 +237,6 @@ const numberToWordConverter = (s) => {
     for (var i = x + 1; i < y; i++)
       str += dg[n[i]] + ' ';
   }
-  console.log({ str })
+  
   return str.replace(/\s+/g, ' ');
 }

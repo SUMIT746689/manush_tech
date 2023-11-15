@@ -74,6 +74,12 @@ const index = async (req, res) => {
                             select: {
                                 tracking_number: true
                             }
+                        },
+                        account: {
+                            select: {
+                                id: true,
+                                title: true
+                            }
                         }
                     }
                 })

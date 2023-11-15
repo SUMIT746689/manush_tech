@@ -416,8 +416,9 @@ model StudentFee {
   payment_method_id Int?
   collected_by      Int?
   created_at        DateTime @default(now())
-
-  transaction_id Int? @unique
+  transaction_id    Int?     @unique
+  status            String?
+  total_payable     Float?
 
   transaction         Transaction?    @relation(fields: [transaction_id], references: [id])
   account             Accounts?       @relation(fields: [account_id], references: [id])

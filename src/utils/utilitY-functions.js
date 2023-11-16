@@ -35,3 +35,16 @@ export function generateUsername(firstName) {
 export function unique_tracking_number(str = '') {
   return str + Date.now().toString() + crypto.randomBytes(5).toString("hex")
 }
+
+export function accessNestedProperty(obj, array) {
+  let currentObject = obj;
+  console.log("array__", array, currentObject);
+  for (const key of array) {
+    if (currentObject && currentObject.hasOwnProperty(key)) {
+      currentObject = currentObject[key];
+    } else {
+      return undefined;
+    }
+  }
+  return currentObject;
+}

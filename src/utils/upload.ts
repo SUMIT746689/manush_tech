@@ -170,7 +170,9 @@ export const fileUpload = async ({ req, filterFiles, uploadFolderName, uniqueFil
                 if (name === key) {
                     // @ts-ignore
                     const type = value.map(element => element.slice(6)).join(', ');
+                    console.log("mimetype____",mimetype);
                     // @ts-ignore
+                    
                     if (!value.includes(mimetype)) {
                         error = `Only ${type} format is supported for ${key}`
                         return false;

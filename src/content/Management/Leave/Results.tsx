@@ -63,6 +63,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 import ApprovalIcon from '@mui/icons-material/Approval';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import { accessNestedProperty } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -114,18 +115,7 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-function accessNestedProperty(obj, array) {
-  let currentObject = obj;
 
-  for (const key of array) {
-    if (currentObject && currentObject.hasOwnProperty(key)) {
-      currentObject = currentObject[key];
-    } else {
-      return undefined;
-    }
-  }
-  return currentObject;
-}
 
 const applyFilters = (
   users,

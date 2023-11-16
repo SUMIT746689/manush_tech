@@ -207,7 +207,7 @@ const Results = ({
     setDeleteSchoolId(null);
   };
 
-  const handleDeleteCompleted = async () => {
+  const handleDeleteCompleted =  () => {
 
     axios.delete(`/api/question/${deleteSchoolId}`).then(res => {
       closeConfirmDelete()
@@ -230,14 +230,18 @@ const Results = ({
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box p={0.5}>
               <DebounceInput
                 debounceTimeout={1000}
                 handleDebounce={(v) => setQuery(v)}
-                value={query}
-                label={'Search exam name or subject'}
+                label={'Search exam name or subject...'}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchTwoToneIcon />
+                    </InputAdornment>
+                  )
+                }}
               />
-            </Box>
           </Grid>
         </Grid>
       </Card>

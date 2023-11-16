@@ -9,7 +9,7 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
-import { read } from "xlsx";
+import { read, utils } from "xlsx";
 import { getSheetHeaders } from '@/utils/sheet';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
@@ -265,7 +265,7 @@ function PageHeader() {
           initialValues={{
             campaign_name: undefined,
             sms_gateway_id: undefined,
-            contact_column:undefined,
+            contact_column: undefined,
             // template_id: undefined,
             body: undefined,
             // recipient_type: undefined,
@@ -298,6 +298,7 @@ function PageHeader() {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
+            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -322,50 +323,56 @@ function PageHeader() {
                       label="File File"
                       name="file_upload"
                       value={values.logo?.name || ''}
-                      handleChangeFile={(e) => {
-                        if (!e.target.files[0]) return;
+                      handleChangeFile={(event) => {
+                        if (!event.target.files[0]) return;
                         const reader = new FileReader();
-                        console.log({ file___: e });
+                        console.log({ file___: event });
 
 
-                        reader.onload = function (e) {
+                        reader.onload = async function (e) {
                           const data = e.target.result;
-                          // console.log({e})
-                          // const blob = new Blob([new Uint8Array(data)], {type: e.type });
-                          // console.log(blob);
-                          console.log({ data })
-                          const workbook = read(data, { type: "array" });
-                          console.log({ workbook })
-                          const { Sheets } = workbook;
-                          console.log({ Sheets })
-                          const { Sheet1 } = {} = Sheets || {};
-                          const { Sheet1: { A1 } } = {} = Sheets || {};
-                          console.log({ Sheet1 })
-                          // setFieldValue("file_upload", e );
-                          setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
+                          const workbook = read(data, { type: 'array' })
+                          /* DO SOMETHING WITH workbook HERE */
+                          const firstSheetName = workbook.SheetNames[0]
+                          /* Get worksheet */
+                          const worksheet = workbook.Sheets[firstSheetName]
+                          const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
+                          setFieldValue("body", '')
+                          setFieldValue("contact_column", {})
+
+                          if (excelArrayDatas.length > 30_000) {
+                            showNotification("file is to large", "error")
+                            setFieldValue("file_upload", null);
+                            setSelectSheetHeaders(() => []);
+                            return;
+                          }
+                          const fileHeads = Object.keys(excelArrayDatas[0]);
+                          console.log({ fileHeads })
+                          setSelectSheetHeaders(() => fileHeads);
+                          if (event.target?.files?.length) setFieldValue("file_upload", event.target.files[0]);
+
+                          // const workbook = read(data, { type: "array" });
+
+                          // console.log({ workbook })
+                          // const { Sheets } = workbook;
+                          // console.log({ Sheets })
+                          // const { Sheet1 } = {} = Sheets || {};
+                          // const { Sheet1: { A1 } } = {} = Sheets || {};
+                          // console.log({ Sheet1 })
+                          // // setFieldValue("file_upload", e );
+                          // setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
                         }
-                        reader.readAsArrayBuffer(e.target.files[0]);
+                        reader.readAsArrayBuffer(event.target.files[0]);
 
-                        // const input = e.target.files[0];
-                        // // handleFile(input)
-                        // // const parser = new DOMParser();
-                        // // const xmlDoc = parser.parseFromString(parser,"text/xml");
-                        // const reader = new FileReader();
-                        // reader.onload = function (e) {
 
-                        //   console.log({e})
-                        //   // const text = JSON.parse(e.target.result);
-                        //   // const splitText = text.split(",")
-                        //   console.log({eeeeee____: e.target.result.toString().split(/\r?\n/) });
-                        // };
-                        // reader.readAsText(input);
-
-                        if (e.target?.files?.length) setFieldValue("file_upload", e.target.files[0]);
                       }}
                       handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
                     />
 
-                    {values?.file_upload?.name && <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>}
+                    {values?.file_upload?.name ?
+                      <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>
+                      : ''
+                    }
 
                     <AutoCompleteWrapper
                       minWidth="100%"
@@ -377,10 +384,11 @@ function PageHeader() {
                           id: i
                         }
                       }) || []}
-                      value={undefined}
+                      value={values.contact_column}
                       handleChange={(e, value) => {
-                        console.log("contact",value)
-                        setFieldValue("contact_column", value?.id)}}
+                        console.log("contact", value)
+                        setFieldValue("contact_column", value)
+                      }}
                     />
 
                     <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >

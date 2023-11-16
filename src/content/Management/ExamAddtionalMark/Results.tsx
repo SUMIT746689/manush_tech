@@ -35,6 +35,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import SearchInputWrapper from '@/components/SearchInput';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -189,10 +190,11 @@ const Results = ({ setEditSubject, users, classList }) => {
 
       <Card sx={{ minHeight: '64.8vh' }}>
         <Box p={2}>
-          <TextField
-            sx={{
-              m: 0
-            }}
+
+          <DebounceInput
+            debounceTimeout={1000}
+            handleDebounce={(v) => setQuery(v)}
+            label={'Search by subject name...'}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -200,13 +202,6 @@ const Results = ({ setEditSubject, users, classList }) => {
                 </InputAdornment>
               )
             }}
-            onChange={handleQueryChange}
-            placeholder={t('Search by subject name...')}
-            value={query}
-            size="small"
-            fullWidth
-            margin="normal"
-            variant="outlined"
           />
         </Box>
 
@@ -266,7 +261,7 @@ const Results = ({ setEditSubject, users, classList }) => {
                           <TableCell>
                             <Typography variant="h5">
                               {
-                                i.examAddtinalMark?.map((cat =>`${cat.addtionalMarkingCategorie?.title}(${cat.total_mark})`)).join(' - ')
+                                i.examAddtinalMark?.map((cat => `${cat.addtionalMarkingCategorie?.title}(${cat.total_mark})`)).join(' - ')
                               }
                             </Typography>
                           </TableCell>

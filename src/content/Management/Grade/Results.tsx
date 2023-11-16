@@ -42,6 +42,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { DebounceInput } from '@/components/DebounceInput';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -233,11 +234,10 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
         <Grid container spacing={1}>
           <Grid item xs={12}>
             <Box>
-              <TextField
-                size='small'
-                sx={{
-                  m: 0
-                }}
+              <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
+                label={'Search by grade name...'}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -245,11 +245,6 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
                     </InputAdornment>
                   )
                 }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by grade name...')}
-                value={query}
-                fullWidth
-                variant="outlined"
               />
             </Box>
           </Grid>

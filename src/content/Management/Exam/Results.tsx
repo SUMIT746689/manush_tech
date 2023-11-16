@@ -11,6 +11,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -200,9 +201,10 @@ const Results = ({
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box p={0.5}>
-              <TextField
-                sx={{ m: 0 }}
-                size='small'
+              <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
+                label={'Search by exam name...'}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -210,11 +212,6 @@ const Results = ({
                     </InputAdornment>
                   )
                 }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by exam name...')}
-                value={query}
-                fullWidth
-                variant="outlined"
               />
             </Box>
           </Grid>

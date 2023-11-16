@@ -50,6 +50,7 @@ import BulkActions from './BulkActions';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { useSnackbar } from 'notistack';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -151,7 +152,7 @@ const applyPagination = (
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ users,setEditClass }) => {
+const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
 
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -183,7 +184,7 @@ const Results: FC<ResultsProps> = ({ users,setEditClass }) => {
   const filteredClasses = applyFilters(users, query, filters);
   const paginatedClasses = applyPagination(filteredClasses, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
- 
+
 
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -208,129 +209,122 @@ const Results: FC<ResultsProps> = ({ users,setEditClass }) => {
     //   TransitionComponent: Zoom
     // });
   };
- 
+
   return (
     <>
-        <Card sx={{minHeight:'calc(100vh - 330px) !important'}}>
-          <Box p={2}>
-            {!selectedBulkActions && (
-              <TextField
-                sx={{
-                  m: 0
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by name or class code...')}
-                value={query}
-                size="small"
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-            )}
-            {selectedBulkActions && <BulkActions />}
-          </Box>
-
-          <Divider />
-
-          {paginatedClasses.length === 0 ? (
-            <>
-              <Typography
-                sx={{
-                  py: 10,
-                  px:4
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t("We couldn't find any class matching your search criteria")}
-              </Typography>
-            </>
-          ) : (
-            <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align='center'>{t('class Id')}</TableCell>
-                      <TableCell align='center'>{t('class name')}</TableCell>
-                      <TableCell align='center'>{t('Class code')}</TableCell>
-                      <TableCell align="center">{t('Actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paginatedClasses.map((i) => {
-
-                      const isUserSelected = selectedItems.includes(i.id);
-                      return (
-                        <TableRow hover key={i.id} selected={isUserSelected}>
-                          <TableCell align='center'>
-                          <Typography variant="h5">
-                              {i?.id}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h5">
-                              {i.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h5">
-                              {i.code}
-                            </Typography>
-                          </TableCell>
-
-                          <TableCell align="center">
-                            <Typography noWrap>
-                              <Tooltip title={t('Edit')} arrow>
-                                <IconButton
-                                  color="primary"
-                                  onClick={()=>setEditClass(i)}
-                                >
-                                  <LaunchTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip title={t('Delete')} arrow>
-                                <IconButton
-                                  onClick={handleConfirmDelete}
-                                  color="primary"
-                                >
-                                  <DeleteTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <Box p={2}>
-                <TablePagination
-                  component="div"
-                  count={filteredClasses.length}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleLimitChange}
-                  page={page}
-                  rowsPerPage={limit}
-                  rowsPerPageOptions={[5, 10, 15]}
-                />
-              </Box>
-            </>
+      <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
+        <Box p={2}>
+          {!selectedBulkActions && (
+            <DebounceInput
+              debounceTimeout={1000}
+              handleDebounce={(v) => setQuery(v)}
+              label={'Search by name or class code...'}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchTwoToneIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
           )}
-        </Card>
-      
+          {selectedBulkActions && <BulkActions />}
+        </Box>
+
+        <Divider />
+
+        {paginatedClasses.length === 0 ? (
+          <>
+            <Typography
+              sx={{
+                py: 10,
+                px: 4
+              }}
+              variant="h3"
+              fontWeight="normal"
+              color="text.secondary"
+              align="center"
+            >
+              {t("We couldn't find any class matching your search criteria")}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align='center'>{t('class Id')}</TableCell>
+                    <TableCell align='center'>{t('class name')}</TableCell>
+                    <TableCell align='center'>{t('Class code')}</TableCell>
+                    <TableCell align="center">{t('Actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedClasses.map((i) => {
+
+                    const isUserSelected = selectedItems.includes(i.id);
+                    return (
+                      <TableRow hover key={i.id} selected={isUserSelected}>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i?.id}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i.code}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <Typography noWrap>
+                            <Tooltip title={t('Edit')} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => setEditClass(i)}
+                              >
+                                <LaunchTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title={t('Delete')} arrow>
+                              <IconButton
+                                onClick={handleConfirmDelete}
+                                color="primary"
+                              >
+                                <DeleteTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box p={2}>
+              <TablePagination
+                component="div"
+                count={filteredClasses.length}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleLimitChange}
+                page={page}
+                rowsPerPage={limit}
+                rowsPerPageOptions={[5, 10, 15]}
+              />
+            </Box>
+          </>
+        )}
+      </Card>
+
       <DialogWrapper
         open={openConfirmDelete}
         maxWidth="sm"

@@ -42,6 +42,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -219,11 +220,10 @@ const Results: FC<ResultsProps> = ({
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box p={0.5}>
-              <TextField
-                size='small'
-                sx={{
-                  m: 0
-                }}
+              <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
+                label={'Search by title...'}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -231,18 +231,13 @@ const Results: FC<ResultsProps> = ({
                     </InputAdornment>
                   )
                 }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by title...')}
-                value={query}
-                fullWidth
-                variant="outlined"
               />
             </Box>
           </Grid>
         </Grid>
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius:0.6 }}>
+      <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.6 }}>
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />

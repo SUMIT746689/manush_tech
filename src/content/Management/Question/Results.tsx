@@ -78,11 +78,7 @@ const applyFilters = (
 
 
       for (const property of properties) {
-
         const queryString = accessNestedProperty(project, property.split('.'))
-        console.log("queryString__", query, queryString);
-
-
         if (queryString?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }

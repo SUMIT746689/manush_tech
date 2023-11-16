@@ -27,10 +27,11 @@ const index = async (req, res, refresh_token) => {
                             }
                         }
                     },
-                    select: {
-                        id: true,
+                    include: {
+                        
                         exam_details: {
                             select: {
+                                id: true,
                                 subject_total: true,
                                 exam: {
                                     select: {
@@ -86,8 +87,8 @@ const index = async (req, res, refresh_token) => {
                                 id: Number(fields.exam_details_id)
                             }
                         },
-                        content: fields?.content,
-                        file: file?.newFilename ? path.join(uploadFolderName, file?.newFilename) : (file || '')
+                        content: fields?.content ? fields?.content : null,
+                        file: file?.newFilename ? path.join(uploadFolderName, file?.newFilename) : null
                     }
                 })
                 res.status(200).json({ message: 'Question created successfully' });

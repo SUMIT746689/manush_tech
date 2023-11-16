@@ -416,8 +416,11 @@ model StudentFee {
   payment_method_id Int?
   collected_by      Int?
   created_at        DateTime @default(now())
-  // tracking_number   String   @unique
+  transaction_id    Int?     @unique
+  status            String?
+  total_payable     Float?
 
+  transaction         Transaction?    @relation(fields: [transaction_id], references: [id])
   account             Accounts?       @relation(fields: [account_id], references: [id])
   payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
   student             Student         @relation(fields: [student_id], references: [id])
@@ -924,6 +927,7 @@ model Transaction {
   account             Accounts?       @relation(fields: [account_id], references: [id])
   payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
   school              School          @relation(fields: [school_id], references: [id])
+  StudentFee          StudentFee?
 
   @@unique([tracking_number, school_id])
   @@map("transactions")

@@ -35,9 +35,8 @@ function ManagementClasses() {
   }, [])
 
   useEffect(() => {
-    if (startDate && endDate && startDate <= endDate) {
-      getData(startDate, endDate)
-    }
+    if (startDate && endDate) getData(startDate, endDate)
+    else if (!startDate && !endDate) getData(new Date(), new Date())
   }, [startDate, endDate])
 
   return (

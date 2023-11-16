@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Avatar, Box, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, Table, TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, TextField, Button, Typography, Dialog, styled } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
@@ -11,6 +11,12 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import Link from 'next/link';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useReactToPrint } from 'react-to-print';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+import { accessNestedProperty } from '@/utils/utilitY-functions';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -67,14 +73,20 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['title'];
+      const properties = ['exam_details.exam.title', 'exam_details.subject.name'];
       let containsQuery = false;
 
-      properties.forEach((property) => {
-        if (project[property]?.toLowerCase().includes(query.toLowerCase())) {
+
+      for (const property of properties) {
+
+        const queryString = accessNestedProperty(project, property.split('.'))
+        console.log("queryString__", query, queryString);
+
+
+        if (queryString?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
-      });
+      }
 
       if (filters.status && project.status !== filters.status) {
         matches = false;
@@ -111,6 +123,7 @@ const Results = ({
   selectedSubject
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
+
   const { t }: { t: any } = useTranslation();
 
   const [page, setPage] = useState<number>(0);
@@ -119,12 +132,33 @@ const Results = ({
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+  const [selectedQuestion, setSelectedQuestion] = useState(null)
+  const [open, setOpen] = useState(false)
+  const selectedInvoiceRef = useRef();
+
+  const handleCreateClassOpen = () => {
+    setOpen(true);
+  };
+  const handleCreateClassClose = () => {
+    setOpen(false);
+    setSelectedQuestion(null);
+  };
+  const handlePrint = useReactToPrint({
+    content: () => selectedInvoiceRef.current,
+    // pageStyle: `@media print {
+    //   @page {
+    //     size: 210mm 115mm;
+    //   }
+    // }`
+  });
+
   const { showNotification } = useNotistick();
 
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
     setQuery(event.target.value);
+
   };
 
   const handleConfirmDelete = (id: string) => {
@@ -160,12 +194,10 @@ const Results = ({
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-
-  const filteredExams = applyFilters(question, query, filters);
+  const filteredExams = applyFilters(question, query, filters)
   const paginatedExams = applyPagination(filteredExams, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < question.length;
-  const selectedAllschools = selectedItems.length === question.length;
+
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -180,7 +212,7 @@ const Results = ({
     axios.delete(`/api/question/${deleteSchoolId}`).then(res => {
       closeConfirmDelete()
       showNotification(res.data.message);
-      // reFetch(selectedSubject?.id)
+      reFetch(selectedSubject?.id)
     }).catch(err => {
       setOpenConfirmDelete(false);
       showNotification('Question falied to delete ', 'error');
@@ -199,21 +231,11 @@ const Results = ({
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box p={0.5}>
-              <TextField
-                sx={{ m: 0 }}
-                size='small'
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by exam name...')}
+              <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
                 value={query}
-                fullWidth
-                variant="outlined"
+                label={'Search exam name or subject'}
               />
             </Box>
           </Grid>
@@ -233,7 +255,7 @@ const Results = ({
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:
               </Typography>{' '}
-              <b>{paginatedExams.length}</b> <b>{t('exams')}</b>
+              <b>{filteredExams.length}</b> <b>{t('exams')}</b>
             </Box>
             <TablePagination
               component="div"
@@ -248,7 +270,7 @@ const Results = ({
         )}
         <Divider />
 
-        {paginatedExams.length === 0 ? (
+        {filteredExams.length === 0 ? (
           <>
             <Typography
               sx={{
@@ -270,79 +292,82 @@ const Results = ({
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <td>
-                    <Checkbox
-                      size='small'
-                      checked={selectedAllschools}
-                      indeterminate={selectedSomeschools}
-                      onChange={handleSelectAllschools}
-                    />
-                  </td>
-                  <td>{t('SL')}</td>
-                  <td>{t('Exam title')}</td>
-                  <td>{t('Class')}</td>
-                  <td>{t('Section')}</td>
-                  <td>{t('Subject title')}</td>
-                  <td>{t('Subject total')}</td>
-                  {/* <td align="center">{t('Actions')}</td> */}
+
+                  <TableCell>{t('SL')}</TableCell>
+                  <TableCell>{t('Exam title')}</TableCell>
+                  <TableCell>{t('Class')}</TableCell>
+                  <TableCell>{t('Section')}</TableCell>
+                  <TableCell>{t('Subject title')}</TableCell>
+                  <TableCell>{t('File')}</TableCell>
+                  <TableCell>{t('Preview')}</TableCell>
+                  <TableCell align="center">{t('Actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedExams.map((exam, index) => {
-                  const isExamselected = selectedItems.includes(
-                    exam.id
-                  );
-                  console.log({ exam });
 
                   return (
                     <TableRow
                       hover
                       key={exam.id}
-                      selected={isExamselected}
                     >
-                      <td>
-                        <Checkbox
-                          size='small'
-                          checked={isExamselected}
-                          onChange={(event) =>
-                            handleSelectOneProject(event, exam.id)
-                          }
-                          value={isExamselected}
-                        />
-                      </td>
-                      <td>
+
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
                           {index + 1}
                         </Typography>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
                           {exam?.exam_details?.exam?.title}
                         </Typography>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
                           {exam?.exam_details?.exam?.section?.class?.name}
                         </Typography>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
                           {exam?.exam_details?.exam?.section?.class?.has_section ? exam?.exam_details?.exam?.section?.name : 'No section'}
                         </Typography>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
                           {exam?.exam_details?.subject?.name}
                         </Typography>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <Typography noWrap variant="h5" py={0}>
-                          {exam?.exam_details?.subject_total}
+
+                          {exam?.file && <a
+                            style={{ width: '50px', color: 'blue', textDecoration: 'underline' }}
+                            target="_blank"
+                            href={`/api/get_file/${exam?.file?.replace(/\\/g, '/')}`}
+                          >
+                            File link
+                          </a>
+                          }
                         </Typography>
-                      </td>
+                      </TableCell>
 
+                      <TableCell>
+                        <Typography>
+                          <Tooltip title={t('Question Preview')} arrow>
 
-                      <td align="center">
+                            <IconButton
+                              color="primary"
+                              onClick={() => {
+                                setSelectedQuestion(exam)
+                                setOpen(true)
+                              }}
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
                         <Typography noWrap py={0}>
                           <Tooltip title={t('Edit')} arrow>
                             <IconButton
@@ -365,7 +390,7 @@ const Results = ({
                             </IconButton>
                           </Tooltip>
                         </Typography>
-                      </td>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -386,7 +411,28 @@ const Results = ({
           </TableContainer>
         )}
       </Card >
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={open}
+        onClose={handleCreateClassClose}
+      >
+        <Grid mt={1} position={'relative'}>
+          <Grid position={'absolute'} top={'8px'} right={'10%'}>
+            <Grid sx={{ position: 'fixed' }}>
 
+              <ButtonWrapper handleClick={handlePrint} startIcon={<LocalPrintshopIcon />}>Print</ButtonWrapper>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid pt={6} px={1} pb={2} ref={selectedInvoiceRef} >
+
+
+          <div dangerouslySetInnerHTML={{ __html: selectedQuestion?.content }} />
+
+        </Grid>
+
+      </Dialog>
 
       <DialogWrapper
         open={openConfirmDelete}

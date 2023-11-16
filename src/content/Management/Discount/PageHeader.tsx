@@ -208,7 +208,7 @@ function PageHeader({ editDiscount, setEditDiscount, reFetchData, fees }) {
                   </Grid>
                 </DialogContent>
                 <DialogActionWrapper
-                  title="Section"
+                  title="Discount"
                   handleCreateClassClose={handleCreateClassClose}
                   errors={errors}
                   editData={editDiscount}

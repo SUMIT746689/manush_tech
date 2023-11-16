@@ -52,6 +52,7 @@ import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { formatNumber } from '@/utils/numberFormat';
 import fee from 'pages/api/fee';
+import Image from 'next/image';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -138,7 +139,7 @@ const Results = ({
 
             setSessions(res.data.data?.fees?.map((fee, index) => {
 
-              const last_payment_date = fee?.status !== 'unpaid' ? dayjs(fee?.last_payment_date).format('DD/MM/YYYY, h:mm a') : ''
+              const last_payment_date = fee?.status !== 'unpaid' ? fee?.last_payment_date : ''
               const last_date = new Date(fee.last_date)
               const today = new Date()
               const status_color = { p: 0.5 };
@@ -188,7 +189,11 @@ const Results = ({
     }
   };
   useEffect(() => {
-    if (selectedStudent) handleStudentPaymentCollect();
+    if (selectedStudent) {
+      console.log({ selectedStudent });
+
+      handleStudentPaymentCollect();
+    }
   }, [selectedStudent]);
 
   const handleSelectAllschools = (
@@ -240,8 +245,6 @@ const Results = ({
 
   }, [sessions, filter, page, limit])
 
-  useEffect(() => { console.log(paginatedfees, filter, page); }, [paginatedfees, filter, page])
-
   // @ts-ignore
   const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions?.length;
   // @ts-ignore
@@ -255,7 +258,7 @@ const Results = ({
 
   useEffect(() => {
     if (selectedSection && academicYear && user) {
-      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`)
+      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}`)
         .then((res) => {
           setStudents(res.data);
         })
@@ -285,21 +288,33 @@ const Results = ({
     }
   };
 
-  const handleCollection = (student_id, fee_id, fee, amount, selectedAccount, selectedGateway, transID) => {
+  const handleCollection = ({ fee, amount, selectedAccount, selectedGateway, transID, payableAmount }) => {
     axios.post('/api/student_payment_collect', {
-      student_id: student_id,
+      student_id: selectedStudent.id,
       collected_by_user: user?.id,
-      fee_id: fee_id,
+      fee_id: fee.id,
       account_id: selectedAccount?.id,
       payment_method_id: selectedGateway?.id,
       collected_amount: amount,
-      transID: transID
+      transID: transID,
+      total_payable: payableAmount
     })
       .then((res) => {
         console.log("res.data__", res.data);
         // setPrintFees([])
         if (res.data.err) throw new Error(res.data.err);
-        setPrintFees([{ fee_id, collected_amount: amount, tracking_number: res.data?.tracking_number,created_at:res.data?.created_at }]);
+        setPrintFees([{
+          fee_id: fee.id,
+          paidAmount: amount,
+          tracking_number: res.data?.tracking_number,
+          created_at: res.data?.created_at,
+          last_payment_date: res.data?.last_payment_date,
+          account: res.data?.account_name,
+          transID: res.data?.transID,
+          payment_method: res.data?.payment_method,
+          status: res.data?.status,
+
+        }]);
         handleStudentPaymentCollect();
         showNotification('The payment has been collected successfully');
       })
@@ -443,19 +458,15 @@ const Results = ({
                 sx={{ p: 1 }}
               >
                 {selectedStudent && (
-                  <>
-                    {selectedStudent?.student_photo ? (
-                      <img
-                        style={{ width: '50px' }}
-                        src={`/images/${selectedStudent.student_photo}`}
-                      />
-                    ) : (
-                      <img
-                        style={{ width: '50px', objectFit: 'contain' }}
-                        src={`/dumy_teacher.png`}
-                      />
-                    )}
-                  </>
+                  <Image src={selectedStudent?.student_photo ? `/api/get_file/${selectedStudent?.student_photo?.replace(/\\/g, '/')}` : `/dumy_teacher.png`}
+                    height={100}
+                    width={100}
+                    alt='student photo'
+                    loading='lazy'
+                    style={{
+                      borderRadius: '15px'
+                    }}
+                  />
                 )}
               </Grid>
               <Grid sx={{ p: 1 }}>
@@ -591,6 +602,7 @@ const Results = ({
               <TableBody>
                 {paginatedfees.map((fee, index) => {
                   const isschoolselected = selectedItems.includes(fee.id);
+                  console.log('fee__', fee);
 
                   return (
                     <TableRow
@@ -642,7 +654,7 @@ const Results = ({
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {fee?.last_payment_date}
+                          {fee?.last_payment_date ? dayjs(fee?.last_payment_date).format('DD/MM/YYYY, h:mm a') : ''}
                         </Typography>
                       </TableCell>
 
@@ -658,9 +670,8 @@ const Results = ({
                             accounts={accounts}
                             accountsOption={accountsOption}
                             due={fee?.due}
-                            project={fee}
+                            fee={fee}
                             handleCollection={handleCollection}
-                            student_id={selectedStudent?.id}
                           />
                           {/* <Tooltip title={t('Edit')} arrow>
                                 <IconButton
@@ -769,7 +780,7 @@ const Results = ({
   );
 };
 
-const AmountCollection = ({ due, project, student_id, handleCollection, accounts, accountsOption }) => {
+const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption }) => {
   const { t }: { t: any } = useTranslation();
   const [amount, setAmount] = useState(due);
   const [selectedGateway, setSelectedGateway] = useState(null);
@@ -865,7 +876,7 @@ const AmountCollection = ({ due, project, student_id, handleCollection, accounts
           variant="contained"
           disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label?.toLowerCase() !== 'cash' && transID || selectedAccount?.label?.toLowerCase() === 'cash' && !transID) ? false : true}
           onClick={() => {
-            handleCollection(student_id, project.id, project, amount, selectedAccount, selectedGateway, transID);
+            handleCollection({ fee, amount, selectedAccount, selectedGateway, transID, payableAmount: fee?.payableAmount });
             setSelectedAccount(null)
             setSelectedGateway(null);
             setTransID(null)

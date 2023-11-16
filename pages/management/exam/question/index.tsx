@@ -82,7 +82,7 @@ function Managementschools() {
             </Head>
             <PageTitleWrapper>
                 <PageHeaderTitleWrapper
-                    name="Question"
+                    name="Exam Question"
                     handleCreateClassOpen={() => router.push('/management/exam/question/create')}
                 />
                 <ExamSubjectSelection

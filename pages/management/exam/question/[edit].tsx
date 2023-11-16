@@ -105,13 +105,12 @@ function Managementschools({ editQuestion }) {
             }
             if (editQuestion?.id) {
 
-                axios.patch(`/api/question/${editQuestion.id}`, formdata)
-                    .then(res => {
-                        showNotification(res.data.message)
-                        successProcess()
-                        router.back()
-                    })
-                    .catch(err => console.log(err));
+                const res = await axios.patch(`/api/question/${editQuestion.id}`, formdata)
+
+                showNotification(res.data.message)
+                successProcess()
+                router.back()
+
             }
 
         } catch (err) {
@@ -220,7 +219,7 @@ function Managementschools({ editQuestion }) {
                                 </Card>
                                 <br />
                                 <ButtonWrapper type='submit' disabled={
-                                    ((values?.file || values?.content) && editQuestion?.id ) ? (Boolean(errors.submit) || isSubmitting) : true
+                                    ((values?.file || values?.content) && editQuestion?.id) ? (Boolean(errors.submit) || isSubmitting) : true
                                 } handleClick={undefined}>Submit</ButtonWrapper>
 
                             </form>

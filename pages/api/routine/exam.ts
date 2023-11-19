@@ -20,12 +20,13 @@ const index = async (req, res) => {
                         exam_details: {
                             include: {
                                 subject: true,
-                                room: {
-                                    select: {
-                                        id: true,
-                                        name: true
-                                    }
-                                }
+                                exam_room: true,
+                                // room: {
+                                //     select: {
+                                //         id: true,
+                                //         name: true
+                                //     }
+                                // }
                             }
                         }
                     }

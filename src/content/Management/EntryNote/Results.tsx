@@ -476,11 +476,11 @@ const Results: FC<ResultsProps> = ({ periods, setEditGrade,editGrade }) => {
 };
 
 Results.propTypes = {
-  grade: PropTypes.array.isRequired
+  periods: PropTypes.array.isRequired
 };
 
 Results.defaultProps = {
-  grade: []
+  periods: []
 };
 
 export default Results;

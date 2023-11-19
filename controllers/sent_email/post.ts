@@ -5,22 +5,22 @@ import { authenticate } from 'middleware/authenticate';
 
 
 const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
-  prisma.sentEmailDetail.create({
-    //@
-    data: {
-      name: 'sfafafd',
-      phone: user.phone || '',
-      status: status,
-      user: { connect: { id: user.id || user.user_id } },
-      sentEmail: {
-        connect: {
-          id: responseSentSms_id
-        }
-      }
-    }
-  }).then(res => {
-    // console.log({ res });
-  })
+  // prisma.sentEmailDetail.create({
+  //   //@
+  //   data: {
+  //     name: 'sfafafd',
+  //     phone: user.phone || '',
+  //     status: status,
+  //     user: { connect: { id: user.id || user.user_id } },
+  //     sentEmail: {
+  //       connect: {
+  //         id: responseSentSms_id
+  //       }
+  //     }
+  //   }
+  // }).then(res => {
+  //   // console.log({ res });
+  // })
 };
 
 const sentSmsToUsers = async (user, responseSentSms,sms_res_gatewayinfo) => {
@@ -65,19 +65,19 @@ const insertsentSms = async ({ recipient_type, campaign_name, sms_template_id, s
   if (sms_template_id) data['smsTemplate'] = { connect: { id: sms_template_id } }
   else if (custom_body) data['custom_body'] = custom_body
 
-  return await prisma.sentEmail.create({
-    data
-  });
+  // return await prisma.sentEmail.create({
+  //   data
+  // });
 
 }
 
 const updateSentSms = async ({ responseSentSms, sentSmsUsers }) => {
-  const ss = await prisma.sentSms.update({
-    where: { id: responseSentSms.id },
-    data: {
-      recipient_count: { increment: sentSmsUsers.length }
-    }
-  });
+  // const ss = await prisma.sentSms.update({
+  //   where: { id: responseSentSms.id },
+  //   data: {
+  //     recipient_count: { increment: sentSmsUsers.length }
+  //   }
+  // });
 }
 
 const getUsers = async ({ role, where }) => {

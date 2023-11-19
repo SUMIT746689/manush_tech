@@ -5,14 +5,15 @@ import { authenticate } from 'middleware/authenticate';
 async function get(req, res, refresh_token) {
   try {
   
-    const response = await prisma.sentEmail.findMany({
-      where: {
-        school_id: Number(refresh_token.school_id)
-      },
-      include: {
-        sentEmailDetail: true
-      }
-    })
+    const response = []
+    // const response = await prisma.sentEmail.findMany({
+    //   where: {
+    //     school_id: Number(refresh_token.school_id)
+    //   },
+    //   include: {
+    //     sentEmailDetail: true
+    //   }
+    // })
 
   res.json({ data: response, success: true });
 

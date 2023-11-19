@@ -26,9 +26,8 @@ const postSchool = async (req, res, authenticate_user) => {
         currency,
         domain,
         main_balance: main_balance ?? undefined,
-        sms_count: sms_count ?? undefined,
-        sms_masking_price: sms_masking_price ?? undefined,
-        sms_non_masking_price: sms_non_masking_price ?? undefined,
+        masking_sms_count: sms_masking_price ?? undefined,
+        non_masking_sms_count: sms_non_masking_price ?? undefined,
         admins: { connect: admins }
       }
     });

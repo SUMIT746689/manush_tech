@@ -1,13 +1,9 @@
 import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import { authenticate } from 'middleware/authenticate';
 
-export const get = async (req, res) => {
+const get = async (req, res, refresh_token) => {
   try {
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
 
     const user = await prisma.user.findFirst({
       where: { id: refresh_token.id },
@@ -58,3 +54,4 @@ export const get = async (req, res) => {
     res.status(404).json({ error: err.message });
   }
 };
+export default authenticate(get)

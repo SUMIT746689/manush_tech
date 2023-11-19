@@ -57,8 +57,8 @@ async function post(req, res, refresh_token) {
       /* Get worksheet */
       const worksheet = workbook.Sheets[firstSheetName]
       const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
-      
-      if(excelArrayDatas.length >30000) return res.status(404).json({error:"large file, maximum support 30,000 row"})
+
+      if (excelArrayDatas.length > 30000) return res.status(404).json({ error: "large file, maximum support 30,000 row" })
       // console.log({excelArrayDatas})
 
       const resSentSms = excelArrayDatas.map((value, index) => {

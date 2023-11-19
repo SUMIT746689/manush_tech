@@ -123,7 +123,7 @@ const applyFilters = (
       let containsQuery = false;
 
       properties.forEach((property) => {
-        if (project[property].toLowerCase().includes(query.toLowerCase())) {
+        if (project[property]?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
       });
@@ -225,7 +225,7 @@ const Results: FC<ResultsProps> = ({
     let url = `/api/exam/teacher_exam_routines?exam_id=${selectedExam?.id}&`;
     // @ts-ignore
     if (auth?.user?.role?.title === "ADMIN") url += `teacher_id=${selectedTeahcerId}`;
-    console.log({url})
+    console.log({ url })
     axios.get(url)
       .then(({ data }: { data: any }) => {
         console.log({ data });
@@ -236,7 +236,7 @@ const Results: FC<ResultsProps> = ({
         setIsLoading(false)
       })
   }
-  console.log({ datas })
+  // console.log({ datas })
   return (
     <>
       <Grid display={"grid"} gridTemplateColumns={{ md: "1fr 1fr" }} gap={1} mb={1}>
@@ -256,7 +256,7 @@ const Results: FC<ResultsProps> = ({
               value={selectedExam}
               handleChange={(e, v) => {
                 console.log({ e, v });
-                setSelectedExam(()=>v)
+                setSelectedExam(() => v)
               }}
             />
             {
@@ -275,7 +275,7 @@ const Results: FC<ResultsProps> = ({
                 })}
                 value={selectedExam}
                 handleChange={(e, v) => {
-                  console.log({ e, v });  
+                  console.log({ e, v });
                   setSelectedTeahcerId(v?.user_id || null)
                 }}
               />

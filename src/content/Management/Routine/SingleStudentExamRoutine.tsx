@@ -15,12 +15,9 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
 import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
 
-const SingleStudentExamResult = ({ data }) => {
+const SingleStudentExamRoutine = ({ data }) => {
   const { t }: { t: any } = useTranslation();
   const [routine, setRoutine] = useState(null);
-  const [slotHeader, setSlotHeader] = useState([]);
-  const [classes, setClasses] = useState([]);
-  const [sections, setSections] = useState([]);
   const [exams, setExams] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
@@ -30,29 +27,29 @@ const SingleStudentExamResult = ({ data }) => {
   const routineRef = useRef()
 
   useEffect(() => {
-    if (selectedSection) {
-      axios.get(`/api/exam/exam-list?school_id=${user?.school_id}&academic_year=${academicYear?.id}&section_id=${data.section_id}`)
-        .then(res => setExams(res.data?.map(i => {
-          return {
+    if (data?.section_id && academicYear) {
+      axios.get(`/api/exam/exam-list?academic_year=${academicYear?.id}&section_id=${data.section_id}`)
+        .then(res => {
+          setExams(res.data?.map(i => ({
             label: i.title,
             id: i.id
-          }
-        })))
-        .catch(err => console.log(err))
-    }
+          })
+          ))
 
-  }, [])
-
-  const handleRoutineGenerate = () => {
-    if (selectedSection) {
-      axios.get(`/api/routine/exam?section_id=${selectedSection?.id}&school_id=${user?.school_id}&academic_year_id=${academicYear?.id}`)
-        .then(res => {
-          console.log(selectedExam, res.data);
-
-          setRoutine(res.data.find(i => i.id == selectedExam.id))
         })
         .catch(err => console.log(err))
     }
+
+  }, [academicYear, data])
+
+  const handleRoutineGenerate = () => {
+    axios.get(`/api/routine/exam?section_id=${data?.section_id}&exam_id=${selectedExam.id}&academic_year_id=${academicYear?.id}`)
+      .then(res => {
+        console.log(selectedExam, res.data);
+
+        setRoutine(res.data)
+      })
+      .catch(err => console.log(err))
   }
 
 
@@ -103,7 +100,7 @@ const SingleStudentExamResult = ({ data }) => {
                       {user?.school?.address}, {user?.school?.phone}
                     </Typography>
                     <Typography variant="h6" align="center" >
-                      Exam Title : {selectedExam?.label}, Class : {selectedClass?.label}, Section : {selectedClass?.has_section ? selectedSection?.label : 'no section'}
+                      Exam Title : {selectedExam?.label}, Class : {data?.class}, Section : {data?.section}
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -147,6 +144,16 @@ const SingleStudentExamResult = ({ data }) => {
                           py: 0.5
                         }}>
                           Subject Name
+                        </TableCell>
+
+                        <TableCell sx={{
+                          border: '1px solid darkgrey',
+                          borderCollapse: 'collapse',
+                          fontSize: '11px',
+                          px: 1,
+                          py: 0.5
+                        }}>
+                          Exam Room
                         </TableCell>
 
                       </TableRow>
@@ -193,6 +200,16 @@ const SingleStudentExamResult = ({ data }) => {
                                 {i?.subject?.name}
                               </Typography>
                             </TableCell>
+                            <TableCell sx={{
+                              border: '1px solid darkgrey',
+                              borderCollapse: 'collapse',
+                              px: 1,
+                              py: 0.5
+                            }}>
+                              <Typography sx={{ fontSize: '11px' }} >
+                                {i?.exam_room?.map(j => j?.name)?.join(', ')}
+                              </Typography>
+                            </TableCell>
 
 
 
@@ -232,12 +249,12 @@ const SingleStudentExamResult = ({ data }) => {
   );
 };
 
-SingleStudentExamResult.propTypes = {
+SingleStudentExamRoutine.propTypes = {
   schools: PropTypes.array.isRequired
 };
 
-SingleStudentExamResult.defaultProps = {
+SingleStudentExamRoutine.defaultProps = {
   schools: []
 };
 
-export default SingleStudentExamResult;
+export default SingleStudentExamRoutine;

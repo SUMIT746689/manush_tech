@@ -120,7 +120,7 @@ function Header() {
           })
         }
       }
-      console.log({ tempMenu });
+      
 
       setMenulist(tempMenu)
 

@@ -12,7 +12,7 @@ import { Grid } from '@mui/material';
 import ExampRoutine from '@/content/Management/Routine/ExamRoutine';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
-import SingleStudentExamResult from '@/content/Management/Routine/SingleStudentExamResult';
+import SingleStudentExamRoutine from '@/content/Management/Routine/SingleStudentExamRoutine';
 
 export async function getServerSideProps(context: any) {
   let student: any = null;
@@ -75,7 +75,7 @@ export async function getServerSideProps(context: any) {
         section_id: student.section.id,
         name: [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' '),
         class: student.section.class.name,
-        section: student.section.class.has_section ? student.section.name : '',
+        section: student.section.class.has_section ? student.section.name : 'No section',
         class_registration_no: student.class_registration_no,
         class_roll_no: student.class_roll_no,
         student_id: student.id
@@ -114,7 +114,7 @@ function ExamRoutine({ data }) {
         <Grid item xs={12}>
           {
             data ?
-              <SingleStudentExamResult data={data} />
+              <SingleStudentExamRoutine data={data} />
               :
               <ExampRoutine />
           }

@@ -13,14 +13,19 @@ import { Grid, Typography } from '@mui/material';
 import Results from 'src/content/Management/Syllabus/Results';
 import axios from 'axios';
 import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '@/hooks/useAuth';
 
 function Managementschools() {
-
+    const { user } = useAuth()
     const [syllabus, setSyllabus] = useState([]);
-    
+
     const [editSyllabus, setEditSyllabus] = useState(null);
     const [classList, setClassList] = useState([]);
     const [classes, setClasses] = useState([]);
+
+    //@ts-ignore
+    const create_syllabus_permission = user?.permissions?.find(i => i?.value == 'create_syllabus')
+
     const seatPlanStickerRef = useRef()
     const handlePrint = useReactToPrint({
         content: () => seatPlanStickerRef.current,
@@ -58,7 +63,8 @@ function Managementschools() {
                     classes={classes}
                     setSyllabus={setSyllabus}
                     syllabus={syllabus}
-                   
+                    create_syllabus_permission={create_syllabus_permission}
+
                 />
             </PageTitleWrapper>
 
@@ -75,40 +81,11 @@ function Managementschools() {
                         syllabus={syllabus}
                         setEditSyllabus={setEditSyllabus}
                         handlePrint={handlePrint}
+                        create_syllabus_permission={create_syllabus_permission}
                     />
                 </Grid>
             </Grid>
             <Footer />
-            {/* <Grid display={'none'}>
-                <Grid ref={seatPlanStickerRef} container gap={1.5} sx={{
-                    p: 1.5,
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-
-                }}>
-                    {
-                        seatPlanSticker?.map(i => (<Grid sx={{
-                            p: 3,
-                            // boxShadow:'0px 10px 10px #86b2f9'
-                            border: '1.5px dotted',
-
-                        }}>
-                            <Typography align='center' pb={2} variant="h3">{[i.student_info.first_name, i.student_info.middle_name, i.student_info.last_name].join(' ')}</Typography>
-                            <Grid sx={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                fontSize: '50px'
-                            }}>
-                                <Typography align='center' variant="h4"> Registration no: {i.class_registration_no}</Typography>
-                                <Typography align='center' variant="h4"> Roll no: {i.class_roll_no}</Typography>
-                                <Typography align='center' variant="h4"> Class: {i.section.class.name}</Typography>
-                                <Typography align='center' variant="h4"> Section: {i.section.name}</Typography>
-                            </Grid>
-                        </Grid>))
-                    }
-
-                </Grid>
-            </Grid> */}
 
         </>
     );

@@ -166,8 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-  //  console.log("permissions__", permissions, item);
-
+  
   const sub_menu = () => {
     ev.push(
       <SidebarMenuItem
@@ -194,6 +193,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
           badge={item.badge}
           badgeTooltip={item.badgeTooltip}
         >
+
           {/* @ts-ignore */}
           {renderSidebarMenuItems({
             permissions,
@@ -203,6 +203,51 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+    else if (item.name === 'Administrator') {
+      if (permissions.findIndex(i => i.group == 'administrator') > -1) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
+    else if (item.name === 'Exam') {
+      if (permissions.findIndex(i => i.group == 'exam') > -1) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
+
     else if (item.name === 'Teachers') {
       if (permissions.findIndex(i => i.group == 'teacher') > -1) ev.push(
         <SidebarMenuItem
@@ -538,7 +583,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       item.name === 'Daily Notes' ||
       item.name === 'Entry Notes' ||
-      item.name === 'Show Notes'
+      item.name === 'Show Notes'||
+
+      item.name === 'Syllabus'
 
 
     ) {
@@ -608,6 +655,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       if (item.name === 'Entry Notes' && permissionVerify(permissions, ['create_note', 'update_note'])) sub_menu();
       if (item.name === 'Show Notes' && permissionVerify(permissions, ['show_note'])) sub_menu();
+
+      if (item.name === 'Syllabus' && permissionVerify(permissions, ['show_syllabus'])) sub_menu();
 
     }
     else sub_menu();

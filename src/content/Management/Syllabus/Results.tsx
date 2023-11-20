@@ -112,6 +112,7 @@ const Results = ({
   syllabus,
   setEditSyllabus,
   handlePrint,
+  create_syllabus_permission
 }) => {
 
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
@@ -280,7 +281,7 @@ const Results = ({
                     />
                   </td> */}
                   <TableCell><Typography noWrap align='left' variant="h5" py={1}>Content</Typography></TableCell>
-                  <TableCell><Typography noWrap align='center' variant="h5" py={1}>Actions</Typography></TableCell>
+                  {create_syllabus_permission && <TableCell><Typography noWrap align='center' variant="h5" py={1}>Actions</Typography></TableCell>}
 
                 </TableRow>
               </TableHead>
@@ -312,7 +313,7 @@ const Results = ({
                         </Typography>
                       </TableCell>
 
-                      <TableCell align='center'>
+                      {create_syllabus_permission && <TableCell align='center'>
                         <Typography noWrap py={0}>
                           <Tooltip title={t('Edit')} arrow>
                             <IconButton
@@ -333,7 +334,7 @@ const Results = ({
                                 </IconButton>
                               </Tooltip> */}
                         </Typography>
-                      </TableCell>
+                      </TableCell>}
                     </TableRow>
                   );
                 })}

@@ -40,7 +40,7 @@ const tableStyle: object = {
   fontSize: '0.8em'
   // backgroundColor: '#cccccc'
 };
-function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyllabus, syllabus }): any {
+function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyllabus, syllabus,create_syllabus_permission }): any {
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
 
@@ -185,13 +185,15 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
     }
 
   }
+
   return (
     <>
 
       <PageHeaderTitleWrapper
         name={"Syllabus"}
         handleCreateClassOpen={handleCreateProjectOpen}
-        actionButton={(selectedClass && selectedSection && selectedExam && selectedSubject) ? null : true}
+        //@ts-ignore
+        actionButton={(selectedClass && selectedSection && selectedExam && selectedSubject && create_syllabus_permission) ? null : true}
       />
 
       <Grid container spacing={0} sx={{
@@ -351,13 +353,13 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
               <Table aria-label="collapsible table" size="small">
                 <TableHead>
                   <TableRow sx={{
-                      border:'1px solid'
-                    }}>
+                    border: '1px solid'
+                  }}>
                     <TableCell align='center' sx={{
-                      border:'1px solid'
+                      border: '1px solid'
                     }}>{t('SL')}</TableCell>
-                    <TableCell align='center'sx={{
-                      border:'1px solid'
+                    <TableCell align='center' sx={{
+                      border: '1px solid'
                     }} >{t('Content')}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -365,14 +367,14 @@ function PageHeader({ editSyllabus, setEditSyllabus, classList, classes, setSyll
 
                   {
                     syllabus?.map((exam, index) => <TableRow sx={{
-                      border:'1px solid'
+                      border: '1px solid'
                     }}>
                       <TableCell align='left' sx={{
-                      border:'1px solid'
-                    }}>{index + 1}</TableCell>
+                        border: '1px solid'
+                      }}>{index + 1}</TableCell>
                       <TableCell align='left' sx={{
-                      border:'1px solid'
-                    }}>{exam?.body}</TableCell>
+                        border: '1px solid'
+                      }}>{exam?.body}</TableCell>
                     </TableRow>)
                   }
 

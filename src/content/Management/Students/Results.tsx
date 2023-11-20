@@ -80,7 +80,7 @@ const ButtonError = styled(Button)(
     `
 );
 
-const ActionStyle : object = {
+const ActionStyle: object = {
   height: '20px'
 }
 interface Filters {
@@ -467,14 +467,17 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                   </TableCell>
                   <TableCell>{t('student name')}</TableCell>
                   <TableCell>{t('Class')}</TableCell>
-                  <TableCell >{t('class Roll')}</TableCell>
+                  <TableCell >{t('Class Roll')}</TableCell>
                   <TableCell >{t('Section')}</TableCell>
+                  <TableCell>{t('Phone')}</TableCell>
                   <TableCell align="center">{t('Actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedClasses.map((i) => {
                   const isUserSelected = selectedItems.includes(i.id);
+                  console.log(i);
+                  
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
                       <TableCell padding="checkbox">
@@ -506,14 +509,19 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
                         </Typography>
                       </TableCell>
+                      <TableCell>
+                        <Typography variant="h5" color="yellowgreen">
+                          <a href={`tel:${i?.student_info?.phone}`}>{i?.student_info?.phone}</a>
+                        </Typography>
+                      </TableCell>
 
                       <TableCell align={'center'}
                         sx={{
                           display: 'flex',
-                          flexDirection:'row',
-                          gap:2,
-                          justifyContent:'center'
-                          
+                          flexDirection: 'row',
+                          gap: 2,
+                          justifyContent: 'center'
+
                         }}
                       >
                         <Tooltip title={t('View Profile')} arrow >

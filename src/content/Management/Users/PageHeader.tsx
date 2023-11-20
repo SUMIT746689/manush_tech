@@ -115,6 +115,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       <PageHeaderTitleWrapper
         name={"User"}
         handleCreateClassOpen={handleCreateUserOpen}
+        actionButton={true}
       />
 
       <Dialog

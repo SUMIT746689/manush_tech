@@ -22,6 +22,7 @@ import ExamSubjectSelection from '@/components/ExamSubjectSelection';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import prisma from '@/lib/prisma_client';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import { getFile } from '@/utils/utilitY-functions';
 
 export async function getServerSideProps(context) {
 
@@ -187,7 +188,7 @@ function Managementschools({ editQuestion }) {
                                                 <a
                                                     style={{ width: '50px' }}
                                                     target="_blank"
-                                                    href={questionFileLink || (editQuestion?.file ? `/api/get_file/${editQuestion?.file?.replace(/\\/g, '/')}` : '')}
+                                                    href={questionFileLink || getFile(editQuestion?.file)}
                                                 >
                                                     {questionFileLink || editQuestion?.file}
                                                 </a>

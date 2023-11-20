@@ -9,6 +9,7 @@ import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrap
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
 import { fetchData } from '@/utils/post';
+import { getFile } from '@/utils/utilitY-functions';
 
 function PageHeader({ editData, setEditData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
@@ -177,12 +178,9 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                           <a
                             style={{ width: '50px' }}
                             target="_blank"
-                            href={photo || (
-                              editData?.file_url ?
-                                `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}`
-                                : '')}
+                            href={photo || getFile(editData?.file_url)}
                           >
-                            {photo || (editData?.file_url ? `/api/get_file/${editData?.file_url?.replace(/\\/g, '/')}` : 'Not selected')}
+                            {photo || (editData?.file_url ? getFile(editData?.file_url) : 'Not selected')}
                           </a>
                         </Grid>
                       }

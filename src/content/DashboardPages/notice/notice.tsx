@@ -1,3 +1,4 @@
+import { getFile } from "@/utils/utilitY-functions";
 import { Button, Checkbox, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useTranslation } from "next-i18next";
@@ -18,7 +19,7 @@ const Notice = ({ blockCount }) => {
               <TableRow sx={{ backgroundColor: '#2196f3' }}>
                 <TableCell padding="checkbox" >
                   <Checkbox
-                  sx={{ color: 'white' }}
+                    sx={{ color: 'white' }}
                     checked={false}
                     indeterminate={false}
                   // onChange={}
@@ -49,7 +50,14 @@ const Notice = ({ blockCount }) => {
                   <TableCell padding='none' align="right">{row.title}</TableCell>
 
                   <TableCell sx={{ p: 0.5 }} align="right">
-                    <Button> Download</Button>
+
+                    <a
+                      style={{ width: '50px' }}
+                      target="_blank"
+                      href={getFile(row?.file_url)}
+                    >
+                      <Button> View</Button>
+                    </a>
                   </TableCell>
                 </TableRow>
               ))}

@@ -53,6 +53,7 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import { formatNumber } from '@/utils/numberFormat';
 import fee from 'pages/api/fee';
 import Image from 'next/image';
+import { getFile } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -458,7 +459,7 @@ const Results = ({
                 sx={{ p: 1 }}
               >
                 {selectedStudent && (
-                  <Image src={selectedStudent?.student_photo ? `/api/get_file/${selectedStudent?.student_photo?.replace(/\\/g, '/')}` : `/dumy_teacher.png`}
+                  <Image src={selectedStudent?.student_photo ? getFile(selectedStudent?.student_photo) : `/dumy_teacher.png`}
                     height={100}
                     width={100}
                     alt='student photo'

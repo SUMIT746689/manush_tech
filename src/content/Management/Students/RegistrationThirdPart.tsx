@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
+import { getFile } from '@/utils/utilitY-functions';
 
 function RegistrationFirstPart({
   totalFormData,
@@ -219,7 +220,7 @@ function RegistrationFirstPart({
                     {/* father_photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={father_photo ? father_photo : `/api/get_file/${(student?.student_info?.father_photo || student?.filePathQuery?.father_photo_path)?.replace(/\\/g, '/')}`}
+                        <Image src={father_photo ? father_photo : getFile(student?.student_info?.father_photo || student?.filePathQuery?.father_photo_path)}
                           height={100}
                           width={100}
                           alt="Father's photo:"
@@ -324,7 +325,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={mother_photo ? mother_photo : `/api/get_file/${(student?.student_info?.mother_photo || student?.filePathQuery?.mother_photo_path)?.replace(/\\/g, '/')}`}
+                        <Image src={mother_photo ? mother_photo : getFile(student?.student_info?.mother_photo || student?.filePathQuery?.mother_photo_path)}
                           height={100}
                           width={100}
                           alt="Mother's photo:"
@@ -435,7 +436,7 @@ function RegistrationFirstPart({
                     <Grid container p={1} gap={1} item xs={12} sm={6} md={6}>
 
                       <Grid item>
-                        <Image src={guardian_photo ? guardian_photo : `/api/get_file/${(student?.guardian_photo || student?.filePathQuery?.guardian_photo_path)?.replace(/\\/g, '/')}`}
+                        <Image src={guardian_photo ? guardian_photo : getFile(student?.guardian_photo || student?.filePathQuery?.guardian_photo_path)}
                           height={100}
                           width={100}
                           alt="Guardian's photo:"

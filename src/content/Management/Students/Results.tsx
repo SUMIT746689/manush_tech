@@ -47,6 +47,7 @@ import dayjs from 'dayjs';
 import axios from 'axios';
 import Image from 'next/image';
 import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
+import { getFile } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -248,7 +249,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
             gap: 2,
             p: 2
           }}>
-            <Image src={`/api/get_file/${selectedStudent?.student_photo?.replace(/\\/g, '/')}`}
+            <Image src={getFile(selectedStudent?.student_photo)}
               height={150}
               width={150}
               alt='Student photo'
@@ -477,7 +478,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                 {paginatedClasses.map((i) => {
                   const isUserSelected = selectedItems.includes(i.id);
                   console.log(i);
-                  
+
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
                       <TableCell padding="checkbox">
@@ -593,7 +594,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                 academicYear: i?.academic_year?.title,
                 phone: i?.phone,
                 birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
-                photo: i?.student_photo ? `/api/get_file/${i?.student_photo?.replace(/\\/g, '/')}` : '/dumy_student.png'
+                photo: i?.student_photo ? getFile(i?.student_photo) : '/dumy_student.png'
               };
               return <Grid sx={{
                 pageBreakAfter: (index + 1) % 8 == 0 ? 'always' : 'avoid',

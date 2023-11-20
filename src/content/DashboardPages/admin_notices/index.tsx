@@ -34,6 +34,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { useSnackbar } from 'notistack';
 import { customizeDate } from '@/utils/customizeDate';
+import { getFile } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -267,7 +268,7 @@ const Notices: FC<NoticessProps> = ({ notices }) => {
                         </TableCell>
                         <TableCell align='center'>
                           <Typography variant="h5">
-                            {i.title}
+                            {i?.title}
                           </Typography>
                         </TableCell>
                         <TableCell align='center'>
@@ -279,7 +280,11 @@ const Notices: FC<NoticessProps> = ({ notices }) => {
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('view notice')} arrow>
-                              <IconButton
+                              <a
+                                style={{ width: '50px' }}
+                                target="_blank"
+                                href={getFile(i?.file_url)}
+                              ><IconButton
                                 sx={{
                                   color: colorBlue,
                                   px: 2,
@@ -300,9 +305,12 @@ const Notices: FC<NoticessProps> = ({ notices }) => {
                               // size='small'
                               // onClick={() => setEditClass(i)}
                               >
-                                View
-                                {/* <LaunchTwoToneIcon fontSize="small" /> */}
-                              </IconButton>
+                                  View
+                                  {/* <LaunchTwoToneIcon fontSize="small" /> */}
+                                </IconButton>
+
+                              </a>
+
                             </Tooltip>
 
                           </Typography>

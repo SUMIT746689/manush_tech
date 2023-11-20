@@ -238,7 +238,7 @@ function PageHeader({
             national_id: Yup.number().required(
               t('The national id field is required')
             ),
-            resume: Yup.mixed().required(t('The resume field is required'))
+            resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
           })}
           onSubmit={async (
             _values,

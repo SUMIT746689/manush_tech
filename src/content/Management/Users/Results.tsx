@@ -61,6 +61,7 @@ import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import dayjs from 'dayjs';
 import { DebounceInput } from '@/components/DebounceInput';
+import LoginIcon from '@mui/icons-material/Login';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -332,17 +333,17 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
               variant="outlined"
             /> */}
             <DebounceInput
-                debounceTimeout={1000}
-                handleDebounce={(v) => setQuery(v)}
-                label={'Search by name, email or username...'}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-              />
+              debounceTimeout={1000}
+              handleDebounce={(v) => setQuery(v)}
+              label={'Search by name, email or username...'}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchTwoToneIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
             <Autocomplete
               size="small"
               id="multiple-limit-tags"
@@ -402,7 +403,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
-                    <TableCell><Typography noWrap>{t('Log in as Admin')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('Log in')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
@@ -429,12 +430,13 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            {dayjs(user?.created_at).format('MMMM D, YYYY h:mm A')}
+                            {dayjs(user?.created_at).format('DD-MM-YYYY, h:mm A')}
                           </Typography>
                         </TableCell>
 
                         <TableCell>
                           <ButtonWrapper
+                            startIcon={<LoginIcon />}
                             handleClick={async () => {
                               try {
                                 // @ts-ignore

@@ -162,11 +162,11 @@ export const menuItems: MenuItems[] = [
           },
         ]
       },
-      {
-        name: 'Teacher Exam Routine',
-        link: '/management/teacher_exam_routine',
-        icon: SummarizeIcon
-      },
+      // {
+      //   name: 'Teacher Exam Routine',
+      //   link: '/management/teacher_exam_routine',
+      //   icon: SummarizeIcon
+      // },
       {
         name: 'Syllabus',
         link: '/management/syllabus',

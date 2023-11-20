@@ -322,7 +322,7 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
       columnGap: 2
     } : {}
 
-  console.log({ pdf });
+  // console.log({ pdf });
 
   return (
     <>
@@ -545,6 +545,21 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
                         value={values.student_count}
                         type='number'
                       />
+                      
+                      <AutoCompleteWrapper
+                          error={Boolean(touched.room_id && errors.room_id)}
+                          helperText={touched.room_id && errors.room_id}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          minWidth="100%"
+                          name='room_id'
+                          label='Select room'
+                          placeholder="Room"
+                          options={rooms}
+                          required={true}
+                          value={rooms?.find((i) => i.id == values?.room_id)}
+                          handleChange={(e, v) => setFieldValue('room_id', v?.id)}
+                        />
 
                     </>
                   }

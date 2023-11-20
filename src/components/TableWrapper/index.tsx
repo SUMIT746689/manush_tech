@@ -73,6 +73,7 @@ export const TableEmptyWrapper = ({ title }) => {
       fontWeight="normal"
       color="text.secondary"
       align="center"
+
     >
       <span>
         <SearchOffIcon sx={{ fontSize: 40 }} />

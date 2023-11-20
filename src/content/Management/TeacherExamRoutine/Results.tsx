@@ -219,7 +219,6 @@ const Results: FC<ResultsProps> = ({
       showNotification(err?.response?.data?.message, 'error');
     }
   };
-  console.log({ exams })
   const handleSearchSeatPlans = () => {
     setIsLoading(true);
     let url = `/api/exam/teacher_exam_routines?exam_id=${selectedExam?.id}&`;

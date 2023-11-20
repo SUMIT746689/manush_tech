@@ -579,7 +579,8 @@ model StudentResult {
   student Student @relation(fields: [student_id], references: [id])
   exam    Exam    @relation(fields: [exam_id], references: [id])
 
-  result_details StudentResultDetails[]
+  result_details                StudentResultDetails[]
+  StudentAddtionalResultDetails StudentAddtionalResultDetails[]
 
   @@map("student_results")
 }
@@ -844,9 +845,10 @@ model GradingSystem {
   school_id        Int
   academic_year_id Int
 
-  school               School                 @relation(fields: [school_id], references: [id])
-  academic_year        AcademicYear           @relation(fields: [academic_year_id], references: [id])
-  StudentResultDetails StudentResultDetails[]
+  school                        School                          @relation(fields: [school_id], references: [id])
+  academic_year                 AcademicYear                    @relation(fields: [academic_year_id], references: [id])
+  StudentResultDetails          StudentResultDetails[]
+  StudentAddtionalResultDetails StudentAddtionalResultDetails[]
 
   @@map("grade_systems")
 }
@@ -1223,9 +1225,24 @@ model ExamAddtionalMark {
   created_at        DateTime @default(now())
   // deleted_at        DateTime
 
-  addtionalMarkingCategorie AddtionalMarkingCategories @relation(fields: [addtional_mark_id], references: [id])
-  exam                      Exam                       @relation(fields: [exam_id], references: [id])
+  addtionalMarkingCategorie     AddtionalMarkingCategories      @relation(fields: [addtional_mark_id], references: [id])
+  exam                          Exam                            @relation(fields: [exam_id], references: [id])
+  StudentAddtionalResultDetails StudentAddtionalResultDetails[]
 
   @@unique([addtional_mark_id, exam_id])
   @@map("exam_addtional_marks")
+}
+
+model StudentAddtionalResultDetails {
+  id                     Int               @id @default(autoincrement())
+  exam_addtional_mark_id Int
+  mark_obtained          Float
+  grade_id               Int?
+  student_result_id      Int
+  created_at             DateTime          @default(now())
+  exaxmAddtionalMark     ExamAddtionalMark @relation(fields: [exam_addtional_mark_id], references: [id])
+  studentResult          StudentResult     @relation(fields: [student_result_id], references: [id])
+  grade                  GradingSystem?    @relation(fields: [grade_id], references: [id])
+
+  @@map("student_addtional_result_details")
 }

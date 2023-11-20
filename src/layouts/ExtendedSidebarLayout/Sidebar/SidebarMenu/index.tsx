@@ -514,6 +514,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Section Wise Result' ||
       item.name === 'Student Wise Result' ||
       item.name === 'Student Result' ||
+      item.name === 'Exam Addtional Marks' ||
 
       item.name === 'Academic Years' ||
       item.name === 'Leave Application' ||
@@ -591,6 +592,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       //result section 
       if (item.name === 'Section Wise Result' && permissionVerify(permissions, ['create_result', 'show_section_wise_result'])) sub_menu();
+      if (item.name === 'Exam Addtional Marks' && permissionVerify(permissions, ['create_result', 'show_section_wise_result'])) sub_menu();
       if (item.name === 'Student Wise Result' && permissionVerify(permissions, ['show_student_wise_result'])) sub_menu();
       if (item.name === 'Student Result' && permissionVerify(permissions, ['show_student_result'])) sub_menu();
 

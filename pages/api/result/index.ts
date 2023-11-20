@@ -52,7 +52,7 @@ const index = async (req, res, refresh_token) => {
                                         id: true,
                                         title: true
                                     }
-                                }
+                                },
                             }
                         },
 
@@ -78,7 +78,21 @@ const index = async (req, res, refresh_token) => {
                                 }
                             }
                         },
-
+                        StudentAddtionalResultDetails: {
+                            select:{
+                                exaxmAddtionalMark:{
+                                    select:{
+                                        addtionalMarkingCategorie: {
+                                            select: {
+                                                title: true,
+                                            }
+                                        }
+                                    }
+                                },
+                                mark_obtained: true,
+                                created_at: true,
+                            }
+                        }
                     }
 
                 })
@@ -108,7 +122,7 @@ const index = async (req, res, refresh_token) => {
                         mark_obtained: true,
                     },
 
-                })
+                });
 
                 res.status(200).json({ sections_result, subject_list, highestMark });
                 break;

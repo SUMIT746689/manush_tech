@@ -182,6 +182,11 @@ export const menuItems: MenuItems[] = [
             icon: AssignmentIcon
           },
           {
+            name: 'Exam Addtional Marks',
+            link: '/management/result/addtional_result',
+            icon: AutoAwesomeMotionIcon
+          },
+          {
             name: 'Student Wise Result',
             link: '/management/result/single',
             icon: AutoAwesomeMotionIcon

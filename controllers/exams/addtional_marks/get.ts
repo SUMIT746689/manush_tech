@@ -8,7 +8,10 @@ const get = async (req, res, refresh_token) => {
             }
         };
         const resAddMarks = await prisma.examAddtionalMark.findMany({
-            where: { exam_id: req.query.exam_id ? parseInt(req.query.exam_id) : undefined }
+            where: { exam_id: req.query.exam_id ? parseInt(req.query.exam_id) : undefined },
+            include: {
+                addtionalMarkingCategorie:true
+            }
         });
 
         res.status(200).json(resAddMarks);

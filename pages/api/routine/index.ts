@@ -1,18 +1,19 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
     try {
         const { method } = req;
 
         switch (method) {
             case 'GET':
-                if (!req.query.section_id || !req.query.school_id) {
-                    res.status(500).json({ message: "section_id or school_id missing" })
+                if (!req.query.section_id) {
+                    res.status(500).json({ message: "Section missing" })
                 }
                 const routine = await prisma.period.findMany({
                     where: {
                         section_id: parseInt(req.query.section_id),
-                        school_id: parseInt(req.query.school_id)
+                        school_id: (refresh_token.school_id)
                     },
                     select: {
                         day: true,
@@ -55,4 +56,4 @@ const index = async (req, res) => {
     }
 };
 
-export default index;
+export default authenticate(index) ;

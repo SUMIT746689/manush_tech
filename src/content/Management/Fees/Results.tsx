@@ -48,6 +48,7 @@ import dayjs from 'dayjs';
 import { formatNumber } from '@/utils/numberFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -238,11 +239,10 @@ const Results: FC<ResultsProps> = ({
         <Grid container>
           <Grid item xs={12}>
             <Box p={0.5}>
-              <TextField
-                size='small'
-                sx={{
-                  m: 0
-                }}
+            <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
+                label={'Search by fees title, id or amount......'}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -250,11 +250,6 @@ const Results: FC<ResultsProps> = ({
                     </InputAdornment>
                   )
                 }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by fees title, id or amount...')}
-                value={query}
-                fullWidth
-                variant="outlined"
               />
             </Box>
           </Grid>

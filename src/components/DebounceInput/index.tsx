@@ -1,39 +1,36 @@
-import { Grid, Input } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export function DebounceInput({ handleDebounce, debounceTimeout, label, type = 'text', value, required = false, disabled = false, ...param }) {
+export function DebounceInput({ handleDebounce, debounceTimeout, label, type = 'text', required = false, disabled = false, ...param }) {
 
-    const timerRef = React.useRef<number>();
+    const [value, setValue] = useState(undefined);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-        }
-
-        timerRef.current = window.setTimeout(() => {
-            handleDebounce(event.target.value);
+    useEffect(() => {
+        const getData = setTimeout(() => {
+            handleDebounce(value);
         }, debounceTimeout);
-    };
+
+        return () => clearTimeout(getData);
+    }, [value]);
 
     return (
-        
-            <TextField
-                {...param}
-                size='small'
-                sx={{
-                    [`& fieldset`]: {
-                        borderRadius: 0.6,
-                    }
-                }}
-                label={label}
-                type={type}
-                required={required}
-                disabled={disabled}
-                fullWidth
-                onChange={handleChange}
 
-            />
-        
+        <TextField
+            {...param}
+            size='small'
+            sx={{
+                [`& fieldset`]: {
+                    borderRadius: 0.6,
+                }
+            }}
+            label={label}
+            type={type}
+            required={required}
+            disabled={disabled}
+            fullWidth
+            onChange={e => setValue(e.target.value)}
+
+        />
+
     )
 }

@@ -36,7 +36,7 @@ const ExamResults = () => {
 
     useEffect(() => {
         if (selectedSection) {
-            axios.get(`/api/exam/exam-list?school_id=${user?.school_id}&academic_year=${academicYear?.id}&section_id=${selectedSection.id}`)
+            axios.get(`/api/exam/exam-list?academic_year=${academicYear?.id}&section_id=${selectedSection.id}`)
                 .then(res => setExams(res.data?.map(i => {
                     return {
                         label: i.title,
@@ -72,15 +72,14 @@ const ExamResults = () => {
     }
 
     const handleRoutineGenerate = () => {
-        if (selectedSection) {
-            axios.get(`/api/routine/exam?section_id=${selectedSection?.id}&school_id=${user?.school_id}&academic_year_id=${academicYear?.id}`)
+        if (selectedSection && selectedExam) {
+            axios.get(`/api/routine/exam?section_id=${selectedSection?.id}&exam_id=${selectedExam.id}&academic_year_id=${academicYear?.id}`)
                 .then(res => {
-                    setRoutine(res.data.find(i => i.id == selectedExam.id))
+                    setRoutine(res.data)
                 })
                 .catch(err => console.log(err))
         }
     }
-    console.log({selectedClass});
     return (
         <>
             <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
@@ -236,7 +235,7 @@ const ExamResults = () => {
                                                             py: 0.5
                                                         }}>
                                                             <Typography sx={{ fontSize: '11px' }} >
-                                                                {i?.room?.name}
+                                                                {i?.exam_room?.map(j=>j?.name)?.join(', ')}
                                                             </Typography>
                                                         </TableCell>
                                                         <TableCell sx={{

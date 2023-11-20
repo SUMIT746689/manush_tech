@@ -60,6 +60,7 @@ import { fetchData } from '@/utils/post';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import dayjs from 'dayjs';
+import { DebounceInput } from '@/components/DebounceInput';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -310,45 +311,57 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
         <Grid p={2} display={'grid'} gridTemplateColumns={'auto auto'} gap={4}>
-          {/* {!selectedBulkActions && ( */}
-          <TextField
-            sx={{
-              m: 0
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchTwoToneIcon />
-                </InputAdornment>
-              )
-            }}
-            onChange={handleQueryChange}
-            placeholder={t('Search by name, email or username...')}
-            value={query}
-            size="small"
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-          <Autocomplete
-            size="small"
-            id="multiple-limit-tags"
-            options={roleOptions || []}
-            value={searchToken}
-            onChange={(e, v) => setSearchToken(v)}
-            renderInput={(params) => <TextField
+          {!selectedBulkActions && (<>
+            {/* <TextField
               sx={{
-                [`& fieldset`]: {
-                  borderRadius: 0.6,
-                }
+                m: 0
               }}
-              {...params}
-              label="Filter by role"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchTwoToneIcon />
+                  </InputAdornment>
+                )
+              }}
+              onChange={handleQueryChange}
+              placeholder={t('Search by name, email or username...')}
+              value={query}
+              size="small"
+              fullWidth
+              margin="normal"
+              variant="outlined"
+            /> */}
+            <DebounceInput
+                debounceTimeout={1000}
+                handleDebounce={(v) => setQuery(v)}
+                label={'Search by name, email or username...'}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchTwoToneIcon />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            <Autocomplete
+              size="small"
+              id="multiple-limit-tags"
+              options={roleOptions || []}
+              value={searchToken}
+              onChange={(e, v) => setSearchToken(v)}
+              renderInput={(params) => <TextField
+                sx={{
+                  [`& fieldset`]: {
+                    borderRadius: 0.6,
+                  }
+                }}
+                {...params}
+                label="Filter by role"
+              />
+              }
             />
-            }
-          />
 
-          {/*  )} */}
+          </>)}
           {/* {selectedBulkActions && <BulkActions />} */}
         </Grid>
 

@@ -92,7 +92,7 @@ const index = async (req, res) => {
                             })
                         } 
                         else {
-                            await prisma.attendance.create({
+                          const rr=  await prisma.attendance.create({
                                 data: {
                                     student_id: i.student_id,
                                     date: new Date(date),
@@ -102,6 +102,7 @@ const index = async (req, res) => {
                                     exam_id: exam_id ? parseInt(exam_id) : null
                                 }
                             })
+                            console.log(date,"rr__",rr)
                         }
                     }
 

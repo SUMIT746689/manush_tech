@@ -38,6 +38,8 @@ import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import BulkActions from './BulkActions';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { DebounceInput } from '@/components/DebounceInput';
+import { accessNestedProperty } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -91,20 +93,15 @@ const applyFilters = (users, query, filters) => {
   return users.filter((user) => {
     let matches = true;
     if (query) {
-      const properties = ['name', 'Group', 'class'];
+      const properties = ['name', 'class.name'];
       let containsQuery = false;
 
-      properties.forEach((property) => {
-        console.log(typeof user[property] === 'object');
-        if (
-          (typeof user[property] === 'string' &&
-            user[property]?.toLowerCase().includes(query.toLowerCase())) ||
-          user[property]?.title?.toLowerCase().includes(query.toLowerCase()) ||
-          user[property]?.name?.toLowerCase().includes(query.toLowerCase())
-        ) {
+      for (const property of properties) {
+        const queryString = accessNestedProperty(user, property.split('.'))
+        if (queryString?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
-      });
+      }
 
       if (filters.role && user.role !== filters.role) {
         matches = false;
@@ -134,7 +131,7 @@ const applyPagination = (users, page, limit) => {
 const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
-  
+
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
   const [query, setQuery] = useState<string>('');
@@ -198,10 +195,11 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
         <Box p={2}>
           {!selectedBulkActions && (
-            <TextField
-              sx={{
-                m: 0
-              }}
+
+            <DebounceInput
+              debounceTimeout={1000}
+              handleDebounce={(v) => setQuery(v)}
+              label={'Search by name, classname or group name...'}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -209,13 +207,6 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                   </InputAdornment>
                 )
               }}
-              onChange={handleQueryChange}
-              placeholder={t('Search by name, classname or group name...')}
-              value={query}
-              size="small"
-              fullWidth
-              margin="normal"
-              variant="outlined"
             />
           )}
           {selectedBulkActions && <BulkActions />}
@@ -258,21 +249,21 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                     return (
                       <TableRow hover key={i.id} selected={isUserSelected}>
                         <TableCell>
-                        <Typography align="center" variant="h5">{i?.id}</Typography>
+                          <Typography align="center" variant="h5">{i?.id}</Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography  variant="h5">{i?.name}</Typography>
+                          <Typography variant="h5">{i?.name}</Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography  variant="h5">{i?.class.name}</Typography>
+                          <Typography variant="h5">{i?.class.name}</Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography  variant="h5">
-                            {i?.groups?.map(group =>group.title).join(', ')}
+                          <Typography variant="h5">
+                            {i?.groups?.map(group => group.title).join(', ')}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography  variant="h5">
+                          <Typography variant="h5">
                             {i?.class_teacher?.user?.username}
                           </Typography>
                         </TableCell>

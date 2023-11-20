@@ -341,12 +341,12 @@ console.log({i});
 
                                                                         setSelectedInvoice([{
                                                                             ...i,
-                                                                            paidAmount: i.collected_amount,
-                                                                            collected_by_user: i.collected_by_user.username,
-                                                                            title: i.fee.title,
-                                                                            last_payment_date: i.created_at,
-                                                                            late_fee: i.fee.late_fee,
-                                                                            amount: i.total_payable,
+                                                                            paidAmount: i?.collected_amount,
+                                                                            collected_by_user: i?.collected_by_user?.username,
+                                                                            title: i?.fee?.title,
+                                                                            last_payment_date: i?.created_at,
+                                                                            late_fee: i?.fee.late_fee,
+                                                                            amount: i?.total_payable,
                                                                             tracking_number: i?.transaction?.tracking_number
                                                                         }])
                                                                         handleCreateClassOpen()

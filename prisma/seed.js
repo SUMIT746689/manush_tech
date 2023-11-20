@@ -111,7 +111,9 @@ async function seed() {
       { name: 'show student certificate', value: 'show_student_certificate', group: 'student_certificate' },
       { name: 'show teacher certificate', value: 'show_teacher_certificate', group: 'teacher_certificate' },
       { name: 'show employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
+
       { name: 'academic', value: 'academic', group: 'academic' },
+      { name: 'administrator', value: 'administrator', group: 'administrator' },
       { name: 'teacher', value: 'teacher', group: 'teacher' },
       { name: 'accounts', value: 'accounts', group: 'accounts' },
       { name: 'front end', value: 'front_end', group: 'front_end' },
@@ -127,36 +129,31 @@ async function seed() {
       { name: 'create discount', value: 'create_discount', group: 'discount' },
       { name: 'show note', value: 'show_note', group: 'note' },
       { name: 'create note', value: 'create_note', group: 'note' },
-      { name: 'update note', value: 'update_note', group: 'note' }
+      { name: 'update note', value: 'update_note', group: 'note' },
+      { name: 'create syllabus', value: 'create_syllabus', group: 'syllabus' },
+      { name: 'show syllabus', value: 'show_syllabus', group: 'syllabus' },
+
     ]
   });
 
   const permissions = await prisma.permission.findMany({
-    // where: {
-    //   NOT: [
-    //     {
-    //       value: 'create_admin'
-    //     },
-    //     {
-    //       value: 'create_school'
-    //     },
-    //     {
-    //       value: 'list_package'
-    //     },
-    //     {
-    //       value: 'list_pending_packages'
-    //     }      
-    //   ]
-    // }
-  });
-
-  const adminPermission = [];
-  
-  for (const i of permissions) {
-    if (!["create_admin","create_school","list_package","list_pending_packages","create_note","update_note"].includes(i.value) ) {
-      adminPermission.push({ id: i.id })
+    where: {
+      NOT: [
+        {
+          value: 'create_admin'
+        },
+        {
+          value: 'create_school'
+        },
+        {
+          value: 'list_package'
+        },
+        {
+          value: 'list_pending_packages'
+        }
+      ]
     }
-  }
+  });
 
   // Dummy Things create
   const hashPassword = await bcrypt.hash('admin', Number(process.env.SALTROUNDS));
@@ -165,7 +162,7 @@ async function seed() {
     data: {
       title: "ADMIN",
       permissions: {
-        connect: adminPermission
+        connect: permissions
       }
     }
   })
@@ -220,12 +217,12 @@ async function seed() {
     }
   });
 
-  const teacherPermissions =[];
+  const teacherPermissions = [];
 
   for (const i of permissions) {
-    if (i.value === 'create_exam' || i.value === 'show_exam_routine' || i.value == 'show_class_routine' || i.value == 'create_result' || i.value == 'create_attendence' ||
-      i.value == 'create_leave' || i.value == 'view_holiday' || i.value == 'view_grade' ||
-      i.value == 'create_student_attendence' || i.value == 'create_exam_attendence' || i.value === 'show_teacher_certificate' || i.value === 'create_note' || i.value === 'update_note'
+    if (['create_exam', 'show_exam_routine', 'show_class_routine', 'create_result', 'create_attendence',
+      'create_leave', 'view_holiday', 'view_grade', 'create_student_attendence',
+      'create_exam_attendence', 'show_teacher_certificate', 'create_note', 'update_note','create_syllabus','show_syllabus'].includes(i.value)
     ) {
       teacherPermissions.push({ id: i.id })
     }
@@ -303,7 +300,7 @@ async function seed() {
   // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
   const studentPermissions = []
   for (const i of permissions) {
-    if (i.value == 'show_student_certificate' || i.value == 'show_class_routine' || i.value == 'show_exam_routine' || i.value == 'create_leave') {
+    if (['show_student_certificate', 'show_class_routine', 'show_exam_routine', 'create_leave','show_syllabus'].includes(i.value)) {
       studentPermissions.push({ id: i.id })
     }
   }

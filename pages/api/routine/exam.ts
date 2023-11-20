@@ -1,31 +1,33 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
         switch (method) {
             case 'GET':
-                const { section_id, school_id, academic_year_id } = req.query
-                if (!section_id || !school_id || !academic_year_id) {
-                    res.status(500).json({ message: "section_id or school_id missing" })
+                const { section_id, academic_year_id, exam_id } = req.query
+                if (!section_id || !academic_year_id) {
+                    res.status(500).json({ message: "section_id or academic_year_id missing" })
                 }
-                const routine = await prisma.exam.findMany({
+                const routine = await prisma.exam.findFirst({
                     where: {
-                        section_id: parseInt(section_id),
-                        school_id: parseInt(school_id),
-                        academic_year_id: parseInt(academic_year_id)
+                        id: Number(exam_id),
+                        section_id: Number(section_id),
+                        school_id: (refresh_token?.school_id),
+                        academic_year_id: Number(academic_year_id)
                     },
                     include: {
                         exam_details: {
                             include: {
                                 subject: true,
-                                room: {
+                                exam_room: {
                                     select: {
                                         id: true,
                                         name: true
                                     }
-                                }
+                                },
                             }
                         }
                     }
@@ -43,4 +45,4 @@ const index = async (req, res) => {
     }
 };
 
-export default index;
+export default authenticate(index);

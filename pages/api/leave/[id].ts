@@ -41,8 +41,8 @@ const id = async (req, res, refresh_token) => {
                     approved_by_id: refresh_token.id,
                     status,
                 }
-                if (from_date) data['from_date'] = new Date(from_date)
-                if (to_date) data['to_date'] = new Date(to_date)
+                if (from_date) data['from_date'] = new Date(new Date(from_date).setUTCHours(0, 0, 0, 0))
+                if (to_date) data['to_date'] = new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
                 if (remarks) data['remarks'] = remarks
                 if (Leave_type) data['Leave_type'] = Leave_type
 
@@ -72,14 +72,14 @@ const id = async (req, res, refresh_token) => {
                             }
                         })
 
-                        // console.log("student__", student);
+                        console.log("student__", student);
 
                         const section_attendance = await prisma.attendance.findMany({
                             where: {
                                 section_id: student.section_id,
                                 date: {
-                                    gte: new Date(from_date),
-                                    lte: new Date(to_date)
+                                    gte: new Date(new Date(from_date).setUTCHours(0, 0, 0, 0)),
+                                    lte: new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
                                 },
 
                             },
@@ -90,10 +90,10 @@ const id = async (req, res, refresh_token) => {
 
                         })
 
-                        // console.log("section_attendance___", section_attendance);
+                        console.log("section_attendance___", section_attendance);
 
                         const needToUpdate = section_attendance.filter(i => i.student_id === student.id)
-                        // console.log("needToUpdate__", needToUpdate);
+                        console.log("needToUpdate__", needToUpdate);
 
                         const prev_attendance = await prisma.attendance.findMany({
                             where: {
@@ -104,6 +104,9 @@ const id = async (req, res, refresh_token) => {
                                 id: true
                             }
                         })
+                        console.log("prev_attendance__", prev_attendance);
+                        console.log("data__", data);
+
                         await prisma.$transaction(async (trans) => {
                             await trans.leave.update({
                                 where: {
@@ -124,11 +127,11 @@ const id = async (req, res, refresh_token) => {
                                 })
                             }
 
-                            const needTocreate = [...new Set(section_attendance.filter(i => i.student_id !== student.id).map(j => j.date.toLocaleDateString()))]
-                            // console.log("needTocreate__", needTocreate);
+                            const needTocreate = [...new Set(section_attendance.filter(i => i.student_id !== student.id).map(j => new Date(new Date(j.date).setUTCHours(0, 0, 0, 0))))]
+                            console.log("needTocreate__", needTocreate);
 
                             for (const i of needTocreate) {
-                                await trans.attendance.create({
+                                const temp = await trans.attendance.create({
                                     data: {
                                         student_id: student.id,
                                         date: new Date(i),
@@ -138,6 +141,8 @@ const id = async (req, res, refresh_token) => {
                                         status: query?.status
                                     }
                                 })
+                                console.log("temp__",temp);
+                                
                             }
                         })
                     }
@@ -187,7 +192,7 @@ const id = async (req, res, refresh_token) => {
                                     await trans.employeeAttendance.create({
                                         data: {
                                             date: new Date(from),
-                                            //@ts-ignore
+                                            // @ts-ignore
                                             status: query?.status,
                                             school_id: refresh_token.school_id,
                                             user: {

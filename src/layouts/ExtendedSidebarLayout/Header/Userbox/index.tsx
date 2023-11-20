@@ -208,7 +208,6 @@ function HeaderUserbox() {
       data: [465, 546, 234, 576, 554, 338, 427, 348, 586, 254, 348]
     }
   ];
-  console.log({ user });
 
   return (
     <>

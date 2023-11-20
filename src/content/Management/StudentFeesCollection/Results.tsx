@@ -191,8 +191,6 @@ const Results = ({
   };
   useEffect(() => {
     if (selectedStudent) {
-      console.log({ selectedStudent });
-
       handleStudentPaymentCollect();
     }
   }, [selectedStudent]);
@@ -236,7 +234,6 @@ const Results = ({
   };
 
   useEffect(() => {
-    console.log("page__", page);
 
     const filterFees_ = filterFees(sessions || [], filter)
     setFilteredFees(() => filterFees_ || [])
@@ -382,7 +379,6 @@ const Results = ({
       setSelectedStudent(null);
     }
   };
-
 
   return (
     <>
@@ -603,7 +599,7 @@ const Results = ({
               <TableBody>
                 {paginatedfees.map((fee, index) => {
                   const isschoolselected = selectedItems.includes(fee.id);
-                  console.log('fee__', fee);
+                  // console.log('fee__', fee);
 
                   return (
                     <TableRow

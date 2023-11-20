@@ -217,7 +217,6 @@ const handleUpdate = async (req, res) => {
         if (req.body.final_percent || req.body.final_percent == 0) {
             updateQuery['final_percent'] = req.body.final_percent == 0 ? null : req.body.final_percent
         }
-        console.log("req.body__", req.body, "updateQuery__", updateQuery);
         const temp = await prisma.exam.update({
             where: {
                 id: parseInt(req.body.exam_id)

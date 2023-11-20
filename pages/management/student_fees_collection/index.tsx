@@ -61,7 +61,6 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-  console.log("prinCollectedtFees________", prinCollectedtFees);
 
   return (
     <>

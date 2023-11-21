@@ -34,6 +34,9 @@ async function seed() {
   const pendingSmsPermissionforSchool = await prisma.permission.create({
     data: { name: 'Pending Buy Sms', value: 'pending_buy_sms', group: 'pending_sms' }
   });
+  const administratorPermission = await prisma.permission.create({
+    data: { name: 'administrator', value: 'administrator', group: 'administrator' }
+  });
 
   const create_user_permission = await prisma.permission.create({
     data: { name: 'create user', value: 'create_user', group: 'user' }
@@ -49,6 +52,7 @@ async function seed() {
           { id: pendingPakcagePermissionforSchool.id },
           { id: create_user_permission.id },
           { id: pendingSmsPermissionforSchool.id },
+          { id: administratorPermission.id },
         ]
       }
     }
@@ -113,7 +117,7 @@ async function seed() {
       { name: 'show employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
 
       { name: 'academic', value: 'academic', group: 'academic' },
-      { name: 'administrator', value: 'administrator', group: 'administrator' },
+      
       { name: 'teacher', value: 'teacher', group: 'teacher' },
       { name: 'accounts', value: 'accounts', group: 'accounts' },
       { name: 'front end', value: 'front_end', group: 'front_end' },

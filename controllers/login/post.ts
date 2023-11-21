@@ -8,22 +8,22 @@ export default async function post(req, res) {
   try {
     let query = {}
     const { user_id, username, password } = req.body;
-    
+
     const request_refresh_token: any = (req.cookies.refresh_token && user_id) ? refresh_token_varify(req.cookies.refresh_token) : null;
-    
-    if (request_refresh_token && request_refresh_token) {
+
+    if (request_refresh_token) {
       //for super admin and admin login there available users 
       // if (request_refresh_token && (request_refresh_token.role?.title === 'ADMIN' || request_refresh_token.role?.title === 'SUPER_ADMIN')) {
       console.log(request_refresh_token);
       //superadmin login as admin
-      if (request_refresh_token &&  (request_refresh_token.role?.title === 'SUPER_ADMIN' || request_refresh_token.role?.title === 'ADMIN'))  query = { id: user_id } ;
-      
+      if (request_refresh_token && (request_refresh_token.role?.title === 'SUPER_ADMIN' || request_refresh_token.role?.title === 'ADMIN')) query = { id: user_id };
+
       else throw new Error('invalid user');
-      
+
     }
     else {
       if (!username || !password) throw new Error(`provide username and password`);
-      else query = { username,is_enabled:true }
+      else query = { username, is_enabled: true }
     }
 
     const user = await prisma.user.findFirst({
@@ -46,31 +46,28 @@ export default async function post(req, res) {
       }
     });
 
+    if (!user) throw new Error(`Invalid Authorization`);
+
     if (user_id) {
       if (user.role_id) {
         if (user.role.title === 'SUPER_ADMIN' && request_refresh_token.role?.title === 'ADMIN') {
           throw new Error('Bad request !');
         }
-        else if ((user.role.title == 'ADMIN'  && request_refresh_token.role?.title !== 'SUPER_ADMIN')) {
+        else if ((user.role.title == 'ADMIN' && request_refresh_token.role?.title !== 'SUPER_ADMIN')) {
           throw new Error('Bad request !');
         }
       }
-      else{
-        if(request_refresh_token.role?.title !== 'ADMIN'){
+      else {
+        if (request_refresh_token.role?.title !== 'ADMIN') {
           throw new Error('Bad request !');
         }
       }
 
     }
-
-
     if (user.role_id) {
       user['permissions'] = user.role?.permissions;
       delete user['role']['permissions'];
     }
-
-
-    if (!user) throw new Error(`Invalid Authorization`);
 
     if (user?.role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
@@ -92,8 +89,6 @@ export default async function post(req, res) {
       const result = await bcrypt.compare(req.body.password, user.password);
 
       if (!result) throw new Error(`Invalid username or password`);
-
-      console.log(process.env.JWT_ACCESS_TOKEN_SECRET);
     }
 
 
@@ -115,14 +110,14 @@ export default async function post(req, res) {
       serialize('access_token', access_token, {
         path: '/',
         maxAge: 5,
-        // secure: process.env.NODE_ENV === 'production'
-        secure: false
+        secure: process.env.NODE_ENV === 'production'
+        // secure: false
       }),
       serialize('refresh_token', refresh_token, {
         path: '/',
         maxAge: 60 * 60 * 24,
-        // secure: process.env.NODE_ENV === 'production'
-        secure: false
+        secure: process.env.NODE_ENV === 'production'
+        // secure: false
       })
     ]);
     delete user['password'];

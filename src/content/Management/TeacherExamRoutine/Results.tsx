@@ -202,6 +202,7 @@ const Results: FC<ResultsProps> = ({
     setDeleteSchoolId(id);
     setOpenConfirmDelete(true);
   };
+  
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);

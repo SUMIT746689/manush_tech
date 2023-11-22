@@ -28,7 +28,7 @@ function PageHeader({ reFetchData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
-  const { user } = useAuth();
+  const { user }: any = useAuth();
   const handleCreateClassOpen = () => {
     setOpen(true);
   };
@@ -66,23 +66,11 @@ function PageHeader({ reFetchData }) {
   return (
     <>
       {
-        //@ts-ignore
-        user?.role?.title === 'ADMIN' ?
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Grid item>
-              <Typography variant="h3" component="h3" gutterBottom textTransform="capitalize">
-                {t('Leave Application')}
-              </Typography>
-              <Typography variant="subtitle2" textTransform={"initial"}>
-                {t(`All aspects of Leave Application can be managed from this page`)}
-              </Typography>
-            </Grid>
-          </Grid>
-          :
-          <PageHeaderTitleWrapper
-            name="Leave Application "
-            handleCreateClassOpen={handleCreateClassOpen}
-          />
+        <PageHeaderTitleWrapper
+          name="Leave Application "
+          handleCreateClassOpen={handleCreateClassOpen}
+          actionButton={user?.role?.title === 'ADMIN' ? true : false}
+        />
       }
 
       <Dialog

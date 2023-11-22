@@ -116,7 +116,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       <PageHeaderTitleWrapper
         name={"User"}
         handleCreateClassOpen={handleCreateUserOpen}
-        actionButton={true}
+        actionButton={user?.role?.title !== 'SUPER_ADMIN' ? true : false}
       />
 
       <Dialog

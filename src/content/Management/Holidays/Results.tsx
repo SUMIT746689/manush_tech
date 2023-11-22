@@ -13,6 +13,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
 import { TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
+import { useAuth } from '@/hooks/useAuth';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -123,6 +124,7 @@ const Results: FC<ResultsProps> = ({
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+  const { user }: any = useAuth()
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -188,6 +190,8 @@ const Results: FC<ResultsProps> = ({
       showNotification(err?.response?.data?.message, 'error')
     }
   };
+
+  const isUserAdmin = user?.role?.title == 'ADMIN'
 
   return (
     <>
@@ -257,7 +261,7 @@ const Results: FC<ResultsProps> = ({
         <Divider />
 
         {paginatedHolidays.length === 0 ? (
-         <TableEmptyWrapper title="holidays" />
+          <TableEmptyWrapper title="holidays" />
         ) : (
           <>
             <TableContainer>
@@ -267,8 +271,10 @@ const Results: FC<ResultsProps> = ({
 
                     <TableCell align="center">{t('Title')}</TableCell>
                     <TableCell align="center">{t('Date')}</TableCell>
+                    {
+                      isUserAdmin && <TableCell align="center">{t('Actions')}</TableCell>
+                    }
 
-                    <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -294,29 +300,31 @@ const Results: FC<ResultsProps> = ({
                             {dayjs(holiday.date).format('YYYY-MM-DD')}
                           </Typography>
                         </TableCell>
+                        {
+                          isUserAdmin && <TableCell align="center">
+                            <Typography noWrap>
+                              <Tooltip title={t('Edit')} arrow>
+                                <IconButton
+                                  onClick={() => setEditData(holiday)}
+                                  color="primary"
+                                >
+                                  <LaunchTwoToneIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t('Delete')} arrow>
+                                <IconButton
+                                  onClick={() =>
+                                    handleConfirmDelete(holiday.id)
+                                  }
+                                  color="primary"
+                                >
+                                  <DeleteTwoToneIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Typography>
+                          </TableCell>
+                        }
 
-                        <TableCell align="center">
-                          <Typography noWrap>
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                onClick={() => setEditData(holiday)}
-                                color="primary"
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={() =>
-                                  handleConfirmDelete(holiday.id)
-                                }
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Typography>
-                        </TableCell>
                       </TableRow>
                     );
                   })}

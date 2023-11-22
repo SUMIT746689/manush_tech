@@ -22,6 +22,7 @@ import { MobileDatePicker } from '@mui/lab';
 import useNotistick from '@/hooks/useNotistick';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { TextFieldWrapper } from '@/components/TextFields';
+import { useAuth } from '@/hooks/useAuth';
 
 function PageHeader({ contentPermission, editData, seteditData, reFetchData }) {
 
@@ -29,7 +30,7 @@ function PageHeader({ contentPermission, editData, seteditData, reFetchData }) {
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
   const theme = useTheme();
-
+  const { user }: any = useAuth()
 
   useEffect(() => {
     if (editData) handleCreateClassOpen();
@@ -80,6 +81,7 @@ function PageHeader({ contentPermission, editData, seteditData, reFetchData }) {
       <PageHeaderTitleWrapper
         name={t('Holidays')}
         handleCreateClassOpen={handleCreateClassOpen}
+        actionButton={user?.role?.title !== 'ADMIN' ? true : false}
       />
 
       <Dialog

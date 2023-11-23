@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export const useSearchUsers = (limit = 10) => {
+export const useSearchUsers = (limit) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 

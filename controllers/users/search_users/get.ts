@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma_client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import { authenticate } from 'middleware/authenticate';
 
 const get = async (req, res, refresh_token) => {
@@ -35,6 +34,10 @@ const get = async (req, res, refresh_token) => {
     }
     else throw new Error('Only role 1 and 2 is allowed to see validate data');
 
+    const takeUser = {};
+    if (limit) {
+      takeUser['take'] = Number(limit) ? Number(limit) : 10
+    }
     const users = await prisma.user.findMany({
       where: {
         AND
@@ -46,7 +49,7 @@ const get = async (req, res, refresh_token) => {
         school_id: true,
         permissions: true
       },
-      take: Number(limit) ? Number(limit) : 10
+      ...takeUser
     });
 
     res.status(200).json(users);

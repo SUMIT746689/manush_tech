@@ -1,4 +1,5 @@
 import get from 'controllers/users/search_users/get';
+import { authenticate } from 'middleware/authenticate';
 
 const search_users = async (req, res) => {
   try {
@@ -19,4 +20,4 @@ const search_users = async (req, res) => {
   }
 };
 
-export default (search_users);
+export default authenticate(search_users);

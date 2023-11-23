@@ -144,7 +144,7 @@ const Results = ({
               const last_date = new Date(fee.last_date)
               const today = new Date()
               const status_color = { p: 0.5 };
-              let due, total_payable_amt;
+              let due, total_payable_amt, payableAmount = 0;
 
               if (fee?.status == 'paid' || fee?.status === 'paid late') {
                 due = 0
@@ -152,7 +152,13 @@ const Results = ({
               }
               else {
                 const late_fee = fee.late_fee ? fee.late_fee : 0
-                total_payable_amt = late_fee && today > last_date ? `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${(Number(fee?.amount) + Number(fee?.late_fee)).toFixed(2)}` : ""
+                if (late_fee && today > last_date) {
+                  payableAmount = (Number(fee?.amount) + Number(fee?.late_fee))
+                  total_payable_amt = `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${payableAmount.toFixed(2)}`;
+                }
+                else {
+                  total_payable_amt = ""
+                }
 
                 due = (fee?.amount + late_fee - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
 
@@ -178,6 +184,7 @@ const Results = ({
               fee['last_payment_date'] = last_payment_date
               fee['due'] = due
               fee['total_payable_amt'] = total_payable_amt
+              fee['payableAmount'] = payableAmount
               fee['status_color'] = status_color
               fee['sl'] = index + 1
               return fee
@@ -286,7 +293,7 @@ const Results = ({
     }
   };
 
-  const handleCollection = ({ fee, amount, selectedAccount, selectedGateway, transID, payableAmount }) => {
+  const handleCollection = ({ fee, amount, selectedAccount, selectedGateway, transID }) => {
     axios.post('/api/student_payment_collect', {
       student_id: selectedStudent.id,
       collected_by_user: user?.id,
@@ -295,7 +302,7 @@ const Results = ({
       payment_method_id: selectedGateway?.id,
       collected_amount: amount,
       transID: transID,
-      total_payable: payableAmount
+      total_payable: fee?.payableAmount
     })
       .then((res) => {
         console.log("res.data__", res.data);
@@ -784,6 +791,9 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
   const [transID, setTransID] = useState(null)
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [gatewayOption, setGatewayOption] = useState([])
+
+  console.log({ fee });
+
   return (
     <Grid container
       sx={{
@@ -873,7 +883,7 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
           variant="contained"
           disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label?.toLowerCase() !== 'cash' && transID || selectedAccount?.label?.toLowerCase() === 'cash' && !transID) ? false : true}
           onClick={() => {
-            handleCollection({ fee, amount, selectedAccount, selectedGateway, transID, payableAmount: fee?.payableAmount });
+            handleCollection({ fee, amount, selectedAccount, selectedGateway, transID });
             setSelectedAccount(null)
             setSelectedGateway(null);
             setTransID(null)

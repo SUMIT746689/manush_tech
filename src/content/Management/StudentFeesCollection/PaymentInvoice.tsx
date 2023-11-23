@@ -174,7 +174,7 @@ function PaymentInvoice({ printFees, student }) {
 
       <Grid container mt={1} px={1} justifyContent="space-between">
         <Grid sx={{ textTransform: 'capitalize' }}>IN WORD: <b>{word} {user?.school?.currency} only</b></Grid>
-        <Grid>Total paid: <b>{formatNumber(totalPaidAmount)}</b></Grid>
+        <Grid>Paid: <b>{formatNumber(totalPaidAmount)}</b></Grid>
       </Grid>
 
       <Grid container mt={10} justifyContent="space-between">

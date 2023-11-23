@@ -12,7 +12,7 @@ import {
   Button,
 } from '@mui/material';
 import useNotistick from '@/hooks/useNotistick';
-import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
+import { generateUsername, getFile, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import axios from 'axios';
@@ -566,7 +566,7 @@ function RegistrationSecondPart({
                     {/* student photo */}
                     <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
                       <Grid item>
-                        <Image src={student_photo ? student_photo : `/api/get_file/${(student?.student_photo || student?.filePathQuery?.student_photo_path)?.replace(/\\/g, '/')}`}
+                        <Image src={student_photo ? student_photo : getFile(student?.student_photo || student?.filePathQuery?.student_photo_path)}
                           height={150}
                           width={150}
                           alt='Student photo'

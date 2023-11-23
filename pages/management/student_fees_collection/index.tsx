@@ -61,7 +61,6 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-  console.log("prinCollectedtFees________", prinCollectedtFees);
 
   return (
     <>
@@ -98,7 +97,7 @@ function Managementschools() {
         </Grid>
       </Grid>
       <Grid px={4} mt={1}>
-        <Card sx={{ pt: 1, px: 1, display: 'grid', gridTemplateColumns: { xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }, justifyContent: 'center', fontSize: 0.1, columnGap: 1 }}>
+        <Card sx={{ pt: 1, px: 1, display: 'grid', gridTemplateColumns: { xs: " 1fr", md: "1fr 1fr" }, justifyContent: 'center', fontSize: 0.1, columnGap: 1 }}>
           <ButtonWrapper
             handleClick={() => setPrintFees([])}
             color="warning"
@@ -106,7 +105,7 @@ function Managementschools() {
             {'Reset'}
           </ButtonWrapper>
 
-          <ButtonWrapper
+          {/* <ButtonWrapper
             disabled={selectedFees.length === 0}
             handleClick={handlePrintSelected}
           >
@@ -123,7 +122,7 @@ function Managementschools() {
             handleClick={handlePrintAll}
           >
             {'Print All'}
-          </ButtonWrapper>
+          </ButtonWrapper> */}
 
           <ButtonWrapper
             sx={{
@@ -144,7 +143,7 @@ function Managementschools() {
           <PaymentInvoice printFees={prinCollectedtFees} student={selectedStudent} />
         </Grid>
 
-        <Grid ref={printSelectedPageRef}>
+        {/* <Grid ref={printSelectedPageRef}>
           <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
           <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
         </Grid>
@@ -152,7 +151,7 @@ function Managementschools() {
         <Grid ref={printAllPageARef}>
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
-        </Grid>
+        </Grid> */}
       </Grid>
       <Footer />
     </>

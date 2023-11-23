@@ -31,7 +31,7 @@ import { DatePicker, MobileDatePicker } from '@mui/lab';
 import dayjs from 'dayjs';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
-import { generateUsername } from '@/utils/utilitY-functions';
+import { generateUsername, getFile } from '@/utils/utilitY-functions';
 
 const BoxUploadWrapper = styled(Box)(
   ({ theme }) => `
@@ -143,7 +143,7 @@ function PageHeader({
           successProcess(t('A teacher has been updated successfully'));
         else throw new Error('edit teacher failed');
       } else {
-        formData.append('username',_values.username)
+        formData.append('username', _values.username)
         const res = await axios({
           method: 'POST',
           url: '/api/teacher',
@@ -194,7 +194,7 @@ function PageHeader({
         <Formik
           initialValues={{
             username: editSchool?.user?.username || undefined,
-            password:  undefined,
+            password: undefined,
             first_name: editSchool?.first_name || '',
             middle_name: editSchool?.middle_name || '',
             last_name: editSchool?.last_name || '',
@@ -319,7 +319,7 @@ function PageHeader({
                         onBlurCapture={(v) => {
                           if (v) {
                             const temp = generateUsername(values.first_name)
-                            if(!editSchool?.user?.username){
+                            if (!editSchool?.user?.username) {
 
                               setFieldValue('password', temp)
                             }
@@ -1001,7 +1001,7 @@ function PageHeader({
                           >
                             <a
                               style={{ width: '50px' }}
-                              href={`/api/get_file/${editSchool?.resume?.replace(/\\/g, '/')}`}
+                              href={getFile(editSchool?.resume)}
                               target='_blank'
                             >
                               {editSchool.resume}
@@ -1078,7 +1078,7 @@ function PageHeader({
                           >
                             <img
                               style={{ width: '50px' }}
-                              src={`/api/get_file/${editSchool?.photo?.replace(/\\/g, '/')}`}
+                              src={getFile(editSchool?.photo)}
                             />
                           </Grid>
                         </>

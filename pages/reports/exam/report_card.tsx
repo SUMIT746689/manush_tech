@@ -19,6 +19,7 @@ import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { ReportCardDesign } from '@/components/Result/ReportCardDesign';
+import { getFile } from '@/utils/utilitY-functions';
 
 
 
@@ -343,7 +344,7 @@ function Managementschools() {
             }}>
                 <Grid ref={reportCardPrint}>
                     {
-                        selectedTempleate && 
+                        selectedTempleate &&
                         (selectedTempleate == 'Default' ?
                             <>
                                 {/* Your content here */}
@@ -400,7 +401,7 @@ function Managementschools() {
                                                                 }}>
                                                                     <Image width={200} height={300} alt='student_photo'
                                                                         loading='eager'
-                                                                        src={i?.student?.student_photo ? `/api/get_file/${i?.student?.student_photo?.replace(/\\/g, '/')}` : "/dumy_student.png"} />
+                                                                        src={i?.student?.student_photo ? getFile(i?.student?.student_photo) : "/dumy_student.png"} />
 
                                                                 </Grid>
 
@@ -876,7 +877,7 @@ function Managementschools() {
                                 }
 
                             </>
-                            )
+                        )
                     }
 
                 </Grid>

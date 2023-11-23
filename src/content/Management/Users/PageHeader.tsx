@@ -22,6 +22,7 @@ import useNotistick from '@/hooks/useNotistick';
 import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { getFile } from '@/utils/utilitY-functions';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
@@ -115,7 +116,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       <PageHeaderTitleWrapper
         name={"User"}
         handleCreateClassOpen={handleCreateUserOpen}
-        actionButton={true}
+        actionButton={user?.role?.title !== 'SUPER_ADMIN' ? true : false}
       />
 
       <Dialog
@@ -286,7 +287,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
                     {
                       (user_photo || editUser?.user_photo) &&
-                      <Image src={user_photo ? user_photo : `/api/get_file/${editUser?.user_photo?.replace(/\\/g, '/')}`}
+                      <Image src={user_photo ? user_photo : getFile(editUser?.user_photo)}
                         height={150}
                         width={150}
                         alt='User photo'

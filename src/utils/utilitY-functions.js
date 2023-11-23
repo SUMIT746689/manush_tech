@@ -47,3 +47,7 @@ export function accessNestedProperty(obj, array) {
   }
   return currentObject;
 }
+
+export function getFile(str) {
+  return str && typeof (str) == 'string' ? `/api/get_file/${str?.replace(/\\/g, '/')}` : ''
+}

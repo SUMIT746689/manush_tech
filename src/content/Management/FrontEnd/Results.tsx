@@ -8,6 +8,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { getFile } from '@/utils/utilitY-functions';
 
 
 const Results = ({ data, reFetchData }) => {
@@ -163,7 +164,7 @@ const Results = ({ data, reFetchData }) => {
                 <Grid container justifyContent='space-around' border='1px solid #cccccc' borderRadius='10px' marginBottom='10px'>
                   {
                     (data?.header_image || header_image) && <Grid item>
-                      <Image src={header_image ? header_image : `/api/get_file/${data?.header_image.replace(/\\/g, '/')}`}
+                      <Image src={header_image ? header_image : getFile(data?.header_image)}
                         height={150}
                         width={150}
                         alt='Header image'
@@ -218,7 +219,7 @@ const Results = ({ data, reFetchData }) => {
                         <Grid >
                           {
                             i?.path && <Image
-                              src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
+                              src={getFile(i?.path)}
                               height={120}
                               width={120}
                               alt='Carousel Image'
@@ -281,7 +282,7 @@ const Results = ({ data, reFetchData }) => {
                           <Grid  >
                             {
                               i?.path && <Image
-                                src={`/api/get_file/${i?.path?.replace(/\\/g, '/')}`}
+                                src={getFile(i?.path)}
                                 height={120}
                                 width={120}
                                 alt='gallery'
@@ -353,7 +354,7 @@ const Results = ({ data, reFetchData }) => {
                         height={200}
                         width={200}
                         alt='History photo'
-                        src={history_photo ? history_photo : `/api/get_file/${data?.history_photo?.replace(/\\/g, '/')}`}
+                        src={history_photo ? history_photo : getFile(data?.history_photo)}
                         loading='lazy'
                       />
 
@@ -392,7 +393,7 @@ const Results = ({ data, reFetchData }) => {
                         height={200}
                         width={200}
                         alt='Chairman photo'
-                        src={chairman_photo ? chairman_photo : `/api/get_file/${data?.chairman_photo?.replace(/\\/g, '/')}`}
+                        src={chairman_photo ? chairman_photo : getFile(data?.chairman_photo)}
                         loading='lazy'
                       />
 
@@ -453,7 +454,7 @@ const Results = ({ data, reFetchData }) => {
                         height={200}
                         width={200}
                         alt='Principal photo'
-                        src={principal_photo ? principal_photo : `/api/get_file/${data?.principal_photo?.replace(/\\/g, '/')}`}
+                        src={principal_photo ? principal_photo : getFile(data?.principal_photo)}
                         loading='lazy'
                       />
 

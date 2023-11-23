@@ -15,7 +15,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useReactToPrint } from 'react-to-print';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
-import { accessNestedProperty } from '@/utils/utilitY-functions';
+import { accessNestedProperty, getFile } from '@/utils/utilitY-functions';
 import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
@@ -343,7 +343,7 @@ const Results = ({
                           {exam?.file && <a
                             style={{ width: '50px', color: 'blue', textDecoration: 'underline' }}
                             target="_blank"
-                            href={`/api/get_file/${exam?.file?.replace(/\\/g, '/')}`}
+                            href={getFile(exam?.file)}
                           >
                             File link
                           </a>

@@ -65,7 +65,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { Formik } from 'formik';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
-import { generateUsername, unique_password_generate } from '@/utils/utilitY-functions';
+import { generateUsername, getFile, unique_password_generate } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
     () => `
@@ -1165,7 +1165,7 @@ const Results = () => {
                                                         >
                                                             <a
                                                                 style={{ width: '50px' }}
-                                                                href={`/api/get_file/${editSchool?.filePathQuery?.resume?.replace(/\\/g, '/')}`}
+                                                                href={getFile(editSchool?.filePathQuery?.resume)}
                                                                 target='_blank'
                                                             >
                                                                 {editSchool?.filePathQuery?.resume}
@@ -1246,7 +1246,7 @@ const Results = () => {
                                                             }}
                                                             style={{ width: 'fit-content' }}
                                                         >
-                                                            <Image src={photo ? `${photo}` : `/api/get_file/${editSchool?.filePathQuery?.photo?.replace(/\\/g, '/')}`}
+                                                            <Image src={photo ? `${photo}` : getFile(editSchool?.filePathQuery?.photo)}
                                                                 height={150}
                                                                 width={150}
                                                                 alt='photo'
@@ -1359,9 +1359,7 @@ const Results = () => {
                                                         <a
                                                             style={{ width: '50px' }}
                                                             target="_blank"
-                                                            href={i?.teacher?.filePathQuery?.resume ?
-                                                                `/api/get_file/${i?.teacher?.filePathQuery?.resume?.replace(/\\/g, '/')}`
-                                                                : ''}
+                                                            href={getFile(i?.teacher?.filePathQuery?.resume)}
                                                         >
                                                             {i?.teacher?.filePathQuery?.resume || ''}
                                                         </a>

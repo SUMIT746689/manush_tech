@@ -25,6 +25,7 @@ import BulkActions from '@/components/BulkAction';
 import { DialogWrapper } from '@/components/DialogWrapper';
 import { TableContainerWrapper, TableEmptyWrapper, TableHeadWrapper } from '@/components/TableWrapper';
 import Image from 'next/image';
+import { getFile } from '@/utils/utilitY-functions';
 
 
 interface ResultsProps {
@@ -264,9 +265,7 @@ const Results: FC<ResultsProps> = ({
                             <a
                               style={{ width: '50px' }}
                               target="_blank"
-                              href={notice?.file_url ?
-                                `/api/get_file/${notice?.file_url?.replace(/\\/g, '/')}`
-                                : ''}
+                              href={getFile(notice?.file_url)}
                             >
                               {notice?.file_url || ''}
                             </a>

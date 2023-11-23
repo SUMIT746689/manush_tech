@@ -270,7 +270,8 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
     if (response.message) reFetchData(true)
     console.log({ err, response });
   }
-
+  //@ts-ignore
+  const isNotSuperAdmin = user?.role?.title !== 'SUPER_ADMIN'
   return (
     <>
       <Dialog
@@ -311,7 +312,12 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
       </Dialog>
 
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-        <Grid p={2} display={'grid'} gridTemplateColumns={'auto auto'} gap={4}>
+        <Grid p={2}
+          sx={isNotSuperAdmin ? {
+            display: 'grid',
+            gridTemplateColumns: 'auto auto',
+            gap: 4
+          } : {}}>
           {!selectedBulkActions && (<>
             {/* <TextField
               sx={{
@@ -344,23 +350,27 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                 )
               }}
             />
-            <Autocomplete
-              size="small"
-              id="multiple-limit-tags"
-              options={roleOptions || []}
-              value={searchToken}
-              onChange={(e, v) => setSearchToken(v)}
-              renderInput={(params) => <TextField
-                sx={{
-                  [`& fieldset`]: {
-                    borderRadius: 0.6,
-                  }
-                }}
-                {...params}
-                label="Filter by role"
+            {
+
+              isNotSuperAdmin && <Autocomplete
+                size="small"
+                id="multiple-limit-tags"
+                options={roleOptions || []}
+                value={searchToken}
+                onChange={(e, v) => setSearchToken(v)}
+                renderInput={(params) => <TextField
+                  sx={{
+                    [`& fieldset`]: {
+                      borderRadius: 0.6,
+                    }
+                  }}
+                  {...params}
+                  label="Filter by role"
+                />
+                }
               />
-              }
-            />
+            }
+
 
           </>)}
           {/* {selectedBulkActions && <BulkActions />} */}

@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 export const get = async (req, res) => {
   try {
     const { id, fromDate, toDate, academic_year_id } = req.query;
-    console.log("req.query__", req.query);
+   
 
     if (!id) throw new Error('provide student_id');
 
@@ -14,7 +14,7 @@ export const get = async (req, res) => {
 
     if (fromDate || toDate) query['created_at'] = dateFilter
 
-    console.log("query__", query);
+  
 
     const student_fee = await prisma.studentFee.findMany({
       where: {

@@ -353,7 +353,7 @@ export default PageHeader;
 const SelectAdmin = ({ setFieldValue, oldSelectedAdminID }) => {
   const [options, setOptions] = useState([]);
   const [searchToken, setSearchToken] = useState('');
-  const { searchUsers } = useSearchUsers(10);
+  const { searchUsers } = useSearchUsers();
   const [selectedOption, setSelectedOption] = useState<any>([]);
 
   const handleSelect = (value) => {

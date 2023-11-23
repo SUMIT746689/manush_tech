@@ -1,7 +1,5 @@
 import prisma from '@/lib/prisma_client';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
-import { Prisma } from "@prisma/client";
-const tables = Prisma.ModelName;
 
 export const get = async (req, res) => {
   try {

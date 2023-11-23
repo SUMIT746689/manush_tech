@@ -198,9 +198,9 @@ const Results = ({
           mb: 1
         }}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Box p={0.5}>
+        {/* <Grid container spacing={2}> */}
+          {/* <Grid item xs={12}> */}
+            {/* <Box p={0.5}> */}
               <DebounceInput
                 debounceTimeout={1000}
                 handleDebounce={(v) => setQuery(v)}
@@ -213,9 +213,9 @@ const Results = ({
                   )
                 }}
               />
-            </Box>
-          </Grid>
-        </Grid>
+            {/* </Box> */}
+          {/* </Grid> */}
+        {/* </Grid> */}
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 450px)' }}>

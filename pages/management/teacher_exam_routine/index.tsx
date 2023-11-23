@@ -87,7 +87,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function ManagementDepartments({ exams, teachers }) {
-  // console.log({ exams })
+  console.log({ teachers })
   // const [academicYear, _] = useContext(AcademicYearContext);
   // console.log({ academicYear });
   // const { datas } = useClientFetch(`/api/exam?academic_year=${academicYear?.id}`);
@@ -130,6 +130,12 @@ function ManagementDepartments({ exams, teachers }) {
           classes={classes}
           setSeatPlan={setSeatPlans}
           seatPlan={seatPlans}
+          teachers={teachers?.map((teacher) => {
+            return {
+              label: teacher.first_name,
+              id: teacher.id,
+            }
+          }) || []}
         />
       </PageTitleWrapper>
 

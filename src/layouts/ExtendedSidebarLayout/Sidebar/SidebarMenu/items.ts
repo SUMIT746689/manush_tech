@@ -141,6 +141,11 @@ export const menuItems: MenuItems[] = [
         icon: AssignmentIcon,
         items: [
           {
+            name: 'Manage Exam Term',
+            link: '/management/exam/exam_terms',
+            icon: AssignmentIcon
+          },
+          {
             name: 'Manage Exam',
             link: '/management/exam',
             icon: AssignmentIcon

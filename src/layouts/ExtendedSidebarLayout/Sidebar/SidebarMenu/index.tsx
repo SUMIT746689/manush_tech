@@ -655,9 +655,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Teacher Certificate' && permissionVerify(permissions, ['show_teacher_certificate'])) sub_menu();
       if (item.name === 'Employee Certificate' && permissionVerify(permissions, ['show_employee_certificate'])) sub_menu();
 
+      // student class notes
       if (item.name === 'Entry Notes' && permissionVerify(permissions, ['create_note', 'update_note'])) sub_menu();
       if (item.name === 'Show Notes' && permissionVerify(permissions, ['show_note'])) sub_menu();
 
+      // syllebus
       if (item.name === 'Syllabus' && permissionVerify(permissions, ['show_syllabus'])) sub_menu();
 
     }

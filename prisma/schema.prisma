@@ -90,6 +90,7 @@ model School {
   RequestBuySms              RequestBuySms[]
   SmsTransaction             SmsTransaction[]
   addtionalMarkingCategories AddtionalMarkingCategories[]
+  ExamTerm                   ExamTerm[]
 
   // routines Routine[]
   @@map("schools")
@@ -454,8 +455,23 @@ model AcademicYear {
   GradingSystem              GradingSystem[]
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   Syllabus                   Syllabus[]
+  ExamTerm                   ExamTerm[]
 
   @@map("academic_years")
+}
+
+model ExamTerm {
+  id               Int       @id @default(autoincrement())
+  title            String
+  academic_year_id Int
+  school_id        Int
+  deleted_at       DateTime?
+
+  school       School       @relation(fields: [school_id], references: [id])
+  academicYear AcademicYear @relation(fields: [academic_year_id], references: [id])
+  Exam         Exam[]
+
+  @@map("exam_terms")
 }
 
 model Exam {
@@ -465,11 +481,13 @@ model Exam {
   academic_year_id Int
   school_id        Int
   final_percent    Int?
+  exam_term_id     Int?
 
   // class         Class        @relation(fields: [class_id], references: [id])
   section       Section      @relation(fields: [section_id], references: [id])
   academic_year AcademicYear @relation(fields: [academic_year_id], references: [id])
   school        School       @relation(fields: [school_id], references: [id])
+  examTerm      ExamTerm?    @relation(fields: [exam_term_id], references: [id])
 
   exam_details     ExamDetails[]
   student_results  StudentResult[]

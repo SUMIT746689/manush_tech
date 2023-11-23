@@ -33,7 +33,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import ReactToPrint, { useReactToPrint } from 'react-to-print';
 
-function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, seatPlan }): any {
+function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, seatPlan, teachers }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
@@ -104,6 +104,7 @@ function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, se
           rooms={rooms} setRooms={setRooms}
           open={open} editExam={editExam}
           classes={classes} classList={classList} setSeatPlan={setSeatPlan}
+          teachers={teachers}
           handleOperationSuccess={handleCreateProjectSuccess}
           handleModalClose={handleCreateProjectClose}
         />
@@ -114,7 +115,7 @@ function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, se
   );
 }
 
-const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose }) => {
+const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, open, editExam, classes, classList, setSeatPlan, handleOperationSuccess, handleModalClose, teachers }) => {
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
 
@@ -261,12 +262,16 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
     }
   }
 
-  const handleSearchSeatPlan = (room_id, exam_details_id,setFieldValue) => {
+  const handleSearchSeatPlan = (room_id, exam_details_id, setFieldValue) => {
     console.log({ room_id });
     axios.get(`/api/seat_plans?room_id=${room_id}&exam_details_id=${exam_details_id}`)
       .then(({ data }) => {
         console.log({ data });
-        
+        if (!data?.success) {
+          showNotification('seat plan not created', 'error');
+          return;
+        }
+        setFieldValue('seat_plan_id', data.seat_plan.id)
       })
   }
 
@@ -287,7 +292,9 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
         handleModalClose();
       };
       _values['academic_year_id'] = academicYear?.id
-
+      _values['teacher_ids'] = _values.teacher_ids.map((teacher) => {
+        return { id: teacher.id }
+      })
       if (editExam) {
         axios
           .patch(`/api/exam/seat_plan`, _values)
@@ -302,14 +309,9 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
           });
       }
       else {
-        const res = await axios.post('/api/exam/seat_plan', _values);
-        if (res.data?.success) {
-
-          successProcess(t('Seat plan has been created successfully'))
-        }
-        else {
-          throw new Error('Seat plan creation failed');
-        }
+        const res = await axios.patch('/api/teacher/exam_seat_plans', _values);
+        if (res.data?.success) successProcess(t('Seat plan has been created successfully'))
+        else throw new Error('Seat plan creation failed')
       }
     } catch (err) {
       console.error(err);
@@ -329,7 +331,8 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
           section_id: editExam ? editExam?.exam_details?.exam?.section?.id : undefined,
           exam_id: editExam ? editExam?.exam_details?.exam_id : undefined,
           exam_details_id: editExam ? editExam?.exam_details_id : undefined,
-
+          seat_plan_id: undefined,
+          teacher_ids: [],
           room_id: editExam ? editExam?.room_id : undefined,
           submit: null
         }}
@@ -345,7 +348,7 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
         onSubmit={handleFormSubmit}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-          console.log({ values });
+          console.log({ values, errors });
 
           return (
             <form onSubmit={handleSubmit}>
@@ -425,7 +428,27 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
                       value={rooms?.find((i) => i.id == values?.room_id)}
                       handleChange={(e, v) => {
                         setFieldValue('room_id', v?.id);
-                        if (v?.id) handleSearchSeatPlan(v.id, values?.exam_details_id,setFieldValue);
+                        if (v?.id) handleSearchSeatPlan(v.id, values?.exam_details_id, setFieldValue);
+                      }}
+                    />
+                  }
+
+                  {
+                    <AutoCompleteWrapper
+                      error={Boolean(touched.teacher_ids && errors.teacher_ids)}
+                      helperText={touched.teacher_ids && errors.teacher_ids}
+                      multiple
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      minWidth="100%"
+                      name='teacher_ids'
+                      label="Select Teachers "
+                      placeholder="Teachers"
+                      options={teachers}
+                      // required={true}
+                      // value={values?.teacher_ids?.map((option) => option?.label) || []}
+                      handleChange={(e, v) => {
+                        setFieldValue('teacher_ids', v);
                       }}
                     />
                   }

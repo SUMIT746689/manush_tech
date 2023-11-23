@@ -1,6 +1,5 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 // @ts-ignore
 async function get(req, res, refresh_token) {
@@ -12,7 +11,7 @@ async function get(req, res, refresh_token) {
         const { exam_details_id, room_id } = req.query;
         console.log({exam_details_id,room_id})
 
-        const response = await prisma.seatPlan.findMany({
+        const response = await prisma.seatPlan.findFirst({
             where: {
                 exam_details_id: parseInt(exam_details_id),
                 room_id: parseInt(room_id)

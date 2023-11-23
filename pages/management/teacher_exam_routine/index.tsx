@@ -5,13 +5,16 @@ import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Card, Grid } from '@mui/material';
+import PageHeader from 'src/content/Management/TeacherExamRoutine/PageHeader';
 import Results from 'src/content/Management/TeacherExamRoutine/Results';
+
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
 import SearchInputWrapper from '@/components/SearchInput';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import axios from 'axios';
 
 
 export async function getServerSideProps(context: any) {
@@ -89,7 +92,25 @@ function ManagementDepartments({ exams, teachers }) {
   // console.log({ academicYear });
   // const { datas } = useClientFetch(`/api/exam?academic_year=${academicYear?.id}`);
   const [seatPlans, setSeatPlans] = useState([]);
-  console.log({teachers})
+  const [editSeatPlan, setEditSeatPlan] = useState(null);
+  const [classList, setClassList] = useState([]);
+  const [classes, setClasses] = useState([]);
+
+
+  useEffect(() => {
+    axios.get(`/api/class`)
+      .then(res => {
+        setClasses(res.data)
+        setClassList(res.data?.map(i => ({
+          label: i.name,
+          id: i.id,
+          has_section: i.has_section
+        })
+        ))
+      })
+      .catch(err => console.log(err));
+
+  }, [])
   return (
     <>
       <Head>
@@ -97,12 +118,21 @@ function ManagementDepartments({ exams, teachers }) {
       </Head>
       <PageTitleWrapper>
         {/* @ts-ignore */}
-        <PageHeaderTitleWrapper
+        {/* <PageHeaderTitleWrapper
           name="Teacher Exam Routine"
           actionButton={true}
           handleCreateClassOpen={0}
+        /> */}
+        <PageHeader
+          editExam={null}
+          setEditExam={setEditSeatPlan}
+          classList={classList}
+          classes={classes}
+          setSeatPlan={setSeatPlans}
+          seatPlan={seatPlans}
         />
       </PageTitleWrapper>
+
 
       <Grid
         sx={{ px: { xs: 1, sm: 3 } }}

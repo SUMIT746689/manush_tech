@@ -116,9 +116,10 @@ model Role {
 }
 
 model Department {
-  id        Int    @id @default(autoincrement())
-  title     String
-  school_id Int
+  id         Int       @id @default(autoincrement())
+  title      String
+  school_id  Int
+  deleted_at DateTime?
 
   teachers Teacher[]
   school   School    @relation(fields: [school_id], references: [id])
@@ -127,7 +128,7 @@ model Department {
 }
 
 model Teacher {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   first_name        String
   middle_name       String?
   last_name         String?
@@ -135,14 +136,15 @@ model Teacher {
   phone             String?
   email             String?
   gender            Gender
-  blood_group       String?  @db.VarChar(20)
+  blood_group       String?   @db.VarChar(20)
   religion          String?
-  date_of_birth     DateTime @db.Date
+  date_of_birth     DateTime  @db.Date
   present_address   String
   permanent_address String
-  joining_date      DateTime @db.Date
+  joining_date      DateTime  @db.Date
   resume            String
   photo             String?
+  deleted_at        DateTime?
 
   department_id Int
   user_id       Int @unique
@@ -260,6 +262,7 @@ model Student {
   fees        StudentFee[]
   attendances Attendance[]
   results     StudentResult[]
+  Homework    Homework[]
 
   @@map("students")
 }
@@ -300,14 +303,16 @@ model Subject {
   Period       Period[]
   DailyNote    DailyNote[]
   Syllabus     Syllabus[]
+  Homework     Homework[]
 
   @@map("subjects")
 }
 
 model Room {
-  id        Int    @id @default(autoincrement())
-  name      String
-  school_id Int
+  id         Int       @id @default(autoincrement())
+  name       String
+  school_id  Int
+  deleted_at DateTime?
 
   periods     Period[]
   school      School        @relation(fields: [school_id], references: [id])
@@ -436,16 +441,16 @@ model Holiday {
   title     String
   date      DateTime @db.Date
   school_id Int
-
-  school School @relation(fields: [school_id], references: [id])
+  school    School   @relation(fields: [school_id], references: [id])
 
   @@map("holidays")
 }
 
 model AcademicYear {
-  id        Int    @id @default(autoincrement())
-  title     String
-  school_id Int
+  id         Int       @id @default(autoincrement())
+  title      String
+  school_id  Int
+  deleted_at DateTime?
 
   school School @relation(fields: [school_id], references: [id])
 
@@ -456,6 +461,7 @@ model AcademicYear {
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   Syllabus                   Syllabus[]
   ExamTerm                   ExamTerm[]
+  Homework                   Homework[]
 
   @@map("academic_years")
 }
@@ -475,13 +481,14 @@ model ExamTerm {
 }
 
 model Exam {
-  id               Int    @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   title            String
   section_id       Int
   academic_year_id Int
   school_id        Int
   final_percent    Int?
   exam_term_id     Int?
+  deleted_at       DateTime?
 
   // class         Class        @relation(fields: [class_id], references: [id])
   section       Section      @relation(fields: [section_id], references: [id])
@@ -855,13 +862,14 @@ enum PhotoStyle {
 }
 
 model GradingSystem {
-  id               Int     @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   lower_mark       Float
   upper_mark       Float
   point            Float?
   grade            String?
   school_id        Int
   academic_year_id Int
+  deleted_at       DateTime?
 
   school                        School                          @relation(fields: [school_id], references: [id])
   academic_year                 AcademicYear                    @relation(fields: [academic_year_id], references: [id])
@@ -1263,4 +1271,19 @@ model StudentAddtionalResultDetails {
   grade                  GradingSystem?    @relation(fields: [grade_id], references: [id])
 
   @@map("student_addtional_result_details")
+}
+
+model Homework {
+  id               Int      @id @default(autoincrement())
+  subject_id       Int
+  student_id       Int
+  date             DateTime @db.Date
+  academic_year_id Int
+  file_path        String
+
+  academicYear AcademicYear @relation(fields: [academic_year_id], references: [id])
+  subject      Subject      @relation(fields: [subject_id], references: [id])
+  student      Student      @relation(fields: [student_id], references: [id])
+
+  @@map("homework")
 }

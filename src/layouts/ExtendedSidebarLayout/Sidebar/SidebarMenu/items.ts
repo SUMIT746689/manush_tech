@@ -178,6 +178,11 @@ export const menuItems: MenuItems[] = [
         icon: SummarizeIcon
       },
       {
+        name: 'Home work',
+        link: '/management/homework',
+        icon: SummarizeIcon
+      },
+      {
         name: 'Result',
         icon: AssignmentTurnedInIcon,
         items: [

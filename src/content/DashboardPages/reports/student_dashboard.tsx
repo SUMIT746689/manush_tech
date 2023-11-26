@@ -1,12 +1,15 @@
 import Footer from 'src/components/Footer';
-import {Card, Grid} from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import Image from 'next/image';
 import Calander from '../calender/calander';
 import Notice from '../notice/notice';
 import Head from '../head/head';
 import QuickLinkCards from '../quick_link_card/quickLinkCard';
+import { useAuth } from '@/hooks/useAuth';
 
-function StudentDashboardReportsContent({ blockCount}) {
+function StudentDashboardReportsContent({ blockCount }) {
+  const { user } = useAuth()
+  console.log({ user,blockCount });
 
   const { student } = blockCount;
   const name = [student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(' ');
@@ -62,10 +65,5 @@ function StudentDashboardReportsContent({ blockCount}) {
     </>
   );
 }
-
-
-
-
-
 
 export default StudentDashboardReportsContent;

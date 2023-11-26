@@ -34,6 +34,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import menuItems from '../Sidebar/SidebarMenu/items';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
+import { useClientDataFetch } from '@/hooks/useClientFetch';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -63,6 +64,8 @@ function Header() {
   const [menulist, setMenulist] = useState([])
   const router = useRouter();
   const { showNotification } = useNotistick();
+  const { data } = useClientDataFetch(`/api/academic_years`)
+
   const handleFetchAcademicYear = () => {
     axios
       .get(`/api/academic_years`)
@@ -72,33 +75,40 @@ function Header() {
         });
         setAcademicYearList(list);
 
-        const storedAcademicYear = JSON.parse(
-          localStorage.getItem('academicYear')
-        );
+        // const storedAcademicYear = JSON.parse(
+        //   localStorage.getItem('academicYear')
+        // );
+        // if (storedAcademicYear) {
 
-        if (storedAcademicYear) {
+        //   const temp = list.find((i) => i.id == storedAcademicYear.id);
 
-          const temp = list.find((i) => i.id == storedAcademicYear.id);
+        //   if (temp) {
+        //     setSelectedAcademicYear({ label: temp.label, id: temp.id });
+        //   } else {
+        //     const lastIndex = list.length;
+        //     setSelectedAcademicYear(
+        //       academicYear.id ? academicYear : list[lastIndex - 1]
+        //     );
+        //   }
+        // } else {
+        //   const lastIndex = list.length;
+        //   setSelectedAcademicYear(
+        //     academicYear.id ? academicYear : list[lastIndex - 1]
+        //   );
+        // }
 
-          if (temp) {
-            setSelectedAcademicYear({ label: temp.label, id: temp.id });
-          } else {
-            const lastIndex = list.length;
-            setSelectedAcademicYear(
-              academicYear.id ? academicYear : list[lastIndex - 1]
-            );
-          }
-        } else {
-          const lastIndex = list.length;
-          setSelectedAcademicYear(
-            academicYear.id ? academicYear : list[lastIndex - 1]
-          );
-        }
+        axios.get('/api/academic_years/current')
+          .then(({ data }) => {
+            console.log({data})
+            if (data?.success) setSelectedAcademicYear(() => ({ id: data.data.id, label: data.data.title }))
+          })
+
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
 
   useEffect(() => {
     // @ts-ignore
@@ -120,7 +130,7 @@ function Header() {
           })
         }
       }
-      
+
 
       setMenulist(tempMenu)
 
@@ -135,20 +145,20 @@ function Header() {
     }
   }, [selectedAcademicYear]);
 
-  const handleAcademicYearChange = (event: any, newValue: string | null) => {
-
-    if (newValue) {
-      localStorage.setItem(
-        'academicYear',
-        JSON.stringify(newValue)
-      );
-      setSelectedAcademicYear(newValue);
-    }
+  const handleAcademicYearChange = async (event: any, newValue: { id: number, label: string } | null) => {
+    if (!newValue?.id && !newValue.label) return showNotification("academic year values not found", "error")
+    axios.patch(`/api/academic_years/${newValue.id}/change_current`)
+      .then(({ data }) => {
+        if (!data?.success) return
+        // localStorage.setItem('academicYear', JSON.stringify(newValue));
+        setSelectedAcademicYear(newValue);
+      })
+      .catch((error) => { showNotification("failed to change academic year", "error") })
   }
   const permissionsArray = auth?.user?.permissions?.length > 0
     ? auth?.user?.permissions?.map((permission: any) => permission.group)
     : [];
- 
+
   return (
     <HeaderWrapper
       display="flex"
@@ -160,7 +170,7 @@ function Header() {
     >
 
       {/* <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Select route</Grid> */}
-      
+
       {/* <CustomAutoCompleteWrapper
         minWidth={'200px'}
         label="Select route"
@@ -188,7 +198,6 @@ function Header() {
           }
         }}
       /> */}
-
 
 
 

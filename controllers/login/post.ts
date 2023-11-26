@@ -3,11 +3,16 @@ import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import prisma from '@/lib/prisma_client';
+import { dcrypt, encrypt } from 'utilities_api/hashing';
 
 export default async function post(req, res) {
   try {
     let query = {}
     const { user_id, username, password } = req.body;
+    const { academic_year: academic_year_cookie } = req.cookies;
+
+    let dcrypt_cookie: any = [null, null];
+    if (academic_year_cookie) dcrypt_cookie = dcrypt(academic_year_cookie)
 
     const request_refresh_token: any = (req.cookies.refresh_token && user_id) ? refresh_token_varify(req.cookies.refresh_token) : null;
 
@@ -40,12 +45,19 @@ export default async function post(req, res) {
             subscription: {
               where: { is_active: true },
               include: { package: true }
+            },
+            academic_years: {
+              orderBy: {
+                id: 'desc'
+              },
+              take: 1
             }
           }
         }
       }
     });
 
+    console.log({ user: user?.school?.academic_years })
     if (!user) throw new Error(`Invalid Authorization`);
 
     if (user_id) {
@@ -71,14 +83,9 @@ export default async function post(req, res) {
 
     if (user?.role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
-      console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
-      if (
-        user?.school?.subscription?.length > 0 &&
-        user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()
-      )
-        isSubscriptionActive = true;
-      if (!isSubscriptionActive)
-        throw new Error('Your subscription has expired or not active');
+      // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
+      if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) isSubscriptionActive = true;
+      if (!isSubscriptionActive) throw new Error('Your subscription has expired or not active');
     }
 
 
@@ -106,7 +113,8 @@ export default async function post(req, res) {
         expiresIn: '1d'
       }
     );
-    res.setHeader('Set-Cookie', [
+
+    const cookies = [
       serialize('access_token', access_token, {
         path: '/',
         maxAge: 5,
@@ -119,8 +127,33 @@ export default async function post(req, res) {
         secure: process.env.NODE_ENV === 'production'
         // secure: false
       })
-    ]);
+    ];
+    const [err, academic_year] = dcrypt_cookie;
+    
+    if ((!academic_year_cookie || academic_year?.school_id !== user.school_id) && user?.school?.academic_years && (user.school?.academic_years.length > 0)) {
+      const academic_year_cookie_datas = { id: user.school.academic_years[0].id, title: user.school.academic_years[0].title, school_id: user.school.academic_years[0].school_id }
+      const encryptData = encrypt(academic_year_cookie_datas);
+      cookies.push(
+        serialize('academic_year', encryptData, {
+          path: '/',
+          maxAge: new Date(993402300000000).getTime(),
+          secure: process.env.NODE_ENV === 'production'
+        })
+      )
+    }
+    else if (academic_year?.school_id && academic_year?.school_id !== user.school_id) {
+      cookies.push(
+        serialize('academic_year', '', {
+          path: '/',
+          maxAge: 0,
+          secure: process.env.NODE_ENV === 'production'
+        })
+      )
+    }
+
+    res.setHeader('Set-Cookie', cookies);
     delete user['password'];
+
     res.status(200).json({ user });
   } catch (err) {
     console.log(err);

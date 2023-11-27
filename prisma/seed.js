@@ -117,7 +117,7 @@ async function seed() {
       { name: 'show employee certificate', value: 'show_employee_certificate', group: 'employee_certificate' },
 
       { name: 'academic', value: 'academic', group: 'academic' },
-      
+
       { name: 'teacher', value: 'teacher', group: 'teacher' },
       { name: 'accounts', value: 'accounts', group: 'accounts' },
       { name: 'front end', value: 'front_end', group: 'front_end' },
@@ -136,6 +136,7 @@ async function seed() {
       { name: 'update note', value: 'update_note', group: 'note' },
       { name: 'create syllabus', value: 'create_syllabus', group: 'syllabus' },
       { name: 'show syllabus', value: 'show_syllabus', group: 'syllabus' },
+      { name: 'home work', value: 'homework', group: 'homework' },
 
     ]
   });
@@ -226,7 +227,7 @@ async function seed() {
   for (const i of permissions) {
     if (['create_exam', 'show_exam_routine', 'show_class_routine', 'create_result', 'create_attendence',
       'create_leave', 'view_holiday', 'view_grade', 'create_student_attendence',
-      'create_exam_attendence', 'show_teacher_certificate', 'create_note', 'update_note','create_syllabus','show_syllabus'].includes(i.value)
+      'create_exam_attendence', 'show_teacher_certificate','homework', 'create_note', 'update_note', 'create_syllabus', 'show_syllabus'].includes(i.value)
     ) {
       teacherPermissions.push({ id: i.id })
     }
@@ -304,7 +305,7 @@ async function seed() {
   // const createPermissionForStudentRole = await prisma.permission.create({ data: { name: 'show routine', value: 'show_routine', group: 'routine' } })
   const studentPermissions = []
   for (const i of permissions) {
-    if (['show_student_certificate', 'show_class_routine', 'show_exam_routine', 'create_leave','show_syllabus'].includes(i.value)) {
+    if (['show_student_certificate','homework','show_class_routine', 'show_exam_routine', 'create_leave', 'show_syllabus'].includes(i.value)) {
       studentPermissions.push({ id: i.id })
     }
   }

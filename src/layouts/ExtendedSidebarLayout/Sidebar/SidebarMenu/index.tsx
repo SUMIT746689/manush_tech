@@ -586,7 +586,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Entry Notes' ||
       item.name === 'Show Notes'||
 
-      item.name === 'Syllabus'
+      item.name === 'Syllabus'||
+      item.name === 'Home work'
 
 
     ) {
@@ -661,6 +662,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       // syllebus
       if (item.name === 'Syllabus' && permissionVerify(permissions, ['show_syllabus'])) sub_menu();
+
+      // homework
+      if (item.name === 'Home work' && permissionVerify(permissions, ['homework'])) sub_menu();
 
     }
     else sub_menu();

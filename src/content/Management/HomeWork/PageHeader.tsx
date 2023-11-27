@@ -151,7 +151,6 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
         .catch((err) => console.log(err));
     }
   }
-  console.log(data);
 
   return (
     <>

@@ -123,7 +123,7 @@ function ManagementLeave({ data }) {
 }
 
 ManagementLeave.getLayout = (page) => (
-  <Authenticated name="">
+  <Authenticated name="homework">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

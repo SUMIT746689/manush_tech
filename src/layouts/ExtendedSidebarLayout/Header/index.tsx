@@ -99,7 +99,7 @@ function Header() {
 
         axios.get('/api/academic_years/current')
           .then(({ data }) => {
-            console.log({data})
+            console.log({ data })
             if (data?.success) setSelectedAcademicYear(() => ({ id: data.data.id, label: data.data.title }))
           })
 

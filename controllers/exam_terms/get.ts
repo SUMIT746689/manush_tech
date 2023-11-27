@@ -1,18 +1,19 @@
 import prisma from '@/lib/prisma_client';
-import { authenticate } from 'middleware/authenticate';
+import { academicYear, authenticate } from 'middleware/authenticate';
 
 // @ts-ignore
-async function get(req, res, refresh_token) {
+async function get(req, res, refresh_token, academic_year) {
   try {
-
+    console.log({ refresh_token, academic_year })
     const { school_id } = refresh_token;
-
+    const { id: academic_year_id } = academic_year;
     if (!school_id) throw new Error('invalid user');
 
     const response = await prisma.examTerm.findMany({
       where: {
         school_id,
-        deleted_at: null
+        deleted_at: null,
+        academic_year_id
       }
     });
 
@@ -23,4 +24,4 @@ async function get(req, res, refresh_token) {
   }
 }
 
-export default authenticate(get)
+export default authenticate(academicYear(get));

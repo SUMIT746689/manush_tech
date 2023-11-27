@@ -218,7 +218,7 @@ const Results = ({
         {/* </Grid> */}
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 450px)' }}>
+      <Card sx={{ minHeight: 'calc(100vh - 394px)' }}>
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />

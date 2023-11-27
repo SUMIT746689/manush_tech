@@ -18,8 +18,6 @@ import {
   Autocomplete,
 } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
-import { useSnackbar } from 'notistack';
-import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,6 +27,7 @@ import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { useClientDataFetch } from '@/hooks/useClientFetch';
 
 function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
   const { t }: { t: any } = useTranslation();
@@ -44,6 +43,8 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
   const [checked, setChecked] = useState(false);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classList, setClassList] = useState([]);
+  const { data } = useClientDataFetch("/api/exam_terms")
+  console.log({data})
 
   useEffect(() => {
     setClassList(classes?.map(i => {
@@ -307,9 +308,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
             submit: null
           }}
           validationSchema={editExam ? null : Yup.object().shape({
-            title: Yup.string()
-              .max(255)
-              .required(t('Exam title field is required')),
+            title: Yup.string().max(255).required(t('Exam title field is required')),
             class_id: Yup.number().min(1).required(t('The class field is required')),
             section_id: Yup.number().min(1).required(t('The section field is required')),
             subject_id_list: Yup.array().required(t('Subject is required')),
@@ -337,17 +336,34 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
                   }}
                 >
                   <Grid container spacing={0}>
-                    {/* Exam name */}
 
-                    <TextFieldWrapper
-                      name="title"
-                      label="Exam Title"
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      errors={errors.title}
-                      touched={touched.title}
-                      value={values.title}
-                    />
+                    <Grid container display="grid" gridTemplateColumns=" 1fr 1fr " columnGap={1}>
+                      {/* Exam name */}
+                      <TextFieldWrapper
+                        name="title"
+                        label="Exam Title"
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        errors={errors.title}
+                        touched={touched.title}
+                        value={values.title}
+                      />
+
+                      {/* exam term */}
+                      <AutoCompleteWrapper
+                        error={Boolean(touched.exam_term && errors.exam_term)}
+                        helperText={touched.exam_term && errors.exam_term}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        minWidth="100%"
+                        name='exam_term'
+                        label="Select Exam Term"
+                        placeholder="Select a exam term..."
+                        options={classList}
+                        value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
+                        handleChange={(event, newValue) => handleClassSelect(event, newValue, setFieldValue)}
+                      />
+                    </Grid>
 
                     <Grid container display="grid" gridTemplateColumns=" 1fr 1fr " columnGap={1}>
 

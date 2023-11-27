@@ -9,24 +9,24 @@ const index = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'GET':
-                console.log({role,id})
+                console.log({ role, id })
                 // if (role.title !== "ADMIN") console.log("true...........");
                 // if (role.title !== "TEACHER") console.log("te...........");
-                
+
                 if (role.title !== "ADMIN" && role.title !== "TEACHER") throw new Error("unauthorized user")
-                
-                const { exam_id, teacher_id } = req.query;
+
+                const { exam_term_id, teacher_id } = req.query;
                 const where = {};
-                
+
                 if (role.title === "TEACHER") where["user_id"] = id;
-                else if (role.title === "ADMIN") where["user_id"] =  parseInt(teacher_id);
+                else if (role.title === "ADMIN") where["user_id"] = parseInt(teacher_id);
                 // { academic_year_id: parseInt(academic_year) }
                 const resTeacherSyllabus = await prisma.teacher.findFirst({
                     where,
                     select: {
                         first_name: role.title !== "TEACHER" ? true : false,
                         seatPlans: {
-                            where: { exam_details: { exam_id: parseInt(exam_id) } },
+                            where: { exam_details: { exam: { exam_term_id: parseInt(exam_term_id) } } },
                             include: {
                                 room: {
                                     select: { name: true }

@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma_client';
-import { academicYear, authenticate } from 'middleware/authenticate';
+import { academicYearVerify, authenticate } from 'middleware/authenticate';
 
 // @ts-ignore
 async function get(req, res, refresh_token, academic_year) {
@@ -24,4 +24,4 @@ async function get(req, res, refresh_token, academic_year) {
   }
 }
 
-export default authenticate(academicYear(get));
+export default authenticate(academicYearVerify(get));

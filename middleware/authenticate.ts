@@ -20,7 +20,7 @@ export const authenticate = (handler: Function) => {
   };
 };
 
-export const academicYear = (handler: Function) => {
+export const academicYearVerify = (handler: Function) => {
   return async (req, res, refresh_token) => {
     try {
       const { academic_year } = req.cookies;

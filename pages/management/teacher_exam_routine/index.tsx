@@ -8,26 +8,28 @@ import { Card, Grid } from '@mui/material';
 import PageHeader from 'src/content/Management/TeacherExamRoutine/PageHeader';
 import Results from 'src/content/Management/TeacherExamRoutine/Results';
 
-import { useClientFetch } from 'src/hooks/useClientFetch';
-import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
-import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import { serverSideAcademicYearVerification, serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
-import SearchInputWrapper from '@/components/SearchInput';
-import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import axios from 'axios';
 
 
 export async function getServerSideProps(context: any) {
-  let props: any = { exams: [] };
+  let props: any = { exams: [], exam_terms: [] };
 
   try {
     const refresh_token: any = serverSideAuthentication(context);
+    const [error, academic_year] = serverSideAcademicYearVerification(context);
+
     if (!refresh_token) return { redirect: { destination: '/login' } };
     const { id, role, school_id } = refresh_token ?? {};
     // console.log({ role })
 
     const exams = await prisma.exam.findMany({ where: { school_id } })
     props["exams"] = exams;
+    if (academic_year?.id) {
+      const exam_terms = await prisma.examTerm.findMany({ where: { school_id, academic_year_id: academic_year.id, deleted_at: null } })
+      props["exam_terms"] = exam_terms;
+    }
 
     const teachers = await prisma.teacher.findMany({ where: { school_id } })
     props["teachers"] = JSON.parse(JSON.stringify(teachers));
@@ -86,8 +88,8 @@ export async function getServerSideProps(context: any) {
   return { props };
 }
 
-function ManagementDepartments({ exams, teachers }) {
-  console.log({ teachers })
+function ManagementDepartments({ exams, exam_terms, teachers }) {
+  console.log({ exam_terms })
   // const [academicYear, _] = useContext(AcademicYearContext);
   // console.log({ academicYear });
   // const { datas } = useClientFetch(`/api/exam?academic_year=${academicYear?.id}`);
@@ -150,7 +152,7 @@ function ManagementDepartments({ exams, teachers }) {
       >
 
         <Grid item xs={12}>
-          <Results exams={exams || []} teachers={teachers || []} datas={seatPlans} setDatas={setSeatPlans} setEditData={() => { }} />
+          <Results exam_terms={exam_terms || []} teachers={teachers || []} datas={seatPlans} setDatas={setSeatPlans} setEditData={() => { }} />
         </Grid>
       </Grid>
       <Footer />

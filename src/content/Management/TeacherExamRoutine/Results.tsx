@@ -92,7 +92,7 @@ const IconButtonError = styled(IconButton)(
 );
 
 interface ResultsProps {
-  exams: [];
+  exam_terms: [];
   teachers: [];
   datas: Project[];
   setEditData: Function;
@@ -158,7 +158,7 @@ const applyPagination = (
 };
 
 const Results: FC<ResultsProps> = ({
-  exams,
+  exam_terms,
   teachers,
   datas,
   setEditData,
@@ -174,7 +174,7 @@ const Results: FC<ResultsProps> = ({
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const [selectedExam, setSelectedExam]: any = useState();
+  const [selectedExamTerm, setSelectedExamTerm]: any = useState();
   const [selectedTeahcerId, setSelectedTeahcerId] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
@@ -202,7 +202,7 @@ const Results: FC<ResultsProps> = ({
     setDeleteSchoolId(id);
     setOpenConfirmDelete(true);
   };
-  
+
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
@@ -222,7 +222,7 @@ const Results: FC<ResultsProps> = ({
   };
   const handleSearchSeatPlans = () => {
     setIsLoading(true);
-    let url = `/api/exam/teacher_exam_routines?exam_id=${selectedExam?.id}&`;
+    let url = `/api/exam/teacher_exam_routines?exam_term_id=${selectedExamTerm?.id}&`;
     // @ts-ignore
     if (auth?.user?.role?.title === "ADMIN") url += `teacher_id=${selectedTeahcerId}`;
     console.log({ url })
@@ -247,16 +247,16 @@ const Results: FC<ResultsProps> = ({
               minWidth="100%"
               label='Select Exam Term'
               placeholder='select a term of exam...'
-              options={exams?.map((exam: any) => {
+              options={exam_terms?.map((term: any) => {
                 return {
-                  label: exam.title,
-                  id: exam.id
+                  label: term.title,
+                  id: term.id
                 }
               })}
-              value={selectedExam}
+              value={selectedExamTerm}
               handleChange={(e, v) => {
                 console.log({ e, v });
-                setSelectedExam(() => v)
+                setSelectedExamTerm(() => v)
               }}
             />
             {
@@ -273,7 +273,7 @@ const Results: FC<ResultsProps> = ({
                     user_id: teacher.user_id
                   }
                 })}
-                value={selectedExam}
+                value={selectedExamTerm}
                 handleChange={(e, v) => {
                   console.log({ e, v });
                   setSelectedTeahcerId(v?.user_id || null)
@@ -281,7 +281,7 @@ const Results: FC<ResultsProps> = ({
               />
             }
           </Grid>
-          <SearchingButtonWrapper disabled={isLoading || !selectedExam} isLoading={isLoading} handleClick={handleSearchSeatPlans}>
+          <SearchingButtonWrapper disabled={isLoading || !selectedExamTerm} isLoading={isLoading} handleClick={handleSearchSeatPlans}>
             Search
           </SearchingButtonWrapper>
         </Card>

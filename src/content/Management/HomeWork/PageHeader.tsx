@@ -121,15 +121,19 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
           label: targetClassSections?.sections[0]?.name,
           id: targetClassSections?.sections[0]?.id
         });
+        gettingStudent(targetClassSections?.sections[0]?.id)
       } else {
         setSelectedSection(null);
       }
     }
   };
   const handleSearch = () => {
-    let url = `/api/homework?academic_year_id=${academicYear?.id}&class_id=${selectedClass?.id}&section_id=${selectedSection?.id}`
-    if (selectedSubject) url += `&subject_id=${selectedSubject?.id}`
-    axios.get(url).then(res => setLeave(res.data)).catch(err => console.log(err))
+    if (academicYear?.id && selectedClass?.id) {
+      let url = `/api/homework?academic_year_id=${academicYear?.id}&class_id=${selectedClass?.id}`
+      if (selectedSection) url += `&section_id=${selectedSection?.id}`
+      if (selectedSubject) url += `&subject_id=${selectedSubject?.id}`
+      axios.get(url).then(res => setLeave(res.data)).catch(err => console.log(err))
+    }
   }
   const gettingStudent = (section_id) => {
     if (section_id) {
@@ -147,71 +151,76 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
         .catch((err) => console.log(err));
     }
   }
+  console.log(data);
+
   return (
     <>
 
       <PageHeaderTitleWrapper
         name="Homework"
         handleCreateClassOpen={handleCreateClassOpen}
+        actionButton={data ? false : true}
       />
+      {
+        !data && <Grid container spacing={0} sx={{
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: {
+            xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr 1fr'
+          },
+          p: 2,
+          columnGap: 2
+        }}>
 
-      <Grid container spacing={0} sx={{
-        width: "100%",
-        display: "grid",
-        gridTemplateColumns: {
-          xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr 1fr'
-        },
-        p: 2,
-        columnGap: 2
-      }}>
-
-        <AutoCompleteWrapper
-          label="Select class"
-          placeholder="Class..."
-          options={classList}
-          value={selectedClass}
-          handleChange={handleClassSelect}
-        />
-
-
-        {selectedClass && selectedClass.has_section && sections && (
           <AutoCompleteWrapper
-            label="Select section"
-            placeholder="Section..."
-            options={sections}
-            value={selectedSection}
-            handleChange={(e, v) => {
-              setSelectedSection(v);
-              gettingStudent(v?.id)
-            }}
+            label="Select class"
+            placeholder="Class..."
+            options={classList}
+            value={selectedClass}
+            handleChange={handleClassSelect}
           />
 
-        )}
 
-        <AutoCompleteWrapper
-          minWidth="100%"
-          label={t('Select Subject')}
-          placeholder={t('Subject...')}
-          limitTags={2}
-          // getOptionLabel={(option) => option.id}
-          required={true}
-          options={subjects}
-          value={selectedSubject}
-          handleChange={(e, v) => setSelectedSubject(v)}
-        />
-        <AutoCompleteWrapper
-          minWidth="100%"
-          label={t('Select student')}
-          placeholder={t('Student...')}
-          limitTags={2}
-          required={true}
-          options={studentList}
-          value={selectedStudent}
-          handleChange={(e, v) => setSelectedStudent(v)}
-        />
-        <ButtonWrapper startIcon={<SearchIcon />} handleClick={handleSearch}>Find</ButtonWrapper>
+          {selectedClass && selectedClass.has_section && sections && (
+            <AutoCompleteWrapper
+              label="Select section"
+              placeholder="Section..."
+              options={sections}
+              value={selectedSection}
+              handleChange={(e, v) => {
+                setSelectedSection(v);
+                gettingStudent(v?.id)
+              }}
+            />
 
-      </Grid>
+          )}
+
+          <AutoCompleteWrapper
+            minWidth="100%"
+            label={t('Select Subject')}
+            placeholder={t('Subject...')}
+            limitTags={2}
+            // getOptionLabel={(option) => option.id}
+            required={true}
+            options={subjects}
+            value={selectedSubject}
+            handleChange={(e, v) => setSelectedSubject(v)}
+          />
+          <AutoCompleteWrapper
+            minWidth="100%"
+            label={t('Select student')}
+            placeholder={t('Student...')}
+            limitTags={2}
+            required={true}
+            options={studentList}
+            value={selectedStudent}
+            handleChange={(e, v) => setSelectedStudent(v)}
+          />
+          <ButtonWrapper startIcon={<SearchIcon />} handleClick={handleSearch}>Find</ButtonWrapper>
+
+        </Grid>
+      }
+
 
 
       <Dialog

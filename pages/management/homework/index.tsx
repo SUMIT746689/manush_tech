@@ -63,7 +63,6 @@ function ManagementLeave({ data }) {
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classes, setClasses] = useState([])
   const [classList, setClassList] = useState([])
-  console.log({ data });
 
   const reFetchData = () => {
     if (data) {

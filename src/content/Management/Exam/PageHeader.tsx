@@ -29,7 +29,7 @@ import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/Auto
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { useClientDataFetch } from '@/hooks/useClientFetch';
 
-function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
+function PageHeader({ editExam, rooms, setEditExam, classes, getExam, examTerms }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const theme = useTheme();
@@ -43,8 +43,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
   const [checked, setChecked] = useState(false);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classList, setClassList] = useState([]);
-  const { data } = useClientDataFetch("/api/exam_terms")
-  console.log({data})
+
 
   useEffect(() => {
     setClassList(classes?.map(i => {
@@ -225,6 +224,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
           subject_id_list: subject_id_list,
           // final_percent: checked ? _values.final_percent || editExam?.final_percent : null,
           final_percent: checked ? _values.final_percent || editExam?.final_percent : 0,
+          exam_term_id: _values.exam_term_id
         };
       } else {
         query = {
@@ -234,7 +234,8 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
           school_id: user.school_id,
           academic_year_id: academicYear?.id,
           subject_id_list: subject_id_list,
-          final_percent: checked ? _values?.final_percent : 0
+          final_percent: checked ? _values?.final_percent : 0,
+          exam_term_id: _values.exam_term_id
         };
       }
 
@@ -299,6 +300,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
 
         <Formik
           initialValues={{
+            exam_term_id: editExam ? editExam.exam_term_id : undefined,
             exam_id: editExam ? editExam.id : undefined,
             title: editExam ? editExam.title : '',
             class_id: editExam ? editExam?.section?.class?.id : undefined,
@@ -326,7 +328,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
             values,
             setFieldValue
           }) => {
-
+            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -337,7 +339,7 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
                 >
                   <Grid container spacing={0}>
 
-                    <Grid container display="grid" gridTemplateColumns=" 1fr 1fr " columnGap={1}>
+                    <Grid container display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} columnGap={1}>
                       {/* Exam name */}
                       <TextFieldWrapper
                         name="title"
@@ -351,17 +353,24 @@ function PageHeader({ editExam, rooms, setEditExam, classes, getExam }): any {
 
                       {/* exam term */}
                       <AutoCompleteWrapper
-                        error={Boolean(touched.exam_term && errors.exam_term)}
-                        helperText={touched.exam_term && errors.exam_term}
+
+                        error={Boolean(touched.exam_term_id && errors.exam_term_id)}
+                        helperText={touched.exam_term_id && errors.exam_term_id}
                         onBlur={handleBlur}
                         onChange={handleChange}
                         minWidth="100%"
-                        name='exam_term'
+                        name='exam_term_id'
                         label="Select Exam Term"
-                        placeholder="Select a exam term..."
-                        options={classList}
-                        value={selectedClass || classList.find((i) => i.id == editExam?.section?.class?.id) || null}
-                        handleChange={(event, newValue) => handleClassSelect(event, newValue, setFieldValue)}
+                        placeholder="select a exam term..."
+                        options={examTerms}
+                        value={
+                          examTerms.find((i) => i.id === values?.exam_term_id) || null
+                          // || examTerms.find((i) => i.id == editExam?.section?.class?.id) || null
+                        }
+                        handleChange={(event, newValue) => {
+                          setFieldValue("exam_term_id", newValue?.id || null)
+                        }
+                        }
                       />
                     </Grid>
 

@@ -4,6 +4,7 @@ import { serialize } from 'cookie';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import prisma from '@/lib/prisma_client';
 import { dcrypt, encrypt } from 'utilities_api/hashing';
+import { makeCookie } from 'utilities_api/handleCookies';
 
 export default async function post(req, res) {
   try {
@@ -129,26 +130,17 @@ export default async function post(req, res) {
       })
     ];
     const [err, academic_year] = dcrypt_cookie;
-    
+
     if ((!academic_year_cookie || academic_year?.school_id !== user.school_id) && user?.school?.academic_years && (user.school?.academic_years.length > 0)) {
       const academic_year_cookie_datas = { id: user.school.academic_years[0].id, title: user.school.academic_years[0].title, school_id: user.school.academic_years[0].school_id }
       const encryptData = encrypt(academic_year_cookie_datas);
-      cookies.push(
-        serialize('academic_year', encryptData, {
-          path: '/',
-          maxAge: new Date(993402300000000).getTime(),
-          secure: process.env.NODE_ENV === 'production'
-        })
-      )
+
+      const maxAge = 15456432416531;
+      cookies.push(makeCookie(serialize, 'academic_year', encryptData, maxAge))
     }
     else if (academic_year?.school_id && academic_year?.school_id !== user.school_id) {
-      cookies.push(
-        serialize('academic_year', '', {
-          path: '/',
-          maxAge: 0,
-          secure: process.env.NODE_ENV === 'production'
-        })
-      )
+      const maxAge = 0;
+      cookies.push(makeCookie(serialize, 'academic_year','', maxAge))
     }
 
     res.setHeader('Set-Cookie', cookies);

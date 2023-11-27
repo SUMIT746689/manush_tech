@@ -14,6 +14,7 @@ import Results from 'src/content/Management/Exam/Results';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
+import { useClientDataFetch } from '@/hooks/useClientFetch';
 
 function Managementschools() {
   // const isMountedRef = useRefMounted();
@@ -24,6 +25,8 @@ function Managementschools() {
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classes, setClasses] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const { data: examTerms } = useClientDataFetch("/api/exam_terms")
+
 
   const getExam = () => {
     axios
@@ -42,7 +45,7 @@ function Managementschools() {
   }, [academicYear]);
 
   useEffect(() => {
-    
+
     axios.get(`/api/class?school_id=${user?.school_id}`)
       .then(res => setClasses(res.data))
       .catch(err => console.log(err));
@@ -68,11 +71,15 @@ function Managementschools() {
           editExam={editExam}
           setEditExam={setEditExam}
           getExam={getExam}
+          examTerms={examTerms?.map(examTerm => {
+            return { id: examTerm.id, label: examTerm.title }
+          }) || []
+          }
         />
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: { xs: 1, sm: 3 } }}
         container
         direction="row"
         justifyContent="center"

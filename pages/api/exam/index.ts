@@ -78,7 +78,7 @@ const index = async (req, res, refresh_token) => {
                 if (!req.body.title || !req.body.section_id || !req.body.academic_year_id || !req.body.subject_id_list) {
                     return res.status(400).send({ message: "parameter missing" })
                 }
-                const { title, section_id, academic_year_id, subject_id_list, class_id, final_percent, exam_date } = req.body;
+                const { title, section_id, academic_year_id, subject_id_list, class_id, final_percent, exam_date, exam_term_id } = req.body;
 
                 for (let i of subject_id_list) {
                     const temp = await prisma.subject.findFirst({
@@ -107,6 +107,9 @@ const index = async (req, res, refresh_token) => {
                         },
                         school: {
                             connect: { id: refresh_token.school_id }
+                        },
+                        examTerm: {
+                            connect: { id: exam_term_id }
                         },
                         final_percent: final_percent ? parseInt(final_percent) : null
                     }
@@ -159,7 +162,12 @@ const index = async (req, res, refresh_token) => {
                                 //     id: parseInt(req.body.exam_id)
                                 // }
                             }
-                        })
+                        }).catch((err) => {
+                            if (!err) return;
+                            if (err.message.search('Foreign key constraint failed on the field: `exam_details_id`')) throw new Error('failed to delete for already using this exam on seat plans or questions ');
+                            throw new Error('falied to delete...');
+                        });
+
                         for (let i of req.body.subject_id_list) {
                             const query = {}
                             if (i?.exam_room?.length > 0) {
@@ -208,15 +216,12 @@ const index = async (req, res, refresh_token) => {
 
 const handleUpdate = async (req, res) => {
     try {
+        const { exam_term_id } = req.body;
 
-
-        const updateQuery = {}
-        if (req.body.title) {
-            updateQuery['title'] = req.body.title
-        }
-        if (req.body.final_percent || req.body.final_percent == 0) {
-            updateQuery['final_percent'] = req.body.final_percent == 0 ? null : req.body.final_percent
-        }
+        const updateQuery = {};
+        if (req.body.title) updateQuery['title'] = req.body.title;
+        if (exam_term_id) updateQuery['exam_term_id'] = exam_term_id;
+        if (req.body.final_percent || req.body.final_percent == 0) updateQuery['final_percent'] = req.body.final_percent == 0 ? null : req.body.final_percent;
         const temp = await prisma.exam.update({
             where: {
                 id: parseInt(req.body.exam_id)

@@ -63,7 +63,7 @@ import { DialogActionWrapper } from '@/components/DialogWrapper';
 import ApprovalIcon from '@mui/icons-material/Approval';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
-import { accessNestedProperty } from '@/utils/utilitY-functions';
+import { accessNestedProperty, getFile } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -166,8 +166,7 @@ const applyPagination = (
   return users.slice(page * limit, page * limit + limit);
 };
 
-const leave_type_options = ['sick', 'casual', 'maternity']
-const status_options = ['pending', 'approved', 'declined']
+
 
 const Results = ({ users, reFetchData }) => {
 
@@ -205,258 +204,33 @@ const Results = ({ users, reFetchData }) => {
 
 
 
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
 
-  const handleConfirmDelete = () => {
-    setOpenConfirmDelete(true);
-  };
+
 
   const closeConfirmDelete = () => {
-    setOpenConfirmDelete(false);
+    setOpenConfirmDelete(null);
   };
 
   const handleDeleteCompleted = () => {
-    setOpenConfirmDelete(false);
+    if (openConfirmDelete && academicYear?.id) {
+      axios.delete(`/api/homework/${openConfirmDelete}?academic_year_id=${academicYear?.id}`)
+        .then(res => {
+          showNotification(res?.data?.message)
+          setOpenConfirmDelete(null);
+          reFetchData()
+        })
+        .catch(err => showNotification(err?.response?.data?.message, 'error'))
+    }
   };
   const handleCreateClassClose = () => {
     setOpen(false);
     setSelectedUser(null)
   };
 
-  const handleFormSubmit = async (
-    _values,
-    { resetForm, setErrors, setStatus, setSubmitting }
-  ) => {
-    try {
-      _values['academic_year_id'] = academicYear?.id
-      const res = await axios.patch(`/api/leave/${selectedUser.id}`, _values)
-      showNotification(res.data.message)
-      resetForm();
-      setStatus({ success: true });
-      setSubmitting(false);
-      reFetchData()
-      handleCreateClassClose();
-
-    } catch (err) {
-      console.error(err);
-      showNotification(err?.response?.data?.message, 'error');
-      setStatus({ success: false });
-      //@ts-ignore
-      setErrors({ submit: err.message });
-      setSubmitting(false);
-    }
-  };
-
   return (
     <>
-      <Dialog
-        fullWidth
-        maxWidth="sm"
-        open={open}
-        onClose={handleCreateClassClose}
-      >
-        <DialogTitle
-          sx={{
-            p: 3
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            {t('Leave Application')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t('Fill in the fields below to apply a new leave')}
-          </Typography>
-        </DialogTitle>
-        <Formik
-          initialValues={{
-            from_date: selectedUser?.from_date ? dayjs(selectedUser?.from_date) : null,
-            to_date: selectedUser?.to_date ? dayjs(selectedUser?.to_date) : null,
-            Leave_type: selectedUser?.Leave_type,
-            status: selectedUser?.status,
-            remarks: undefined
-          }}
-          validationSchema={Yup.object().shape({
-            from_date: Yup.date().required(t('The From date field is required')),
-            to_date: Yup.date()
-              .required(t('The To date field is required')),
-            Leave_type: Yup.string()
-              .required(t('Leave type field is required')),
-            status: Yup.string()
-              .required(t('Leave status field is required')),
-            remarks: Yup.string()
-              .max(255)
-          })}
-          onSubmit={handleFormSubmit}
-        >
-          {({
-            errors,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            isSubmitting,
-            touched,
-            values,
-            setFieldValue
-          }) => {
-            return (
-              <form onSubmit={handleSubmit}>
-                <DialogContent
-                  dividers
-                  sx={{
-                    p: 3
-                  }}
-                >
-                  <Grid container spacing={1}>
-                    <Grid item xs={12}>
-                      <Grid display={"grid"} gridTemplateColumns='1fr 1fr' pb={1} item gap={0.5}>
-                        <Grid>
-                          <MobileDatePicker
-                            inputFormat='dd/MM/yyyy'
-                            value={values.from_date}
-                            label="From date"
-                            onChange={(value) => setFieldValue("from_date", value, true)}
-                            renderInput={
-                              (params) => (
-                                <TextField
-                                  fullWidth
-                                  size='small'
-                                  error={Boolean(touched.from_date && errors.from_date)}
-                                  helperText={touched.from_date && errors.from_date}
-                                  name='from_date'
-                                  sx={{
-                                    [`& fieldset`]: {
-                                      borderRadius: 0.6,
-                                    }
-                                  }}
-                                  {...params}
-                                />
-                              )
-                            }
 
-                          />
-
-                        </Grid>
-                        <Grid>
-                          <MobileDatePicker
-                            label="To Date"
-                            inputFormat='dd/MM/yyyy'
-                            value={values.to_date}
-                            onChange={(value) => setFieldValue("to_date", value, true)}
-                            renderInput={
-                              (params) =>
-                                <TextField
-                                  fullWidth
-                                  size='small'
-                                  name='to_date'
-                                  sx={{
-                                    [`& fieldset`]: {
-                                      borderRadius: 0.6,
-                                    }
-                                  }}
-                                  {...params}
-                                />}
-
-                          />
-                        </Grid>
-                      </Grid>
-
-                    </Grid>
-                    <AutoCompleteWrapper
-                      minWidth="100%"
-                      label={t('Leave type')}
-                      placeholder={t('Type...')}
-                      required
-                      limitTags={2}
-                      options={leave_type_options}
-                      error={Boolean(touched.Leave_type && errors.Leave_type)}
-                      helperText={touched.Leave_type && errors.Leave_type}
-                      value={leave_type_options.find(i => i == values.Leave_type)}
-                      handleChange={(e, v) => setFieldValue("Leave_type", v ? v : undefined)}
-                    />
-
-                    <Grid item xs={12} p={1}>
-                      <Typography variant="h6">
-                        Description : <span> {selectedUser?.description} </span>
-                      </Typography>
-                    </Grid>
-
-                    <AutoCompleteWrapper
-                      minWidth="100%"
-                      label={t('Status')}
-                      placeholder={t('Status...')}
-                      required
-                      limitTags={2}
-                      options={status_options}
-                      error={Boolean(touched.status && errors.status)}
-                      helperText={touched.status && errors.status}
-                      value={status_options.find(i => i == values.status)}
-                      handleChange={(e, v) => setFieldValue("status", v ? v : undefined)}
-                    />
-                    <Grid item xs={12}>
-                      <TextField
-                        error={Boolean(touched.remarks && errors.remarks)}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.remarks && errors.remarks}
-                        label={t('Remarks')}
-                        name="remarks"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.remarks}
-                        variant="outlined"
-                        minRows={4}
-                        maxRows={5}
-                        multiline
-                      />
-                    </Grid>
-                  </Grid>
-                </DialogContent>
-                <DialogActionWrapper
-                  titleFront="+"
-                  title="Submit"
-                  editData={undefined}
-                  errors={errors}
-                  handleCreateClassClose={handleCreateClassClose}
-                  isSubmitting={isSubmitting}
-                />
-
-              </form>
-            );
-          }}
-        </Formik>
-      </Dialog>
-      <Card
-        sx={{
-          p: 1,
-          mb: 3
-        }}
-      >
-        <Grid container spacing={1}>
-          <Grid item xs={12}>
-            <Box p={0.5}>
-              <TextField
-                size='small'
-                sx={{
-                  m: 0
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-                onChange={handleQueryChange}
-                placeholder={t('Search by User Name or Role or Leave type...')}
-                value={query}
-                fullWidth
-                variant="outlined"
-              />
-            </Box>
-          </Grid>
-        </Grid>
-      </Card>
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
         <Box
           p={2}
@@ -498,146 +272,81 @@ const Results = ({ users, reFetchData }) => {
         ) : (
           <>
 
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align='center'>{t('ID')}</TableCell>
+                    <TableCell align='center'>{t('Date')}</TableCell>
+                    <TableCell align='center'>{t('To Date')}</TableCell>
+                    <TableCell align="center">{t('Applied Date')}</TableCell>
+                    <TableCell align='center'>{t('Status')}</TableCell>
 
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedClasses.map((i) => {
 
-            {
-              // @ts-ignore
-              user?.role?.title === 'ADMIN' ?
-                <TableContainer>
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align='center'>{t('ID')}</TableCell>
-                        <TableCell align='center'>{t('User Name')}</TableCell>
-                        <TableCell align='center'>{t('Role')}</TableCell>
-                        <TableCell align='center'>{t('Leave type')}</TableCell>
-                        <TableCell align='center'>{t('Status')}</TableCell>
-                        <TableCell align='center'>{t('Action')}</TableCell>
+                    return (
+                      <TableRow hover key={i.id}>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i?.id}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {dayjs(i?.date).format('YYYY-MM-DD')}
+                          </Typography>
+                        </TableCell>
 
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paginatedClasses.map((i) => {
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i?.subject?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            <Typography noWrap variant="h5" py={0}>
 
-                        return (
-                          <TableRow hover key={i.id}>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {i?.id}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {i?.user?.username}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {i?.user?.role?.title}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {i?.Leave_type}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                <Chip
-                                  label={i?.status}
-                                  size="medium"
-                                  color={i?.status == 'approved' ? 'primary' : 'error'}
-                                />
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                <Tooltip title={t('Approve')} arrow>
-                                  <IconButton
-                                    color="primary"
-                                    onClick={() => {
-                                      setSelectedUser(i)
-                                      setOpen(true)
-                                    }}
-                                  >
-                                    <ApprovalIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Typography>
-                            </TableCell>
-
-
-
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                :
-
-                <TableContainer>
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align='center'>{t('ID')}</TableCell>
-                        <TableCell align='center'>{t('From Date')}</TableCell>
-                        <TableCell align='center'>{t('To Date')}</TableCell>
-                        <TableCell align="center">{t('Applied Date')}</TableCell>
-                        <TableCell align='center'>{t('Status')}</TableCell>
+                              {i?.file_path && <a
+                                style={{ width: '50px', color: 'blue', textDecoration: 'underline' }}
+                                target="_blank"
+                                href={getFile(i?.file_path)}
+                              >
+                                File link
+                              </a>
+                              }
+                            </Typography>
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            <Tooltip title={t('Delete')} arrow>
+                              <IconButton
+                                onClick={() => setOpenConfirmDelete(i?.id)}
+                                color="primary"
+                              >
+                                <DeleteTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Typography>
+                        </TableCell>
 
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paginatedClasses.map((i) => {
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                        return (
-                          <TableRow hover key={i.id}>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {i?.id}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {dayjs(i?.from_date).format('YYYY-MM-DD')}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {dayjs(i?.to_date).format('YYYY-MM-DD')}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                {dayjs(i?.created_at).format('YYYY-MM-DD')}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography variant="h5">
-                                <Chip
-                                  label={i?.status}
-                                  size="medium"
-                                  color={i?.status == 'approved' ? 'primary' : 'error'}
-                                />
-                              </Typography>
-                            </TableCell>
-
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-            }
 
           </>
         )}
       </Card>
 
       <DialogWrapper
-        open={openConfirmDelete}
+        open={openConfirmDelete ? true : false}
         maxWidth="sm"
         fullWidth
         TransitionComponent={Transition}

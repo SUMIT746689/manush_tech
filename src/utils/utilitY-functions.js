@@ -51,3 +51,8 @@ export function accessNestedProperty(obj, array) {
 export function getFile(str) {
   return str && typeof (str) == 'string' ? `/api/get_file/${str?.replace(/\\/g, '/')}` : ''
 }
+
+export const imagePdfDocType = ['image/x-png','image/png', 'image/gif', 'image/jpeg',
+  'image/jpg', 'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/msword']

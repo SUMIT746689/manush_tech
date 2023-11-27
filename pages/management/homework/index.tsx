@@ -6,11 +6,90 @@ import Footer from 'src/components/Footer';
 import { Grid } from '@mui/material';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import Results from 'src/content/Management/HomeWork/Results';
-import { useClientFetch } from '@/hooks/useClientFetch';
+import { useContext, useEffect, useState } from 'react';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import prisma from '@/lib/prisma_client';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import axios from 'axios';
 
-function ManagementLeave() {
+export async function getServerSideProps(context: any) {
 
-  const { data: leave, reFetchData } = useClientFetch(`/api/homework`);
+  let data: any = null;
+  try {
+    const refresh_token_varify: any = serverSideAuthentication(context)
+    if (!refresh_token_varify) return { props: { data } };
+
+    if (refresh_token_varify.role.title === 'STUDENT') {
+
+      data = await prisma.student.findFirst({
+        where: {
+          student_info: {
+            user_id: Number(refresh_token_varify.id),
+            school_id: refresh_token_varify.school_id
+          }
+        },
+        select: {
+          id: true,
+          student_photo: true,
+          section_id: true,
+          academic_year: true,
+          section: {
+            select: {
+              id: true,
+              name: true,
+              class: {
+                select: {
+                  id: true,
+                  name: true,
+                  has_section: true,
+                  subjects: true
+                }
+              }
+            }
+
+          },
+        }
+      });
+    }
+  }
+  catch (error) {
+    console.log({ error })
+  }
+  const parse = JSON.parse(JSON.stringify({ data }));
+  return { props: parse }
+}
+function ManagementLeave({ data }) {
+  const [leave, setLeave] = useState([])
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const [classes, setClasses] = useState([])
+  const [classList, setClassList] = useState([])
+  console.log({ data });
+
+  const reFetchData = () => {
+    if (data) {
+      if (academicYear?.id) {
+        axios.get(`/api/homework?academic_year_id=${academicYear?.id}&class_id=${data?.section?.class?.id}&student_id=${data?.id}`)
+          .then(res => setLeave(res.data))
+          .catch(err => console.log(err))
+      }
+    } else {
+      axios.get(`/api/class`)
+        .then(res => {
+          setClasses(res.data)
+          setClassList(res.data?.map(i => ({
+            label: i.name,
+            id: i.id,
+            has_section: i.has_section
+          })
+          ))
+        })
+        .catch(err => console.log(err));
+    }
+  }
+  useEffect(() => {
+    reFetchData()
+  }, [data, academicYear])
+
 
   return (
     <>
@@ -19,6 +98,10 @@ function ManagementLeave() {
       </Head>
       <PageTitleWrapper>
         <PageHeader
+          data={data}
+          classes={classes}
+          classList={classList}
+          setLeave={setLeave}
           reFetchData={reFetchData}
         />
       </PageTitleWrapper>
@@ -32,7 +115,7 @@ function ManagementLeave() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results users={leave || []} reFetchData={reFetchData}/>
+          <Results users={leave} reFetchData={reFetchData} />
         </Grid>
       </Grid>
       <Footer />

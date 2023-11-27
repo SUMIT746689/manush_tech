@@ -238,7 +238,7 @@ export const fileDelete = (pathParams) => {
 
 export const unknownFileDelete = (files: object, haveTotake: Array<string>) => {
     for (const i in files) {
-        if (!haveTotake?.find(j => j == i)) {
+        if (!haveTotake?.includes(i)) {
             if (fs.existsSync(files[i]?.filepath)) {
                 fs.unlinkSync(files[i]?.filepath)
             }

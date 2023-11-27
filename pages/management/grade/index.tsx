@@ -48,6 +48,7 @@ function Managementrooms() {
           <Results
             grade={grade}
             editGrade={editGrade}
+            reFetchData={reFetchData}
             setEditGrade={setEditGrade}
           />
         </Grid>

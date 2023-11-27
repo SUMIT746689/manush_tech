@@ -81,6 +81,7 @@ interface ResultsProps {
   grade: Project[];
   editGrade: object;
   setEditGrade: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -142,7 +143,7 @@ const applyPagination = (
   return rooms.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
+const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -210,17 +211,15 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade }) => {
   console.log({ deleteSchoolId });
 
   const handleDeleteCompleted = async () => {
-    // try {
-    //   const result = await axios.delete(`/api/rooms/${deleteSchoolId}`);
-    //   console.log({ result });
-    //   setOpenConfirmDelete(false);
-    //   if (!result.data?.success) throw new Error('unsuccessful delete');
-    //   if (!result.data?.success) throw new Error('unsuccessful delete');
-    //   showNotification('The rooms has been deleted successfully');
-    // } catch (err) {
-    //   setOpenConfirmDelete(false);
-    //   showNotification('The school falied to delete ','error');
-    // }
+    try {
+      await axios.delete(`/api/grade/${deleteSchoolId}`);
+      closeConfirmDelete()
+      reFetchData()
+      showNotification('The grade has been deleted successfully');
+    } catch (err) {
+      setOpenConfirmDelete(false);
+      showNotification('The grade falied to delete ', 'error');
+    }
   };
 
   return (

@@ -105,11 +105,12 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['name'];
+      const properties = ['lower_mark','upper_mark','grade'];
       let containsQuery = false;
 
       properties.forEach((property) => {
-        if (project[property].toLowerCase().includes(query.toLowerCase())) {
+        
+        if (project[property]?.toString().toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
       });
@@ -144,7 +145,6 @@ const applyPagination = (
 };
 
 const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData }) => {
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
@@ -155,31 +155,6 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
     status: null
   });
 
-  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    event.persist();
-    setQuery(event.target.value);
-  };
-
-  const handleSelectAllschools = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setSelectedItems(
-      event.target.checked ? grade.map((project) => project.id) : []
-    );
-  };
-
-  const handleSelectOneProject = (
-    _event: ChangeEvent<HTMLInputElement>,
-    projectId: string
-  ): void => {
-    if (!selectedItems.includes(projectId)) {
-      setSelectedItems((prevSelected) => [...prevSelected, projectId]);
-    } else {
-      setSelectedItems((prevSelected) =>
-        prevSelected.filter((id) => id !== projectId)
-      );
-    }
-  };
 
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
@@ -191,11 +166,9 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
 
   const filteredGrades = applyFilters(grade, query, filters);
   const paginatedGrades = applyPagination(filteredGrades, page, limit);
-  const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomesGrades =
-    selectedItems.length > 0 && selectedItems.length < grade.length;
-  const selectedAllGrades = selectedItems.length === grade.length;
-  ;
+
+ 
+ 
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -251,7 +224,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
       </Card>
       <Card sx={{ minHeight: 'calc(100vh - 450px) !important' }}>
 
-        {!selectedBulkActions && (
+     
           <Box
             p={2}
             display="flex"
@@ -274,7 +247,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
               rowsPerPageOptions={[5, 10, 15]}
             />
           </Box>
-        )}
+        
         <Divider />
 
         {paginatedGrades.length === 0 ? (
@@ -300,62 +273,42 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllGrades}
-                        indeterminate={selectedSomesGrades}
-                        onChange={handleSelectAllschools}
-                      />
-                    </TableCell>
-
-                    <TableCell>{t('Lower mark')}</TableCell>
-                    <TableCell>{t('Upper mark')}</TableCell>
-                    <TableCell>{t('Point')}</TableCell>
-                    <TableCell>{t('Grade')}</TableCell>
+                    <TableCell align="center">{t('Lower mark')}</TableCell>
+                    <TableCell align="center">{t('Upper mark')}</TableCell>
+                    <TableCell align="center">{t('Point')}</TableCell>
+                    <TableCell align="center">{t('Grade')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
 
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {paginatedGrades.map((singleGrade) => {
-                    const isschoolselected = selectedItems.includes(
-                      singleGrade.id
-                    );
+                   
                     return (
                       <TableRow
                         hover
                         key={singleGrade.id}
-                        selected={isschoolselected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isschoolselected}
-                            onChange={(event) =>
-                              handleSelectOneProject(event, singleGrade.id)
-                            }
-                            value={isschoolselected}
-                          />
-                        </TableCell>
 
-                        <TableCell>
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {singleGrade?.lower_mark}
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {singleGrade?.upper_mark}
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {singleGrade?.point}
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {singleGrade?.grade}
                           </Typography>

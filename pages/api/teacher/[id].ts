@@ -1,5 +1,5 @@
 import { get } from 'controllers/teachers/get';
-import { deleteTeacher } from 'controllers/teachers/teacher/delete';
+import  deleteTeacher from 'controllers/teachers/teacher/delete';
 
 const index = async (req, res) => {
   try {

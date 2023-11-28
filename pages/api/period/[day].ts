@@ -16,13 +16,11 @@ const Day = async (req, res, refresh_token) => {
                 if (teacher_id) where['teacher_id'] = parseInt(teacher_id);
 
                 const schedule = await prisma.period.findMany({
-                    where:{
-                        section_id :1,
-                        
-                    },
+                    where,
                     include: {
                         room: true,
                         teacher: {
+                            where: { deleted_at: null },
                             select: {
                                 id: true,
                                 first_name: true

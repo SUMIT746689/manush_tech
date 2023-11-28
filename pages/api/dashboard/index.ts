@@ -41,7 +41,7 @@ const index = async (req, res) => {
           };
           totalCount['teachers'] = {
             count: await prisma.teacher.count({
-              where: { school_id: userInfo?.school_id }
+              where: { school_id: userInfo?.school_id,deleted_at: null }
             })
           };
         }

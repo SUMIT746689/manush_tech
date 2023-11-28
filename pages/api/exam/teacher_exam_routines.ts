@@ -16,7 +16,7 @@ const index = async (req, res, refresh_token) => {
                 if (role.title !== "ADMIN" && role.title !== "TEACHER") throw new Error("unauthorized user")
 
                 const { exam_term_id, teacher_id } = req.query;
-                const where = {};
+                const where = {deleted_at:null};
 
                 if (role.title === "TEACHER") where["user_id"] = id;
                 else if (role.title === "ADMIN") where["user_id"] = parseInt(teacher_id);

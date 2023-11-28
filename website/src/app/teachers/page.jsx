@@ -14,7 +14,8 @@ async function getData() {
       where: {
         school:{
           domain: domain
-        }
+        },
+        deleted_at:null
       },
       select: {
         first_name: true,

@@ -28,6 +28,7 @@ export const get = async (req, res) => {
     const teachers = await prisma.teacher.findMany({
       where: {
         ...query,
+        deleted_at:null
       },
       include: {
         user: {

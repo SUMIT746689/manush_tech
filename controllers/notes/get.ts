@@ -14,12 +14,12 @@ const get = async (req, res, refresh_token) => {
         if (refresh_token?.role?.title !== 'ADMIN') return res.status(403).json({ error: "unauthorized user" });
 
         const { section_id, start_date, end_date } = req.query;
-        
+
         if (!section_id || !start_date || !end_date) return res.status(404).json({ error: "required field missing" })
 
         const start_date_ = convertToDate(start_date);
         const end_date_ = convertToDate(end_date);
-        
+
         const resDailyNote = await prisma.dailyNote.findMany({
           where: {
             date: { gte: start_date_, lte: end_date_ },
@@ -37,6 +37,7 @@ const get = async (req, res, refresh_token) => {
             period: {
               select: {
                 teacher: {
+                  where: { deleted_at: null },
                   select: {
                     first_name: true
                   }

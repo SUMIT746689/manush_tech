@@ -12,7 +12,7 @@ const get = async (req, res, refresh_token, academic_year) => {
 
         if (role.title !== "ADMIN" && role.title !== "TEACHER") throw new Error("unauthorized user")
 
-        const where = {};
+        const where = {deleted_at: null};
 
         if (role.title === "TEACHER") where["user_id"] = id;
         else if (role.title === "ADMIN") where["user_id"] = parseInt(teacher_id);

@@ -18,10 +18,16 @@ export async function getServerSideProps(context: any) {
     // console.log({ refresh_token_varify })
     if (!refresh_token_varify || refresh_token_varify?.role?.title !== 'TEACHER') return { props };
 
-    const day = getToday();
+    const day : any = getToday();
 
-    //@ts-ignore
-    const periods = await prisma.period.findMany({ where: { day, teacher: { user_id: refresh_token_varify.id } }, include: { section: { include: { class: true } }, subject: true, room: true } })
+   
+    const periods = await prisma.period.findMany({
+      where: {
+        day,
+        teacher: { user_id: refresh_token_varify.id,deleted_at: null }
+      },
+      include: { section: { include: { class: true } }, subject: true, room: true }
+    })
     props["periods"] = JSON.parse(JSON.stringify(periods))
     // const classes = await prisma.$queryRaw`
     // WITH 

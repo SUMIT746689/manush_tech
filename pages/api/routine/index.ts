@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res,refresh_token) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -21,6 +21,7 @@ const index = async (req, res,refresh_token) => {
                         end_time: true,
                         room: true,
                         teacher: {
+                            where: { deleted_at: null },
                             select: {
                                 school_id: true,
                                 user: {
@@ -56,4 +57,4 @@ const index = async (req, res,refresh_token) => {
     }
 };
 
-export default authenticate(index) ;
+export default authenticate(index);

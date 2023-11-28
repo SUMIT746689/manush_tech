@@ -1,4 +1,4 @@
-// import get from 'controllers/exam_terms/exam_term/get';
+import get from 'controllers/exam_terms/exam_term/get';
 import patch from 'controllers/exam_terms/exam_term/patch';
 import delete_ from 'controllers/exam_terms/exam_term/delete_';
 
@@ -8,9 +8,9 @@ const index = async (req, res) => {
     const { method } = req;
 
     switch (method) {
-      // case 'GET':
-      //   get(req, res);
-      //   break;
+      case 'GET':
+        get(req, res);
+        break;
       case 'PATCH':
         patch(req, res);
         break;

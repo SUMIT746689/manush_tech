@@ -76,7 +76,7 @@ export const menuItems: MenuItems[] = [
       {
         name: 'Dashboard',
         icon: DashboardIcon,
-        link: '/dashboards/',
+        link: '/',
 
       },
       {
@@ -397,43 +397,43 @@ export const menuItems: MenuItems[] = [
 
             ]
           },
-          {
-            name: 'Financial Reports',
-            icon: LocalAtmIcon,
-            items: [
-              {
-                name: 'Account Statement',
-                link: '/reports/financial_reports/account_statement',
-                icon: AccountBalanceWalletIcon
-              },
-              {
-                name: 'Income Report',
-                link: '/reports/financial_reports/income_report',
-                icon: AttachMoneySharpIcon
-              },
-              {
-                name: 'Expence Report',
-                link: '/reports/financial_reports/expense_report',
-                icon: MoneyOffCsredSharpIcon
-              },
-              {
-                name: 'Transactions Report',
-                link: '/reports/financial_reports/transactions_report',
-                icon: JoinFullSharpIcon
-              },
-              {
-                name: 'Balance Sheet',
-                link: '/reports/financial_reports/balance_sheet',
-                icon: AccountBalanceWalletSharpIcon
-              },
-              {
-                name: 'Income VS Expense',
-                link: '/reports/financial_reports/income_vs_expense',
-                icon: BorderBottomSharpIcon
-              },
+          // {
+          //   name: 'Financial Reports',
+          //   icon: LocalAtmIcon,
+          //   items: [
+          //     {
+          //       name: 'Account Statement',
+          //       link: '/reports/financial_reports/account_statement',
+          //       icon: AccountBalanceWalletIcon
+          //     },
+          //     {
+          //       name: 'Income Report',
+          //       link: '/reports/financial_reports/income_report',
+          //       icon: AttachMoneySharpIcon
+          //     },
+          //     {
+          //       name: 'Expence Report',
+          //       link: '/reports/financial_reports/expense_report',
+          //       icon: MoneyOffCsredSharpIcon
+          //     },
+          //     {
+          //       name: 'Transactions Report',
+          //       link: '/reports/financial_reports/transactions_report',
+          //       icon: JoinFullSharpIcon
+          //     },
+          //     {
+          //       name: 'Balance Sheet',
+          //       link: '/reports/financial_reports/balance_sheet',
+          //       icon: AccountBalanceWalletSharpIcon
+          //     },
+          //     {
+          //       name: 'Income VS Expense',
+          //       link: '/reports/financial_reports/income_vs_expense',
+          //       icon: BorderBottomSharpIcon
+          //     },
 
-            ]
-          },
+          //   ]
+          // },
         ]
       },
       {

@@ -101,7 +101,7 @@ function Logo() {
 
   return (
     <TooltipWrapper title={t('Home')} arrow>
-      <LogoWrapper href="/dashboards/">
+      <LogoWrapper href="/">
         <Badge
           sx={{
             '.MuiBadge-badge': {

@@ -179,7 +179,7 @@ function Hero() {
           </TypographyH2>
           <Button
             component={Link}
-            href="/dashboards"
+            href="/"
             size="large"
             variant="contained"
           >
@@ -246,7 +246,7 @@ function Hero() {
         </Grid>
         <Grid item md={6}>
           <BoxContent>
-            <Link href="/dashboards">
+            <Link href="/">
               <ImgWrapper>
                 <img
                   alt="Tokyo"

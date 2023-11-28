@@ -12,10 +12,13 @@ async function getData() {
 
     const data = await prisma.teacher.findMany({
       where: {
-        school:{
+        school: {
           domain: domain
         },
-        deleted_at:null
+        deleted_at: null,
+        department: {
+          deleted_at: null
+        }
       },
       select: {
         first_name: true,
@@ -36,7 +39,7 @@ async function getData() {
 }
 async function page() {
   const data = await getData();
-   console.log("data__", data);
+  console.log("data__", data);
 
   return (
     <div className=' container mx-auto'>

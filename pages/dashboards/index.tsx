@@ -88,7 +88,7 @@ export async function getServerSideProps(context: any) {
         blockCount['domain'] = school?.domain || '';
         blockCount['teachers'] = {
           count: await prisma.teacher.count({
-            where: { school_id: refresh_token?.school_id,deleted_at: null }
+            where: { school_id: refresh_token?.school_id, deleted_at: null }
           })
         };
         blockCount["school"] = school;
@@ -99,7 +99,7 @@ export async function getServerSideProps(context: any) {
       case 'TEACHER':
         blockCount['role'] = 'teacher';
         blockCount['teacher'] = await prisma.teacher.findFirst({
-          where: { user_id: refresh_token.id,deleted_at:null },
+          where: { user_id: refresh_token.id, deleted_at: null, department: { deleted_at: null } },
           select: {
             first_name: true,
             middle_name: true,

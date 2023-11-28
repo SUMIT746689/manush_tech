@@ -42,7 +42,7 @@ function ManagementDepartments() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results datas={datas} setEditData={setEditData} />
+          <Results datas={datas} setEditData={setEditData} reFetchData={reFetchData} />
         </Grid>
       </Grid>
       <Footer />

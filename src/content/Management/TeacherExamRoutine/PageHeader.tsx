@@ -66,7 +66,7 @@ function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, se
     <>
 
       <PageHeaderTitleWrapper
-        name={"Exam seat plan"}
+        name={"Teacher Exam Routine"}
         handleCreateClassOpen={handleCreateProjectOpen}
       />
 
@@ -93,10 +93,10 @@ function PageHeader({ editExam, setEditExam, classList, classes, setSeatPlan, se
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t(`${editExam ? 'Edit seat plan' : 'Create seat plan'}`)}
+            {t(`${editExam ? 'Edit teacher exam routine' : 'Create teacher exam routine'}`)}
           </Typography>
           <Typography variant="subtitle2">
-            {t('Use this dialog window to add a seat plan')}
+            {t('Use this dialog window to add a teacher exam routine')}
           </Typography>
         </DialogTitle>
         <FormControl
@@ -268,7 +268,7 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
       .then(({ data }) => {
         console.log({ data });
         if (!data?.success) {
-          showNotification('seat plan not created', 'error');
+          showNotification('exam routine not created', 'error');
           return;
         }
         setFieldValue('seat_plan_id', data.seat_plan.id)
@@ -446,6 +446,7 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
                       placeholder="Teachers"
                       options={teachers}
                       // required={true}
+                      value={undefined}
                       // value={values?.teacher_ids?.map((option) => option?.label) || []}
                       handleChange={(e, v) => {
                         setFieldValue('teacher_ids', v);
@@ -457,7 +458,7 @@ const FormControl = ({ pdf = false, setPdf = null, rooms, seatPlan, setRooms, op
               </DialogContent>
               {
                 open === true && <DialogActionWrapper
-                  title="Seat plan"
+                  title="Teacher exam routine"
                   editData={editExam}
                   errors={errors}
                   handleCreateClassClose={handleModalClose}

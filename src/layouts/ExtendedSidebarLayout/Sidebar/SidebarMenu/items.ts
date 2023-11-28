@@ -168,11 +168,6 @@ export const menuItems: MenuItems[] = [
         ]
       },
       {
-        name: 'Teacher Exam Routine',
-        link: '/management/teacher_exam_routine',
-        icon: SummarizeIcon
-      },
-      {
         name: 'Syllabus',
         link: '/management/syllabus',
         icon: SummarizeIcon
@@ -223,6 +218,11 @@ export const menuItems: MenuItems[] = [
             name: 'Teachers recruitment',
             link: '/management/teachers/teachers-recruitment',
             icon: RecordVoiceOverIcon
+          },
+          {
+            name: 'Teacher Exam Routine',
+            link: '/management/teacher_exam_routine',
+            icon: SummarizeIcon
           },
         ]
       },

@@ -166,7 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-  
+
   const sub_menu = () => {
     ev.push(
       <SidebarMenuItem
@@ -584,10 +584,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       item.name === 'Daily Notes' ||
       item.name === 'Entry Notes' ||
-      item.name === 'Show Notes'||
+      item.name === 'Show Notes' ||
 
-      item.name === 'Syllabus'
+      item.name === 'Syllabus' ||
 
+      item.name === 'Teacher Exam Routine'
 
     ) {
       // switch(item.name){
@@ -662,6 +663,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       // syllebus
       if (item.name === 'Syllabus' && permissionVerify(permissions, ['show_syllabus'])) sub_menu();
 
+      //teacher
+      if (item.name === 'Teacher Exam Routine' && permissionVerify(permissions, ['show_teacher_exam_routine'])) sub_menu();
     }
     else sub_menu();
     // {

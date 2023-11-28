@@ -205,9 +205,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
     }
   };
 
-  const handleEdit = (data: object) => {
-    setEditSchool(data);
-  };
+
 
   return (
     <>
@@ -340,7 +338,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
-                                onClick={() => handleEdit(i)}
+                                onClick={() => setEditSchool(i)}
                                 color="primary"
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
@@ -353,7 +351,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                                 }
                                 color="primary"
                               >
-                                <DeleteTwoToneIcon fontSize="small" />
+                                <DeleteTwoToneIcon fontSize="small" color='error' />
                               </IconButton>
                             </Tooltip>
                           </Typography>

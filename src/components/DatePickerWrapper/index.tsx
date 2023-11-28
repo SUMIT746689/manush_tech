@@ -99,6 +99,31 @@ export const DatePickerWrapper = ({ label, date, handleChange }) => {
   )
 }
 
+export const MobileDatePickerWrapper = ({ label, date, handleChange, required = false }) => (
+  <Grid item pb={1}>
+    <MobileDatePicker
+      label={label}
+      inputFormat='dd/MM/yyyy'
+      value={date}
+      clearable
+      onChange={handleChange}
+      renderInput={
+        (params) =>
+          <TextField
+            fullWidth
+            required={required}
+            size='small'
+            sx={{
+              [`& fieldset`]: {
+                borderRadius: 0.6,
+              }
+            }}
+            {...params}
+          />}
+    />
+  </Grid>
+)
+
 export const TimePickerWrapper = ({ label, value, handleChange, minWidth = "100%" }) => {
   return (
     <Grid minWidth={minWidth} item pb={1}>

@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField";
 import React, { useEffect, useState } from "react";
 
-export function DebounceInput({ handleDebounce, debounceTimeout, label, type = 'text', required = false, disabled = false, ...param }) {
+export function DebounceInput({ handleDebounce, debounceTimeout, label, type = 'text', required = false, disabled = false,sx={}, ...param }) {
 
     const [value, setValue] = useState(undefined);
 
@@ -21,7 +21,8 @@ export function DebounceInput({ handleDebounce, debounceTimeout, label, type = '
             sx={{
                 [`& fieldset`]: {
                     borderRadius: 0.6,
-                }
+                },
+                ...sx
             }}
             label={label}
             type={type}

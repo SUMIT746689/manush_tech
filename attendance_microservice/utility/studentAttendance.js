@@ -57,6 +57,10 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
           // data: { status: "present"}
           data: { status: isAttend ? "present" : "late" }
         })
+          .then(() => {
+            prisma.tbl_attendance_queue.deleteMany({ where: { user_id } })
+              .catch((error) => { console.log("error tbl_attendance_queue:", `(user_id:-${user_id})`, error.message) })
+          })
           .catch((error) => { console.log("error update attendance", error.message) });
       }
       else {
@@ -70,21 +74,27 @@ export const studentAttendence = async ({ std_entry_time, class_id, student, las
             school_id,
           }
         })
-          .catch((error) => { console.log("error create attendance", error) });
+          .then(() => {
+            prisma.tbl_attendance_queue.deleteMany({ where: { user_id } })
+              .catch((error) => { console.log("error tbl_attendance_queue:", `(user_id:-${user_id})`, error.message) })
+          })
+          .catch((error) => { console.log("error create attendance", `(user_id:-${user_id})`, error) });
       }
 
     }
+    else {
+      // delete users attendences from 
+      prisma.tbl_attendance_queue.deleteMany({ where: { user_id } })
+        .catch((error) => { console.log("error tbl_attendance_queue:", `(user_id:-${user_id})`, error.message) })
+    }
 
-    // delete users attendences from 
-    prisma.tbl_attendance_queue.deleteMany({ where: { user_id } })
-      .catch((error) => { console.log("error tbl_attendance_queue", error.message) })
 
     // store user data to sent sms queue table 
     if (!guardian_phone) return;
 
     const smsQueueHandlerParameters = { user_id, contacts: guardian_phone, submission_time: last_time, school_id, school_name, sender_id, index };
     smsQueueHandlerParameters["sms_text"] = `Dear Parents, Your ${gender === "male" ? "son" : "daughter"}, Class-${class_id}, Sec-${section_id}, Roll-${class_roll_no} is absent ${new Date(last_time).toLocaleDateString('en-US')} in class. Principal, ${school_name}`;
-    
+
     createSmsQueueTableHandler(smsQueueHandlerParameters);
   }
   catch (error) {

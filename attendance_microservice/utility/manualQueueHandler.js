@@ -11,6 +11,8 @@ export const studentManualQueueHandle = async (student_attendace_queue) => {
   // response from sms gateway response
   const smsGatewayRes = await prisma.smsGateway.findFirst({ where: { school_id } })
 
+  if (!smsGatewayRes) return console.log("error :-", "sms gateway missing");
+
   const { details } = smsGatewayRes;
   const { sender_id, sms_api_key: api_key } = details ?? {};
   if (!sender_id && !api_key) return console.log("error :-", "sender_id or api_key missing");
@@ -58,7 +60,7 @@ export const studentManualQueueHandle = async (student_attendace_queue) => {
   if (!responseStudentsViaClass?.sections || responseStudentsViaClass.sections.length === 0) throw new Error("No students founds");
 
   const { school: { name: school_name } } = responseStudentsViaClass;
-  
+
   responseStudentsViaClass.sections.forEach((section, index) => {
     // const getEntryTime = new Date(section.std_entry_time);
     // const getEntryMinute = getEntryTime.getMinutes();
@@ -70,4 +72,4 @@ export const studentManualQueueHandle = async (student_attendace_queue) => {
       studentAttendence({ std_entry_time, class_id, student, last_time: created_at, school_id, school_name, sender_id, section_id, index })
     })
   })
-} 
+}

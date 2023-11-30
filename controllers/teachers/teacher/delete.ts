@@ -5,15 +5,6 @@ import { authenticate } from 'middleware/authenticate';
 const id = async (req, res, refresh_token) => {
   try {
     
-    await prisma.user.findFirstOrThrow({
-      where: {
-        role: {
-          id: refresh_token?.role?.id,
-          title: 'ADMIN'
-        }
-      }
-    })
-    
     const id = Number(req.query.id);
     
     await prisma.teacher.update({
@@ -33,4 +24,4 @@ const id = async (req, res, refresh_token) => {
   }
 };
 
-export default authenticate(id);
+export default id;

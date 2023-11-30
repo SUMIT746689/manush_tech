@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { fileUpload } from '@/utils/upload';
 import bcrypt from 'bcrypt';
 import fs from 'fs';
+import adminCheck from 'middleware/adminCheck';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 
@@ -122,7 +123,7 @@ console.log(files);
     res.status(404).json({ err: err.message });
   }
 };
-export default authenticate(patch);
+export default authenticate(adminCheck(patch));
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {

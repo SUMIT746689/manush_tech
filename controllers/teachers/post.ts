@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
+import adminCheck from 'middleware/adminCheck';
 
 const post = async (req, res, refresh_token) => {
   const uploadFolderName = 'teacher';
@@ -152,7 +153,7 @@ const post = async (req, res, refresh_token) => {
     res.status(404).json({ err: err.message });
   }
 };
-export default authenticate(post)
+export default authenticate(adminCheck(post))
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {

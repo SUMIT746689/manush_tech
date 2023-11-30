@@ -63,6 +63,7 @@ import dayjs from 'dayjs';
 import { DebounceInput } from '@/components/DebounceInput';
 import LoginIcon from '@mui/icons-material/Login';
 import { accessNestedProperty } from '@/utils/utilitY-functions';
+import { customizeDate } from '@/utils/customizeDate';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -415,6 +416,8 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
+                    <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
+                    
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
@@ -441,9 +444,16 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            {dayjs(user?.created_at).format('DD-MM-YYYY, h:mm A')}
+                            { customizeDate(user?.created_at)}
                           </Typography>
                         </TableCell>
+                        <TableCell>
+                          {/* @ts-ignore */}
+                          <Typography variant="h5" noWrap >
+                            { user?.school?.name}
+                          </Typography>
+                        </TableCell>
+                        
 
                         <TableCell align='center'>
                           {/* @ts-ignore */}

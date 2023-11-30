@@ -9,7 +9,7 @@ export default async function Home() {
 
   const headersList = headers();
   const domain = headersList.get('host')
-
+console.log({domain});
   const school_info = await prisma.websiteUi.findFirst({
     where: {
       school: {

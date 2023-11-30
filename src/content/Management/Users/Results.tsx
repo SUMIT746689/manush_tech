@@ -62,6 +62,7 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 import dayjs from 'dayjs';
 import { DebounceInput } from '@/components/DebounceInput';
 import LoginIcon from '@mui/icons-material/Login';
+import { accessNestedProperty } from '@/utils/utilitY-functions';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -120,14 +121,15 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['email', 'name', 'username'];
+      const properties = ['username','school.name' ];
       let containsQuery = false;
 
-      properties.forEach((property) => {
-        if (user[property]?.toLowerCase().includes(query.toLowerCase())) {
+      for (const property of properties) {
+        const queryString = accessNestedProperty(user, property.split('.'))
+        if (queryString?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
-      });
+      }
 
       if (filters.role && user.role !== filters.role) {
         matches = false;

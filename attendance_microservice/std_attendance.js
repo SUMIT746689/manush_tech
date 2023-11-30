@@ -5,18 +5,19 @@ import { isUserAttend } from "./attendance_utility/verifyUserAttend.js";
 
 const attendance = async () => {
     try {
+        const today = new Date(Date.now());
         const std_min_attend_date_wise = new Date(today);
         std_min_attend_date_wise.setUTCHours(0);
         std_min_attend_date_wise.setUTCMinutes(0);
         std_min_attend_date_wise.setUTCSeconds(0);
         std_min_attend_date_wise.setUTCMilliseconds(0);
-    
+
         const std_max_attend_date_wise = new Date(today);
         std_max_attend_date_wise.setUTCHours(23);
         std_max_attend_date_wise.setUTCMinutes(59);
         std_max_attend_date_wise.setUTCSeconds(59);
         std_max_attend_date_wise.setUTCMilliseconds(999);
-        
+
         const resAttendance = await prisma.tbl_attendance_queue.findMany({
             // where: {
             //     school_id
@@ -42,7 +43,7 @@ const attendance = async () => {
             const { user } = attendance_;
             const { teacher, student } = user ?? {};
             const { variance } = student ?? {};
-
+            console.log({ attendance_ })
             let haveAttendance;
             // const { }
             // console.log({ student, teacher });
@@ -55,14 +56,15 @@ const attendance = async () => {
                 console.log(section);
 
                 const date = new Date(Date.now());
+                // const entry_time =
 
-                haveAttendance = await stdAlreadyAttendance({ student_id: student.id, today: date })
+                    haveAttendance = await stdAlreadyAttendance({ student_id: student.id, today: date, last_time: section.std_entry_time, school_id: user.school_id, section_id: section.id })
                 // .then((res) => { console.log({ res }) })
                 // .catch((err) => { console.log({ err }) })
 
                 if (!haveAttendance) {
-                    const verify = await isUserAttend({ user_id: user.id, std_min_attend_date_wise: section?.std_entry_time, entry_time: section?.std_entry_time, today: date })
-                    console.log({ verify })
+                    // const verify = await isUserAttend({ user_id: user.id, std_min_attend_date_wise: section?.std_entry_time, entry_time: section?.std_entry_time, today: date })
+                    // console.log({ verify })
                     // student_attendence({ student: variance[0], last_time: section?.std_entry_time, user_id: student.user_id });
                 }
             }

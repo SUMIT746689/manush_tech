@@ -2,6 +2,8 @@ import { dcrypt } from 'utilities_api/hashing';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export const authenticate = (handler: Function) => {
+
+  
   return async (req, res) => {
     try {
       if (!req.cookies.refresh_token)

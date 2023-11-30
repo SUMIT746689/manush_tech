@@ -12,7 +12,8 @@ const index = async (req, res,refresh_token) => {
                 if (req.query.academic_year) {
                     query = {...query,
                         academic_year: {
-                            id: parseInt(req.query.academic_year)
+                            id: parseInt(req.query.academic_year),
+                            deleted_at:null
                         }
                     }
                 }

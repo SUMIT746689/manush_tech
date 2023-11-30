@@ -1,21 +1,17 @@
 import get from '../../../controllers/departments/get';
 import post from '../../../controllers/departments/post';
-import patch from '../../../controllers/departments/patch';
+import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
   try {
     const { method } = req;
-
     switch (method) {
       case 'GET':
-        get(req, res);
+        get(req, res,refresh_token);
         break;
       case 'POST':
-        post(req, res);
+        post(req, res,refresh_token);
         break;
-      case'PATCH':
-        patch(req,res);
-      break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);
         res.status(405).end(`Method ${method} Not Allowed`);
@@ -26,4 +22,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(index) ;

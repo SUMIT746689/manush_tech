@@ -78,18 +78,6 @@ const ButtonError = styled(Button)(
     `
 );
 
-const IconButtonError = styled(IconButton)(
-  ({ theme }) => `
-     background: ${theme.colors.error.lighter};
-     color: ${theme.colors.error.main};
-     padding: ${theme.spacing(0.75)};
-
-     &:hover {
-      background: ${lighten(theme.colors.error.lighter, 0.4)};
-     }
-`
-);
-
 interface ResultsProps {
   datas: Project[];
   setEditData: Function;
@@ -196,9 +184,9 @@ const Results: FC<ResultsProps> = ({
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/departments/${deleteSchoolId}`);
-      closeConfirmDelete()
+      setOpenConfirmDelete(false);
       reFetchData()
-      showNotification(result.data?.message);
+      showNotification(result?.data?.message);
 
     } catch (err) {
       setOpenConfirmDelete(false);
@@ -290,7 +278,7 @@ const Results: FC<ResultsProps> = ({
                         </TableCell>
 
                         <TableCell align="center">
-                          <Typography noWrap>
+                          <Typography noWrap sx={{display:'flex',justifyContent:'center',gap:3}}>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 onClick={() => setEditData(i)}
@@ -304,7 +292,7 @@ const Results: FC<ResultsProps> = ({
                                 onClick={() =>
                                   handleConfirmDelete(i.id)
                                 }
-                                color='error'
+                                color="error"
                               >
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>

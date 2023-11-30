@@ -12,7 +12,8 @@ const index = async (req, res, refresh_token) => {
                 if (req.query.academic_year) {
                     query = {
                         academic_year: {
-                            id: parseInt(req.query.academic_year)
+                            id: parseInt(req.query.academic_year),
+                            deleted_at:null
                         }
                     }
                 }
@@ -49,7 +50,11 @@ const index = async (req, res, refresh_token) => {
                                 subject: true,
                                 subject_total: true,
                                 exam_date: true,
-                                exam_room: true
+                                exam_room: {
+                                    where: {
+                                        deleted_at: null
+                                    }
+                                }
                             }
                         }
                     }

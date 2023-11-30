@@ -83,7 +83,13 @@ const updateSentSms = async ({ responseSentSms, sentSmsUsers }) => {
 const getUsers = async ({ role, where }) => {
   switch (role.title) {
     case "TEACHER":
-      return await prisma.teacher.findMany({ where: { ...where, deleted_at: null }, select: { phone: true, user_id: true } });
+      return await prisma.teacher.findMany({
+        where: {
+          deleted_at: null,
+          ...where
+        },
+        select: { phone: true, user_id: true }
+      });
 
     case "STUDENT":
 

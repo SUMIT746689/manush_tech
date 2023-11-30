@@ -1,17 +1,23 @@
+import deleteRoom from 'controllers/rooms/room/deleteRoom';
 import get from 'controllers/rooms/room/get';
 import patch from 'controllers/rooms/room/patch';
+import adminCheck from 'middleware/adminCheck';
+import { authenticate } from 'middleware/authenticate';
 
 
-const index = async (req, res) => {
+const index = async (req, res,refresh_token) => {
   try {
     const { method } = req;
 
     switch (method) {
       case 'GET':
-        get(req, res);
+        get(req, res,refresh_token);
         break;
       case 'PATCH':
-        patch(req, res);
+        patch(req, res,refresh_token);
+        break;
+      case 'DELETE':
+        deleteRoom(req, res,refresh_token);
         break;
       default:
         res.setHeader('Allow', ['GET', 'PATCH']);
@@ -23,4 +29,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(adminCheck(index)) ;

@@ -120,11 +120,11 @@ const handlePost = async (req, res, refresh_token) => {
                             )
                         }
                         else if (key == 'admission_date' || key == 'date_of_birth') {
-                            console.log("value__",value);
-                            
+                            console.log("value__", value);
+
                             if (dayjs(value).isValid()) {
                                 calculatedValue = new Date(value)
-                                console.log("calculatedValue___",calculatedValue);
+                                console.log("calculatedValue___", calculatedValue);
                             } else {
                                 return res.status(404).json({ message: `${row + 1} number row ${key} Date invalid !!` });
                             }
@@ -225,7 +225,8 @@ const handlePost = async (req, res, refresh_token) => {
                 const academicYearValidity = await prisma.academicYear.findFirst({
                     where: {
                         ...query,
-                        school_id: parseInt(refresh_token?.school_id)
+                        school_id: parseInt(refresh_token?.school_id),
+                        deleted_at: null
                     }
                 })
                 if (!academicYearValidity) {

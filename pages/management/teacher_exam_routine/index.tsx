@@ -31,7 +31,7 @@ export async function getServerSideProps(context: any) {
       props["exam_terms"] = exam_terms;
     }
 
-    const teachers = await prisma.teacher.findMany({ where: { school_id,deleted_at:null } })
+    const teachers = await prisma.teacher.findMany({ where: { school_id, deleted_at: null } })
     props["teachers"] = JSON.parse(JSON.stringify(teachers));
     // switch (role?.title) {
     //   // case "ADMIN": 

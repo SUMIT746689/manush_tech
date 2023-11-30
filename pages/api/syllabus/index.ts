@@ -46,7 +46,8 @@ const index = async (req, res, refresh_token) => {
                 await prisma.academicYear.findFirstOrThrow({
                     where: {
                         id: Number(academic_year_id),
-                        school_id: refresh_token.school_id
+                        school_id: refresh_token.school_id,
+                        deleted_at:null
                     }
                 })
                 const syllabusMain = await prisma.syllabus.findFirst({

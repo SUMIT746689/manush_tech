@@ -17,10 +17,16 @@ const index = async (req, res, refresh_token) => {
                             school_id: refresh_token.school_id,
                             academic_year_id: Number(req.query.academic_year_id),
                             section_id: Number(req.query.section_id)
-                        }
+                        },
+
                     },
                     select: {
                         seatPlan: {
+                            where: {
+                                room: {
+                                    deleted_at: null
+                                }
+                            },
                             include: {
                                 room: true,
                                 exam_details: {
@@ -59,7 +65,7 @@ const index = async (req, res, refresh_token) => {
                         id: true
                     }
                 })
-                await prisma.room.findFirstOrThrow({ where: { id: room_id, school_id: refresh_token.school_id } })
+                await prisma.room.findFirstOrThrow({ where: { id: room_id, school_id: refresh_token.school_id, deleted_at: null } })
 
                 await prisma.seatPlan.create({
                     data: {

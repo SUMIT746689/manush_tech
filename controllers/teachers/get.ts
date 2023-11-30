@@ -3,12 +3,12 @@ import { refresh_token_varify } from 'utilities_api/jwtVerify';
 // @ts-ignore
 export const get = async (req, res) => {
   try {
-     console.log("request domain__", req.headers.host);
+    console.log("request domain__", req.headers.host);
     let query = {}
 
     if (!req.cookies.refresh_token) {
       query = {
-        school:{
+        school: {
           domain: req.headers.host
         }
       }
@@ -41,7 +41,7 @@ export const get = async (req, res) => {
         }
       }
     });
-    
+
     res.status(200).json(teachers);
   } catch (err) {
     console.log(err);

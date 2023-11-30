@@ -27,7 +27,7 @@ export default async function Admission() {
     })
 
     const academicYear = await prisma.academicYear.findMany({
-        where: { school: { domain: domain } }
+        where: { school: { domain: domain },deleted_at:null }
     });
   
     console.log(classes, academicYear);

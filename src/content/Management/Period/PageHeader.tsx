@@ -279,7 +279,7 @@ function PageHeader() {
                           handleChange={(event, value) => {
                             setSelectedDay(value)
                             if (value) {
-                              axios.get(`/api/period/${value}?school_id=${user?.school_id}`)
+                              axios.get(`/api/period/${value}`)
                                 .then((res) => setBookedClass(res.data))
                                 .catch((err) => console.log(err));
                               setFieldValue('day', value);

@@ -1,13 +1,7 @@
 import prisma from '@/lib/prisma_client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
-export default async function post(req, res) {
+export default async function post(req, res,refresh_token) {
   try {
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
     const { name } = req.body;
 
     if (!name && !refresh_token.school_id) throw new Error('provide valid data');

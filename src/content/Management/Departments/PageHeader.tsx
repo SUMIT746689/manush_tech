@@ -67,7 +67,7 @@ function PageHeader({ editData, seteditData, reFetchData }) {
       };
       if (editData) {
         const res = await axios.patch(
-          `/api/departments?department_id=${editData.id}`,
+          `/api/departments/${editData.id}`,
           _values
         );
         successResponse('edited');

@@ -1,16 +1,16 @@
 import { get } from 'controllers/teachers/get';
-import  deleteTeacher from 'controllers/teachers/teacher/delete';
+import deleteTeacher from 'controllers/teachers/teacher/delete';
+import adminCheck from 'middleware/adminCheck';
+import { authenticate } from 'middleware/authenticate';
 
-const index = async (req, res) => {
+
+const id = async (req, res, refresh_token) => {
   try {
     const { method } = req;
 
     switch (method) {
-      case 'GET':
-        get(req, res);
-        break;
       case 'DELETE':
-        deleteTeacher(req, res);
+        deleteTeacher(req, res, refresh_token);
         break;
       default:
         res.setHeader('Allow', ['GET', 'DELETE']);
@@ -22,4 +22,4 @@ const index = async (req, res) => {
   }
 };
 
-export default index;
+export default authenticate(adminCheck(id));

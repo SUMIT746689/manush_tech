@@ -1,3 +1,4 @@
+import deleteholiday from 'controllers/holidays/holiday/deleteholiday';
 import patch from 'controllers/holidays/holiday/patch';
 
 const index = async (req, res) => {
@@ -7,6 +8,9 @@ const index = async (req, res) => {
     switch (method) {
       case 'PATCH':
         patch(req, res);
+        break;
+      case 'DELETE':
+        deleteholiday(req, res);
         break;
       default:
         res.setHeader('Allow', ['PATCH']);

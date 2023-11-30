@@ -28,6 +28,9 @@ async function get(req, res, refresh_token) {
               deleted_at: null
             }
           }
+        },
+        academic_year: {
+          deleted_at: null
         }
       },
       include: {

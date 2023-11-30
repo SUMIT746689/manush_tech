@@ -50,6 +50,7 @@ const ButtonError = styled(Button)(
 interface ResultsProps {
   datas: Project[];
   setEditData: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -112,7 +113,8 @@ const applyPagination = (
 
 const Results: FC<ResultsProps> = ({
   datas,
-  setEditData
+  setEditData,
+  reFetchData
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -181,10 +183,10 @@ const Results: FC<ResultsProps> = ({
 
   const handleDeleteCompleted = async () => {
     try {
-      const result = await axios.delete(`/api/datas/${deleteSchoolId}`);
-      setOpenConfirmDelete(false);
-      if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification('The datas has been deleted successfully')
+      const result = await axios.delete(`/api/holidays/${deleteSchoolId}`);
+      closeConfirmDelete()
+      reFetchData()
+      showNotification(result.data.message)
     } catch (err) {
       setOpenConfirmDelete(false);
       showNotification(err?.response?.data?.message, 'error')
@@ -316,7 +318,7 @@ const Results: FC<ResultsProps> = ({
                                   onClick={() =>
                                     handleConfirmDelete(holiday.id)
                                   }
-                                  color="primary"
+                                  color="error"
                                 >
                                   <DeleteTwoToneIcon fontSize="small" />
                                 </IconButton>

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from 'middleware/authenticate';
 
-const section = async (req, res) => {
+const id = async (req, res, refresh_token) => {
   try {
     const { method } = req;
     const id = parseInt(req.query.id);
@@ -9,7 +10,10 @@ const section = async (req, res) => {
       case 'GET':
         const group = await prisma.group.findUnique({
           where: {
-            id: id
+            id: id,
+            class: {
+              school_id: refresh_token?.school_id
+            }
           }
           // include: {
 
@@ -39,7 +43,10 @@ const section = async (req, res) => {
       case 'DELETE':
         await prisma.group.delete({
           where: {
-            id: id
+            id: id,
+            class: {
+              school_id: refresh_token?.school_id
+            }
           }
         });
         res.status(200).json({ success: 'Group deleted successfully!' });
@@ -55,4 +62,4 @@ const section = async (req, res) => {
   }
 };
 
-export default section;
+export default authenticate(id);

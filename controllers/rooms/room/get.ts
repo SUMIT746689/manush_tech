@@ -1,12 +1,12 @@
 import prisma from "@/lib/prisma_client";
 
-export default async function get(req, res) {
+export default async function get(req, res,refresh_token) {
   try {
     const { id } = req.query;
 
     // if (name) {
     const response = await prisma.room.findFirst({
-      where: { id: Number(id) }
+      where: { id: Number(id), deleted_at: null,school_id:refresh_token?.school_id }
     });
 
     if (response) return res.json({ success: true, rooms: response });

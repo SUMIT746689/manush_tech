@@ -11,12 +11,16 @@ const index = async (req, res, refresh_token) => {
                     where: {
                         exam: {
                             id: parseInt(req.query.exam_id),
-                            school_id: refresh_token.school_id
-                        }
+                            school_id: refresh_token.school_id,
+                        },
                     },
                     include: {
                         subject: true,
-                        exam_room: true
+                        exam_room: {
+                            where: {
+                                deleted_at: null
+                            }
+                        }
                     }
                 });
                 res.status(200).json(examSubjects);

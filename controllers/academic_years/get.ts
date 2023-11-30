@@ -11,7 +11,7 @@ async function get(req, res,refresh_token) {
     
     // @ts-ignore
     const response = await prisma.academicYear.findMany({
-      where: { school_id: user.school_id }
+      where: { school_id: user.school_id,deleted_at:null }
     });
 
     if (response) return res.json({ data: response, success: true });

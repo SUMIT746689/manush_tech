@@ -23,6 +23,7 @@ const index = async (req, res, refresh_token) => {
                             include: {
                                 subject: true,
                                 exam_room: {
+                                    where:{deleted_at: null},
                                     select: {
                                         id: true,
                                         name: true

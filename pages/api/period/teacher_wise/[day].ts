@@ -8,12 +8,12 @@ const Day = async (req, res, refresh_token) => {
         switch (method) {
             case 'GET':
                 const { id, school_id, role } = refresh_token;
-                
-                if(!id || !school_id || role?.title !== "TEACHER") throw new Error("unauthorized user ")
-                
+
+                if (!id || !school_id || role?.title !== "TEACHER") throw new Error("unauthorized user ")
+
                 const { day, section_id } = req.query;
 
-                if(!day || !section_id) throw new Error("required fields missing")
+                if (!day || !section_id) throw new Error("required fields missing")
 
                 const schedule = await prisma.period.findMany({
                     where: {
@@ -22,6 +22,7 @@ const Day = async (req, res, refresh_token) => {
                         teacher: { user_id: parseInt(id) },
                         day,
 
+                        room: { deleted_at: null }
                     },
                     include: {
                         room: true,

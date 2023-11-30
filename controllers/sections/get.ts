@@ -20,7 +20,9 @@ const get = async (req, res, refresh_token) => {
         }
       },
       class_teacher: {
-        where: { deleted_at: null },
+        where: {
+          deleted_at: null
+        },
         select: {
           user: {
             select: {

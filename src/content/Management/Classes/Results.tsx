@@ -231,6 +231,29 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
           {selectedBulkActions && <BulkActions />}
         </Box>
 
+        <Box
+          p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedClasses.length}</b> <b>{t('Class')}</b>
+          </Box>
+          <TablePagination
+            component="div"
+            count={filteredClasses.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
         <Divider />
 
         {paginatedClasses.length === 0 ? (
@@ -283,7 +306,7 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
                         </TableCell>
 
                         <TableCell align="center">
-                          <Typography noWrap>
+                          <Typography noWrap sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 color="primary"
@@ -296,7 +319,7 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={handleConfirmDelete}
-                                color="primary"
+                                color="error"
                               >
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>
@@ -310,17 +333,7 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box p={2}>
-              <TablePagination
-                component="div"
-                count={filteredClasses.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
+
           </>
         )}
       </Card>

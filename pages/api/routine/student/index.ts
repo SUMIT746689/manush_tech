@@ -21,7 +21,8 @@ const index = async (req, res, refresh_token) => {
         const routine = await prisma.period.findMany({
           where: {
             section_id: responseStudent.section.id,
-            school_id: refresh_token.school_id
+            school_id: refresh_token.school_id,
+            room:{deleted_at: null}
           },
           select: {
             day: true,

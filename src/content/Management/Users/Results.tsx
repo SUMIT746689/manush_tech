@@ -413,7 +413,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
-                    <TableCell><Typography noWrap>{t('Log in')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
@@ -444,20 +443,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                           </Typography>
                         </TableCell>
 
-                        <TableCell>
-                          <ButtonWrapper
-                            startIcon={<LoginIcon />}
-                            handleClick={async () => {
-                              try {
-                                // @ts-ignore
-                                await superAdminLogInAsAdmin(user.id);
-                              } catch (err) {
-                                console.error(err);
-                              }
-                            }}
-                          >Log in</ButtonWrapper>
-                        </TableCell>
-
                         <TableCell align='center'>
                           {/* @ts-ignore */}
                           <Typography variant="h5" color={user?.is_enabled ? 'green' : 'red'}>
@@ -468,6 +453,22 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
                         <TableCell align="center">
                           <Typography noWrap align='center'>
+                            <Tooltip title={t('Log In')} arrow>
+                              <IconButton
+                                // href={'/management/users/single/' + user.id}
+                                color="primary"
+                                onClick={async () => {
+                                  try {
+                                    // @ts-ignore
+                                    await superAdminLogInAsAdmin(user.id);
+                                  } catch (err) {
+                                    console.error(err);
+                                  }
+                                }}
+                              >
+                                <LoginIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 color="primary"
@@ -501,12 +502,12 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                                 </IconButton>
                               </Tooltip>
                             }
+
                             <Tooltip title={t('Permission')} arrow>
                               <IconButton
                                 // href={'/management/users/single/' + user.id}
                                 color="primary"
                                 onClick={() => {
-
                                   axios
                                     .get(`/api/user/${user?.id}`)
                                     .then((res) => {

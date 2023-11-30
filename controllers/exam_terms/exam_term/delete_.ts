@@ -13,8 +13,7 @@ async function delete_(req, res, refresh_token) {
 
         const response = await prisma.examTerm.update({
             where: {
-                id: parseInt(id),
-                school_id: parseInt(school_id)
+                id: parseInt(id)
             },
             data: {
                 deleted_at: new Date(Date.now())

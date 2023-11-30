@@ -74,7 +74,7 @@ export const post = async (req, res, refresh_token) => {
       payment_method_id,
       collected_by_user,
       transID, total_payable }: any = req.body;
-    const collected_amount = parseFloat(req.body.collected_amount);
+    const collected_amount = Number(req.body.collected_amount);
 
     if (!student_id || !fee_id || !collected_amount) throw new Error('provide valid informations');
     const voucher = await prisma.voucher.findFirstOrThrow({
@@ -133,6 +133,8 @@ export const post = async (req, res, refresh_token) => {
         created_at: true
       }
     })
+    console.log("isAlreadyAvaliable__",isAlreadyAvaliable);
+    
     //  return res.send(isAlreadyAvaliable)
 
     const data = {

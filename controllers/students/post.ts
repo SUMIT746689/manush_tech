@@ -205,34 +205,6 @@ const postHandle = async (req, res, refresh_token) => {
         }
       });
 
-      const fees = await transaction.fee.findMany({
-        where: {
-          class_id: parseInt(fields.class_id),
-          academic_year_id: parseInt(fields?.academic_year_id)
-        },
-        select: {
-          id: true
-        }
-      });
-
-      let StudentFeeContainer = [];
-      for (let i of fees) {
-        StudentFeeContainer.push({
-          student_id: student?.id,
-          fee_id: i.id,
-          collected_amount: 0,
-          account_id,
-          payment_method_id,
-          payment_method: account.payment_method[0].title,
-        });
-      }
-
-      console.log("StudentFeeContainer__", StudentFeeContainer);
-
-      await transaction.studentFee.createMany({
-        data: StudentFeeContainer
-      });
-
     });
 
     const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({

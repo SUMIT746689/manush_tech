@@ -447,10 +447,11 @@ model Holiday {
 }
 
 model AcademicYear {
-  id         Int       @id @default(autoincrement())
-  title      String
-  school_id  Int
-  deleted_at DateTime?
+  id          Int       @id @default(autoincrement())
+  title       String
+  school_id   Int
+  curr_active Boolean   @default(false)
+  deleted_at  DateTime?
 
   school School @relation(fields: [school_id], references: [id])
 

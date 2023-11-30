@@ -47,5 +47,5 @@
     "next.config.cjs",
     "postcss.config.cjs",
     "tailwind.config.js"
-, "website/src/components/OnlineAdmission.jsx"  ]
+, "website/src/components/OnlineAdmission.jsx", "attendance_microservice/attendance_utility/findAlreadyAttendance.js"  ]
 }

@@ -94,10 +94,10 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t('Create new school')}
+            {t(editSchool ? 'Edit a School' : 'Create new school')}
           </Typography>
           <Typography variant="subtitle2">
-            {t('Use this dialog window to add a new school')}
+            {t(`Use this dialog window to ${editSchool ? 'update a' : 'add a new'} school`)}
           </Typography>
         </DialogTitle>
         <Formik
@@ -112,9 +112,10 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
             main_balance: editSchool?.main_balance ? editSchool?.main_balance : null,
-            sms_count: editSchool?.sms_count ? editSchool?.sms_count : null,
-            sms_masking_price: editSchool?.sms_masking_price ? editSchool?.sms_masking_price : null,
-            sms_non_masking_price: editSchool?.sms_non_masking_price ? editSchool?.sms_non_masking_price : null,
+            masking_sms_count: editSchool?.masking_sms_count ? editSchool?.masking_sms_count : null,
+            non_masking_sms_count: editSchool?.non_masking_sms_count ? editSchool?.non_masking_sms_count : null,
+            masking_sms_price: editSchool?.masking_sms_price ? editSchool?.masking_sms_price : null,
+            non_masking_sms_price: editSchool?.non_masking_sms_price ? editSchool?.non_masking_sms_price : null,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -298,35 +299,45 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
 
                     <TextFieldWrapper
                       type="number"
-                      errors={errors.sms_masking_price}
-                      touched={touched.sms_masking_price}
-                      name="sms_masking_price"
+                      errors={errors.masking_sms_price}
+                      touched={touched.masking_sms_price}
+                      name="masking_sms_price"
                       label={t('Masking Sms Price')}
                       handleBlur={handleBlur}
                       handleChange={handleChange}
-                      value={values.sms_masking_price}
+                      value={values.masking_sms_price}
                     />
 
                     <TextFieldWrapper
                       type="number"
-                      errors={errors.sms_non_masking_price}
-                      touched={touched.sms_non_masking_price}
-                      name="sms_non_masking_price"
+                      errors={errors.non_masking_sms_price}
+                      touched={touched.non_masking_sms_price}
+                      name="non_masking_sms_price"
                       label={t('Non Masking Sms Price')}
                       handleBlur={handleBlur}
                       handleChange={handleChange}
-                      value={values.sms_non_masking_price}
+                      value={values.non_masking_sms_price}
                     />
 
                     <TextFieldWrapper
                       type="number"
-                      errors={errors.sms_count}
-                      touched={touched.sms_count}
-                      name="sms_count"
-                      label={t('No Of Sms Available')}
+                      errors={errors.masking_sms_count}
+                      touched={touched.masking_sms_count}
+                      name="masking_sms_count"
+                      label={t('Masking Sms Count')}
                       handleBlur={handleBlur}
                       handleChange={handleChange}
-                      value={values.sms_count}
+                      value={values.masking_sms_count}
+                    />
+                    <TextFieldWrapper
+                      type="number"
+                      errors={errors.non_masking_sms_count}
+                      touched={touched.non_masking_sms_count}
+                      name="non_masking_sms_count"
+                      label={t('Non Masking Sms Count')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.non_masking_sms_count}
                     />
                   </Grid>
 

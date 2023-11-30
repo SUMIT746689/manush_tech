@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma_client";
 export default async function patchSchool(req, res, refresh_token) {
   try {
     const { id } = req.query;
-    const { name, phone, email, address, admin_ids, currency, domain, main_balance, sms_count, sms_masking_price, sms_non_masking_price } = req.body;
+    const { name, phone, email, address, admin_ids, currency, domain, main_balance, masking_sms_count, non_masking_sms_count, masking_sms_price, non_masking_sms_price } = req.body;
 
     let data = {};
     if (name) data['name'] = name;
@@ -11,10 +11,13 @@ export default async function patchSchool(req, res, refresh_token) {
     if (email) data['email'] = email;
     if (address) data['address'] = address;
     if (currency) data['currency'] = currency;
-    if (domain) data['main_balance'] = main_balance;
-    if (domain) data['sms_count'] = sms_count;
-    if (domain) data['sms_masking_price'] = sms_masking_price;
-    if (domain) data['sms_non_masking_price'] = sms_non_masking_price;
+    if (domain) data['domain'] = domain;
+    if (main_balance) data['main_balance'] = main_balance;
+    if (masking_sms_count) data['masking_sms_count'] = masking_sms_count;
+    if (non_masking_sms_count) data['non_masking_sms_count'] = non_masking_sms_count;
+
+    if (masking_sms_price) data['masking_sms_price'] = masking_sms_price;
+    if (non_masking_sms_price) data['non_masking_sms_price'] = non_masking_sms_price;
 
     const existingSchoolIdList = await prisma.user.findMany({
       where: {

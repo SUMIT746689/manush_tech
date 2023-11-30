@@ -13,7 +13,8 @@ export default async function Admission() {
         where: {
             school: {
                 domain
-            }
+            },
+            deleted_at: null
         }
     })
     return (

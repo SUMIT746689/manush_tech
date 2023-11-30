@@ -38,7 +38,7 @@ export const createCampaign = async ({ recipient_type, campaign_name, sms_templa
 export const getUsers = async ({ role, where }) => {
   switch (role.title) {
     case "TEACHER":
-      const teachers = await prisma.teacher.findMany({ where: { ...where }, select: { phone: true } });
+      const teachers = await prisma.teacher.findMany({ where: { ...where,deleted_at:null }, select: { phone: true } });
       return teachers;
     // const teachers = await prisma.teacher.findMany({ where: { ...where }, select: { phone: true, user_id: true, first_name: true, middle_name: true, last_name: true, } });
     // const teachers = await prisma.$queryRaw`

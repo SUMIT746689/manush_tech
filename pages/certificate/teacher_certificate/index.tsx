@@ -26,7 +26,13 @@ export async function getServerSideProps(context: any) {
 
     if (refresh_token_varify.role.title === 'TEACHER') {
 
-      teacher = await prisma.teacher.findFirst({ where: { user_id: Number(refresh_token_varify.id) }, include: { department: true } })
+      teacher = await prisma.teacher.findFirst({
+        where: { user_id: Number(refresh_token_varify.id), deleted_at: null, department: { deleted_at: null } },
+
+        include: {
+          department: true
+        }
+      })
       const parseTeacher = JSON.parse(JSON.stringify(teacher));
       return { props: { teacher: parseTeacher, templates, roles } };
     }
@@ -54,7 +60,7 @@ const Packages = ({ teacher, templates, roles }) => {
             teacher ?
               <StudentTeacherResults certificateFor={"teacher"} teacher={teacher} templates={templates} />
               :
-              <Result defauleRole={ roles && roles?.length > 0 ? roles[0].id : undefined } roles={roles}  templates={templates} />
+              <Result defauleRole={roles && roles?.length > 0 ? roles[0].id : undefined} roles={roles} templates={templates} />
           }
         </Grid>
 

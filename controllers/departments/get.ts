@@ -14,7 +14,8 @@ export default async function get(req: any, res: any) {
     //@ts-ignore
     const departments = await prisma.department.findMany({
       where: {
-        school_id: refresh_token.school_id
+        school_id: refresh_token.school_id,
+        deleted_at: null
       }
     });
     // delete user['password'];

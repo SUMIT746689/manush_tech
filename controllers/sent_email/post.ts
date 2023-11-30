@@ -23,21 +23,21 @@ const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
   // })
 };
 
-const sentSmsToUsers = async (user, responseSentSms,sms_res_gatewayinfo) => {
+const sentSmsToUsers = async (user, responseSentSms, sms_res_gatewayinfo) => {
   let status = "pending"
   try {
     const { data: sms_res } = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${user?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${name}, ${responseSentSms?.custom_body}`)}`)
     if (typeof sms_res === "string" && sms_res?.startsWith("SMS SUBMITTED")) status = "success"
     else status = "failed"
-    insertDataToSentSmsDetails({ responseSentSms_id:responseSentSms.id, status, user })
+    insertDataToSentSmsDetails({ responseSentSms_id: responseSentSms.id, status, user })
   }
   catch (err) {
     status = "failed"
-    insertDataToSentSmsDetails({ responseSentSms_id:responseSentSms.id, status, user })
+    insertDataToSentSmsDetails({ responseSentSms_id: responseSentSms.id, status, user })
   }
 }
 
-const sentSmsHandler = async ({ sentSmsUsers, responseSentSms,school_id }) => {
+const sentSmsHandler = async ({ sentSmsUsers, responseSentSms, school_id }) => {
   //individual user sent sms and insert response and data into sent sms details table
   const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
     where: {
@@ -47,7 +47,7 @@ const sentSmsHandler = async ({ sentSmsUsers, responseSentSms,school_id }) => {
   })
   sentSmsUsers.forEach((user) => {
     // if (user) 
-    sentSmsToUsers(user, responseSentSms,sms_res_gatewayinfo)
+    sentSmsToUsers(user, responseSentSms, sms_res_gatewayinfo)
   })
 };
 
@@ -83,7 +83,7 @@ const updateSentSms = async ({ responseSentSms, sentSmsUsers }) => {
 const getUsers = async ({ role, where }) => {
   switch (role.title) {
     case "TEACHER":
-      return await prisma.teacher.findMany({ where: { ...where }, select: { phone: true, user_id: true } });
+      return await prisma.teacher.findMany({ where: { ...where, deleted_at: null }, select: { phone: true, user_id: true } });
 
     case "STUDENT":
 
@@ -103,7 +103,7 @@ async function post(req, res, refresh_token) {
   try {
     const { subject, campaign_name, recipient_type, role_id, class_id, section_id, name: individual_user_id, body: custom_body, sms_template_id } = req.body;
     const { school_id } = refresh_token;
-    
+
     if (!subject || !recipient_type) throw new Error("provide valid data")
 
     const data = {
@@ -118,7 +118,7 @@ async function post(req, res, refresh_token) {
       case "GROUP":
         if (!role_id) throw new Error("permission denied");
         const roles = await prisma.role.findMany({ where: { id: { in: role_id } }, select: { title: true, id: true } })
-       
+
         // const roleArray = [];
         // get users persmissions
         // const user = await prisma.user.findFirst({ where: { id: refresh_token.id }, select: { role: { select: { permissions: { select: { value: true } } } }, permissions: { select: { value: true } } } })
@@ -147,7 +147,7 @@ async function post(req, res, refresh_token) {
           //udpate sentsms table
           updateSentSms({ sentSmsUsers: singleGroupUsers, responseSentSms });
           // every group individually sending sms handles
-          sentSmsHandler({ sentSmsUsers: singleGroupUsers, responseSentSms,school_id });
+          sentSmsHandler({ sentSmsUsers: singleGroupUsers, responseSentSms, school_id });
         })
 
         return res.status(200).json({ message: "successfull" });
@@ -203,7 +203,7 @@ async function post(req, res, refresh_token) {
     // insert sent sms in sentsms table   
     responseSentSms = await insertsentSms({ recipient_type, campaign_name, sms_template_id, subject, school_id: refresh_token.school_id, custom_body, recipient_count: sentSmsUsers.length });
     // users sending sms handle 
-    sentSmsUsers.length > 0 && sentSmsHandler({ sentSmsUsers, responseSentSms,school_id });
+    sentSmsUsers.length > 0 && sentSmsHandler({ sentSmsUsers, responseSentSms, school_id });
 
     return res.json({ message: 'success' });
 

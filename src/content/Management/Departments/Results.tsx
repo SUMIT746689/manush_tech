@@ -93,6 +93,7 @@ const IconButtonError = styled(IconButton)(
 interface ResultsProps {
   datas: Project[];
   setEditData: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -155,7 +156,8 @@ const applyPagination = (
 
 const Results: FC<ResultsProps> = ({
   datas,
-  setEditData
+  setEditData,
+  reFetchData
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -168,11 +170,6 @@ const Results: FC<ResultsProps> = ({
     status: null
   });
 
-  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    event.persist();
-    setQuery(event.target.value);
-  };
-
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -183,7 +180,7 @@ const Results: FC<ResultsProps> = ({
 
   const filteredschools = applyFilters(datas, query, filters);
   const paginatedDepartments = applyPagination(filteredschools, page, limit);
-  const selectedBulkActions = selectedItems.length > 0;
+  
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
@@ -198,10 +195,10 @@ const Results: FC<ResultsProps> = ({
 
   const handleDeleteCompleted = async () => {
     try {
-      const result = await axios.delete(`/api/datas/${deleteSchoolId}`);
-      setOpenConfirmDelete(false);
-      if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification('The datas has been deleted successfully');
+      const result = await axios.delete(`/api/departments/${deleteSchoolId}`);
+      closeConfirmDelete()
+      reFetchData()
+      showNotification(result.data?.message);
 
     } catch (err) {
       setOpenConfirmDelete(false);
@@ -238,12 +235,8 @@ const Results: FC<ResultsProps> = ({
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.6 }}>
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
-        {!selectedBulkActions && (
+       
+      
           <Box
             p={2}
             display="flex"
@@ -266,7 +259,7 @@ const Results: FC<ResultsProps> = ({
               rowsPerPageOptions={[5, 10, 15]}
             />
           </Box>
-        )}
+      
         <Divider />
 
         {paginatedDepartments.length === 0 ? (
@@ -283,19 +276,16 @@ const Results: FC<ResultsProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paginatedDepartments.map((department) => {
-                    const isschoolselected = selectedItems.includes(
-                      department.id
-                    );
+                  {paginatedDepartments.map((i) => {
+                    
                     return (
                       <TableRow
                         hover
-                        key={department?.id}
-                        selected={isschoolselected}
+                        key={i?.id}
                       >
                         <TableCell align="center">
                           <Typography noWrap variant="h5">
-                            {department?.title}
+                            {i?.title}
                           </Typography>
                         </TableCell>
 
@@ -303,7 +293,7 @@ const Results: FC<ResultsProps> = ({
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
-                                onClick={() => setEditData(department)}
+                                onClick={() => setEditData(i)}
                                 color="primary"
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
@@ -312,9 +302,9 @@ const Results: FC<ResultsProps> = ({
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
-                                  handleConfirmDelete(department.id)
+                                  handleConfirmDelete(i.id)
                                 }
-                                color="primary"
+                                color='error'
                               >
                                 <DeleteTwoToneIcon fontSize="small" />
                               </IconButton>

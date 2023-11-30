@@ -26,6 +26,7 @@ const Day = async (req, res, refresh_token) => {
                     include: {
                         room: true,
                         teacher: {
+                            where:{ deleted_at: null},
                             select: {
                                 id: true,
                                 first_name: true

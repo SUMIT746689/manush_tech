@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma_client";
+import { authenticate } from "middleware/authenticate";
 
-const id = async (req, res) => {
+const id = async (req, res, refresh_token) => {
     try {
         const { method } = req;
         const id = parseInt(req.query.id)
@@ -9,25 +10,27 @@ const id = async (req, res) => {
 
         }
         switch (method) {
-            case 'GET':
-                const user = await prisma.section.findUnique({
-                    where: {
-                        id: id
-                    },
-                    // include: {
-                     
-                    // }
-                })
-                res.status(200).json(user);
-                break;
             case 'DELETE':
-                await prisma.section.delete({
+                await prisma.user.findFirstOrThrow({
                     where: {
-                        id: id
+                        school_id: refresh_token?.school_id,
+                        role: {
+                            id: refresh_token?.role?.id,
+                            title: 'ADMIN'
+                        }
                     }
                 })
+                await prisma.department.update({
+                    where: {
+                        id: id,
+                    },
+                    data: {
+                        deleted_at: new Date()
+                    }
+                })
+                res.status(200).json({message:'Department deleted successfully !!'});
                 break;
-            
+
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
                 res.status(405).end(`Method ${method} Not Allowed`);
@@ -39,4 +42,4 @@ const id = async (req, res) => {
     }
 }
 
-export default id
+export default authenticate(id) 

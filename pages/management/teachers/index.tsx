@@ -59,6 +59,7 @@ function Managementschools() {
             setTeachers={setTeachers}
             editSchool={editSchool}
             setEditSchool={setEditSchool}
+            reFetchData={reFetchData}
           />
         </Grid>
       </Grid>

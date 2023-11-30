@@ -7,7 +7,7 @@ const index = async (req, res, refresh_token) => {
 
     switch (method) {
       case 'GET':
-        
+
         const responseStudent = await prisma.student.findFirst({
           where: {
             student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id },
@@ -29,6 +29,7 @@ const index = async (req, res, refresh_token) => {
             end_time: true,
             room: true,
             teacher: {
+              where: { deleted_at: null },
               select: {
                 school_id: true,
                 user: {

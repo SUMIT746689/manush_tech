@@ -43,6 +43,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import useNotistick from '@/hooks/useNotistick';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
+import { getFile } from '@/utils/utilitY-functions';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -83,6 +84,7 @@ interface ResultsProps {
   setTeachers: Function;
   editSchool: object;
   setEditSchool: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -147,7 +149,7 @@ const applyPagination = (
   return schools.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
+const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetchData }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -176,7 +178,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
 
   const filteredschools = applyFilters(schools, query, filters);
   const paginatedschools = applyPagination(filteredschools, page, limit);
-  const selectedBulkActions = selectedItems.length > 0;
+
 
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
@@ -193,22 +195,17 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
 
   const handleDeleteCompleted = async () => {
     try {
-      const result: any = await axios.delete(`/api/teacher/${deleteSchoolId}`);
-      if (!result.data?.success) throw new Error('unsuccessful delete');
-      setTeachers((teachers: any) =>
-        teachers.filter((teacher) => teacher.id !== result.id)
-      );
+      const result = await axios.delete(`/api/teacher/${deleteSchoolId}`);
       setOpenConfirmDelete(false);
-      showNotification('The schools has been deleted successfully');
+      showNotification(result.data.message);
+      reFetchData();
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification('The school falied to delete ', 'error');
+      showNotification(err?.response?.data?.message, 'error')
     }
   };
 
-  const handleEdit = (data: object) => {
-    setEditSchool(data);
-  };
+
 
   return (
     <>
@@ -248,11 +245,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
       <Card
         sx={{ minHeight: 'calc(100vh - 412px) !important' }}
       >
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
 
         <Divider />
 
@@ -289,52 +281,42 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paginatedschools.map((project) => {
-                    const isschoolselected = selectedItems.includes(
-                      project.id
-                    );
-                    let name = project.first_name;
-                    if (project?.middle_name) {
-                      name += project?.middle_name
-                    }
-                    if (project?.last_name) {
-                      name += project?.last_name
-                    }
+                  {paginatedschools.map((i) => {
                     return (
                       <TableRow
                         hover
-                        key={project.id}
-                        selected={isschoolselected}
+                        key={i.id}
+
                       >
                         <TableCell align="center">
                           <Typography noWrap variant="h5">
-                            {project.id}
+                            {i.id}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {name}
+                            {[i?.first_name, i?.middle_name, i?.last_name].join(' ')}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project.user?.username}
+                            {i.user?.username}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5" color="yellowgreen">
-                            <a href={`tel:${project.phone}`}>{project.phone}</a>
+                            <a href={`tel:${i.phone}`}>{i.phone}</a>
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project.photo ? (
+                            {i.photo ? (
                               <Image
                                 style={{ width: '50px' }}
                                 alt="profile photo"
                                 width={20}
                                 height={20}
-                                src={`/api/get_file/${project?.photo?.replace(/\\/g, '/')}`}
+                                src={getFile(i?.photo)}
                               />
                             ) : (
                               <Image
@@ -349,14 +331,14 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {project.user?.school?.name}
+                            {i.user?.school?.name}
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
-                                onClick={() => handleEdit(project)}
+                                onClick={() => setEditSchool(i)}
                                 color="primary"
                               >
                                 <LaunchTwoToneIcon fontSize="small" />
@@ -365,11 +347,11 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool }) => {
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
                                 onClick={() =>
-                                  handleConfirmDelete(project.id)
+                                  handleConfirmDelete(i.id)
                                 }
                                 color="primary"
                               >
-                                <DeleteTwoToneIcon fontSize="small" />
+                                <DeleteTwoToneIcon fontSize="small" color='error' />
                               </IconButton>
                             </Tooltip>
                           </Typography>

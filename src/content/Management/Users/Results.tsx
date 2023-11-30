@@ -122,7 +122,7 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['username','school.name' ];
+      const properties = ['username', 'school.name'];
       let containsQuery = false;
 
       for (const property of properties) {
@@ -344,7 +344,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
             <DebounceInput
               debounceTimeout={1000}
               handleDebounce={(v) => setQuery(v)}
-              label={'Search by name, email or username...'}
+              label={t('Search by Username or School...')}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -378,9 +378,16 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
           </>)}
           {/* {selectedBulkActions && <BulkActions />} */}
         </Grid>
-
-        <Divider />
-        <Box p={2}>
+        <Box py={1} px={2} 
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between">
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedUsers.length}</b> <b>{t('users')}</b>
+          </Box>
           <TablePagination
             component="div"
             count={filteredUsers.length}
@@ -390,7 +397,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
             rowsPerPage={limit}
             rowsPerPageOptions={[5, 10, 15]}
           />
+
         </Box>
+        <Divider />
+
 
         {paginatedUsers.length === 0 ? (
           <>
@@ -417,7 +427,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
-                    
+
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
@@ -444,16 +454,16 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            { customizeDate(user?.created_at)}
+                            {customizeDate(user?.created_at)}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            { user?.school?.name}
+                            {user?.school?.name}
                           </Typography>
                         </TableCell>
-                        
+
 
                         <TableCell align='center'>
                           {/* @ts-ignore */}
@@ -464,7 +474,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         </TableCell>
 
                         <TableCell align="center">
-                          <Typography noWrap align='center'>
+                          <Typography noWrap align='center' sx={{display:'flex',flexWrap:"nowrap",justifyContent:'space-around',}}>
                             <Tooltip title={t('Log In')} arrow>
                               <IconButton
                                 // href={'/management/users/single/' + user.id}

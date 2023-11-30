@@ -12,7 +12,10 @@ import {
   CircularProgress,
   Autocomplete,
   Button,
-  Card
+  Card,
+  Dialog,
+  DialogTitle,
+  Typography
 } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import axios from 'axios';
@@ -29,9 +32,10 @@ import { MobileTimePicker } from '@mui/lab';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 
-function PageHeader() {
-
+function PageHeader({reFetchData}) {
+  const [open, setOpen] = useState(false);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const [rooms, setRooms] = useState([]);
@@ -48,13 +52,24 @@ function PageHeader() {
   const [selectedDay, setSelectedDay] = useState(null);
   const { user } = useAuth();
 
-  const handleSubmitSuccess = () => {
+  const handleCreateProjectOpen = () => {
+    setOpen(true);
+  };
+
+  const handleCreateProjectClose = () => {
+    setOpen(false);
+  };
+
+ 
+  const handleCreateProjectSuccess = () => {
+    setSelectedClass(null);
     setStartTime(null);
     setEndTime(null);
     setBookedClass(null);
     setSelectedRoom(null);
-    setSelectedTeacher(null);
-
+    setSelectedTeacher(null); 
+    setSelectedDay(null); 
+    setOpen(false);
   };
 
   const handleCreateUserSuccess = () => {
@@ -86,16 +101,6 @@ function PageHeader() {
   const handleClassSelect = (e, value, setFieldValue) => {
     setSelectedClass(value)
     if (value?.id) {
-      // for (const i of classes) {
-      //   if (i.id == value.id) {
-      //     setSections(
-      //       i.sections?.map((j) => {
-      //         return { label: j.name, id: j.id };
-      //       })
-      //     );
-      //     break;
-      //   }
-      // }
       const selectedClass = classes.find(i => i.id == value.id);
       if (selectedClass) {
         if (selectedClass.has_section) {
@@ -130,112 +135,124 @@ function PageHeader() {
 
   return (
     <>
-      <Formik
-        initialValues={{
-          day: undefined,
-          room_id: undefined,
-          start_time: undefined,
-          end_time: undefined,
-          section_id: undefined,
-          subject_id: undefined,
-          teacher_id: undefined
-        }}
-        validationSchema={Yup.object().shape({
-          day: Yup.string().max(255).required(t('The day field is required')),
-          room_id: Yup.number()
-            .positive()
-            .integer()
-            .required(t('The room_id field is required')),
-          start_time: Yup.string()
-            .max(255)
-            .required(t('The start_time field is required')),
-          end_time: Yup.string()
-            .max(255)
-            .required(t('The end_time field is required')),
-          section_id: Yup.number()
-            .positive()
-            .integer()
-            .required(t('The section_id field is required')),
-          teacher_id: Yup.number().positive().integer()
-        })}
-        onSubmit={async (
-          _values,
-          { resetForm, setErrors, setStatus, setSubmitting }
-        ) => {
-          const values = { ..._values, school_id: user?.school_id };
-          axios
-            .post(`/api/period`, values)
-            .then(() => {
-              resetForm();
-              setStatus({ success: true });
-              setSubmitting(false);
-              handleCreateUserSuccess();
-              setSelectedClass(null)
-              setSelectedDay(null)
-              handleSubmitSuccess();
-            })
-            .catch((err) => {
-              console.log(err);
-              showNotification(`${err?.response?.data?.message || 'Error'}`, 'error')
-            });
-        }}
+      <PageHeaderTitleWrapper
+        name="Period"
+        handleCreateClassOpen={handleCreateProjectOpen}
+      />
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        open={open}
+        onClose={handleCreateProjectClose}
       >
-        {({
-          errors,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          touched,
-          values,
-          setFieldValue
-        }) => {
-          return (
-            <Grid display={"grid"} gridTemplateColumns={{ md: "1fr 1fr" }} sx={{}} mt={2} mx={1} gap={1}>
+        <Formik
+          initialValues={{
+            day: undefined,
+            room_id: undefined,
+            start_time: undefined,
+            end_time: undefined,
+            section_id: undefined,
+            subject_id: undefined,
+            teacher_id: undefined
+          }}
+          validationSchema={Yup.object().shape({
+            day: Yup.string().max(255).required(t('The day field is required')),
+            room_id: Yup.number()
+              .positive()
+              .integer()
+              .required(t('The room_id field is required')),
+            start_time: Yup.string()
+              .max(255)
+              .required(t('The start_time field is required')),
+            end_time: Yup.string()
+              .max(255)
+              .required(t('The end_time field is required')),
+            section_id: Yup.number()
+              .positive()
+              .integer()
+              .required(t('The section_id field is required')),
+            teacher_id: Yup.number().positive().integer()
+          })}
+          onSubmit={async (
+            _values,
+            { resetForm, setErrors, setStatus, setSubmitting }
+          ) => {
+            const values = { ..._values, school_id: user?.school_id };
+            axios
+              .post(`/api/period`, values)
+              .then(() => {
+                resetForm();
+                setStatus({ success: true });
+                setSubmitting(false);
+                reFetchData();
+                handleCreateUserSuccess();
+                handleCreateProjectSuccess();
+              })
+              .catch((err) => {
+                console.log(err);
+                showNotification(`${err?.response?.data?.message || 'Error'}`, 'error')
+              });
+          }}
+        >
+          {({
+            errors,
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            isSubmitting,
+            touched,
+            values,
+            setFieldValue
+          }) => {
+            return (
+              <Grid display={"grid"} gridTemplateColumns={{ md: "1fr 1fr" }} sx={{}} mt={2} mx={1} gap={1}>
 
-              <Card sx={{ ":nth-of-type": { order: 2 }, p: 1, justifyContent: 'center', borderRadius: 0.6, width: "100%" }}>
-                <form onSubmit={handleSubmit}>
-                  <DialogTitleWrapper name="period" editData={undefined} />
-                  <DialogContent
-                    dividers
-                    sx={{
-                      p: 4
-                    }}
-                  >
-                    {/* <Grid container spacing={3}> */}
-                    <Grid item >
+                <Card sx={{ ":nth-of-type": { order: 2 }, p: 1, justifyContent: 'center', borderRadius: 0.6, width: "100%" }}>
+                  <form onSubmit={handleSubmit}>
+                    <DialogTitleWrapper name="period" editData={undefined} />
+                    <DialogContent
+                      dividers
+                      sx={{
+                        p: 4
+                      }}
+                    >
+                      {/* <Grid container spacing={3}> */}
+
                       <Grid container spacing={1}>
-                        {/* Select class */}
-                        <AutoCompleteWrapper
-                          label={t('Class')}
-                          placeholder={t('select a class...')}
-                          minWidth="100%"
-                          required={true}
-                          options={classes?.map((i) => ({ label: i.name, id: i.id, has_section: i.has_section }))}
-                          value={selectedClass}
-                          handleChange={(e, v) => handleClassSelect(e, v, setFieldValue)}
-                        />
-                        {/* Select section */}
-                        {
-                          (selectedClass && selectedClass.has_section) ? (<>
+
+                        <Grid item sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr',gap:1,width:'100%' }}>
+                          {/* Select class */}
                             <AutoCompleteWrapper
+                              label={t('Class')}
+                              placeholder={t('select a class...')}
                               minWidth="100%"
                               required={true}
-                              label={t('section')}
-                              placeholder={t('Select Section...')}
-                              options={sections}
-                              value={undefined}
-                              handleChange={(e, value) => setFieldValue('section_id', value?.id)}
+                              options={classes?.map((i) => ({ label: i.name, id: i.id, has_section: i.has_section }))}
+                              value={selectedClass}
+                              handleChange={(e, v) => handleClassSelect(e, v, setFieldValue)}
                             />
-                          </>
-                          )
-                            :
-                            <EmptyAutoCompleteWrapper minWidth="100%" label="Section" placeholder="select a section..." value={undefined} options={[]} />
-                        }
-
+                          {/* Select section */}
+                            {
+                              (selectedClass && selectedClass.has_section) ? (<>
+                                <AutoCompleteWrapper
+                                  minWidth="100%"
+                                  required={true}
+                                  label={t('section')}
+                                  placeholder={t('Select Section...')}
+                                  options={sections}
+                                  value={undefined}
+                                  handleChange={(e, value) => setFieldValue('section_id', value?.id)}
+                                />
+                              </>
+                              )
+                                :
+                                <EmptyAutoCompleteWrapper minWidth="100%" label="Section" placeholder="select a section..." value={undefined} options={[]} />
+                            }
+                          </Grid>
+                          <Grid item sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr',gap:1,width:'100%' }}>
                         {/* Select subject */}
                         <AutoCompleteWrapper
-                        required={true}
+                          required={true}
                           minWidth="100%"
                           label={t('Subject')}
                           placeholder={t('select a subject...')}
@@ -258,7 +275,7 @@ function PageHeader() {
                             setFieldValue('room_id', value?.id);
                           }}
                         />
-
+                    </Grid>
                         {/* Select day */}
                         <AutoCompleteWrapper
                           minWidth="100%"
@@ -291,7 +308,7 @@ function PageHeader() {
                         {/* start_time */}
                         <Grid item xs={12} sm={6} md={6}>
                           <MobileTimePicker
-                          
+
                             label="Start Time"
                             value={startTime}
                             onChange={(n) => {
@@ -375,160 +392,160 @@ function PageHeader() {
                           }}
                         />
                       </Grid>
-                    </Grid>
 
 
 
-                    {/* </Grid> */}
-                  </DialogContent>
 
-                  <DialogActionWrapper
-                    titleFront={"Add New"}
-                    title="Period"
-                    handleCreateClassClose={handleSubmitSuccess}
-                    errors={errors}
-                    editData={undefined}
-                    isSubmitting={isSubmitting}
-                  />
-                </form>
-              </Card>
-              {/* {
+                      {/* </Grid> */}
+                    </DialogContent>
+
+                    <DialogActionWrapper
+                      titleFront={"Add New"}
+                      title="Period"
+                      handleCreateClassClose={handleCreateProjectSuccess}
+                      errors={errors}
+                      editData={undefined}
+                      isSubmitting={isSubmitting}
+                    />
+                  </form>
+                </Card>
+                {/* {
                 bookedClass && ( */}
-              <Grid item height="100%" width="full" overflow="auto" sx={{ ":nth-of-type": { order: 1 } }} >
-                <TableContainer component={Paper} sx={{ minHeight: "100%", borderRadius: 0.6 }}>
-                  <Table
-                    sx={{ minWidth: 600 }}
-                    size="small"
-                    aria-label="a dense table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align="center">Room</TableCell>
-                        <TableCell align="center">Start Time</TableCell>
-                        <TableCell align="center">End Time</TableCell>
-                        <TableCell align="center">Teacher</TableCell>
-                        <TableCell align="center">Teacher's Id</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {bookedClass?.map((row) => {
-                        let start_time;
-                        let end_time;
+                <Grid item height="100%" width="full" overflow="auto" sx={{ ":nth-of-type": { order: 1 } }} >
+                  <TableContainer component={Paper} sx={{ minHeight: "100%", borderRadius: 0.6 }}>
+                    <Table
+                      sx={{ minWidth: 600 }}
+                      size="small"
+                      aria-label="a dense table"
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center">Room</TableCell>
+                          <TableCell align="center">Start Time</TableCell>
+                          <TableCell align="center">End Time</TableCell>
+                          <TableCell align="center">Teacher</TableCell>
+                          <TableCell align="center">Teacher's Id</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {bookedClass?.map((row) => {
+                          let start_time;
+                          let end_time;
 
-                        const tempStart_time = new Date(
-                          row?.start_time
-                        ).getHours();
-                        const tempEnd_time = new Date(
-                          row?.end_time
-                        ).getHours();
-                        if (tempStart_time > 12) {
-                          start_time = `${tempStart_time - 12
-                            } : ${new Date(
-                              row?.start_time
-                            ).getMinutes()} pm`;
-                        } else {
-                          start_time = `${tempStart_time} : ${new Date(
+                          const tempStart_time = new Date(
                             row?.start_time
-                          ).getMinutes()} am`;
-                        }
-                        if (tempEnd_time > 12) {
-                          end_time = `${tempEnd_time - 12} : ${new Date(
+                          ).getHours();
+                          const tempEnd_time = new Date(
                             row?.end_time
-                          ).getMinutes()} pm`;
-                        } else {
-                          end_time = `${tempEnd_time} : ${new Date(
-                            row?.end_time
-                          ).getMinutes()} am`;
-                        }
-                        let mark = {};
-                        if (
-                          selectedRoom &&
-                          row.room.id == selectedRoom.id &&
-                          row.room.id == selectedRoom.id
-                        ) {
-                          mark = {
-                            color: 'white',
-                            bgcolor: 'text.secondary'
-                            // opacity:
-                          };
-                        } else {
-                          mark = {
-                            color: 'text.primary'
-                          };
-                        }
-                        let markTeacher = {};
-                        // { color: selectedTeacher ? (selectedTeacher.id == row?.teacher?.id ) ? 'error.main' : 'text.primary' : 'text.primary' }
+                          ).getHours();
+                          if (tempStart_time > 12) {
+                            start_time = `${tempStart_time - 12
+                              } : ${new Date(
+                                row?.start_time
+                              ).getMinutes()} pm`;
+                          } else {
+                            start_time = `${tempStart_time} : ${new Date(
+                              row?.start_time
+                            ).getMinutes()} am`;
+                          }
+                          if (tempEnd_time > 12) {
+                            end_time = `${tempEnd_time - 12} : ${new Date(
+                              row?.end_time
+                            ).getMinutes()} pm`;
+                          } else {
+                            end_time = `${tempEnd_time} : ${new Date(
+                              row?.end_time
+                            ).getMinutes()} am`;
+                          }
+                          let mark = {};
+                          if (
+                            selectedRoom &&
+                            row.room.id == selectedRoom.id &&
+                            row.room.id == selectedRoom.id
+                          ) {
+                            mark = {
+                              color: 'white',
+                              bgcolor: 'text.secondary'
+                              // opacity:
+                            };
+                          } else {
+                            mark = {
+                              color: 'text.primary'
+                            };
+                          }
+                          let markTeacher = {};
+                          // { color: selectedTeacher ? (selectedTeacher.id == row?.teacher?.id ) ? 'error.main' : 'text.primary' : 'text.primary' }
 
-                        if (
-                          selectedTeacher &&
-                          selectedTeacher.id == row?.teacher?.id &&
-                          selectedRoom &&
-                          row.room.id == selectedRoom.id &&
-                          row.room.id == selectedRoom.id
-                        )
-                          markTeacher = {
-                            bgcolor: 'warning.main'
-                          };
+                          if (
+                            selectedTeacher &&
+                            selectedTeacher.id == row?.teacher?.id &&
+                            selectedRoom &&
+                            row.room.id == selectedRoom.id &&
+                            row.room.id == selectedRoom.id
+                          )
+                            markTeacher = {
+                              bgcolor: 'warning.main'
+                            };
 
-                        let timeOverlap = {};
-                        if (
-                          startTime &&
-                          //@ts-ignore
-                          startTime.$H == tempStart_time &&
-                          new Date(row?.start_time).getMinutes() ==
-                          //@ts-ignore
-                          startTime.$m &&
-                          endTime &&
-                          //@ts-ignore
-                          endTime.$H == tempEnd_time &&
-                          new Date(row?.end_time).getMinutes() ==
-                          //@ts-ignore
-                          endTime.$m
-                        ) {
-                          timeOverlap = {
-                            bgcolor: 'error.main'
-                          };
-                        }
+                          let timeOverlap = {};
+                          if (
+                            startTime &&
+                            //@ts-ignore
+                            startTime.$H == tempStart_time &&
+                            new Date(row?.start_time).getMinutes() ==
+                            //@ts-ignore
+                            startTime.$m &&
+                            endTime &&
+                            //@ts-ignore
+                            endTime.$H == tempEnd_time &&
+                            new Date(row?.end_time).getMinutes() ==
+                            //@ts-ignore
+                            endTime.$m
+                          ) {
+                            timeOverlap = {
+                              bgcolor: 'error.main'
+                            };
+                          }
 
-                        return (
-                          <TableRow
-                            key={row.id}
-                            sx={{
-                              '&:last-child td, &:last-child th': {
-                                border: 0
-                              }
-                            }}
-                          >
-                            <TableCell sx={mark}>
-                              {row?.room?.name}
-                            </TableCell>
-                            <TableCell align="center" sx={timeOverlap}>
-                              {start_time}
-                            </TableCell>
-                            <TableCell align="center" sx={timeOverlap}>
-                              {end_time}
-                            </TableCell>
-                            <TableCell align="center" sx={markTeacher}>
-                              {row?.teacher?.first_name}
-                            </TableCell>
-                            <TableCell align="center" sx={markTeacher}>
-                              {row?.teacher?.id}
-                            </TableCell>
-                            {/* <TableCell >{row?.section?.class?.name}</TableCell> */}
-                            {/* <TableCell>{row?.section?.name}</TableCell> */}
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                          return (
+                            <TableRow
+                              key={row.id}
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0
+                                }
+                              }}
+                            >
+                              <TableCell sx={mark}>
+                                {row?.room?.name}
+                              </TableCell>
+                              <TableCell align="center" sx={timeOverlap}>
+                                {start_time}
+                              </TableCell>
+                              <TableCell align="center" sx={timeOverlap}>
+                                {end_time}
+                              </TableCell>
+                              <TableCell align="center" sx={markTeacher}>
+                                {row?.teacher?.first_name}
+                              </TableCell>
+                              <TableCell align="center" sx={markTeacher}>
+                                {row?.teacher?.id}
+                              </TableCell>
+                              {/* <TableCell >{row?.section?.class?.name}</TableCell> */}
+                              {/* <TableCell>{row?.section?.name}</TableCell> */}
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+
               </Grid>
-              {/* )
-              } */}
-            </Grid>
-          );
-        }}
-      </Formik >
+            );
+          }}
+        </Formik >
+      </Dialog>
     </>
   );
 }

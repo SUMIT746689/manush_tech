@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import deletePeriod from "controllers/period/deletePeriod";
 import { authenticate } from "middleware/authenticate";
 
 const Day = async (req, res, refresh_token) => {
@@ -39,6 +40,9 @@ const Day = async (req, res, refresh_token) => {
                     }
                 })
                 res.status(200).json(schedule);
+                break;
+            case 'DELETE':
+                deletePeriod(req, res,refresh_token);
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);

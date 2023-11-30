@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma_client';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export default async function deleteRoom(req, res,refresh_token) {
   try {

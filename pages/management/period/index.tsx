@@ -2,36 +2,44 @@ import Head from 'next/head';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import PageHeader from 'src/content/Management/Period/PageHeader';
+import Result from 'src/content/Management/Period/Result';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { DialogTitle, Grid, Typography } from '@mui/material';
-import { useTranslation } from 'next-i18next';
+import {  Grid } from '@mui/material';
+import { useState } from 'react';
+import { useClientFetch } from '@/hooks/useClientFetch';
 function PeriodManagement() {
-  const { t }: { t: any } = useTranslation();
+  const { data,reFetchData, error } = useClientFetch('/api/period');
+  const [editPeriod, setEditPeriod] = useState(null);
+console.log("data__",data)
   return (
     <>
       <Head>
         <title>Period - Management</title>
       </Head>
-      {/* <PageTitleWrapper >
-        <DialogTitle
-          sx={{
-            px: 3,
-            py: 0
-          }}
-        >
-          <Typography variant="h4" gutterBottom>
-            {t('Add new period')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t('Fill in the fields below to create and add a new period')}
-          </Typography>
-        </DialogTitle>
-      </PageTitleWrapper> */}
+      <PageTitleWrapper>
+        <PageHeader
+         reFetchData={reFetchData}
+        />
+      </PageTitleWrapper>
 
-      <Grid sx={{ minHeight: 'calc(100vh - 233px)' }}>
-        <PageHeader />
+      <Grid
+        sx={{ px: 4 }}
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="stretch"
+        spacing={3}
+      >
+        <Grid item xs={12}>
+          <Result
+            periods={data || []}
+            reFetchData={reFetchData}
+            setEditPeriod={setEditPeriod}
+          />
+        </Grid>
       </Grid>
+
 
 
       <Footer />

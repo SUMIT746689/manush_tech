@@ -320,7 +320,6 @@ const Results: FC<ResultsProps> = ({
                     <TableCell>{t('Subscription End')}</TableCell>
                     <TableCell>{t('Contact Number')}</TableCell>
                     <TableCell>{t('Email')}</TableCell>
-                    <TableCell>{t('Address')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -389,11 +388,7 @@ const Results: FC<ResultsProps> = ({
                             </a>
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {school?.address}
-                          </Typography>
-                        </TableCell>
+                        
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Manage Subscription')} arrow>

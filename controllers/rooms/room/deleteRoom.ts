@@ -8,7 +8,7 @@ export default async function deleteRoom(req, res,refresh_token) {
     await prisma.department.delete({
         where: {
             id: id,
-            school_id: refresh_token?.school_id
+            // school_id: refresh_token?.school_id
         },
     })
     res.status(200).json({ message: 'Department deleted successfully' })

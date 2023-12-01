@@ -8,7 +8,7 @@ async function deletePeriod(req, res, refresh_token) {
         await prisma.period.delete({
             where: {
                 id: id,
-                school_id: refresh_token?.school_id
+                // school_id: refresh_token?.school_id
             },
         })
         res.status(200).json({ message: 'Period deleted successfully' })

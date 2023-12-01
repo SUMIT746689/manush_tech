@@ -37,6 +37,7 @@ const get = async (req, res, refresh_token) => {
             period: {
               select: {
                 teacher: {
+                  // @ts-ignore
                   where: { deleted_at: null },
                   select: {
                     first_name: true

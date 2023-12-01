@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import post from "controllers/period/post";
+import get from "controllers/period/get";
 
 
 const index = async (req, res) => {
@@ -8,25 +9,8 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-                const periods = await prisma.period.findMany({
-                    where: {
-                        school_id: {
-                            equals: req.body.school_id
-                        }
-                    }
-                })
-                res.status(200).json(periods?.map(period => {
-                    return {
-                        id: period.id,
-                        room_id: period.room_id,
-                        day: period.day,
-                        start_time: new Date(Date.parse(period.start_time + "+0000")),
-                        end_time: new Date(Date.parse(period.end_time + "+0000")),
-                        school_id: period.school_id,
-                    }
-                }));
+                get(req, res)
                 break;
-
             case 'POST':
                 post(req, res)
                 break;

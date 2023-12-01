@@ -10,7 +10,7 @@ async function deleteholiday(req, res, refresh_token) {
         await prisma.holiday.delete({
             where: {
                 id: Number(id),
-                school_id: refresh_token.school_id
+                // school_id: refresh_token.school_id
             },
 
         });

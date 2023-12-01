@@ -6,7 +6,7 @@ export const deleteTeacher = async (req, res, refresh_token) => {
     await prisma.teacher.update({
       where: {
         id: Number(id),
-        school_id: refresh_token?.school_id
+        // school_id: refresh_token?.school_id
       },
       data: {
         deleted_at: new Date()

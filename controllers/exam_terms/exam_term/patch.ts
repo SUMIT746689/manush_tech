@@ -14,7 +14,8 @@ async function patch(req, res, refresh_token) {
     
     const response = await prisma.examTerm.update({
       where: {
-        id: parseInt(id)
+        id: parseInt(id),
+        // school_id
       },
       data: {
         title

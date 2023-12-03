@@ -1,6 +1,6 @@
 import prisma from "./prisma_client.js"
 
-export const stdAlreadyAttendance = async ({ student_id, today, last_time, section_id, school_id }) => {
+export const stdAlreadyAttendance = async ({ student_id, today, last_time }) => {
     const std_min_attend_date_wise = new Date(today);
     std_min_attend_date_wise.setUTCHours(0);
     std_min_attend_date_wise.setUTCMinutes(0);
@@ -19,7 +19,7 @@ export const stdAlreadyAttendance = async ({ student_id, today, last_time, secti
     entry_time.setFullYear(std_attend_date_.getFullYear());
     entry_time.setMonth(std_attend_date_.getMonth());
     entry_time.setDate(std_attend_date_.getDate());
-  
+
 
     // const std_attend_date_ = new Date(last_time);
     // const entry_time = new Date(std_entry_time);
@@ -27,18 +27,34 @@ export const stdAlreadyAttendance = async ({ student_id, today, last_time, secti
     // entry_time.setMonth(std_attend_date_.getMonth());
     // entry_time.setDate(std_attend_date_.getDate());
 
-    const haveAttendance = await prisma.attendance.upsert({
-        where: { student_id, date: { gte: std_min_attend_date_wise, lte: std_max_attend_date_wise } },
-        update: { status: "bunk"},
-        create: {
-            student_id,
-            date: new Date(last_time),
-            status: "late",
-            // status: "absent",
-            section_id,
-            school_id,
+    const haveAttendance = await prisma.attendance.findFirst({
+        where: { AND: [{ student_id }, { date: { gte: std_min_attend_date_wise, lte: std_max_attend_date_wise } }] },
+        select: {
+            id: true
         }
+        // update: { status: "bunk" },
+        // create: {
+        //     student_id,
+        //     date: new Date(last_time),
+        //     status: "late",
+        //     // status: "absent",
+        //     section_id,
+        //     school_id,
+        // }
     });
+
+    // const haveAttendance = await prisma.attendance.upsert({
+    //     where: { AND: [{ student_id }, { date: { gte: std_min_attend_date_wise, lte: std_max_attend_date_wise } }] },
+    //     update: { status: "bunk" },
+    //     create: {
+    //         student_id,
+    //         date: new Date(last_time),
+    //         status: "late",
+    //         // status: "absent",
+    //         section_id,
+    //         school_id,
+    //     }
+    // });
     return haveAttendance;
 }
 

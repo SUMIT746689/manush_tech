@@ -64,6 +64,9 @@ import { DebounceInput } from '@/components/DebounceInput';
 import LoginIcon from '@mui/icons-material/Login';
 import { accessNestedProperty } from '@/utils/utilitY-functions';
 import { customizeDate } from '@/utils/customizeDate';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -378,7 +381,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
           </>)}
           {/* {selectedBulkActions && <BulkActions />} */}
         </Grid>
-        <Box py={1} px={2} 
+        <Box py={1} px={2}
           display="flex"
           alignItems="center"
           justifyContent="space-between">
@@ -474,87 +477,19 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         </TableCell>
 
                         <TableCell align="center">
-                          <Typography noWrap align='center' sx={{display:'flex',flexWrap:"nowrap",justifyContent:'space-around',}}>
-                            <Tooltip title={t('Log In')} arrow>
-                              <IconButton
-                                // href={'/management/users/single/' + user.id}
-                                color="primary"
-                                onClick={async () => {
-                                  try {
-                                    // @ts-ignore
-                                    await superAdminLogInAsAdmin(user.id);
-                                  } catch (err) {
-                                    console.error(err);
-                                  }
-                                }}
-                              >
-                                <LoginIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                color="primary"
-                                sx={{ color: 'yellowgreen' }}
-                                onClick={() => setEditUser(user)}
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            {
-                              !user.role_id && <Tooltip title={t('Reset Permission')} arrow>
-                                <IconButton
-                                  onClick={() => {
-                                    try {
-                                      axios.put(`/api/permission/attach-user`, {
-                                        role_id: user.user_role.id,
-                                        user_id: user.id
-                                      })
-                                        .then(() => {
-                                          reFetchData()
-                                        })
-                                    } catch (err) {
-                                      console.log(err);
+                          <Typography noWrap align='center' sx={{ display: 'flex', flexWrap: "nowrap", justifyContent: 'space-around', }}>
 
-                                    }
+                            <MenuList
+                              user={user}
+                              setEditUser={setEditUser}
+                              reFetchData={reFetchData}
+                              setSelectedUser={setSelectedUser}
+                              setPermissionModal={setPermissionModal}
+                              setUserDeleteId={setUserDeleteId}
+                              handleConfirmDelete={handleConfirmDelete}
+                            />
 
-                                  }}
-                                  sx={{ color: 'darkorange' }}
-                                >
-                                  <RestartAltIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            }
 
-                            <Tooltip title={t('Permission')} arrow>
-                              <IconButton
-                                // href={'/management/users/single/' + user.id}
-                                color="primary"
-                                onClick={() => {
-                                  axios
-                                    .get(`/api/user/${user?.id}`)
-                                    .then((res) => {
-                                      console.log('selectedUser__', res.data);
-                                      setSelectedUser(res.data);
-                                      setPermissionModal(true);
-                                    })
-                                    .catch((err) => console.log(err));
-                                }}
-                              >
-                                <KeyIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={() => {
-                                  setUserDeleteId(user?.id)
-                                  handleConfirmDelete()
-                                }}
-                                sx={{ color: 'red' }}
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -674,6 +609,143 @@ const SinglePermission = ({ setAllUsers, singlePermission, selectedUser }) => {
     </Box>
   );
 };
+
+
+const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissionModal, setUserDeleteId, handleConfirmDelete }) => {
+  const { t }: { t: any } = useTranslation();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <div>
+      <Button
+        id="basic-button"
+        variant='outlined'
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+      >
+        Actions
+      </Button>
+
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+
+        <MenuItem onClick={handleClose}>
+          <Button
+            startIcon={<LoginIcon fontSize="small" />}
+            color="primary"
+            variant='text'
+            onClick={async () => {
+              try {
+                // @ts-ignore
+                await superAdminLogInAsAdmin(user.id);
+              } catch (err) {
+                console.error(err);
+              }
+            }}
+          >
+            {t('Log in')}
+          </Button>
+        </MenuItem>
+
+        <MenuItem onClick={handleClose}>
+          <Button
+            startIcon={<LaunchTwoToneIcon fontSize="small" />}
+            color="primary"
+            variant='text'
+            onClick={() => setEditUser(user)}
+          >
+            {t('Edit')}
+          </Button>
+        </MenuItem>
+
+        {
+          !user.role_id && <MenuItem onClick={handleClose}>
+            <Button
+              startIcon={<RestartAltIcon fontSize="small" />}
+              color="primary"
+              variant='text'
+              onClick={() => {
+                try {
+                  axios.put(`/api/permission/attach-user`, {
+                    role_id: user.user_role.id,
+                    user_id: user.id
+                  })
+                    .then(() => {
+                      reFetchData()
+                    })
+                } catch (err) {
+                  console.log(err);
+
+                }
+
+              }}
+            >
+              {t('Reset Permission')}
+            </Button>
+          </MenuItem>
+        }
+
+
+        <MenuItem onClick={handleClose}>
+          <Button
+            startIcon={<KeyIcon fontSize="small" />}
+            color="primary"
+            variant='text'
+            onClick={() => {
+              axios
+                .get(`/api/user/${user?.id}`)
+                .then((res) => {
+                  console.log('selectedUser__', res.data);
+                  setSelectedUser(res.data);
+                  setPermissionModal(true);
+                })
+                .catch((err) => console.log(err));
+            }}
+          >
+            {t('Permission')}
+          </Button>
+        </MenuItem>
+
+        <MenuItem onClick={handleClose}>
+        <Button
+            startIcon={<DeleteTwoToneIcon fontSize="small" />}
+            color="primary"
+            variant='text'
+            onClick={() => {
+              setUserDeleteId(user?.id)
+              handleConfirmDelete()
+            }}
+            sx={{ color: 'red' }}
+          >
+            {t('Delete')}
+          </Button>
+        </MenuItem>
+
+
+      </Menu>
+    </div>
+  );
+};
+
 
 Results.propTypes = {
   users: PropTypes.array.isRequired

@@ -555,6 +555,8 @@ model Attendance {
   school_id        Int
   exam_id          Int?
   time_diff_in_min Int?
+  entry_time       DateTime?
+  exit_time        DateTime?
 
   student Student @relation(fields: [student_id], references: [id])
   section Section @relation(fields: [section_id], references: [id])
@@ -574,12 +576,14 @@ enum AttendenceStatus {
 }
 
 model EmployeeAttendance {
-  id        Int                      @id @default(autoincrement())
-  date      DateTime                 @db.Date
-  status    EmployeeAttendenceStatus
-  remark    String?
-  school_id Int
-  user_id   Int
+  id         Int                      @id @default(autoincrement())
+  date       DateTime                 @db.Date
+  status     EmployeeAttendenceStatus
+  remark     String?
+  school_id  Int
+  user_id    Int
+  entry_time DateTime?
+  exit_time  DateTime?
 
   user User @relation(fields: [user_id], references: [id])
 

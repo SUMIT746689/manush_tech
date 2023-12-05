@@ -65,7 +65,14 @@ const attendance = async () => {
                                                 exit_time: stdAttendanceQ[0].exit_time
                                             }
                                         })
-                                            .then(() => console.log(`user_id(${user_id}) student update successfull`))
+                                            .then(() => {
+                                                console.log(`user_id(${user_id}) student update successfull`);
+                                                const deleteIds = stdAttendanceQ.map((e) => e.id);
+                                                prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
+                                                    .then(res => { console.log("tbl_attendance_queue delete successfull") })
+                                                    .catch(err => { console.log(`error delete student tbl_attendance_queue ids${deleteIds}`, err.message) })
+
+                                            })
                                             .catch((err) => `user_id(${user_id}) student failed to update`)
                                     })
                                     .catch(err => { console.log({ "error failed student tbl_attendance_queue ": err.message }) })
@@ -112,10 +119,10 @@ const attendance = async () => {
                                         })
                                             .then(res__ => {
                                                 console.log({ "success_request": res__ });
-                                                const deleteIds = res.map((e) => e.id);
-                                                // prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
-                                                //     .then(res => { console.log("tbl_attendance_queue delete successfull") })
-                                                //     .catch(err => { console.log(`error to delete tbl_attendance_queue ids${deleteIds}`, err.message) })
+                                                const deleteIds = stdAttendanceQ.map((e) => e.id);
+                                                prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
+                                                    .then(res => { console.log("tbl_attendance_queue delete successfull") })
+                                                    .catch(err => { console.log(`error delete student tbl_attendance_queue ids${deleteIds}`, err.message) })
                                             })
                                             .catch((err) => {
                                                 console.log(`error: create attendaance student_id(${id})`)
@@ -179,11 +186,19 @@ const attendance = async () => {
                                         exit_time: tblAttendanceQ[0].exit_time
                                     }
                                 })
-                                    .then(() => console.log(`employee user_id(${isEmpAlreadyEntryAttend.user_id}) update successfull`))
+                                    .then(() => {
+                                        console.log(`employee user_id(${isEmpAlreadyEntryAttend.user_id}) update successfull`);
+
+                                        const deleteIds = tblAttendanceQ.map((e) => e.id);
+
+                                        prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
+                                            .then(res => { console.log("tbl_attendance_queue delete successfull") })
+                                            .catch(err => { console.log(`error delete employee tbl_attendance_queue ids${deleteIds}`, err.message) })
+
+                                    })
                                     .catch((err) => `employee user_id(${isEmpAlreadyEntryAttend.user_id}) failed to update`)
                             })
                             .catch(err => { console.log({ "error failed employee tbl_attendance_queue ": err.message }) })
-
                     }
                     else {
                         prisma.$queryRaw`
@@ -216,9 +231,9 @@ const attendance = async () => {
                                         console.log(`create employee attendance user_id(${res.user_id})`);
                                         const deleteIds = tblAttendanceQ.map((e) => e.id);
 
-                                        // prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
-                                        //     .then(res => { console.log("tbl_attendance_queue delete successfull") })
-                                        //     .catch(err => { console.log(`error to delete tbl_attendance_queue ids${deleteIds}`, err.message) })
+                                        prisma.tbl_attendance_queue.deleteMany({ where: { id: { in: deleteIds } } })
+                                            .then(res => { console.log("tbl_attendance_queue delete successfull") })
+                                            .catch(err => { console.log(`error delete employee tbl_attendance_queue ids${deleteIds}`, err.message) })
 
                                     })
                                     .catch(err => { console.log(`error create employee attendance user_id(${res.user_id})`); })

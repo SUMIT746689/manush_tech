@@ -2,14 +2,17 @@ import prisma from "./utility/prisma_client.js";
 import { stdAlreadyAttendance, empAlreadyAttendance } from './attendance_utility/findAlreadyAttendance.js'
 import { student_attendence } from "./attendance_utility/createAttendance.js";
 import { isUserAttend } from "./attendance_utility/verifyUserAttend.js";
+// import cron from "node-cron"
 
 const attendance = async () => {
     try {
         const today = new Date(Date.now());
+        // utc day start time 
         const std_min_attend_date_wise = new Date(today);
         std_min_attend_date_wise.setHours(0, 0, 0, 0);
         console.log({ std_min_attend_date_wise });
 
+        // utc day end time
         const std_max_attend_date_wise = new Date(today);
         std_max_attend_date_wise.setHours(23, 59, 59, 999);
         console.log({ std_max_attend_date_wise });
@@ -46,8 +49,11 @@ const attendance = async () => {
                             const { id, guardian_phone, section, student_info, class_roll_no } = resStudent ?? {};
                             // console.log({ id, guardian_phone, student_info, section });
                             if (!id || !section?.std_entry_time) return console.log(`user_id(${user_id}) is not found`);
-                            const isAttend = await stdAlreadyAttendance({ student_id: id, today, last_time: section.std_entry_time })
+                            const isAttend = await stdAlreadyAttendance({ student_id: id, std_min_attend_date_wise, std_max_attend_date_wise })
                             console.log({ isAttend })
+                            const attendanceStatus = section.std_entry_time.getTime();
+                            console.log({ attendanceStatus, sss: section.std_entry_time })
+
                             if (isAttend && isAttend?.id) {
                                 prisma.$queryRaw`
                                     SELECT
@@ -59,6 +65,8 @@ const attendance = async () => {
                                     .then(stdAttendanceQ => {
                                         console.log({ stdAttendanceQ });
                                         if (stdAttendanceQ.length === 0) return console.log(`student attendence not found for update user_id(${user_id})`);
+                                        const date = new Date(stdAttendanceQ[0].exit_time).getHours();
+                                        console.log({ date })
                                         prisma.attendance.update({
                                             where: { id: isAttend.id },
                                             data: {
@@ -75,24 +83,29 @@ const attendance = async () => {
                                 const res = await prisma.$queryRaw`
                                     SELECT
                                         id,
+                                        (
+                                            CASE 
+                                            WHEN TIME(MIN(submission_time) OVER()) < TIME(${section.std_entry_time}) THEN "present"
+                                            ELSE "late"
+                                            END
+                                        ) AS status,
                                         MIN(submission_time) OVER() AS entry_time,
                                         MAX(submission_time) OVER() AS exit_time
                                     FROM tbl_attendance_queue
                                     WHERE user_id = ${user_id} AND submission_time >=${std_min_attend_date_wise} AND submission_time <= ${std_max_attend_date_wise}
                                 `;
-                                // const 
                                 console.log({ res })
                                 let entry_time;
                                 let exit_time;
                                 if (Array.isArray(res) && res.length > 0) {
                                     entry_time = res[0].entry_time;
                                     exit_time = res[0].exit_time;
-                                }
+                                };
                                 prisma.attendance.create({
                                     data: {
                                         student_id: id,
                                         date: new Date(Date.now()),
-                                        status: "late",
+                                        status: res[0].status,
                                         // status: "absent",
                                         section_id: section.id,
                                         school_id: student_info.school_id,
@@ -290,5 +303,10 @@ const attendance = async () => {
     }
 }
 
+// setInterval(()=>{
 attendance();
+// },10000)
 
+// cron.schedule('1 * * * * * *', () => {
+// console.log('running every minute 1, 2, 4 and 5');
+//   });

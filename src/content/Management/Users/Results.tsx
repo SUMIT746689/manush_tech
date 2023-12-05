@@ -610,8 +610,8 @@ const SinglePermission = ({ setAllUsers, singlePermission, selectedUser }) => {
 };
 
 
-const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPermissionModal, setUserDeleteId, handleConfirmDelete }) => {
-  const {  superAdminLogInAsAdmin } = useAuth();
+const MenuList = ({ targetUser, setEditUser, reFetchData, setSelectedUser, setPermissionModal, setUserDeleteId, handleConfirmDelete }) => {
+  const { superAdminLogInAsAdmin } = useAuth();
   const { t }: { t: any } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -623,16 +623,12 @@ const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPer
   };
   return (
     <div>
-      <Button
-        id="basic-button"
-        variant='outlined'
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
+      <ButtonWrapper
+        handleClick={handleClick}
+        variant="outlined"
       >
         Actions
-      </Button>
+      </ButtonWrapper>
 
       <Menu
         id="basic-menu"
@@ -647,13 +643,11 @@ const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPer
           flexDirection: 'column'
         }}
       >
-
-        <MenuItem onClick={handleClose}>
-          <Button
+        <li>
+          <ButtonWrapper
             startIcon={<LoginIcon fontSize="small" />}
-            color="primary"
-            variant='text'
-            onClick={async () => {
+            variant="outlined"
+            handleClick={async () => {
               try {
                 // @ts-ignore
                 await superAdminLogInAsAdmin(targetUser.id);
@@ -663,27 +657,26 @@ const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPer
             }}
           >
             {t('Log in')}
-          </Button>
-        </MenuItem>
+          </ButtonWrapper>
+        </li>
 
-        <MenuItem onClick={handleClose}>
-          <Button
+        <li>
+          <ButtonWrapper
             startIcon={<LaunchTwoToneIcon fontSize="small" />}
-            color="primary"
-            variant='text'
-            onClick={() => setEditUser(targetUser)}
+            handleClick={() => setEditUser(targetUser)}
+            variant="outlined"
           >
             {t('Edit')}
-          </Button>
-        </MenuItem>
+          </ButtonWrapper>
+        </li>
 
         {
-          !targetUser.role_id && <MenuItem onClick={handleClose}>
-            <Button
+          !targetUser.role_id &&
+          (<li>
+            <ButtonWrapper
               startIcon={<RestartAltIcon fontSize="small" />}
-              color="primary"
-              variant='text'
-              onClick={() => {
+              variant="outlined"
+              handleClick={() => {
                 try {
                   axios.put(`/api/permission/attach-user`, {
                     role_id: targetUser.user_role.id,
@@ -700,17 +693,16 @@ const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPer
               }}
             >
               {t('Reset Permission')}
-            </Button>
-          </MenuItem>
+            </ButtonWrapper>
+          </li>)
         }
 
 
-        <MenuItem onClick={handleClose}>
-          <Button
+        <li>
+          <ButtonWrapper
             startIcon={<KeyIcon fontSize="small" />}
-            color="primary"
-            variant='text'
-            onClick={() => {
+            variant="outlined"
+            handleClick={() => {
               axios
                 .get(`/api/user/${targetUser?.id}`)
                 .then((res) => {
@@ -722,23 +714,22 @@ const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPer
             }}
           >
             {t('Permission')}
-          </Button>
-        </MenuItem>
+          </ButtonWrapper>
+        </li>
 
-        <MenuItem onClick={handleClose}>
-          <Button
+        <li onClick={handleClose}>
+          <ButtonWrapper
             startIcon={<DeleteTwoToneIcon fontSize="small" />}
-            color="primary"
-            variant='text'
-            onClick={() => {
+            variant="outlined"
+            handleClick={() => {
               setUserDeleteId(targetUser?.id)
               handleConfirmDelete()
             }}
             sx={{ color: 'red' }}
           >
             {t('Delete')}
-          </Button>
-        </MenuItem>
+          </ButtonWrapper>
+        </li>
 
 
       </Menu>

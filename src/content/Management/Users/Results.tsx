@@ -360,7 +360,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
               isNotSuperAdmin && <Autocomplete
                 size="small"
-                id="multiple-limit-tags"
                 options={roleOptions || []}
                 value={searchToken}
                 onChange={(e, v) => setSearchToken(v)}
@@ -436,43 +435,43 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paginatedUsers.map((user) => {
+                  {paginatedUsers.map((i) => {
 
 
-                    const isUserSelected = selectedItems.includes(user.id);
+                    const isUserSelected = selectedItems.includes(i.id);
                     return (
-                      <TableRow hover key={user.id} selected={isUserSelected}>
+                      <TableRow hover key={i.id} selected={isUserSelected}>
                         <TableCell>
-                          <Typography noWrap variant="h5">{user?.username}</Typography>
+                          <Typography noWrap variant="h5">{i?.username}</Typography>
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
                           <Chip
-                            label={user?.user_role?.title}
+                            label={i?.user_role?.title}
                             size="medium"
-                            color={user.role_id ? 'primary' : 'error'}
+                            color={i.role_id ? 'primary' : 'error'}
                           />
 
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            {customizeDate(user?.created_at)}
+                            {customizeDate(i?.created_at)}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           {/* @ts-ignore */}
                           <Typography variant="h5" noWrap >
-                            {user?.school?.name}
+                            {i?.school?.name}
                           </Typography>
                         </TableCell>
 
 
                         <TableCell align='center'>
                           {/* @ts-ignore */}
-                          <Typography variant="h5" color={user?.is_enabled ? 'green' : 'red'}>
+                          <Typography variant="h5" color={i?.is_enabled ? 'green' : 'red'}>
                             {/* {user?.is_enabled ? 'Enable' : 'Disable'} */}
-                            <Switch checked={user?.is_enabled} onClick={() => handleUserEnabled(user)} />
+                            <Switch checked={i?.is_enabled} onClick={() => handleUserEnabled(i)} />
                           </Typography>
                         </TableCell>
 
@@ -480,7 +479,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                           <Typography noWrap align='center' sx={{ display: 'flex', flexWrap: "nowrap", justifyContent: 'space-around', }}>
 
                             <MenuList
-                              user={user}
+                              targetUser={i}
                               setEditUser={setEditUser}
                               reFetchData={reFetchData}
                               setSelectedUser={setSelectedUser}
@@ -611,7 +610,8 @@ const SinglePermission = ({ setAllUsers, singlePermission, selectedUser }) => {
 };
 
 
-const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissionModal, setUserDeleteId, handleConfirmDelete }) => {
+const MenuList = ({ targetUser,setEditUser, reFetchData, setSelectedUser, setPermissionModal, setUserDeleteId, handleConfirmDelete }) => {
+  const {  superAdminLogInAsAdmin } = useAuth();
   const { t }: { t: any } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -656,7 +656,7 @@ const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissi
             onClick={async () => {
               try {
                 // @ts-ignore
-                await superAdminLogInAsAdmin(user.id);
+                await superAdminLogInAsAdmin(targetUser.id);
               } catch (err) {
                 console.error(err);
               }
@@ -671,14 +671,14 @@ const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissi
             startIcon={<LaunchTwoToneIcon fontSize="small" />}
             color="primary"
             variant='text'
-            onClick={() => setEditUser(user)}
+            onClick={() => setEditUser(targetUser)}
           >
             {t('Edit')}
           </Button>
         </MenuItem>
 
         {
-          !user.role_id && <MenuItem onClick={handleClose}>
+          !targetUser.role_id && <MenuItem onClick={handleClose}>
             <Button
               startIcon={<RestartAltIcon fontSize="small" />}
               color="primary"
@@ -686,8 +686,8 @@ const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissi
               onClick={() => {
                 try {
                   axios.put(`/api/permission/attach-user`, {
-                    role_id: user.user_role.id,
-                    user_id: user.id
+                    role_id: targetUser.user_role.id,
+                    user_id: targetUser.id
                   })
                     .then(() => {
                       reFetchData()
@@ -712,7 +712,7 @@ const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissi
             variant='text'
             onClick={() => {
               axios
-                .get(`/api/user/${user?.id}`)
+                .get(`/api/user/${targetUser?.id}`)
                 .then((res) => {
                   console.log('selectedUser__', res.data);
                   setSelectedUser(res.data);
@@ -726,12 +726,12 @@ const MenuList = ({ user, setEditUser, reFetchData, setSelectedUser, setPermissi
         </MenuItem>
 
         <MenuItem onClick={handleClose}>
-        <Button
+          <Button
             startIcon={<DeleteTwoToneIcon fontSize="small" />}
             color="primary"
             variant='text'
             onClick={() => {
-              setUserDeleteId(user?.id)
+              setUserDeleteId(targetUser?.id)
               handleConfirmDelete()
             }}
             sx={{ color: 'red' }}

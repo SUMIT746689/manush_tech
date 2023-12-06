@@ -1,4 +1,4 @@
-import prisma from "./prisma_client.js";
+import prisma from "./prismaClient.js";
 
 export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
 

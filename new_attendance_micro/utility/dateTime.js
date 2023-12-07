@@ -8,5 +8,5 @@ export const todayMinMaxDateTime = () => {
     const max_attend_datetime = new Date(today);
     max_attend_datetime.setHours(23, 59, 59, 999);
 
-    return { min_attend_datetime, max_attend_datetime };
+    return { today, min_attend_datetime, max_attend_datetime };
 };

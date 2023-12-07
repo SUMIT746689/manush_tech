@@ -1,11 +1,10 @@
 import { resEmpAttendanceQueues, userWiseAttendanceQueues, deleteTblAttendanceQueues, userWiseAttendanceQueuesWithStatus } from "./utility/handleAttendanceQueue.js"
 import { createEmployeeAttendance, resEmployeeAttendance, updateEmployeeAttendance } from "./utility/handleAttendance.js"
-export const empAttendance = async ({ min_attend_datetime, max_attend_datetime }) => {
+export const empAttendance = async ({ today, min_attend_datetime, max_attend_datetime }) => {
     const { error, data: resEmp } = await resEmpAttendanceQueues();
     if (error) return console.log({ error })
 
     resEmp.forEach(async (empAttend) => {
-
         const { user_id } = empAttend;
         const { error, data: isEmpAlreadyEntryAttend } = await resEmployeeAttendance({ user_id, min_attend_datetime, max_attend_datetime })
         if (error) return console.log({ error })
@@ -37,7 +36,8 @@ export const empAttendance = async ({ min_attend_datetime, max_attend_datetime }
                 exit_time = tblAttendanceQ.length > 1 ? tblAttendanceQ[0].exit_time : undefined;
             }
             const status = "late";
-            const { error: errorCreateEmpAttendance } = await createEmployeeAttendance({ user_id, school_id, data, status, entry_time, exit_time });
+
+            const { error: errorCreateEmpAttendance } = await createEmployeeAttendance({ user_id, school_id: tblAttendanceQ[0].school_id, today, status, entry_time, exit_time });
             if (errorCreateEmpAttendance) return console.log({ errorCreateEmpAttendance })
 
             const deleteIds = tblAttendanceQ.map((e) => e.id);

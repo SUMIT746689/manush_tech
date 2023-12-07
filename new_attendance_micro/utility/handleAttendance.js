@@ -93,14 +93,14 @@ export const updateEmployeeAttendance = async ({ user_id, id, exit_time }) => {
     }
 }
 
-export const createEmployeeAttendance = async ({ }) => {
+export const createEmployeeAttendance = async ({ user_id, school_id, status, today, entry_time, exit_time }) => {
     try {
         await prisma.employeeAttendance.create({
             data: {
-                user_id: empAttend.user_id,
-                school_id: tblAttendanceQ[0].school_id,
+                user_id,
+                school_id,
                 date: today,
-                status: "late",
+                status,
                 entry_time,
                 exit_time
             }

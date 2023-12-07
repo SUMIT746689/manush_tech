@@ -9,13 +9,13 @@ import { resEmpAttendanceQueues } from "./utility/handleAttendanceQueue.js";
 const attendance = async () => {
     try {
 
-        const { min_attend_datetime, max_attend_datetime } = todayMinMaxDateTime();
+        const {today, min_attend_datetime, max_attend_datetime } = todayMinMaxDateTime();
 
         // student attendance processing 
         stdAttendance({ min_attend_datetime, max_attend_datetime });
 
         // employees attendance processing
-        empAttendance({ min_attend_datetime, max_attend_datetime });
+        empAttendance({ today, min_attend_datetime, max_attend_datetime });
 
     }
     catch (err) {

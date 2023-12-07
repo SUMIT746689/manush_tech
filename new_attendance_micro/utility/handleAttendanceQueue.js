@@ -101,7 +101,7 @@ export const resEmpAttendanceQueues = async () => {
         if (!Array.isArray(res)) return { error: "tbl_attendance_queue response is not array", data: null };
         if (res.length === 0) return { error: "today's employee tbl_attendance_queue response array length is 0 ", data: null };
 
-        return { error: null, data: res }
+        return { error: null, data: res };
     }
     catch (err) {
         return { error: "getting all emmployees from tbl_attendance_queue", data: null }

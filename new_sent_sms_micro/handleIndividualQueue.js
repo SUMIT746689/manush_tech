@@ -20,7 +20,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
   //get students via school class section academic year wise
   const { error: student_err, data: studentsViaClass } = await handleClassWiseStudents({ school_id, class_id, whereSection, academic_year_id });
   if (student_err) return console.log(student_err);
-  
+
   const { school } = studentsViaClass;
   const { name: school_name, masking_sms_price, masking_sms_count, non_masking_sms_price, non_masking_sms_count } = school ?? {};
   const sms_type = "masking";
@@ -36,13 +36,15 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
   studentsViaClass.sections.forEach((section, index) => {
     if (Array.isArray(section?.students)) totalSmsCount += section?.students.length;
   });
-  
+
   if (sms_count < totalSmsCount) return console.log(`error school_id(${school_id}) have not enough ${sms_type} sms `);
 
 
   studentsViaClass.sections.forEach((section, index) => {
     const { id: section_id } = section;
+
     section.students?.forEach(async student => {
+
       const { id, guardian_phone, class_roll_no, student_info } = student;
       const { user_id, gender, phone } = student_info ?? {};
 
@@ -69,7 +71,8 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
       smsQueueHandlerParameters["sms_text"] = `Dear Parents, Your ${gender === "male" ? "son" : "daughter"}, Class-${class_id}, Sec-${section_id}, Roll-${class_roll_no} is ${haveAttendance?.status || "absent"} ${new Date(created_at).toLocaleDateString('en-US')} in class. Principal, ${school_name}`;
       smsQueueHandlerParameters["number_of_sms_parts"] = smsQueueHandlerParameters.sms_text?.length <= 160 ? 1 : Math.ceil(smsQueueHandlerParameters.sms_text?.length / 153)
-      
+
+      // create sent sms queue, tbl sent sms and update school 
       createSmsQueueTableHandler(smsQueueHandlerParameters);
     })
   })

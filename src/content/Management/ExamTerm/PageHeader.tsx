@@ -65,7 +65,7 @@ function PageHeader({ editRooms, setEditRooms, reFetchData }): any {
             }
         } catch (err) {
             console.error(err);
-            showNotification(err.message, 'error');
+            showNotification(err?.response?.data?.message, 'error');
             setStatus({ success: false });
             setErrors({ submit: err.message });
             setSubmitting(false);

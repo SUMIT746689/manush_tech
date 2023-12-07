@@ -17,7 +17,7 @@ export const authenticate = (handler: Function) => {
 
       return handler(req, res, refresh_token);
     } catch (err) {
-      res.status(401).json({ error: err.message });
+      res.status(401).json({ message: err.message });
     }
   };
 };

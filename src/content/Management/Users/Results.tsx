@@ -282,7 +282,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
     <>
       <Dialog
         fullWidth
-        maxWidth="md"
+        maxWidth='lg'
         open={permissionModal}
         onClose={() => {
           setPermissionModal(false);
@@ -290,21 +290,16 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
         sx={{ paddingX: { xs: 3, md: 0 } }}
       >
         <Grid item container flexDirection={'column'} sx={{ p: 4 }}>
-          <Grid display="flex" alignItems="center" sx={{ mb: { xs: 2, md: 4 } }} >
-            <Avatar
-              sx={{
-                mr: 1
-              }}
+          <Grid display="flex" alignItems="center" gap={2} sx={{ mb: { xs: 2, md: 4 } }} >
+            <Avatar 
               src={selectedUser?.avatar}
             />
-            <Box>
-              <Link variant="h5" href="#">
-                <Typography fontSize={20} fontWeight={'bold'}>{selectedUser?.username}</Typography>
-              </Link>
-            </Box>
+            
+              <Typography fontSize={20} fontWeight={'bold'}>{selectedUser?.username}</Typography>
+          
           </Grid>
 
-          <Grid item container display={'grid'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 1, sm: 2 } }}>
+          <Grid item container display={'grid'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' }, gap: { xs: 1, sm: 1 } }}>
             {user?.permissions?.map((i: any) => (
               <SinglePermission
                 key={i.id}
@@ -603,7 +598,7 @@ const SinglePermission = ({ setAllUsers, singlePermission, selectedUser }) => {
 
   return (
     <Box display={'flex'} justifyContent="space-between" p={1} borderRadius={0.4} sx={{ backgroundColor: 'lightGray', ":hover": { backgroundColor: 'darkGray' } }} key={singlePermission.id}>
-      <Typography sx={{ my: 'auto', textTransform: 'capitalize', fontSize: { xs: 10, md: 15 } }}>{singlePermission?.name}</Typography>
+      <Typography variant='body2' sx={{ my: 'auto', textTransform: 'capitalize', }}>{singlePermission?.name}</Typography>
       <Switch sx={{ my: 'auto' }} checked={checked} onChange={handlePermissionUpdate} />
     </Box>
   );

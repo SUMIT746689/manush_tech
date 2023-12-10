@@ -26,7 +26,7 @@ async function post(req, res, refresh_token) {
     const userRes = prisma.user.findFirst({ where: { id: parseInt(id) }, select: { username: true } })
 
     const resQueries = await Promise.all([smsGatewayRes, schoolInfoRes, userRes])
-    
+
     const { details }: any = resQueries[0];
     const { sender_id, sms_api_key: api_key } = details ?? {};
     if (!sender_id && !api_key) throw new Error("sender_id or api_key missing");

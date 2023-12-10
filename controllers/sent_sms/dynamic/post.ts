@@ -39,7 +39,7 @@ async function post(req, res, refresh_token) {
     let buffer_part = 0;
     const bufferList = [];
     datas.on("data", (buffer) => {
-      console.log({ buffer });
+      // console.log({ buffer });
       bufferList.push(buffer)
       buffer_part += 1;
       res.status(404)
@@ -48,7 +48,7 @@ async function post(req, res, refresh_token) {
     datas.on("end", async () => {
 
       const totalBuffer = Buffer.concat(bufferList);
-      console.log({ totalBuffer })
+      // console.log({ totalBuffer })
 
       const uint8 = new Uint8Array(totalBuffer)
       const workbook = XLSX.read(uint8, { type: "array" })
@@ -59,17 +59,21 @@ async function post(req, res, refresh_token) {
       const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
 
       if (excelArrayDatas.length > 30000) return res.status(404).json({ error: "large file, maximum support 30,000 row" })
-      // console.log({excelArrayDatas})
+      
+      let error = null;
 
       const resSentSms = excelArrayDatas.map((value, index) => {
         let body = fields.body;
         let contacts = value[fields.contact_column];
+        
+        if (!contacts) {
+          error = "selected contact field is missing";
+        }
 
         for (const element of allMatchesArray) {
           body = body.replaceAll(`#${element}#`, value[element])
         }
-        console.log({ contacts })
-        // console.log({ body });
+        
         return {
           sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
           user_id: parseInt(id),
@@ -84,6 +88,8 @@ async function post(req, res, refresh_token) {
           total_count: 1,
         }
       })
+
+      if (error) return res.status(404).json({ error })
 
       await prisma.$transaction([
         prisma.tbl_queued_sms.createMany({

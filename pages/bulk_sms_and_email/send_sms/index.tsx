@@ -5,11 +5,18 @@ import { Button, ButtonGroup, Card, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import SmsPage from '@/content/BulkSmsAndEmail/SendSms/SmsPage';
+import IndividualSmsPage from '@/content/BulkSmsAndEmail/SendSms/IndividualSmsPage';
 import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadSentSms';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Packages = () => {
-  const [type, setType] = useState("INDIVIDUAL_SMS")
+  const [type, setType] = useState("INDIVIDUAL_SMS");
+  const { user } = useAuth();
+  console.log({ user });
+  const { school } = user || {};
+  console.log({ school });
+
   return (
     <>
       <Head>
@@ -36,15 +43,15 @@ const Packages = () => {
               </ButtonGroup>
             </Grid>
 
-            {type === "INDIVIDUAL_SMS" && <SmsPage />}
+            {type === "INDIVIDUAL_SMS" && <IndividualSmsPage />}
             {type === "GROUP_SMS" && <SmsPage />}
             {type === "FILE_UPLOAD" && < FileUploadSentSmsPage />}
           </Grid>
 
           <Grid width={400} mt={7} >
-            <Card sx={{ padding: 2,height:'fit', fontWeight:600, fontSize:16, boxShadow:"inherit" }}>
-              <Grid color="darkcyan">Masking Sms Count: </Grid>
-              <Grid color="darkkhaki">Non Masking Sms Count:</Grid>
+            <Card sx={{ padding: 2, height: 'fit', fontWeight: 600, fontSize: 16, borderRadius: 0.5 }}>
+              <Grid color="darkcyan">Masking Sms Count: {school?.masking_sms_count} </Grid>
+              <Grid color="darkkhaki">Non Masking Sms Count: {school?.non_masking_sms_count}</Grid>
             </Card>
           </Grid>
         </Grid>

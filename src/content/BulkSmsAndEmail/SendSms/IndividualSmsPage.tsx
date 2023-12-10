@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, Chip } from '@mui/material';
+import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
@@ -9,9 +9,6 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
-import { read, utils } from "xlsx";
-import { getSheetHeaders } from '@/utils/sheet';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -192,7 +189,6 @@ const DynamicTypeSelect = () => {
 function PageHeader() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-  const [selectSheetHeaders, setSelectSheetHeaders] = useState([]);
 
   const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
@@ -205,25 +201,7 @@ function PageHeader() {
         // reFetchData();
       };
 
-      const datas = new FormData()
-      // datas.set('file', "asss")
-
-      for (const [key, value] of Object.entries(_values)) {
-        console.log(`${key}: ${value}`);
-        // @ts-ignore
-        if (key === "contact_column") datas.set(key, value.id)
-        else if (value) datas.set(key, _values[key]);
-      }
-      console.log({ datas })
-      // const {file_upload} = _values;
-      // const fileToBlob = new Blob([new Uint8Array(await file_upload.arrayBuffer())], {type: file_upload.type });
-      // _values.file_upload.arrayBuffer().then((arrayBuffer) => {
-      //   const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file_upload.type });
-      //   console.log({blob});
-      // }); 
-      // _values.file_upload = fileToBlob;
-      console.log({ _values })
-      const { data } = await axios.post(`/api/sent_sms/dynamic`, datas);
+      const { data } = await axios.post(`/api/sent_sms`, _values);
       successResponse('created');
 
     } catch (err) {
@@ -236,27 +214,6 @@ function PageHeader() {
     }
   };
 
-
-  // function handleFile(file /*:File*/) {
-  //   /* Boilerplate to set up FileReader */
-  //   const reader = new FileReader();
-  //   const rABS = !!reader.readAsBinaryString;
-  //   reader.onload = e => {
-  //     /* Parse data */
-  //     const bstr = e.target.result;
-  //     const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
-  //     /* Get first worksheet */
-  //     const wsname = wb.SheetNames[0];
-  //     const ws = wb.Sheets[wsname];
-  //     console.log(rABS, wb);
-  //     /* Convert array of arrays */
-  //     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-  //     /* Update state */
-  //     console.log({ data: data, cols: make_cols(ws["!ref"]) });
-  //   };
-  //   reader.readAsBinaryString(file)
-  // };
-
   return (
     <>
       <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
@@ -267,31 +224,31 @@ function PageHeader() {
           initialValues={{
             campaign_name: undefined,
             sms_gateway_id: undefined,
-            contact_column: undefined,
-            // template_id: undefined,
+            template_id: undefined,
             body: undefined,
-            // recipient_type: undefined,
-            // class_id: undefined,
-            // section_id: [],
-            // role_id: [],
-            // name: [],
+            recipient_type: undefined,
+            class_id: undefined,
+            section_id: [],
+            role_id: [],
+            name: [],
             schedule_date: undefined,
             schedule_time: undefined,
-            submit: null
+            submit: null,
+            file_upload: undefined,
           }}
           validationSchema={Yup.object().shape({
             campaign_name: Yup.string()
               .max(255)
               .required(t('The campaign name field is required')),
             body: Yup.string()
-              .max(255)
+              .max(1000)
               .required(t('The body field is required')),
-            // sms_gateway_id: Yup.number()
-            //   .min(0)
-            //   .required(t('The sms gateway field is required')),
-            // recipient_type: Yup.string()
-            //   .min(4)
-            //   .required(t('The type field is required')),
+            sms_gateway_id: Yup.number()
+              .min(0)
+              .required(t('The sms gateway field is required')),
+            recipient_type: Yup.string()
+              .min(4)
+              .required(t('The type field is required')),
           })}
           onSubmit={handleFormSubmit}
         >
@@ -300,7 +257,6 @@ function PageHeader() {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
-            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -319,91 +275,8 @@ function PageHeader() {
                       required={true}
                     />
 
+                    <DynamicSelectTemplate />
 
-                    <FileUploadFieldWrapper
-                      htmlFor="files"
-                      label="File File"
-                      name="file_upload"
-                      value={values.logo?.name || ''}
-                      handleChangeFile={(event) => {
-                        if (!event.target.files[0]) return;
-                        const reader = new FileReader();
-                        console.log({ file___: event });
-
-
-                        reader.onload = async function (e) {
-                          const data = e.target.result;
-                          const workbook = read(data, { type: 'array' })
-                          /* DO SOMETHING WITH workbook HERE */
-                          const firstSheetName = workbook.SheetNames[0]
-                          /* Get worksheet */
-                          const worksheet = workbook.Sheets[firstSheetName]
-                          const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
-                          setFieldValue("body", '')
-                          setFieldValue("contact_column", {})
-
-                          if (excelArrayDatas.length > 30_000) {
-                            showNotification("file is to large", "error")
-                            setFieldValue("file_upload", null);
-                            setSelectSheetHeaders(() => []);
-                            return;
-                          }
-                          const fileHeads = Object.keys(excelArrayDatas[0]);
-                          console.log({ fileHeads })
-                          setSelectSheetHeaders(() => fileHeads);
-                          if (event.target?.files?.length) setFieldValue("file_upload", event.target.files[0]);
-
-                          // const workbook = read(data, { type: "array" });
-
-                          // console.log({ workbook })
-                          // const { Sheets } = workbook;
-                          // console.log({ Sheets })
-                          // const { Sheet1 } = {} = Sheets || {};
-                          // const { Sheet1: { A1 } } = {} = Sheets || {};
-                          // console.log({ Sheet1 })
-                          // // setFieldValue("file_upload", e );
-                          // setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
-                        }
-                        reader.readAsArrayBuffer(event.target.files[0]);
-
-
-                      }}
-                      handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
-                    />
-
-                    {values?.file_upload?.name ?
-                      <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>
-                      : ''
-                    }
-
-                    <AutoCompleteWrapper
-                      minWidth="100%"
-                      label='Select Mobile Number Column'
-                      placeholder='select mobile number column... '
-                      options={selectSheetHeaders?.map(i => {
-                        return {
-                          label: i,
-                          id: i
-                        }
-                      }) || []}
-                      value={values.contact_column}
-                      handleChange={(e, value) => {
-                        console.log("contact", value)
-                        setFieldValue("contact_column", value)
-                      }}
-                    />
-
-                    <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
-                      {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
-
-                      <Grid display={"flex"} justifyContent={"right"} flexWrap={"wrap"} gap={0.5}>
-                        {selectSheetHeaders.map((value, index) => <Chip key={index} color="primary" onClick={(e) => {
-                          setFieldValue("body", (values.body || '') + ` #${value}#`)
-                        }} sx={{ borderRadius: 0.5, fontSize: 13, fontWeight: 700 }} label={`#${value}#`} clickable />)}
-                      </Grid>
-
-                    </Grid>
-                    {/* <DynamicSelectTemplate /> */}
                     <TextAreaWrapper
                       sx={{ pb: 0 }}
                       name="body"
@@ -430,11 +303,16 @@ function PageHeader() {
 
                     <GateWaySelect />
 
-                    {/* <DynamicTypeSelect /> */}
+                    <DynamicTypeSelect />
 
-                    {/* {values.recipient_type === "CLASS" && <TypeClass />} */}
-                    {/* {values.recipient_type === "GROUP" && <TypeGroup />} */}
-                    {/* {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />} */}
+                    {values.recipient_type === "CLASS" && <TypeClass />}
+                    {values.recipient_type === "GROUP" && <TypeGroup />}
+                    {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />}
+                    {/* <DropDownSelectWrapper required={true} label="Type" menuItems={[]} />
+                    <DropDownSelectWrapper required={true} label="Role" menuItems={[]} /> */}
+                    {/* <DropDownSelectWrapper menuItems={[]} /> */}
+                    {/* <MobileDatePicker />
+                    <MobileDatePicker /> */}
 
                   </Grid>
                 </DialogContent>
@@ -463,38 +341,3 @@ function PageHeader() {
 
 export default PageHeader;
 
-
-const SheetJSFT = [
-  "xlsx",
-  "xlsb",
-  "xlsm",
-  "xls",
-  "xml",
-  "csv",
-  "txt",
-  "ods",
-  "fods",
-  "uos",
-  "sylk",
-  "dif",
-  "dbf",
-  "prn",
-  "qpw",
-  "123",
-  "wb*",
-  "wq*",
-  "html",
-  "htm"
-]
-  .map(function (x) {
-    return "." + x;
-  })
-  .join(",");
-
-/* generate an array of column objects */
-// const make_cols = refstr => {
-//   let o = [],
-//     C = XLSX.utils.decode_range(refstr).e.c + 1;
-//   for (var i = 0; i < C; ++i) o[i] = { name: XLSX.utils.encode_col(i), key: i };
-//   return o;
-// };

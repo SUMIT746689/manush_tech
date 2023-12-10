@@ -6,7 +6,10 @@ export interface School {
   id: Number;
   name: String;
   phone: String;
-
+  masking_sms_price: number;
+  masking_sms_count: number;
+  non_masking_sms_price: number;
+  non_masking_sms_count: number;
 }
 export interface User {
   id: string;

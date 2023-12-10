@@ -10,11 +10,11 @@ import Results from 'src/content/Management/Users/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-
+import useNotistick from '@/hooks/useNotistick';
 
 function ManagementUsers() {
     const router = useRouter()
-
+    const { showNotification } = useNotistick();
     const handleClick = async () => {
 
         try {
@@ -22,12 +22,15 @@ function ManagementUsers() {
             console.log({ data });
 
             router.push(data.bkashURL)
-        } catch (error) {
-            console.log(error);
+        } catch (err) {
+            showNotification(err?.response?.data?.message, 'error')
+            console.log(err);
 
         }
     }
-
+    if (router.query?.message) {
+        router.query?.message == 'success' ? showNotification(router.query?.message) : showNotification(router.query?.message,'error')
+    }
 
     return (
         <>

@@ -11,10 +11,14 @@ const index = async (req, res, refresh_token) => {
     const { paymentID, status } = req.query
     console.log(req.query);
 
-    if (status === 'cancel' || status === 'failure') {
-        return res.redirect(`http://localhost:3000/error?message=${status}`)
+    if (status === 'cancel') {
+        await prisma.session_store.delete({ where: { paymentID: paymentID } })
+        res.redirect(`http://localhost:3000/management/test?message=${status}`)
     }
-    if (status === 'success') {
+    else if (status === 'failure') {
+        res.redirect(`http://localhost:3000/management/test?message=${status}`)
+    }
+    else if (status === 'success') {
         try {
             switch (method) {
                 case 'GET':
@@ -23,6 +27,7 @@ const index = async (req, res, refresh_token) => {
                             paymentID
                         },
                     })
+
                     const { data } = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute', { paymentID }, {
                         headers: {
                             "Content-Type": "application/json",
@@ -31,13 +36,13 @@ const index = async (req, res, refresh_token) => {
                             'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq'
                         }
                     })
-                    await prisma.session_store.delete({ where: { paymentID: session.paymentID } })
-                    
-                    if (data && data.statusCode === '0000') {
+                    console.log("exe data__", data);
 
-                        return res.redirect(`http://localhost:3000/management/student_fees_collection`)
+                    if (data && data.statusCode === '0000') {
+                        await prisma.session_store.delete({ where: { paymentID: session.paymentID } })
+                        return res.redirect(`http://localhost:3000/management/test?message=${status}`)
                     } else {
-                        return res.redirect(`http://localhost:3000/error?message=${data.statusMessage}`)
+                        return res.redirect(`http://localhost:3000/management/test?message=${data.statusMessage}`)
                     }
                     break;
                 default:

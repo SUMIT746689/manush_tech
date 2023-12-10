@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { unique_tracking_number } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
+import dayjs from 'dayjs';
 
 const index = async (req, res, refresh_token) => {
     try {
@@ -26,7 +27,7 @@ const index = async (req, res, refresh_token) => {
                     mode: '0011',
                     payerReference: " ",
                     callbackURL: 'http://localhost:3000/api/bkash/execute_payment',
-                    amount: 50,
+                    amount: 5,
                     currency: "BDT",
                     intent: 'sale',
                     merchantInvoiceNumber: 'Inv' + '134235'
@@ -38,17 +39,21 @@ const index = async (req, res, refresh_token) => {
                         'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq',
                     }
                 })
+                console.log("payment__", payment.data);
+
+                if (!payment.data?.paymentID || !data?.id_token) throw Error(payment.data.statusMessage)
 
                 await prisma.session_store.create({
 
                     data: {
-                        //@ts-ignore
                         paymentID: payment.data.paymentID,
-                        token: data.id_token
+                        created_at: new Date(payment.data?.paymentCreateTime.slice(0, 19)),
+                        user_id: refresh_token.id,
+                        token: data.id_token,
                     }
                 })
-                console.log("payment__", payment.data);
-                return res.status(200).json({ bkashURL: payment.data.bkashURL })
+
+                res.status(200).json({ bkashURL: payment.data.bkashURL })
                 break;
 
 
@@ -64,4 +69,4 @@ const index = async (req, res, refresh_token) => {
     }
 };
 
-export default (index);
+export default authenticate(index);

@@ -27,7 +27,7 @@ const SpeechesCard = ({ title, image, description }) => {
         {title}
       </div>
       <div className="">
-        <img className=" w-1/3 float-left pr-2 md:pr-3" src={`${image}`} />
+      {image && image !== '*' && <img className=" w-1/3 float-left pr-2 md:pr-3" src={`${image}`} />}
         <div className="text-lg font-medium leading-9 text-justify">
           {description}
         </div>

@@ -20,9 +20,8 @@ const index = async (req, res, refresh_token) => {
                         password: 'sandboxTokenizedUser02@12345',
                     }
                 })
-                // console.log("data__", data);
-    
-    
+
+
                 const payment = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create', {
                     mode: '0011',
                     payerReference: " ",
@@ -35,14 +34,23 @@ const index = async (req, res, refresh_token) => {
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        authorization: data?.id_token,
+                        authorization: data.id_token,
                         'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq',
+                    }
+                })
+
+                await prisma.session_store.create({
+
+                    data: {
+                        //@ts-ignore
+                        paymentID: payment.data.paymentID,
+                        token: data.id_token
                     }
                 })
                 console.log("payment__", payment.data);
                 return res.status(200).json({ bkashURL: payment.data.bkashURL })
                 break;
-            
+
 
 
 

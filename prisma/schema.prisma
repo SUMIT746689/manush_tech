@@ -1287,3 +1287,10 @@ model Homework {
 
   @@map("homework")
 }
+
+model session_store {
+  paymentID String @id
+  token     String @db.MediumText
+
+  @@map("session_store")
+}

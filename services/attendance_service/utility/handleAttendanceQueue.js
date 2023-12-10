@@ -88,7 +88,7 @@ export const resEmpAttendanceQueues = async () => {
             WHERE title="STUDENT"
         ),
         attendance_queue as (
-            SELECT users.user_role_id,user_id
+            SELECT users.user_role_id,user_id,users.school_id as school_id
             FROM tbl_attendance_queue as taq
             JOIN user_role
             JOIN users ON taq.user_id = users.id

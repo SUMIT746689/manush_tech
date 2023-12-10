@@ -11,8 +11,9 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
   prisma.tbl_student_sent_sms_queue.delete({ where: { id } }).catch(err => { console.log("error delete tbl_manual_student_attendace_queue", err) });
 
   // verify sms gateway
-  const { error, data } = await handleSmsGateWay({ school_id });
+  const { error, data: smsGatewayData } = await handleSmsGateWay({ school_id });
   if (error) return console.log(error);
+  const { sender_id } = smsGatewayData
 
   const whereSection = {};
   if (section_id) whereSection["id"] = section_id;

@@ -64,6 +64,6 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
       }
     })
   ])
-    .then(res => { console.log(`tbl_queue_sms & tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
+    .then(res => { console.log(`tbl_queue_sms, tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
     .catch(err => { console.log("error tbl_queue_sms or tbl_sent_sms create", err) })
 }

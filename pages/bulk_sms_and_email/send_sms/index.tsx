@@ -9,14 +9,17 @@ import IndividualSmsPage from '@/content/BulkSmsAndEmail/SendSms/IndividualSmsPa
 import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadSentSms';
 import { useContext, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { BasicTabWrapper } from '@/components/Tab/Tab';
+import { useClientDataFetch } from '@/hooks/useClientFetch';
 
 const Packages = () => {
-  const [type, setType] = useState("INDIVIDUAL_SMS");
+  // const [type, setType] = useState("INDIVIDUAL_SMS");
   const { user } = useAuth();
   console.log({ user });
   const { school } = user || {};
   console.log({ school });
-
+  const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
+  console.log({ sms_gateway })
   return (
     <>
       <Head>
@@ -30,7 +33,13 @@ const Packages = () => {
             gap={2}
             width="100%"
           >
-            <Grid display="flex" justifyContent="center">
+            {sms_gateway && <BasicTabWrapper items={[
+              { label: "INDIVIDUAL SMS", value: <IndividualSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> },
+              { label: "GROUP SMS", value: <SmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> },
+              { label: "FILE UPLOAD", value: <FileUploadSentSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> }
+            ]} />
+            }
+            {/* <Grid display="flex" justifyContent="center">
               <ButtonGroup
                 disableElevation
                 variant="contained"
@@ -41,11 +50,11 @@ const Packages = () => {
                 <Button onClick={() => { setType("GROUP_SMS") }} variant={type === "GROUP_SMS" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> GROUP SMS</Button>
                 <Button onClick={() => { setType("FILE_UPLOAD") }} variant={type === "FILE_UPLOAD" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> FILE UPLOAD</Button>
               </ButtonGroup>
-            </Grid>
+            </Grid> */}
 
-            {type === "INDIVIDUAL_SMS" && <IndividualSmsPage />}
+            {/* {type === "INDIVIDUAL_SMS" && <IndividualSmsPage />}
             {type === "GROUP_SMS" && <SmsPage />}
-            {type === "FILE_UPLOAD" && < FileUploadSentSmsPage />}
+            {type === "FILE_UPLOAD" && < FileUploadSentSmsPage />} */}
           </Grid>
 
           <Grid width={400} mt={7} >

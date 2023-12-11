@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
+import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, TextField } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
@@ -34,87 +34,18 @@ const DynamicSelectTemplate = () => {
   )
 }
 
-const GateWaySelect = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
-  useEffect(() => {
-    sms_gateway[0]?.id && setFieldValue("sms_gateway_id", sms_gateway[0]?.id)
-  }, [sms_gateway])
+// const GateWaySelect = () => {
+//   const { values, touched, errors, setFieldValue }: any = useFormikContext()
+//   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
+//   useEffect(() => {
+//     sms_gateway[0]?.id && setFieldValue("sms_gateway_id", sms_gateway[0]?.id)
+//   }, [sms_gateway])
 
-  return values.sms_gateway_id ?
-    <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={sms_gateway[0]?.title} />
-    :
-    <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={'No Gateway Selected'} />
-}
-
-const TypeClass = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: classes } = useClientFetch('/api/class');
-  const [selectClassList, setSelectClassList]: any = useState([{ value: 0, title: 'Select' }]);
-  const [selectSectionList, setSelecteSectionList]: any = useState([]);
-
-  useEffect(() => {
-    const customize_select_classlist = classes?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    customize_select_classlist && setSelectClassList(value => [...value, ...customize_select_classlist]);
-  }, [classes])
-
-  const handleClassSelect = (e) => {
-    setSelecteSectionList(() => []);
-    setFieldValue("section_id", []);
-    const findSelectedTemplate = classes ? classes.find(data => data.id === e.target.value) : false;
-    if (!findSelectedTemplate) return;
-    setFieldValue("class_id", e.target.value);
-    if (!findSelectedTemplate.has_section) return;
-    const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    setSelecteSectionList((value) => customize_select_sectionlist)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  const handleSectionSelect = (e) => {
-    // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
-    // if (!findSelectedTemplate) return;
-    setFieldValue("section_id", e.target.value)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  return <>
-    <DynamicDropDownSelectWrapper label="Select Class" name="class_id" value={values.class_id} menuItems={selectClassList} handleChange={handleClassSelect} />
-
-    <DynamicDropDownMuilipleSelectWrapper label="Select Section" name="section_id" value={values.section_id} menuItems={selectSectionList} handleChange={handleSectionSelect} />
-
-  </>
-
-}
-
-const TypeGroup = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
-  const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  console.log({ roles })
-  useEffect(() => {
-    const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
-    customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
-    return () => setFieldValue("role_id", [])
-  }, [roles])
-
-  const handleRoleSelect = (e) => {
-    console.log({ e })
-    // if (e.target.value <= 0) return;
-    // const findSelectedTemplate = roles.find(data => data.id === e.target.value)
-    // if (!findSelectedTemplate) return;
-    setFieldValue("role_id", e.target.value)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  return (
-    <>
-      <DynamicDropDownMuilipleSelectWrapper label="Select Role" name="role_id" value={Array.isArray(values.role_id) ? values.role_id : []} menuItems={selectRolesList} handleChange={handleRoleSelect} />
-    </>
-  )
-}
+//   return values.sms_gateway_id ?
+//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={sms_gateway[0]?.title} />
+//     :
+//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={'No Gateway Selected'} />
+// }
 
 
 const TypeIndividual = () => {
@@ -162,44 +93,24 @@ const TypeIndividual = () => {
 }
 
 
-const DynamicTypeSelect = () => {
-  // const { data: sms_datas } = useClientDataFetch("/api/")
-  // const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue } = useFormikContext()
-  const { values, setFieldValue }: any = useFormikContext()
+function PageHeader({ sms_gateway }) {
 
-  const types = [{ value: "SELECT", title: "SELECT" }, { value: "CLASS", title: "CLASS" }, { value: "GROUP", title: "GROUP" }, { value: 'INDIVIDUAL', title: "INDIVIDUAL" }]
-
-  const handleTypeChange = (e) => {
-    setFieldValue("recipient_type", e.target.value)
-    setFieldValue("class_id", undefined)
-    setFieldValue("section_id", [])
-  }
-
-  // return <DropDownSelectWrapper   label="Type" handleChange={handleTypeChange} menuItems={types} />
-  return (
-    <>
-      <DynamicDropDownSelectWrapper required={true} value={values.recipient_type} name="recipient_type" label="Type" menuItems={types} handleChange={handleTypeChange} />
-
-    </>
-  )
-
-
-}
-
-function PageHeader() {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
-  const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
+  const handleFormSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting, setFieldValue }) => {
     try {
 
       const successResponse = (message) => {
         showNotification('send sms ' + message + ' successfully');
         resetForm();
+        setFieldValue()
         setStatus({ success: true });
         setSubmitting(false);
         // reFetchData();
       };
+
+      _values["recipient_type"] = "INDIVIDUAL"
 
       const { data } = await axios.post(`/api/sent_sms`, _values);
       successResponse('created');
@@ -221,12 +132,14 @@ function PageHeader() {
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
         <Formik
+          enableReinitialize={true}
           initialValues={{
-            campaign_name: undefined,
-            sms_gateway_id: undefined,
+            campaign_name: '',
+            sms_gateway: sms_gateway?.title || undefined,
+            sms_gateway_id: sms_gateway?.id || undefined,
             template_id: undefined,
-            body: undefined,
-            recipient_type: undefined,
+            body: '',
+            // recipient_type: undefined,
             class_id: undefined,
             section_id: [],
             role_id: [],
@@ -246,9 +159,9 @@ function PageHeader() {
             sms_gateway_id: Yup.number()
               .min(0)
               .required(t('The sms gateway field is required')),
-            recipient_type: Yup.string()
-              .min(4)
-              .required(t('The type field is required')),
+            // recipient_type: Yup.string()
+            //   .min(4)
+            //   .required(t('The type field is required')),
           })}
           onSubmit={handleFormSubmit}
         >
@@ -257,6 +170,8 @@ function PageHeader() {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
+            console.log({ errors, values });
+            console.log({ sms_gateway })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -274,6 +189,16 @@ function PageHeader() {
                       handleBlur={handleBlur}
                       required={true}
                     />
+
+                    {
+                      sms_gateway && <DisableTextWrapper
+                        label="Selected Sms Gateway"
+                        touched={values.sms_gateway}
+                        errors={errors.sms_gateway}
+                        value={values.sms_gateway}
+                      />
+                    }
+                    {/* <GateWaySelect /> */}
 
                     <DynamicSelectTemplate />
 
@@ -301,13 +226,13 @@ function PageHeader() {
                       `}
                     </Grid>
 
-                    <GateWaySelect />
+                    {/* <DynamicTypeSelect /> */}
 
-                    <DynamicTypeSelect />
-
-                    {values.recipient_type === "CLASS" && <TypeClass />}
-                    {values.recipient_type === "GROUP" && <TypeGroup />}
-                    {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />}
+                    {/* {values.recipient_type === "CLASS" && <TypeClass />} */}
+                    {/* {values.recipient_type === "GROUP" && <TypeGroup />} */}
+                    {/* {values.recipient_type === "INDIVIDUAL" &&  */}
+                    <TypeIndividual />
+                    {/* } */}
                     {/* <DropDownSelectWrapper required={true} label="Type" menuItems={[]} />
                     <DropDownSelectWrapper required={true} label="Role" menuItems={[]} /> */}
                     {/* <DropDownSelectWrapper menuItems={[]} /> */}

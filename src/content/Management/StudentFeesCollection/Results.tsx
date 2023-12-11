@@ -188,7 +188,8 @@ const Results = ({
               fee['status_color'] = status_color
               fee['sl'] = index + 1
               return fee
-            }));
+            }
+            ));
           }
         })
         .catch((err) => {

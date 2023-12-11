@@ -117,6 +117,7 @@ export async function getServerSideProps(context: any) {
     })
 
     data = {
+      student_id: student.id,
       ...student.student_info,
       name: [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' '),
       class: student.section.class.name,
@@ -146,6 +147,67 @@ function ManagementStudentPayment({ data }) {
 
   // const { data, error } = useClientFetch('/api/student_payment_collect');
 
+  useEffect(() => {
+    if (data) {
+      setDatas({
+        ...data,
+        fees: data?.fees?.map((fee, index) => {
+
+          const last_payment_date = fee?.status !== 'unpaid' ? fee?.last_payment_date : ''
+          const last_date = new Date(fee.last_date)
+          const today = new Date()
+          const status_color = { p: 0.5 };
+          let due, total_payable_amt, payableAmount = 0;
+
+          if (fee?.status == 'paid' || fee?.status === 'paid late') {
+            due = 0
+            total_payable_amt = ""
+          }
+          else {
+            const late_fee = fee.late_fee ? fee.late_fee : 0
+            if (late_fee && today > last_date) {
+              payableAmount = (Number(fee?.amount) + Number(fee?.late_fee))
+              total_payable_amt = `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${payableAmount.toFixed(2)}`;
+            }
+            else {
+              total_payable_amt = ""
+            }
+
+            due = (fee?.amount + late_fee - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
+
+            console.log(fee.title, "due__", due, today < last_date);
+
+            if (today < last_date) {
+              due -= late_fee
+            }
+          }
+
+
+          if (fee?.status === 'paid' || fee?.status === 'paid late') {
+            status_color['color'] = 'green'
+          }
+          else if (fee?.status === 'partial paid') {
+            status_color['color'] = 'blue'
+          }
+          else {
+            status_color['color'] = 'red'
+          }
+
+
+          fee['last_payment_date'] = last_payment_date
+          fee['due'] = due
+          fee['total_payable_amt'] = total_payable_amt
+          fee['payableAmount'] = payableAmount
+          fee['status_color'] = status_color
+          fee['sl'] = index + 1
+          return fee
+        })
+      }
+
+      )
+    }
+  }, [data])
+
   const printPageRef = useRef();
   const printAllPageARef = useRef();
 
@@ -171,20 +233,19 @@ function ManagementStudentPayment({ data }) {
       >
         <Grid item xs={12}>
           <StudentPayment
-            data={data}
             sessions={datas}
             setSessions={setDatas}
             // students={students}
-            setStudents={setStudents}
-            selectedStudent={selectedStudent}
+            // setStudents={setStudents}
+            // selectedStudent={selectedStudent}
             // setSelectedStudent={setSelectedStudent}
             setPrintFees={setPrintFees}
-            // filteredFees={filteredFees}
+            filteredFees={filteredFees}
             setFilteredFees={setFilteredFees}
           />
         </Grid>
       </Grid>
-      <Grid px={4} mt={1}>
+      {/* <Grid px={4} mt={1}>
         <Card sx={{ pt: 1, px: 1, display: 'grid', justifyContent: 'center', columnGap: 1, gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr 1fr" } }}>
           <ButtonWrapper
             handleClick={() => setPrintFees([])}
@@ -230,14 +291,14 @@ function ManagementStudentPayment({ data }) {
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
           <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
         </Grid>
-      </Grid>
+      </Grid> */}
       <Footer />
     </>
   );
 }
 
 ManagementStudentPayment.getLayout = (page) => (
-  <Authenticated name='student_payment'>
+  <Authenticated name='student_fee_payment'>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

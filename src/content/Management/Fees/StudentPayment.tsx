@@ -23,9 +23,11 @@ import useNotistick from '@/hooks/useNotistick';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import dayjs from 'dayjs';
-import { UncontrolledTextFieldWrapper } from '@/components/TextFields';
+import { TextFieldWrapper, UncontrolledTextFieldWrapper } from '@/components/TextFields';
 import { formatNumber } from '@/utils/numberFormat';
-
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import Image from "next/image"
+import { useRouter } from 'next/navigation';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -98,65 +100,25 @@ const applyPagination = (sessions, page, limit) => {
 };
 
 const StudentPayment = ({
-  data,
   sessions,
   setSessions,
-  setStudents,
-  selectedStudent,
+  // setStudents,
+  // selectedStudent,
   setPrintFees,
+  filteredFees,
   setFilteredFees
 
 }) => {
-  const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
+  const router = useRouter()
   const { showNotification } = useNotistick();
-
+  const { user } = useAuth();
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(5);
+  const [limit, setLimit] = useState<number>(10);
   const [filter, setFilter] = useState<string>('all');
   const [paginatedschools, setPaginatedSchool] = useState<any>([]);
 
-  const { user } = useAuth();
-  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
 
-  const handleStudentPaymentCollect = () => {
-    if (selectedStudent) {
-      axios
-        // @ts-ignore
-        .get(`/api/student_payment_collect/${selectedStudent.id}`)
-        .then((res) => {
-          if (res.data?.success) setSessions(res.data.data);
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
-    }
-  };
-  useEffect(() => {
-    if (selectedStudent) handleStudentPaymentCollect();
-  }, [selectedStudent]);
-
-  const handleSelectAllschools = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setSelectedschools(
-      // @ts-ignore
-      event.target.checked ? data?.fees?.map((project) => project.id) : []
-    );
-  };
-
-  const handleSelectOneProject = (
-    _event: ChangeEvent<HTMLInputElement>,
-    projectId: string
-  ): void => {
-    if (!selectedItems.includes(projectId)) {
-      setSelectedschools((prevSelected) => [...prevSelected, projectId]);
-    } else {
-      setSelectedschools((prevSelected) =>
-        prevSelected.filter((id) => id !== projectId)
-      );
-    }
-  };
 
   const handlePageChange = (_event: any, newPage: number): void => {
 
@@ -166,126 +128,84 @@ const StudentPayment = ({
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-  // @ts-ignore
   useEffect(() => {
-    const filteredfeesdata = applyFilters(data?.fees || [], filter);
+    // @ts-ignore
+    if (router.query?.message) {
+      // @ts-ignore
+      router.query?.message == 'success' ? showNotification(router.query?.message) : showNotification(router.query?.message, 'error')
+    }
+    // @ts-ignore
+  }, [router?.query])
+  useEffect(() => {
+    const filteredfeesdata = applyFilters(sessions?.fees || [], filter);
     setFilteredFees(filteredfeesdata);
     const paginatedschools = applyPagination(filteredfeesdata, page, limit);
 
     console.log(paginatedschools, page, limit);
 
     setPaginatedSchool(paginatedschools);
-  }, [data, filter, page])
+  }, [sessions, filter, page])
 
-  const selectedBulkActions = selectedItems?.length > 0;
-  const selectedSomeschools =
-    // @ts-ignore
-    selectedItems?.length > 0 && selectedItems?.length < data?.fees?.length;
-  // @ts-ignore
-  const selectedAllschools = selectedItems?.length === data?.fees?.length;
 
-  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-  const [deleteSchoolId, setDeleteSchoolId] = useState(null);
+  const handlePayment = async ({
+    fee_id,
+    collected_amount,
+    total_payable
+  }) => {
 
-  const [sections, setSections] = useState(null);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedSection, setSelectedSection] = useState(null);
-
-  useEffect(() => {
-    //  axios.get(`/api/student`).then((res) => setStudents(res.data));
-
-    if (selectedSection && academicYear && user) {
-      axios
-        .get(
-          `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}&school_id=${user?.school_id}`
-        )
-        .then((res) => {
-          //  console.log("students__",res.data);
-
-          setStudents(res.data);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [selectedSection, academicYear, user]);
-
-  const handleConfirmDelete = (id: string) => {
-    setDeleteSchoolId(id);
-    setOpenConfirmDelete(true);
-  };
-
-  const closeConfirmDelete = () => {
-    setOpenConfirmDelete(false);
-    setDeleteSchoolId(null);
-  };
-
-  const handleDeleteCompleted = async () => {
     try {
-      const result = await axios.delete(`/api/sessions/${deleteSchoolId}`);
-      console.log({ result });
-      setOpenConfirmDelete(false);
-      if (!result.data?.success) throw new Error('unsuccessful delete');
-      showNotification('The sessions has been deleted successfully');
+      const data = {
+        student_id : sessions.student_id,
+        collected_by_user: user?.id,
+        fee_id,
+        collected_amount,
+        total_payable
+      }
+      console.log("got__",data);
+      
+      const req = await axios.post('/api/bkash/create-payment', data)
+
+      router.push(req.data.bkashURL)
     } catch (err) {
-      setOpenConfirmDelete(false);
-      showNotification('The school falied to delete ', 'error');
+      showNotification(err?.response?.data?.message, 'error')
+      console.log(err);
+
     }
-  };
+  }
 
-  const handleCollection = (student_id, fee_id, fee, amount, payment_method) => {
-    axios.post('/api/student_payment_collect', {
-      student_id: student_id,
-      collected_by_user: user?.id,
-      fee_id: fee_id,
-      payment_method: payment_method,
-      collected_amount: amount
-    })
-      .then((res) => {
-        console.log({ res });
-        if (res.data.err) throw new Error(res.data.err);
-        setPrintFees((prev) => [...prev, fee]);
-        handleStudentPaymentCollect();
-        showNotification('The payment has been collected successfully');
-      })
-      .catch((err) => {
-        console.error({ err });
-        showNotification(err.response?.data?.err, 'error');
-      });
-  };
 
-  const handlePaymentStatus = (fees) => {
-    let payment = { totalAmount: 0, paid: 0, remaining: 0 };
-
-    const filterPayment = fees.reduce((prev, curr) => {
-      prev.totalAmount += curr.amount;
-      if (curr.status === 'paid') prev.paid += curr.amount;
-      else prev.remaining += curr.amount;
-      return prev;
-    }, payment);
-
-    return (
-      <TableRow>
-        <TableCell>Total : {filterPayment?.totalAmount}</TableCell>
-        <TableCell>Paid : {filterPayment?.paid}</TableCell>
-        <TableCell>Remaining : {filterPayment?.remaining}</TableCell>
-      </TableRow>
-    );
-  };
 
   return (
     <>
       <Card sx={{ px: 1, pt: 1, mb: 1, mx: 'auto', maxWidth: '800px', display: 'grid', gap: 1, gridTemplateColumns: '1fr 1fr 1fr' }}>
-        <UncontrolledTextFieldWrapper label="Section" value={data.name} />
-        <UncontrolledTextFieldWrapper label="Class" value={data.class} />
-        <UncontrolledTextFieldWrapper label="Section" value={data.section} />
+        <UncontrolledTextFieldWrapper label="Section" value={sessions.name} />
+        <UncontrolledTextFieldWrapper label="Class" value={sessions.class} />
+        <UncontrolledTextFieldWrapper label="Section" value={sessions.section} />
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 405px) !important' }}>
-        {/* {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
+      <Card sx={{ minHeight: 'calc(100vh - 305px) !important' }}>
+        <Box p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between">
+
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedschools.length}</b> <b>{t('fees')}</b>
           </Box>
-        )} */}
-        
+          <TablePagination
+            component="div"
+            count={filteredFees.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
         <Divider />
 
         {
@@ -309,122 +229,87 @@ const StudentPayment = ({
           ) : (
             <>
               <TableContainer>
-                <Table size='small'>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedAllschools}
-                          indeterminate={selectedSomeschools}
-                          onChange={handleSelectAllschools}
-                        />
-                      </TableCell>
-                      <TableCell>{t('Fee Title')}</TableCell>
-                      <TableCell>{t('Pay Amount')}</TableCell>
-                      <TableCell>{t('Status')}</TableCell>
-                      <TableCell>{t('Due')}</TableCell>
-                      <TableCell>{t('Last payment date')}</TableCell>
-                      <TableCell>{t('Total payable amount')}</TableCell>
 
-                      {/* <TableCell align="center">{t('Actions')}</TableCell> */}
+                <Table size='small'>
+                  <TableHead >
+                    <TableRow>
+                      <TableCell align="center" >
+                        <Typography noWrap variant="h5">
+                          {t('SL')}</Typography>
+                      </TableCell>
+
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Title')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Amount')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Status')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Due')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Last date')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Last payment date')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Total payable amount')}</Typography></TableCell>
+                      <TableCell align="center"><Typography noWrap variant="h5">{t('Actions')}</Typography></TableCell>
+
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {paginatedschools.map((project) => {
-
-                      const last_date = dayjs(project.last_date).valueOf()
-                      const today = project.last_payment_date ? dayjs(project.last_payment_date).valueOf() : 0;
-                      const changeColor = today > last_date ? {
-                        color: 'red'
-                      } : {}
-                      const isschoolselected = selectedItems.includes(project.id);
-
-                      let due;
-                      if (project?.status == 'paid' || project?.status === 'paid late') {
-                        due = 0
-                      } else {
-                        due = (project?.amount + (project.late_fee ? project.late_fee : 0) -
-                          (project.paidAmount ? project.paidAmount : ((project?.status == 'unpaid') ? 0 : project?.amount))).toFixed(1)
-                        console.log(today, "  ", last_date);
-
-                        if (today < last_date) {
-                          due -= (project.late_fee ? project.late_fee : 0)
-                        }
-                      }
-
-
+                    {paginatedschools.map((fee, index) => {
                       return (
                         <TableRow
                           hover
-                          key={project.id}
-                          selected={isschoolselected}
+                          key={fee.id}
+
                         >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={isschoolselected}
-                              onChange={(event) =>
-                                handleSelectOneProject(event, project.id)
-                              }
-                              value={isschoolselected}
-                            />
-                          </TableCell>
-                          <TableCell>
+
+                          <TableCell sx={{ p: 0.5 }} align="center">
                             <Typography noWrap variant="h5">
-                              {project?.title}
+                              {fee?.sl}
                             </Typography>
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ p: 0.5 }} align="center">
                             <Typography noWrap variant="h5">
-                              { formatNumber(project?.amount.toFixed(1))}
+                              {fee?.title}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ p: 0.5 }} align="center">
+                            <Typography noWrap variant="h5">
+                              {(fee?.amount.toFixed(2))}
                             </Typography>
                           </TableCell>
 
-                          <TableCell
-                            sx={
-                              // @ts-ignore
-                              (project?.status === 'paid' || project?.status === 'paid late')
-                                ? { color: 'green' }
-                                : // @ts-ignore
-                                project?.status === 'partial paid'
-                                  ? { color: 'blue' }
-                                  : { color: 'red' }
-                            }
-                          >
+                          <TableCell sx={fee?.status_color} align="center">
                             <Typography noWrap variant="h5">
-                              {/* @ts-ignore */}
-                              {project?.status.toUpperCase()}
+                              {fee?.status?.toUpperCase()}
                             </Typography>
                           </TableCell>
 
-                          <TableCell>
+                          <TableCell sx={{ p: 0.5 }} align="center">
                             <Typography noWrap variant="h5">
-                              {formatNumber(due)}
+                              {formatNumber(fee?.due)}
                             </Typography>
                           </TableCell>
 
-                          <TableCell>
+                          <TableCell sx={{ p: 0.5 }} align="center">
                             <Typography noWrap variant="h5">
-                              {
-                                project?.status !== 'unpaid' ? dayjs(project?.last_payment_date).format(
-                                  'MMMM D, YYYY h:mm A'
-                                ) : ''}
+                              {dayjs(fee?.last_date).format('DD/MM/YYYY')}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ p: 0.5 }} align="center">
+                            <Typography noWrap variant="h5">
+                              {fee?.last_payment_date ? dayjs(fee?.last_payment_date).format('DD/MM/YYYY, h:mm a') : ''}
                             </Typography>
                           </TableCell>
 
-                          <TableCell>
-                            <Typography noWrap variant="h5" sx={changeColor}>
-                              {(today <= last_date || project?.status === 'paid late') ? due : `${Number(project?.amount).toFixed(2)} + ${Number(project?.late_fee).toFixed(2)} = ${formatNumber(project?.amount + project?.late_fee)}`}
+                          <TableCell sx={{ p: 0.5 }} align="center">
+                            <Typography noWrap variant="h5" sx={{ color: 'red' }}>
+                              {fee?.total_payable_amt}
                             </Typography>
                           </TableCell>
 
-                          <TableCell align="center">
+                          <TableCell align="center" sx={{ p: 0.5 }}>
                             <Typography noWrap>
-                              {/* <AmountCollection
-                                project={project}
-                                handleCollection={handleCollection}
-                                student_id={selectedStudent?.id}
-                              /> */}
+                              <AmountCollection
+                                fee={fee}
+                                handlePayment={handlePayment}
 
+                              />
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -432,158 +317,62 @@ const StudentPayment = ({
                     })}
                   </TableBody>
                 </Table>
+
               </TableContainer>
             </>
           )}
-      </Card>
+      </Card >
 
-      <DialogWrapper
-        open={openConfirmDelete}
-        maxWidth="sm"
-        fullWidth
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={closeConfirmDelete}
-      >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-          p={5}
-        >
-          <AvatarError>
-            <CloseIcon />
-          </AvatarError>
 
-          <Typography
-            align="center"
-            sx={{
-              pt: 4,
-              px: 6
-            }}
-            variant="h3"
-          >
-            {t('Do you really want to delete this project')}?
-          </Typography>
-
-          <Typography
-            align="center"
-            sx={{
-              pt: 2,
-              pb: 4,
-              px: 6
-            }}
-            fontWeight="normal"
-            color="text.secondary"
-            variant="h4"
-          >
-            {t("You won't be able to revert after deletion")}
-          </Typography>
-
-          <Box>
-            <Button
-              variant="text"
-              size="large"
-              sx={{
-                mx: 1
-              }}
-              onClick={closeConfirmDelete}
-            >
-              {t('Cancel')}
-            </Button>
-            <ButtonError
-              onClick={handleDeleteCompleted}
-              size="large"
-              sx={{
-                mx: 1,
-                px: 3
-              }}
-              variant="contained"
-            >
-              {t('Delete')}
-            </ButtonError>
-          </Box>
-        </Box>
-      </DialogWrapper>
     </>
   );
 };
 
-const AmountCollection = ({ project, student_id, handleCollection }) => {
-  const { t }: { t: any } = useTranslation();
-  const [amount, setAmount] = useState(null);
-  const [payment_method, setPayment_method] = useState('cash');
-
+const AmountCollection = ({ fee, handlePayment }) => {
+  const [amount, setAmount] = useState(fee?.due)
   return (
-    <Grid container sx={{
-      display: 'flex',
-      gap: 1,
-      justifyContent: 'center'
+    <Grid sx={{
+      display: 'grid',
+      gridTemplateColumns: '130px 0.8fr',
+      gap: 1.5,
+      pt: 0.8
     }}>
-      <Grid item sx={{
-        minWidth: '130px'
-      }}>
-        <Autocomplete
-
-          // getOptionLabel={(option) => option.name}
-          options={['cash', 'online']}
-          value={payment_method}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              fullWidth
-              variant="outlined"
-              label={t('pay via')}
-              placeholder={t('Select payment_method...')}
-            />
-          )}
-          onChange={(e, value) => {
-            console.log(value);
-            setPayment_method(value)
-          }}
-        />
-
-      </Grid>
-      <Grid item>
-        <TextField
-          sx={{
-            width: '100px'
-          }}
-          variant="outlined"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)
-            //   {
-            //   if(e.target.value && Number(e.target.value) > 0){
-            //     console.log(Number(e.target.value));
-
-            //     setAmount(Number(e.target.value))
-            //   }
-
-            // } 
-          }
+      <Grid >
+        <TextFieldWrapper
           label="Amount"
+          name=""
           type="number"
+          touched={undefined}
+          errors={undefined}
+          value={amount || ''}
+          handleChange={(e) => setAmount(e.target.value)}
+          handleBlur={undefined}
         />
       </Grid>
 
-      <Grid item>
-        <Button
-          variant="contained"
-          disabled={amount && payment_method && Number(amount) > 0 ? false : true}
-          onClick={() => {
-            handleCollection(student_id, project.id, project, amount, payment_method);
-            setPayment_method(null)
-            setAmount(null);
-          }}
-        >
-          Collect
-        </Button>
-      </Grid>
-    </Grid>
-  );
-};
 
+      <Button sx={{
+        borderRadius: 0.5,
+        textAlign: 'center',
+        px: 'auto', display: 'flex',
+        justifyContent: 'center', alignItems: 'center',
+        height: 0.8,
+        backgroundColor: amount && amount >= 10 && '#42a5f5',
+      }}
+        variant='contained'
+        disabled={amount && amount >= 10 ? false : true}
+        onClick={() => handlePayment({
+          fee_id: fee.id,
+          collected_amount: amount,
+          total_payable: fee?.payableAmount
+        })}>
+
+        <Image src={'/BKash-Icon-Logo.wine.svg'} alt={'bkash'} width={35} height={35} />
+        Pay
+      </Button>
+    </Grid>
+  )
+}
 // StudentPayment.propTypes = {
 //   sessions: PropTypes.array.isRequired
 // };

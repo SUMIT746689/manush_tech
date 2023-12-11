@@ -1293,6 +1293,7 @@ model session_store {
   token      String   @db.MediumText
   user_id    Int
   created_at DateTime
+  data       Json
 
   @@map("session_store")
 }

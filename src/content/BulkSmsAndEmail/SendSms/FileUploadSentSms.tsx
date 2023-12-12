@@ -202,6 +202,7 @@ function PageHeader({ sms_gateway }) {
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
+        setSelectSheetHeaders(() => []);
         // reFetchData();
       };
 

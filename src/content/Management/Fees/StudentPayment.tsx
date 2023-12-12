@@ -155,14 +155,14 @@ const StudentPayment = ({
 
     try {
       const data = {
-        student_id : sessions.student_id,
+        student_id: sessions.student_id,
         collected_by_user: user?.id,
         fee_id,
         collected_amount,
         total_payable
       }
-      console.log("got__",data);
-      
+      console.log("got__", data);
+
       const req = await axios.post('/api/bkash/create-payment', data)
 
       router.push(req.data.bkashURL)
@@ -177,10 +177,42 @@ const StudentPayment = ({
 
   return (
     <>
-      <Card sx={{ px: 1, pt: 1, mb: 1, mx: 'auto', maxWidth: '800px', display: 'grid', gap: 1, gridTemplateColumns: '1fr 1fr 1fr' }}>
+      <Card sx={{ p: 1, mb: 1, mx: 'auto', maxWidth: '800px', display: 'grid', gap: 1, gridTemplateColumns: { sm: '1fr 1fr 1fr 1fr' } }}>
         <UncontrolledTextFieldWrapper label="Section" value={sessions.name} />
         <UncontrolledTextFieldWrapper label="Class" value={sessions.class} />
         <UncontrolledTextFieldWrapper label="Section" value={sessions.section} />
+      
+          <FormControl  >
+            <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
+            <Select
+              fullWidth
+              size="small"
+              label="Filter By"
+
+              sx={{
+                [`& fieldset`]: {
+                  borderRadius: 0.6
+                },
+                px: '10px',
+                minWidth: '50px',
+              }}
+
+              value={filter}
+              onChange={(e: any) => {
+                setFilter(e.target.value);
+              }}
+            >
+              <MenuItem value={'all'}>ALL</MenuItem>
+              <MenuItem value={'paid'}>PAID</MenuItem>
+              <MenuItem value={'paid late'}>PAID LATE</MenuItem>
+              <MenuItem value={'partial paid'}>PARTIAL PAID</MenuItem>
+              <MenuItem value={'unpaid'}>UNPAID</MenuItem>
+            </Select>
+
+          </FormControl>
+
+       
+
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 305px) !important' }}>

@@ -213,7 +213,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
           open: true,
           vertical: 'top',
           horizontal: 'right',
-          message: err.message
+          message: 'Log in failed'
         });
        
       });

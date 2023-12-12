@@ -89,7 +89,7 @@ const index = async (req, res, refresh_token) => {
         try {
             switch (method) {
                 case 'GET':
-                    const session = await prisma.session_store.findFirst({
+                    const session = await prisma.session_store.findFirstOrThrow({
                         where: {
                             paymentID
                         },
@@ -107,49 +107,41 @@ const index = async (req, res, refresh_token) => {
 
                     if (paymentVerify.data && paymentVerify.data.statusCode === '0000') {
                         //@ts-ignore
-                        const { student_id, collected_by_user, fee_id, collected_amount, total_payable,school_id } = session.data
-                        
+                        const { student_id, collected_by_user, fee_id, collected_amount, total_payable, school_id } = session.data
+
                         const voucher = await prisma.voucher.findFirstOrThrow({
                             where: {
-                              resource_type: 'fee',
-                              resource_id: fee_id
+                                resource_type: 'fee',
+                                resource_id: fee_id
                             }
-                          })
+                        })
                         const account = await prisma.accounts.findFirstOrThrow({
                             where: {
-                              id: Number(2)
+                                id: Number(2)
                             },
                             include: {
-                              payment_method: {
-                                where: {
-                                  id: Number(4)
+                                payment_method: {
+                                    where: {
+                                        id: Number(4)
+                                    }
                                 }
-                              }
                             }
-                          })
+                        })
                         const data = {
                             student_id,
                             fee_id,
                             collected_amount,
-                            account_id:2,
-                            payment_method_id:4,
+                            account_id: 2,
+                            payment_method_id: 4,
                             payment_method: account?.payment_method[0]?.title,
                             collected_by: Number(collected_by_user),
                             total_payable: Number(total_payable)
-                          }
-                        await handleTransaction({
-                            //@ts-ignore
-                            // student_id,
-                            // collected_by_user,
-                            // fee_id,
-                            // collected_amount,
-                            // total_payable
-                            data, status:session.data.status, account, voucher, school_id
-                        })
-                        // data, status, account, voucher, refresh_token
-
+                        }
+                        //@ts-ignore
+                        await handleTransaction({ data, status: session.data.status, account, voucher, school_id })
 
                         await prisma.session_store.delete({ where: { paymentID: session.paymentID } })
+
                         return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${status}`)
                     } else {
                         return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${paymentVerify.data.statusMessage}`)

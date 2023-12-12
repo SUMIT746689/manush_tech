@@ -2,13 +2,13 @@
 import { todayMinMaxDateTime } from "./utility/dateTime.js";
 import { handleIndividualQueue } from "./handleIndividualQueue.js";
 import prisma from "./utility/prismaClient.js";
-
+import { logFile } from "./utility/handleLog.js";
 
 const main = async () => {
   try {
     let res_tbl_student_sent_sms_queue = await prisma.tbl_student_sent_sms_queue.findMany()
 
-    if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) throw new Error("manual attendace queue is empty");
+    if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) logFile.error("manual attendace queue is empty");
 
     const { std_min_attend_date_wise, std_max_attend_date_wise } = todayMinMaxDateTime();
 
@@ -20,7 +20,7 @@ const main = async () => {
 
   catch (err) {
     prisma.$disconnect();
-    console.log({ "server": err.message })
+    logFile.error({ "server": err.message })
   }
 }
 

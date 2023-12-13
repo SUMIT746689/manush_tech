@@ -6,21 +6,26 @@ import { logFile } from "./utility/handleLog.js";
 
 const main = async () => {
   try {
-    let res_tbl_student_sent_sms_queue = await prisma.tbl_student_sent_sms_queue.findMany()
+    prisma.tbl_student_sent_sms_queue.findMany()
+      .then((res_tbl_student_sent_sms_queue) => {
+        
+        if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) logFile.error("manual attendace queue is empty");
 
-    if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) logFile.error("manual attendace queue is empty");
+        const { std_min_attend_date_wise, std_max_attend_date_wise } = todayMinMaxDateTime();
 
-    const { std_min_attend_date_wise, std_max_attend_date_wise } = todayMinMaxDateTime();
-
-    // manually send attendance for students
-    res_tbl_student_sent_sms_queue.forEach(individual_student_attendace_queue => {
-      handleIndividualQueue({ student_attendace_queue: individual_student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise })
-    });
+        // manually send attendance for students
+        res_tbl_student_sent_sms_queue.forEach(individual_student_attendace_queue => {
+          handleIndividualQueue({ student_attendace_queue: individual_student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise })
+        });
+      })
+      .catch(err => {
+        logFile.error(err.message)
+      })
   }
 
   catch (err) {
     prisma.$disconnect();
-    logFile.error({ "server": err.message })
+    logFile.error(err.message)
   }
 }
 

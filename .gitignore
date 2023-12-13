@@ -25,3 +25,5 @@ mynewfile.txt
 /certificate_templates
 /public/certificate_images
 /public/frontendPhoto
+/services/attendance_service/logs
+/services/sent_sms_service/logs

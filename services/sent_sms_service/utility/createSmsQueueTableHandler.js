@@ -1,6 +1,8 @@
-import prisma from "./prisma_client.js";
+import { logFile } from "./handleLog.js";
+import prisma from "./prismaClient.js";
 
-export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, index }) => {
+
+export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
 
   const currentDate = new Date().getTime();
   const sms_shoot_id = [String(school_id), String(currentDate), String(index)].join("_");
@@ -13,7 +15,7 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         school_id,
         school_name,
         sender_id,
-        sms_type: 'masking',
+        sms_type,
         sms_text,
         // // sender_id: 1,
         // // sender_name: "",
@@ -23,8 +25,9 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         // // status: status,
         // // route_id: 1,
         // // coverage_id: 1,
-        // // charges_per_sms: 0.25,
+        charges_per_sms,
         total_count: 1,
+        number_of_sms_parts
         // // is_black_list: 2,
         //fail_count: 3,
         //priority: 4
@@ -37,7 +40,7 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         school_id,
         school_name,
         sender_id,
-        sms_type: 'masking',
+        sms_type,
         sms_text,
         // // sender_id: 1,
         // // sender_name: "",
@@ -47,14 +50,22 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         // // status: status,
         // // route_id: 1,
         // // coverage_id: 1,
-        // // charges_per_sms: 0.25,
+        charges_per_sms,
         total_count: 1,
+        number_of_sms_parts
         // // is_black_list: 2,
         //fail_count: 3,
         //priority: 4
       }
     }),
+    prisma.school.update({
+      where: { id: school_id },
+      data: {
+        masking_sms_count: sms_type === "masking" ? { decrement: 1 } : undefined,
+        non_masking_sms_count: sms_type === "non_masking" ? { decrement: 1 } : undefined
+      }
+    })
   ])
-    // .then(res => { console.log("tbl_queue_sms", res) })
-    .catch(err => { console.log("tbl_queue_sms", err) })
+    .then(res => { logFile.error(`tbl_queue_sms, tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
+    .catch(err => { logFile.error("error tbl_queue_sms or tbl_sent_sms create", err) })
 }

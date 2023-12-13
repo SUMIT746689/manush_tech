@@ -189,7 +189,7 @@ const DynamicTypeSelect = () => {
 
 }
 
-function PageHeader() {
+function PageHeader({ sms_gateway }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const [selectSheetHeaders, setSelectSheetHeaders] = useState([]);
@@ -202,6 +202,7 @@ function PageHeader() {
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
+        setSelectSheetHeaders(() => []);
         // reFetchData();
       };
 
@@ -210,7 +211,9 @@ function PageHeader() {
 
       for (const [key, value] of Object.entries(_values)) {
         console.log(`${key}: ${value}`);
-        if (value) datas.set(key, _values[key]);
+        // @ts-ignore
+        if (key === "contact_column") datas.set(key, value.id)
+        else if (value) datas.set(key, _values[key]);
       }
       console.log({ datas })
       // const {file_upload} = _values;
@@ -263,11 +266,12 @@ function PageHeader() {
 
         <Formik
           initialValues={{
-            campaign_name: undefined,
-            sms_gateway_id: undefined,
-            contact_column: undefined,
+            campaign_name: '',
+            sms_gateway: sms_gateway?.title || undefined,
+            sms_gateway_id: sms_gateway?.id || undefined,
+            contact_column: null,
             // template_id: undefined,
-            body: undefined,
+            body: '',
             // recipient_type: undefined,
             // class_id: undefined,
             // section_id: [],
@@ -317,6 +321,14 @@ function PageHeader() {
                       required={true}
                     />
 
+                    <DisableTextWrapper
+                      label="Selected Sms Gateway"
+                      touched={values.sms_gateway}
+                      errors={errors.sms_gateway}
+                      value={values.sms_gateway}
+                    />
+                    {/* <GateWaySelect /> */}
+
 
                     <FileUploadFieldWrapper
                       htmlFor="files"
@@ -338,7 +350,7 @@ function PageHeader() {
                           const worksheet = workbook.Sheets[firstSheetName]
                           const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
                           setFieldValue("body", '')
-                          setFieldValue("contact_column", {})
+                          setFieldValue("contact_column", null)
 
                           if (excelArrayDatas.length > 30_000) {
                             showNotification("file is to large", "error")
@@ -425,14 +437,6 @@ function PageHeader() {
                           values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
                       `}
                     </Grid>
-
-                    <GateWaySelect />
-
-                    {/* <DynamicTypeSelect /> */}
-
-                    {/* {values.recipient_type === "CLASS" && <TypeClass />} */}
-                    {/* {values.recipient_type === "GROUP" && <TypeGroup />} */}
-                    {/* {values.recipient_type === "INDIVIDUAL" && <TypeIndividual />} */}
 
                   </Grid>
                 </DialogContent>

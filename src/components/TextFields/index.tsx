@@ -72,16 +72,17 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
         fullWidth
         helperText={touched && errors}
         disabled
+        // focused={focused}
       />
     </Grid>
   )
 }
 
-export const TextAreaWrapper = ({ name, value, touched, errors, handleChange, handleBlur, minRows = 6, required = false,sx ={} }) => {
+export const TextAreaWrapper = ({ name, value, touched, errors, handleChange, handleBlur, minRows = 6, required = false, sx = {} }) => {
   return (
     <Grid item container pb={1}>
       <TextField
-        sx={{maxlength:10}}
+        sx={{ maxlength: 10 }}
         id="outlined-multiline-static"
         label={name}
         variant="outlined"

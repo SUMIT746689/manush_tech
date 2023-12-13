@@ -1,8 +1,8 @@
-import prisma from "./prisma_client.js.js";
+import prisma from "./utility/prisma_client.js";
 
 
 const studentAttendence = (attend_queue, student_id, index) => {
-
+  console.log({ attend_queue })
   prisma.attendance.create({
     data: {
       student_id: student_id,
@@ -34,7 +34,8 @@ const studentAttendence = (attend_queue, student_id, index) => {
       sms_text: 'eqfretrh rwgvebttrynt',
       // is_black_list: 2,
       fail_count: 3,
-      priority: 4
+      priority: 4,
+      school_id: attend_queue.school_id,
     }
   }).catch(err => { console.log("tbl_queue_sms", err) })
 }

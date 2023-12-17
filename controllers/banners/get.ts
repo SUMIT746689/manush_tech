@@ -6,6 +6,8 @@ const get = async (req: any, res: any, refresh_token) => {
     try {
 
         if (refresh_token.school_id) throw new Error('permission denied');
+        const { role } = refresh_token;
+        if(role?.title !== 'SUPER_ADMIN') throw new Error('permission denied')
         // const {user_id} = refresh_token;
         // console.log({ refresh_token });
 

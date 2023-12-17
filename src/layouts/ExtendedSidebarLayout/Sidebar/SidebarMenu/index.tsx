@@ -586,10 +586,12 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Entry Notes' ||
       item.name === 'Show Notes' ||
 
-      item.name === 'Syllabus'||
-      item.name === 'Home work'||
+      item.name === 'Syllabus' ||
+      item.name === 'Home work' ||
 
-      item.name === 'Teacher Exam Routine'
+      item.name === 'Teacher Exam Routine' ||
+
+      item.name === 'Banners'
 
     ) {
       // switch(item.name){
@@ -668,6 +670,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Teacher Exam Routine' && permissionVerify(permissions, ['show_teacher_exam_routine'])) sub_menu();
       // homework
       if (item.name === 'Home work' && permissionVerify(permissions, ['homework'])) sub_menu();
+      // banners
+      if (item.name === 'Banners' && permissionVerify(permissions, ['create_banner'])) sub_menu();
 
     }
     else sub_menu();

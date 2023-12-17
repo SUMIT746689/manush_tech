@@ -16,6 +16,7 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
+import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import ClassIcon from '@mui/icons-material/Class';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -503,6 +504,11 @@ export const menuItems: MenuItems[] = [
         name: 'Holidays',
         link: '/management/holidays',
         icon: HolidayVillageIcon
+      },
+      {
+        name: 'Banners',
+        link: '/banners',
+        icon: ViewCarouselIcon
       },
       {
         name: 'Package',

@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { FileUploadFieldWrapper_ } from '@/components/TextFields';
+import { FileUploadFieldWrapper_, TextFieldWrapper } from '@/components/TextFields';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], refetchBanner: () => void }) {
@@ -117,7 +117,10 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
                             <>
                                 <Grid width="100%" fontWeight={600}>Preview:</Grid>
                                 {previewImages?.map((image, index) => (
-                                    <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                    <>
+                                        <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                        {/* <TextFieldWrapper/> */}
+                                    </>
                                 ))
                                 }
                             </>

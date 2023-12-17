@@ -43,7 +43,7 @@ const post = async (req: any, res: any, refresh_token) => {
             // @ts-ignore
             if (resBanner.banners?.left_banners) bannersData["left_banners"] = resBanner.banners?.left_banners;
             // @ts-ignore
-            if (resBanner.banners?.right_banners) bannersData.right_banners.push(...resBanner.banners?.right_banners);
+            // if (resBanner.banners?.right_banners) bannersData.right_banners.push(...resBanner.banners?.right_banners);
             const response = await prisma.banners.update({
                 where: { id: resBanner.id },
                 data: {

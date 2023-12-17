@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AttendanceIcon, ExamIcon, FeesCollectionIcon, RoutineIcon, StaffsIcon, StudentRegIcon, StudentsIcon, TeacherRoutineIcon } from '@/components/Icon';
 import Notices from '../admin_notices';
 import { Attendance } from '../attendance';
+import ImageSlider from '@/components/ImageSlider/ImageSlider';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -16,9 +17,14 @@ const colorDarkViolet = "#9C2BAD"
 const colorLightViolet = "#F9E5F9"
 
 function AdminDashboardReportsContent({ blockCount = null }) {
+  console.log({ blockCount })
+  const { banners: banners_ } = blockCount || {};
+  const { banners } = banners_ || {};
+  const { left_banners, right_banners } = banners || {};
 
   const { t }: { t: any } = useTranslation();
-
+  console.log({});
+  console.log({ right_banners: right_banners && right_banners[0] })
   return (
     <>
 
@@ -88,7 +94,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         {/* quick links */}
         {/* <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 4, justifyContent: "center", width: 4 / 6, mx: 'auto' }} > */}
         <Grid width="100%" display="flex" justifyContent="center">
-          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", width: { xs: '100%', md: 4 / 6 },maxWidth:"550px", height: 'fit-content', transition: 'all 5s' }} >
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", width: { xs: '100%', md: 4 / 6 }, maxWidth: "550px", height: 'fit-content', transition: 'all 5s' }} >
             <StudentPathButton linkUrl="/management/students/registration" icon={<StudentRegIcon style={{ margin: 'auto' }} />} name="Student Registration" />
             <StudentPathButton linkUrl="/management/routine/class_routine" icon={<RoutineIcon style={{ margin: 'auto' }} />} name="Routine" />
             <StudentPathButton linkUrl="#" icon={<TeacherRoutineIcon style={{ margin: 'auto' }} />} name="Teacher Routine" />
@@ -106,12 +112,24 @@ function AdminDashboardReportsContent({ blockCount = null }) {
       {/* banners */}
       {/* <Grid sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, p: 2 }}> */}
       <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
-        <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', borderRadius: '10px' }} src='admin_dashboard/banner_1.png' alt="banner_1" />
-        <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', borderRadius: '10px' }} src='admin_dashboard/banner_2.png' alt="banner_2" />
+        <Card sx={{
+          width: "100",
+          borderRadius: 0,
+          // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
+          overflow: "hidden"
+        }} >
+          <ImageSlider images={left_banners ? left_banners?.map(banner => ({ url: banner.url })) : []} />
+        </Card>
+        <Card sx={{ width: "100", borderRadius: 0 }}>
+          <Link href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : "#"}>
+            <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+          </Link>
+        </Card>
       </Grid>
 
       {/* notice board and calander */}
-      <Grid sx={{ display: 'grid', width: "100%", height: "100%", gridTemplateColumns: { md: '1fr 1fr' }, px: 2, gap: 2 }}>
+      < Grid sx={{ display: 'grid', width: "100%", height: "100%", gridTemplateColumns: { md: '1fr 1fr' }, px: 2, gap: 2 }
+      }>
         <Grid xs={12} md={11} sx={{ height: 'full' }}>
           <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700 }}>Notice Board</Grid>
           <Notices notices={blockCount?.school?.Notice || []} />
@@ -128,7 +146,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700 }}>Calander</Grid>
           <Calander holidays={blockCount.holidays} />
         </Grid>
-      </Grid>
+      </Grid >
 
       <Footer />
     </>

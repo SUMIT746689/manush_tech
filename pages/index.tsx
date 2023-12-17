@@ -92,6 +92,7 @@ export async function getServerSideProps(context: any) {
           })
         };
         blockCount["school"] = school;
+        blockCount["banners"] = await prisma.banners.findFirst({});
 
         await updateHolidays();
         break;

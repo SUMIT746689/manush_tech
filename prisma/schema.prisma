@@ -34,6 +34,7 @@ model User {
   tbl_attendence_queue tbl_attendance_queue[]
   // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
   approved_user        Leave[]                @relation("approved_by")
+  banners              Banners[]
 
   @@map("users")
 }
@@ -1301,4 +1302,14 @@ model session_store {
   data       Json
 
   @@map("session_store")
+}
+
+model Banners {
+  id      Int  @id @default(autoincrement())
+  banners Json
+  user_id Int
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("banners")
 }

@@ -72,7 +72,7 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
         fullWidth
         helperText={touched && errors}
         disabled
-        // focused={focused}
+      // focused={focused}
       />
     </Grid>
   )
@@ -146,6 +146,54 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
       <Button onClick={handleRemoveFile} variant='contained' component="span" sx={{ borderTopLeftRadius: 0, ml: 0.1, bgcolor: 'gray', ":hover": { bgcolor: 'lightgrey' } }}>
         Remove
       </Button>
+    </Grid>
+  )
+}
+
+export const FileUploadFieldWrapper_ = ({ htmlFor, accept = "image", multiple = false, handleChangeFile }) => {
+
+  return (
+    <Grid pb="1" mb={1} sx={{ position: "relative", height: 60 }} >
+      {/* <TextField
+        id="outlined-basic"
+        label={label}
+        variant="outlined"
+        size='small'
+
+        name={name}
+        value={value}
+        sx={{
+          borderTopRightRadius: 1,
+          [`& fieldset`]: {
+            py: 1.85,
+            borderRadius: 0.8,
+            borderTopRightRadius: 0,
+            // borderTopLeftRadius:0.6,
+            // borderBottomRightRadius:0.6,
+            // borderBottomLeftRadius:0.6,
+            // fontSize: 0.2
+          },
+        }}
+        disabled
+      /> */}
+
+      <label htmlFor={htmlFor}>
+        <input
+          accept={`${accept}/*`}
+          style={{ position: "absolute", width: "100%", height: "100%", zIndex: 1, opacity: 0, cursor: "pointer" }}
+          id={htmlFor}
+          multiple={multiple}
+          type="file"
+          onChange={handleChangeFile}
+        />
+        <Button
+          variant="outlined"
+          component="span"
+          sx={{ width: "100%", height: "100%", borderStyle: "dashed", position: "absolute", borderRadius: 0.5 }}
+        >
+          + Upload
+        </Button>
+      </label>
     </Grid>
   )
 }

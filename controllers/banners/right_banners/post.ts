@@ -2,6 +2,7 @@ import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
+import fs from 'fs';
 
 export const config = {
     api: {
@@ -24,7 +25,7 @@ const post = async (req: any, res: any, refresh_token) => {
         }
 
         const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
-        // console.log({ files, fields, error })
+        const { redirectUrl } = fields;
         if (error) throw new Error(error);
 
         const { banners } = files;
@@ -33,8 +34,9 @@ const post = async (req: any, res: any, refresh_token) => {
 
         const uploaPaths: any = [];
         // @ts-ignore
-        if (!Array.isArray(banners)) uploaPaths.push({ url: path.join(uploadFolderName, banners?.newFilename) })
-        else uploaPaths.push(...banners?.map(banner => ({ url: path.join(uploadFolderName, banner?.newFilename) })))
+        if (!Array.isArray(banners)) uploaPaths.push({ url: path.join(uploadFolderName, banners?.newFilename), redirectUrl })
+        else throw new Error('multiple file not allowed')
+        // else uploaPaths.push(...banners?.map(banner => ({ url: path.join(uploadFolderName, banner?.newFilename) })))
 
         const resBanner = await prisma.banners.findFirst({});
         const bannersData = { right_banners: uploaPaths }
@@ -42,8 +44,18 @@ const post = async (req: any, res: any, refresh_token) => {
         if (resBanner) {
             // @ts-ignore
             if (resBanner.banners?.left_banners) bannersData["left_banners"] = resBanner.banners?.left_banners;
-            // @ts-ignore
             // if (resBanner.banners?.right_banners) bannersData.right_banners.push(...resBanner.banners?.right_banners);
+
+            // @ts-ignore    
+            // remove previous images
+            if (resBanner.banners?.right_banners) {
+                // @ts-ignore
+                resBanner.banners?.right_banners.forEach((banner: { url: string }) => {
+                    const datas = path.join(process.cwd(), `${process.env.FILESFOLDER}`, banner.url);
+                    fs.unlinkSync(datas)
+                });
+            }
+
             const response = await prisma.banners.update({
                 where: { id: resBanner.id },
                 data: {

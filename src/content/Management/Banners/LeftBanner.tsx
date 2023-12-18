@@ -24,12 +24,15 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
     const [images, setImages] = useState([]);
     const [previewImages, setPreviewImages] = useState(undefined);
     const { showNotification } = useNotistick();
+    const [redirectUrl, setRedirectUrl] = useState('');
+
     const handleSubmit = () => {
 
         const formData = new FormData();
         Array.prototype.forEach.call(images, (file) => {
             formData.append("banners", file);
-        })
+        });
+        formData.append("redirectUrl", redirectUrl);
         axios({
             method: 'POST',
             url: `/api/banners/left_banners`,
@@ -97,6 +100,10 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
             })
     }
 
+    const handleRedirectUrlChange = (e) => {
+        setRedirectUrl(e.target.value)
+    }
+
     return (
         <>
             <Card sx={{ borderRadius: 0.5 }}>
@@ -107,7 +114,7 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
                     <FileUploadFieldWrapper_
                         htmlFor="left_images"
                         // name="left_images"
-                        multiple={true}
+                        // multiple={true}
                         accept="image"
                         handleChangeFile={handleFileChange}
                     />
@@ -116,12 +123,21 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
                             (Array.isArray(previewImages) && previewImages.length > 0) &&
                             <>
                                 <Grid width="100%" fontWeight={600}>Preview:</Grid>
-                                {previewImages?.map((image, index) => (
-                                    <>
-                                        <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
-                                        {/* <TextFieldWrapper/> */}
-                                    </>
-                                ))
+                                {
+                                    previewImages?.map((image, index) => (
+                                        <>
+                                            <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                            <TextFieldWrapper
+                                                label="Redirect url"
+                                                name="redirect url"
+                                                value={redirectUrl}
+                                                handleChange={handleRedirectUrlChange}
+                                                handleBlur={undefined}
+                                                errors={undefined}
+                                                touched={undefined}
+                                            />
+                                        </>
+                                    ))
                                 }
                             </>
                         }

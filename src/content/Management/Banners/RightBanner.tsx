@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Grid, Button, Card, } from '@mui/material';
-import { FileUploadFieldWrapper_ } from '@/components/TextFields';
+import { FileUploadFieldWrapper_, TextFieldWrapper } from '@/components/TextFields';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
@@ -10,6 +10,7 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
     const [images, setImages] = useState([]);
     const [previewImages, setPreviewImages] = useState(undefined);
     const { showNotification } = useNotistick();
+    const [redirectUrl, setRedirectUrl] = useState('');
 
     const handleSubmit = () => {
 
@@ -17,6 +18,7 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
         Array.prototype.forEach.call(images, (file) => {
             formData.append("banners", file);
         })
+        formData.append("redirectUrl", redirectUrl);
         axios({
             method: 'POST',
             url: `/api/banners/right_banners`,
@@ -83,7 +85,11 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
                 console.log({ error })
             })
     }
-    
+
+    const handleRedirectUrlChange = (e) => {
+        setRedirectUrl(e.target.value)
+    }
+
     return (
         <>
             <Card sx={{ borderRadius: 0.5 }}>
@@ -94,7 +100,7 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
                     <FileUploadFieldWrapper_
                         htmlFor="left_images"
                         // name="left_images"
-                        multiple={true}
+                        // multiple={true}
                         accept="image"
                         handleChangeFile={handleFileChange}
                     />
@@ -104,7 +110,18 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
                             <>
                                 <Grid width="100%" fontWeight={600}>Preview:</Grid>
                                 {previewImages?.map((image, index) => (
-                                    <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                    <>
+                                        <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                        <TextFieldWrapper
+                                            label="Redirect url"
+                                            name="redirect url"
+                                            value={redirectUrl}
+                                            handleChange={handleRedirectUrlChange}
+                                            handleBlur={undefined}
+                                            errors={undefined}
+                                            touched={undefined}
+                                        />
+                                    </>
                                 ))
                                 }
                             </>

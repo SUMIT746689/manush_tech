@@ -118,10 +118,10 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
           overflow: "hidden"
         }} >
-          <ImageSlider images={left_banners ? left_banners?.map(banner => ({ url: banner.url })) : []} />
+          <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
         </Card>
         <Card sx={{ width: "100", borderRadius: 0 }}>
-          <Link href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : "#"}>
+          <Link target='_blank' href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : "#"}>
             <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
           </Link>
         </Card>

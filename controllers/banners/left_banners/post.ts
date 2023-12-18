@@ -28,13 +28,14 @@ const post = async (req: any, res: any, refresh_token) => {
         if (error) throw new Error(error);
 
         const { banners } = files;
+        const { redirectUrl } = fields;
 
         if (!banners) return res.status(404).json({ message: 'file missing !!' });
 
         const uploaPaths: any = [];
         // @ts-ignore
-        if (!Array.isArray(banners)) uploaPaths.push({ url: path.join(uploadFolderName, banners?.newFilename) })
-        else uploaPaths.push(...banners?.map(banner => ({ url: path.join(uploadFolderName, banner?.newFilename) })))
+        if (!Array.isArray(banners)) uploaPaths.push({ url: path.join(uploadFolderName, banners?.newFilename), redirectUrl })
+        // else uploaPaths.push(...banners?.map(banner => ({ url: path.join(uploadFolderName, banner?.newFilename) })))
 
         const resBanner = await prisma.banners.findFirst({});
         const bannersData = { left_banners: uploaPaths }

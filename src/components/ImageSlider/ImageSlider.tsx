@@ -27,7 +27,7 @@ function SampleNextArrow(props) {
 }
 
 
-const ImageSlider = ({ images }: { images: { url: string, redirectUrl?: string }[] }) => {
+const ImageSlider = ({ images, target='' }: { images: { url: string, redirectUrl?: string }[],target:'_blank' | '' }) => {
     const settings = {
         dots: true,
         arrows: true,
@@ -72,7 +72,7 @@ const ImageSlider = ({ images }: { images: { url: string, redirectUrl?: string }
         <>
             <Slider {...settings}>
                 {
-                    images?.map((image, index) => <Link href={image?.redirectUrl || "#"} key={index}> <img className=" max-h-96 object-fill w-screen" src={`/api/get_file/${image?.url}`} /></Link>)
+                    images?.map((image, index) => <Link target={target} href={image?.redirectUrl || "#"} key={index}> <img className=" max-h-96 object-fill w-screen" src={`/api/get_file/${image?.url}`} /></Link>)
                 }
             </Slider>
         </>

@@ -15,16 +15,26 @@ export default async function Admission() {
                 domain
             },
             deleted_at: null
+        },
+        include: {
+            school: {
+                select: {
+                    TeacherRecruitmentForm: true
+                }
+            }
         }
-    })
+    });
+    const { school } = departments;
+    const { TeacherRecruitmentForm } = school || {}
     return (
-        <div>
+        <div className=' max-w-5xl mx-auto px-5'>
             <TeachersApplication
                 serverHost={`${process.env.SERVER_HOST}`}
                 departments={departments?.map(i => ({
                     label: i.title,
-                    value: i.id
+                    value: i.ids
                 })) || []}
+                teacherRecruitmentForm={TeacherRecruitmentForm}
             />
         </div>
     )

@@ -92,6 +92,7 @@ model School {
   SmsTransaction             SmsTransaction[]
   addtionalMarkingCategories AddtionalMarkingCategories[]
   ExamTerm                   ExamTerm[]
+  StudentAdmissionForm       StudentAdmissionForm?
 
   // routines Routine[]
   @@map("schools")
@@ -1312,4 +1313,15 @@ model Banners {
   user User @relation(fields: [user_id], references: [id])
 
   @@map("banners")
+}
+
+model StudentAdmissionForm {
+  id        Int    @id @default(autoincrement())
+  file_url  String
+  school_id Int
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@unique([school_id])
+  @@map("student_admission_forms")
 }

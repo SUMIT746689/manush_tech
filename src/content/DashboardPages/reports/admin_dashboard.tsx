@@ -17,14 +17,12 @@ const colorDarkViolet = "#9C2BAD"
 const colorLightViolet = "#F9E5F9"
 
 function AdminDashboardReportsContent({ blockCount = null }) {
-  console.log({ blockCount })
   const { banners: banners_ } = blockCount || {};
   const { banners } = banners_ || {};
   const { left_banners, right_banners } = banners || {};
 
   const { t }: { t: any } = useTranslation();
-  console.log({});
-  console.log({ right_banners: right_banners && right_banners[0] })
+  // console.log({ right_banners: right_banners && right_banners[0] })
   return (
     <>
 
@@ -121,9 +119,20 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
         </Card>
         <Card sx={{ width: "100", borderRadius: 0 }}>
-          <Link target='_blank' href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : "#"}>
+          {
+            (Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ?
+              <Link target='_blank' href={right_banners[0].redirectUrl} >
+                <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+              </Link>
+              :
+              <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+          }
+          {/* <Link
+            target='_blank'
+            href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : ''}
+          >
             <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-          </Link>
+          </Link> */}
         </Card>
       </Grid>
 

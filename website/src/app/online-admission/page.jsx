@@ -27,9 +27,15 @@ export default async function Admission() {
     })
 
     const academicYear = await prisma.academicYear.findMany({
-        where: { school: { domain: domain },deleted_at:null }
+        where: { school: { domain: domain }, deleted_at: null }
     });
-  
+
+    const studentAdmissionForm = await prisma.studentAdmissionForm.findFirst({
+        where: {
+            school: { domain }
+        }
+    })
+
     console.log(classes, academicYear);
     return (
         <div>
@@ -37,6 +43,7 @@ export default async function Admission() {
                 classes={classes || []}
                 academicYears={academicYear || []}
                 serverHost={`${process.env.SERVER_HOST}`}
+                studentAdmissionForm={studentAdmissionForm}
             />
         </div>
     )

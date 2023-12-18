@@ -9,8 +9,9 @@ import RegistrationFirstPart from './admissionForm/RegistrationFirstPart';
 import RegistrationSecondPart from './admissionForm/RegistrationSecondPart';
 import RegistrationThirdPart from './admissionForm/RegistrationThirdPart';
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
-const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
+const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studentAdmissionForm }) => {
     console.log("classes,academicYears__", classes, academicYears);
     const router = useRouter();
     const { t } = useTranslation();
@@ -18,7 +19,7 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
     const [totalFormData, setTotalFormData] = useState({});
     const [classesFlag, setClassesFlag] = useState(false);
     const registration3rdPart = useRef(null)
-    
+
     const central = useRef(null)
     const handleCreateClassClose = () => {
 
@@ -28,8 +29,16 @@ const OnlineAdmission = ({ classes, academicYears, serverHost,school_id }) => {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Grid py={8}>
-                <h1 className=' text-center text-2xl'>Online Admission</h1>
-                <br />
+                <h1 className=' text-center text-3xl text-sky-700 font-semibold'>Online Admission</h1>
+                <br/>
+                {
+                    studentAdmissionForm?.file_url &&
+                    <Grid mx="auto" sx={{ display: 'flex', justifyContent: "center" }}>
+                        <Link href={studentAdmissionForm?.file_url } download={true} >
+                            <Button variant='contained' color='warning'>Download Form</Button>
+                        </Link>
+                    </Grid>
+                }
                 <br />
 
                 <Grid>

@@ -46,6 +46,9 @@ async function seed() {
     data: { name: 'create banner', value: 'create_banner', group: 'banner' }
   });
 
+  const package_payment_history = await prisma.permission.create({
+    data: { name: 'package payment history', value: 'package_payment_history', group: 'package_payment_history' }
+  });
   const createSuperAdminRole = await prisma.role.create({
     data: {
       title: "SUPER_ADMIN",
@@ -58,7 +61,8 @@ async function seed() {
           { id: create_user_permission.id },
           { id: pendingSmsPermissionforSchool.id },
           { id: administratorPermission.id },
-          { id: createBanners }
+          { id: createBanners },
+          { id: package_payment_history.id },
         ]
       }
     }
@@ -161,6 +165,9 @@ async function seed() {
         },
         {
           value: 'list_pending_packages'
+        },
+        {
+          value: 'package_payment_history'
         }
       ]
     }

@@ -24,15 +24,19 @@ import useNotistick from '@/hooks/useNotistick';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import MobileDatePicker from '@mui/lab/MobileDatePicker';
 
 function ManageSubcriptions({ open, setOpen, reFetchData }): any {
+
+  console.log({ open });
+
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const theme = useTheme();
   const { data: packages } = useClientFetch('/api/packages');
 
   const handleCreateProjectClose = () => {
-    setOpen(null);
+    setOpen(false);
   };
 
   const handleCreateProjectSuccess = (message) => {
@@ -40,10 +44,6 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
     setOpen(false);
   };
 
-  const handleCreateProjectError = (message) => {
-    showNotification(message, 'error');
-    setOpen(false);
-  };
 
   const handleFormSubmit = async (
     _values,
@@ -53,6 +53,8 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
     setSubmitting
   ) => {
     try {
+      console.log("_values__", _values);
+
       const handleSubmitSuccess = async (message) => {
         resetForm();
         setStatus({ success: true });
@@ -68,15 +70,17 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
       });
       if (res.data?.success) {
         handleSubmitSuccess(t('School package added successfully'));
-      } else throw new Error('Adding package for school was failed');
+      } 
     } catch (err) {
+      console.log(err);
+      
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
-      handleCreateProjectError(t(err.message));
+      showNotification(err?.response?.data?.message, 'error')
     }
   };
-
+  const subscriptionLength = open?.subscription?.length > 0
   return (
     <>
       <Dialog
@@ -100,8 +104,8 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
         <Formik
           initialValues={{
             name: open?.name,
-            package_id:
-              open?.subscription?.length > 0 && open.subscription[0].package_id,
+            package_id: subscriptionLength && open.subscription[0].package_id,
+            end_date: subscriptionLength && open?.subscription[0].end_date,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -139,7 +143,7 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                   p: 3
                 }}
               >
-                <Grid container spacing={0}>
+                <Grid container spacing={2}>
 
                   <TextFieldWrapper
                     errors={errors.name}
@@ -152,11 +156,7 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                   />
 
                   <Grid
-                    // sx={{
-                    //   mb: `${theme.spacing(3)}`
-                    // }}
                     display={"grid"}
-                    gap={2}
                     item
                     width={"100%"}
                   >
@@ -200,6 +200,32 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
                       onChange={(e, value: any) => {
                         setFieldValue('package_id', value?.id || 0);
                       }}
+                    />
+                  </Grid>
+
+                  <Grid
+                    display={"grid"}
+                    item
+                    width={"100%"}
+                  >
+                    <MobileDatePicker
+                      label="Select End Date"
+                      inputFormat='dd/MM/yyyy'
+                      value={values.end_date || null}
+                      onChange={(newValue) => {
+                        setFieldValue('end_date', newValue);
+                      }}
+                      renderInput={(params) => <TextField
+                        size='small'
+                        sx={{
+                          mb: 1,
+                          [`& fieldset`]: {
+                            borderRadius: 0.6,
+                          }
+                        }}
+                        fullWidth
+                        {...params}
+                      />}
                     />
                   </Grid>
                 </Grid>

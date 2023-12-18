@@ -6,6 +6,9 @@ import { useTranslation } from 'next-i18next';
 const ActivePackage = () => {
   const { t }: { t: any } = useTranslation();
   const { user } = useAuth();
+
+  // console.log(user?.school?.subscription[0]?.package);
+  
   return (
     <Card sx={{height:'auto',md:{minHeight:315} }} >
       <DialogTitle
@@ -24,6 +27,10 @@ const ActivePackage = () => {
         <Typography noWrap variant="h5">
           {/* @ts-ignore */}
           Name: {user?.school?.subscription[0]?.package?.title}
+        </Typography>
+        <Typography noWrap variant="h5">
+          {/* @ts-ignore */}
+          Amount: {user?.school?.subscription[0]?.package?.price}
         </Typography>
         <Typography noWrap variant="h5">
            {/* @ts-ignore */}

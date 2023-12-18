@@ -16,16 +16,7 @@ export default async function Admission() {
             },
             deleted_at: null
         },
-        include: {
-            school: {
-                select: {
-                    TeacherRecruitmentForm: true
-                }
-            }
-        }
     });
-    const { school } = departments;
-    const { TeacherRecruitmentForm } = school || {}
     return (
         <div className=' max-w-5xl mx-auto px-5'>
             <TeachersApplication
@@ -34,7 +25,6 @@ export default async function Admission() {
                     label: i.title,
                     value: i.ids
                 })) || []}
-                teacherRecruitmentForm={TeacherRecruitmentForm}
             />
         </div>
     )

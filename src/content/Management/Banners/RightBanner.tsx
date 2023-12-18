@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Grid, Button, Card, } from '@mui/material';
-import { FileUploadFieldWrapper_, TextFieldWrapper } from '@/components/TextFields';
+import { NewFileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
@@ -97,7 +97,7 @@ function RightBanner({ banners, refetchBanner }: { banners: { url: string }[], r
                     Right Banner Images
                 </Grid>
                 <Grid m={1} mt={2}>
-                    <FileUploadFieldWrapper_
+                    <NewFileUploadFieldWrapper
                         htmlFor="left_images"
                         // name="left_images"
                         // multiple={true}

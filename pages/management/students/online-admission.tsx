@@ -48,6 +48,11 @@ import Footer from '@/components/Footer';
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import StudentForm from '@/components/Student/StudentForm';
+import PageHeader from '@/components/PageHeaderDocs';
+import PageHead from 'src/content/Management/Students/OnlineAddmission/PageHeader';
+import PageTitleWrapper from '@/components/PageTitleWrapper';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -205,14 +210,11 @@ const Results = () => {
     selectedItems.length > 0 && selectedItems.length < users.length;
   const selectedAllUsers = selectedItems.length === users.length;
 
-  console.log("selectedStudent__", selectedStudent);
-
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(null);
   };
 
   const handleDeleteCompleted = () => {
-    console.log(openConfirmDelete);
 
     axios.delete(`/api/onlineAdmission/${openConfirmDelete}`)
       .then(res => {
@@ -228,12 +230,20 @@ const Results = () => {
   const handleConfirmDelete = (id) => {
     setOpenConfirmDelete(id)
   }
-
+  const [editSection, setEditSection] = useState();
   return (
     <>
       <Head>
         <title>Online admission - Management</title>
       </Head>
+
+      <PageTitleWrapper>
+        <PageHead
+          editSection={editSection}
+          setEditSection={setEditSection}
+          reFetchData={() => { }}
+        />
+      </PageTitleWrapper>
 
       <Dialog
         fullWidth
@@ -310,7 +320,7 @@ const Results = () => {
                 <TableBody>
                   {paginatedClasses.map((i) => {
                     console.log(i);
-                    
+
                     return (
                       <TableRow hover key={i.id} >
 

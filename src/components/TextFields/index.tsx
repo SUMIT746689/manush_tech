@@ -150,33 +150,10 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
   )
 }
 
-export const FileUploadFieldWrapper_ = ({ htmlFor, accept = "image", multiple = false, handleChangeFile }) => {
+export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple = false, handleChangeFile }) => {
 
   return (
     <Grid pb="1" mb={1} sx={{ position: "relative", height: 60 }} >
-      {/* <TextField
-        id="outlined-basic"
-        label={label}
-        variant="outlined"
-        size='small'
-
-        name={name}
-        value={value}
-        sx={{
-          borderTopRightRadius: 1,
-          [`& fieldset`]: {
-            py: 1.85,
-            borderRadius: 0.8,
-            borderTopRightRadius: 0,
-            // borderTopLeftRadius:0.6,
-            // borderBottomRightRadius:0.6,
-            // borderBottomLeftRadius:0.6,
-            // fontSize: 0.2
-          },
-        }}
-        disabled
-      /> */}
-
       <label htmlFor={htmlFor}>
         <input
           accept={`${accept}/*`}
@@ -194,6 +171,28 @@ export const FileUploadFieldWrapper_ = ({ htmlFor, accept = "image", multiple = 
           + Upload
         </Button>
       </label>
+    </Grid>
+  )
+}
+
+export const PreviewImageCard = ({ data, index, handleRemove }) => {
+  const { src, name } = data;
+  return (
+    <Grid height={180} width={150} display="flex" flexDirection="column" justifyContent="end" gridTemplateColumns={"auto"}
+      sx={{
+        border: "1px solid skyblue", borderRadius: 0.6, borderStyle: "dashed", p: 0.5, ":hover": {
+          scale: 1.5,
+          cursor: "pointer"
+        }
+      }}
+    >
+      <Grid maxHeight={140} m={"auto"}>
+        <img src={src} style={{ height: "100%", objectFit: "contain" }} />
+      </Grid>
+      <Grid sx={{ height: 20, fontSize: 11, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>
+        File name: <span style={{ color: "darkcyan" }}>{name}</span>
+      </Grid>
+      <Button onClick={() => handleRemove(index)} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button>
     </Grid>
   )
 }

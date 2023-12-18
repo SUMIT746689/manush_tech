@@ -14,7 +14,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
           width: '100%',
           ":disabled": {
             backgroundColor: 'lightgray'
-          }
+          },
         }}
         onClick={handleClick}
         {...params}

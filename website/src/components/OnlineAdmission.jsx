@@ -30,11 +30,12 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Grid py={8}>
                 <h1 className=' text-center text-3xl text-sky-700 font-semibold'>Online Admission</h1>
-                <br/>
+                <br />
                 {
                     studentAdmissionForm?.file_url &&
                     <Grid mx="auto" sx={{ display: 'flex', justifyContent: "center" }}>
-                        <Link href={studentAdmissionForm?.file_url } download={true} >
+
+                        <Link href={`${serverHost}/api/get_file/${studentAdmissionForm?.file_url}`} target='_blank' download={true} >
                             <Button variant='contained' color='warning'>Download Form</Button>
                         </Link>
                     </Grid>

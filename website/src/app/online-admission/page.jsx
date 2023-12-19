@@ -1,6 +1,5 @@
 import prisma from '../../../../src/lib/prisma_client';
 import { headers } from 'next/headers';
-import { redirect } from "next/navigation";
 import OnlineAdmission from "../../components/OnlineAdmission";
 
 
@@ -35,8 +34,7 @@ export default async function Admission() {
             school: { domain }
         }
     })
-
-    console.log(classes, academicYear);
+    
     return (
         <div>
             <OnlineAdmission

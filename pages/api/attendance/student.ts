@@ -7,19 +7,19 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-                const date_ = req.query.date;
-
-                // utc day start time 
-                const minDate = new Date(date_);
-                minDate.setHours(0, 0, 0, 0);
-
-                // utc day end time
-                const maxDate = new Date(date_);
-                maxDate.setHours(23, 59, 59, 999);
-
-                let query = {};
+               let query = {};
                 if (req.query.date) {
-                    query['date'] = { gte: minDate, lte: maxDate }
+
+                    const gte = new Date(req.query.date)
+                    gte.setHours(0, 0, 0, 0);
+                    const lte = new Date(req.query.date)
+                    lte.setHours(23, 59, 59, 999);
+
+                    query['date'] = {
+                        gte,
+                        lte
+                    }
+                    // query['date'] = { equals: new Date(req.query.date) }
                 }
                 else if (req.query.from_date && req.query.to_date) {
                     query['date'] = {

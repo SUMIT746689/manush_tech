@@ -146,7 +146,7 @@ function Header() {
   }, [selectedAcademicYear]);
 
   const handleAcademicYearChange = async (event: any, newValue: { id: number, label: string } | null) => {
-    if (!newValue?.id && !newValue.label) return showNotification("academic year values not found", "error")
+    if (!newValue?.id && !newValue?.label) return showNotification("academic year values not found", "error")
     axios.patch(`/api/academic_years/${newValue.id}/change_current`)
       .then(({ data }) => {
         if (!data?.success) return

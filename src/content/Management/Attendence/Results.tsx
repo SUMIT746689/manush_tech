@@ -72,7 +72,7 @@ function fixedHeaderContent() {
             overflow: 'hidden',
             padding: '10px 2px',
             marginBottom: '1px solid black',
-            backgroundColor:'white',
+            backgroundColor: 'white',
           }}
 
         >
@@ -267,8 +267,10 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
   const handleAttendenceFind = () => {
     if (selectedSection && selectedDate && academicYear) {
       setStudents(null)
-      const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
-
+      const date_ = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
+      const date = new Date(date_);
+      console.log({date})
+    
       axios.get(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}`)
         .then(response => {
           const temp = targetsectionStudents?.map(i => {
@@ -302,7 +304,8 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
   }
 
   const handleSubmit = () => {
-    const date = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
+    const date_ = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
+    const date = new Date(date_);
 
     if (selectedForAll) {
       axios.post(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}&status=${selectedForAll.id}`)

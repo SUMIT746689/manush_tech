@@ -18,7 +18,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function ExamRoutine({ data }) {
-  console.log({data})
+  console.log({ data })
   // const { user }: any = useAuth();
 
   return (
@@ -44,7 +44,7 @@ function ExamRoutine({ data }) {
             data ?
               <ShowStudentAttendence data={data} />
               :
-              <ShowSelectStudentAttendenceResult/>
+              <ShowSelectStudentAttendenceResult />
           }
 
         </Grid>

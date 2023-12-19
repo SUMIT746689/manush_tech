@@ -1,10 +1,9 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
-
         switch (method) {
             case 'GET':
                 let query = {};
@@ -18,7 +17,7 @@ const index = async (req, res) => {
                     }
                 }
                 const where = {
-                    school_id: parseInt(req.query.school_id),
+                    school_id: parseInt(refresh_token.school_id),
                     ...query,
                     user: {
                         role_id: parseInt(req.query.role_id)
@@ -33,6 +32,7 @@ const index = async (req, res) => {
                         user_id: true
                     }
                 });
+                console.log({ data })
                 res.status(200).json(data)
                 break;
             case 'POST':

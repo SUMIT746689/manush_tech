@@ -93,11 +93,8 @@ model School {
   SmsTransaction             SmsTransaction[]
   addtionalMarkingCategories AddtionalMarkingCategories[]
   ExamTerm                   ExamTerm[]
-<<<<<<< HEAD
   StudentAdmissionForm       StudentAdmissionForm?
-=======
   Package_transaction        Package_transaction[]
->>>>>>> 1f97c0f564bd26607b1848b23dc17619c27f5a86
 
   // routines Routine[]
   @@map("schools")

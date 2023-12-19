@@ -321,8 +321,6 @@ const Results = () => {
                 </TableHead>
                 <TableBody>
                   {paginatedClasses.map((i) => {
-                    console.log(i);
-
                     return (
                       <TableRow hover key={i.id} >
 

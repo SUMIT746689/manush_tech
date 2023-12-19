@@ -7,9 +7,19 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
+                const date_ = req.query.date;
+
+                // utc day start time 
+                const minDate = new Date(date_);
+                minDate.setHours(0, 0, 0, 0);
+
+                // utc day end time
+                const maxDate = new Date(date_);
+                maxDate.setHours(23, 59, 59, 999);
+
                 let query = {};
                 if (req.query.date) {
-                    query['date'] = { equals: new Date(req.query.date) }
+                    query['date'] = { gte: minDate, lte: maxDate }
                 }
                 else if (req.query.from_date && req.query.to_date) {
                     query['date'] = {
@@ -72,7 +82,7 @@ const index = async (req, res) => {
                 })
 
                 if (sectionAttendence) {
-                
+
                     for (const i of sectionAttendence) {
 
                         const updatequery = {
@@ -90,9 +100,9 @@ const index = async (req, res) => {
                                 },
                                 data: updatequery
                             })
-                        } 
+                        }
                         else {
-                          const rr=  await prisma.attendance.create({
+                            const rr = await prisma.attendance.create({
                                 data: {
                                     student_id: i.student_id,
                                     date: new Date(date),
@@ -102,7 +112,7 @@ const index = async (req, res) => {
                                     exam_id: exam_id ? parseInt(exam_id) : null
                                 }
                             })
-                            console.log(date,"rr__",rr)
+                            console.log(date, "rr__", rr)
                         }
                     }
 
@@ -120,7 +130,7 @@ const index = async (req, res) => {
                                     status
                                 }
                             })
-                        } 
+                        }
                         else {
                             await prisma.attendance.create({
                                 data: {

@@ -7,6 +7,7 @@ import { AttendanceIcon, ExamIcon, FeesCollectionIcon, RoutineIcon, StaffsIcon, 
 import Notices from '../admin_notices';
 import { Attendance } from '../attendance';
 import ImageSlider from '@/components/ImageSlider/ImageSlider';
+import dayjs from 'dayjs';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -20,6 +21,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   const { banners: banners_ } = blockCount || {};
   const { banners } = banners_ || {};
   const { left_banners, right_banners } = banners || {};
+console.log({blockCount});
 
   const { t }: { t: any } = useTranslation();
   // console.log({ right_banners: right_banners && right_banners[0] })
@@ -38,7 +40,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
             }}>
               <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
               <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Address: {blockCount?.school?.address}</Grid>
-              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Package: {blockCount?.school?.subscription[0]?.package.title} </Grid>
+              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Package: {blockCount?.school?.subscription[0]?.package.title}, End date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
             </Grid>
           </Card>
 

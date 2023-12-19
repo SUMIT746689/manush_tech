@@ -35,6 +35,7 @@ model User {
   // tbl_manual_attendace_queue tbl_manual_attendace_queue[]
   approved_user        Leave[]                @relation("approved_by")
   banners              Banners[]
+  Subscription_history Subscription_history[]
 
   @@map("users")
 }
@@ -92,7 +93,11 @@ model School {
   SmsTransaction             SmsTransaction[]
   addtionalMarkingCategories AddtionalMarkingCategories[]
   ExamTerm                   ExamTerm[]
+<<<<<<< HEAD
   StudentAdmissionForm       StudentAdmissionForm?
+=======
+  Package_transaction        Package_transaction[]
+>>>>>>> 1f97c0f564bd26607b1848b23dc17619c27f5a86
 
   // routines Routine[]
   @@map("schools")
@@ -638,10 +643,30 @@ model Package {
   duration      Int
   student_count Int
 
-  subscription   Subscription[]
-  RequestPackage RequestPackage[]
+  subscription        Subscription[]
+  RequestPackage      RequestPackage[]
+  Package_transaction Package_transaction[]
 
   @@map("packages")
+}
+
+model Package_transaction {
+  id                    Int       @id @default(autoincrement())
+  package_id            Int
+  paymentID             String
+  amount                Float
+  paymentExecuteTime    DateTime?
+  created_at            DateTime  @default(now())
+  pay_via               String
+  trxID                 String
+  merchantInvoiceNumber String
+  customerMsisdn        String
+  school_id             Int
+
+  school  School  @relation(fields: [school_id], references: [id])
+  package Package @relation(fields: [package_id], references: [id])
+
+  @@map("package_transaction")
 }
 
 model RequestPackage {
@@ -671,10 +696,24 @@ model Subscription {
   end_date   DateTime @db.Date
   is_active  Boolean
 
-  school  School  @relation(fields: [school_id], references: [id])
-  package Package @relation(fields: [package_id], references: [id])
+  school               School                 @relation(fields: [school_id], references: [id])
+  package              Package                @relation(fields: [package_id], references: [id])
+  Subscription_history Subscription_history[]
 
+  @@unique([school_id, package_id])
   @@map("subscriptions")
+}
+
+model Subscription_history {
+  id              Int      @id @default(autoincrement())
+  subscription_id Int
+  edited_at       DateTime @default(now())
+  edited_by       Int
+
+  user         User         @relation(fields: [edited_by], references: [id])
+  subscription Subscription @relation(fields: [subscription_id], references: [id])
+
+  @@map("subscription_history")
 }
 
 model WebsiteUi {

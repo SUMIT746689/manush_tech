@@ -521,6 +521,11 @@ export const menuItems: MenuItems[] = [
         link: '/pending_packages',
       },
       {
+        name: 'Package payment history',
+        icon: HistoryIcon,
+        link: '/management/package_payment_history',
+      },
+      {
         name: 'Pending Buy Sms',
         icon: ShoppingBagIcon,
         link: '/pending_sms_requests',
@@ -612,6 +617,11 @@ export const menuItems: MenuItems[] = [
           {
             name: 'Sms Request',
             link: '/settings/sms_request',
+            icon: RequestQuoteIcon
+          },
+          {
+            name: 'Payment Gateway',
+            link: '/settings/payment-gateway-credential-configuration',
             icon: RequestQuoteIcon
           },
           {

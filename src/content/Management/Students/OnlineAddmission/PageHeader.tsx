@@ -26,12 +26,13 @@ import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
-import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
+import { ImageCard, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import TimePicker from '@mui/lab/TimePicker';
 import { TimePickerWrapper } from '@/components/DatePickerWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { useClientFetch } from '@/hooks/useClientFetch';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -49,6 +50,8 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
     const [open, setOpen] = useState(false);
     const { showNotification } = useNotistick();
     const [previewImages, setPreviewImages] = useState(undefined);
+    const { data: admissionFileData, reFetchData: reFetchAdmissionFileData } = useClientFetch('/api/onlineAdmission/admission_files');
+    console.log({ admissionFileData })
 
     const handleCreateClassOpen = () => {
         setOpen(true);
@@ -89,6 +92,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                     setSubmitting(false);
                     handleCreateUserSuccess(t('The admission form was added successfully'));
                     reFetchData();
+                    reFetchAdmissionFileData();
                 });
         } catch (err) {
             console.error(err);
@@ -167,7 +171,6 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                 <Formik
                     initialValues={{
                         studentAdmission: editSection?.studentAdmission || undefined,
-
                     }}
                     validationSchema={Yup.object().shape({
                         studentAdmission: Yup.string()
@@ -205,11 +208,26 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                                                 <Grid width="100%" fontWeight={600}>Preview:</Grid>
                                                 {
                                                     previewImages?.map((image, index) => (
-                                                        <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                                        <>
+                                                            <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove} />
+                                                            {/* <embed src={`/api/get_file/${admissionFileData?.file_url}`} width="100%" height="100%" /> */}
+                                                            {/* <Button onClick={() => handleRemove(index)} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button> */}
+                                                        </>
+
                                                     ))
                                                 }
                                             </>
                                         }
+                                    </Grid>
+                                    <Grid item mt={2}>
+                                        {admissionFileData?.file_url &&
+                                            (
+                                                <>
+                                                    <Typography variant='h5' pb={1} color="blueviolet" >Already Uploaded File :</Typography>
+                                                    {/* <object data={`/api/get_file/${admissionFileData?.file_url}`} width="100%" height="100%"></object> */}
+                                                    <embed src={`/api/get_file/${admissionFileData?.file_url}`} width="100%" height="100%" />
+                                                </>
+                                            )}
                                     </Grid>
                                 </DialogContent>
                                 <DialogActionWrapper

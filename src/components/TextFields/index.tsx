@@ -1,4 +1,5 @@
-import { Button, FormControl, Grid, InputLabel, TextField } from '@mui/material';
+import { Button, Card, FormControl, Grid, InputLabel, TextField } from '@mui/material';
+import { FC } from 'react';
 
 export const TextFieldWrapper = ({ label, name, value, type = "string", touched, errors, handleChange, handleBlur, required = false, disabled = false, ...params }) => {
   return (
@@ -196,6 +197,29 @@ export const PreviewImageCard = ({ data, index, handleRemove }) => {
     </Grid>
   )
 }
+
+type ImageCardType = {
+  url: string,
+  handleRemove: (arg: string) => void
+}
+export const ImageCard: FC<ImageCardType> = ({ url, handleRemove }) => {
+  return (
+    <Card sx={{
+      height: 180, width: 150, display: "flex", flexDirection: "column", justifyContent: "end", gridTemplateColumns: "auto",
+      border: "1px solid lightgray", borderRadius: 0.5, boxShadow: "1px solid black", p: 0.5, ":hover": {
+        scale: 1.5,
+        cursor: "pointer"
+      }
+    }}
+    >
+      <Grid maxHeight={150} m={"auto"}>
+        <img src={`/api/get_file/${url}`} style={{ height: "100%", objectFit: "contain" }} />
+      </Grid>
+      <Button onClick={() => handleRemove(url)} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button>
+    </Card>
+  )
+}
+
 
 // export const NumberFieldWrapper = () => {
 

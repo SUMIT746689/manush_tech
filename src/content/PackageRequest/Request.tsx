@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'src/hooks/useAuth';
-
+import Image from "next/image"
 import {
   styled,
   Grid,
@@ -25,6 +25,8 @@ import { useSnackbar } from 'notistack';
 import axios from 'axios';
 
 import useNotistick from '@/hooks/useNotistick';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { useRouter } from 'next/navigation';
 
 
 function PageHeader({ packages }) {
@@ -34,7 +36,9 @@ function PageHeader({ packages }) {
   const { user } = useAuth();
   const theme = useTheme();
   const [documentFile, setDocumentFile] = useState();
-  const {showNotification} = useNotistick()
+  const router = useRouter()
+
+  const { showNotification } = useNotistick()
   useEffect(() => {
     if (packages) handleCreateClassOpen();
   }, [packages]);
@@ -119,7 +123,7 @@ function PageHeader({ packages }) {
       });
 
       if (response) {
-        console.log("response___XXXXXXX____",response);
+        console.log("response___XXXXXXX____", response);
         successResponse('created');
       }
 
@@ -130,7 +134,7 @@ function PageHeader({ packages }) {
       //@ts-ignore
       setErrors({ submit: err.message });
       setSubmitting(false);
-      showNotification(err?.response?.data?.message,'error')
+      showNotification(err?.response?.data?.message, 'error')
     }
   };
 
@@ -141,6 +145,25 @@ function PageHeader({ packages }) {
     'image/gif',
     'image/png'
   ];
+  const handlePayment = async ({
+    collected_amount,
+  }) => {
+
+    try {
+      const data = {
+        collected_amount,
+      }
+      console.log("got__", data);
+
+      const req = await axios.post('/api/package_requests/bkash/create-payment', data)
+
+      router.push(req.data.bkashURL)
+    } catch (err) {
+      showNotification(err?.response?.data?.message, 'error')
+      console.log(err);
+
+    }
+  }
 
   return (
     <>
@@ -150,14 +173,37 @@ function PageHeader({ packages }) {
             p: 3
           }}
         >
-          <Typography variant="h4" gutterBottom>
+          {/* <Typography variant="h4" gutterBottom>
             {t('Request for Package')}
           </Typography>
           <Typography variant="subtitle2">
             {t('Fill in the fields below to request for add a package')}
+          </Typography> */}
+
+          <Typography variant="h4" gutterBottom>
+            {t('Pay Package bill')}
           </Typography>
         </DialogTitle>
-        <Formik
+        <Grid display={'flex'} justifyContent={'center'} alignItems={'center'} pb={3}>
+          <Button sx={{
+            borderRadius: 0.5,
+            textAlign: 'center',
+            px: 'auto', display: 'flex',
+            justifyContent: 'center', alignItems: 'center',
+            height: 0.8,
+            backgroundColor: '#42a5f5',
+          }}
+            variant='contained'
+            disabled={Number(user?.school?.subscription[0]?.package?.price) ? false : true}
+            onClick={() => handlePayment({ collected_amount: Number(user?.school?.subscription[0]?.package?.price) })}>
+
+            <Image src={'/BKash-Icon-Logo.wine.svg'} alt={'bkash'} width={35} height={35} />
+            Pay
+          </Button>
+
+        </Grid>
+
+        {/* <Formik
           initialValues={{
             package_id: undefined,
             document_photo: undefined,
@@ -283,9 +329,6 @@ function PageHeader({ packages }) {
                     p: 3
                   }}
                 >
-                  {/* <Button color="secondary" onClick={handleCreateClassClose}>
-                    {t('Cancel')}
-                  </Button> */}
                   <Button
                     type="submit"
                     startIcon={
@@ -301,7 +344,12 @@ function PageHeader({ packages }) {
               </form>
             );
           }}
-        </Formik>
+        </Formik> */}
+
+
+
+
+
       </Card>
     </>
   );

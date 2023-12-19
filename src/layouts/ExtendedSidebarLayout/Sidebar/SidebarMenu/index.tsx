@@ -166,6 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
+console.log({permissions});
 
   const sub_menu = () => {
     ev.push(
@@ -591,7 +592,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       item.name === 'Teacher Exam Routine' ||
 
-      item.name === 'Banners'
+      item.name === 'Banners'||
+      item.name === 'Package payment history'
+
 
     ) {
       // switch(item.name){
@@ -672,6 +675,10 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Home work' && permissionVerify(permissions, ['homework'])) sub_menu();
       // banners
       if (item.name === 'Banners' && permissionVerify(permissions, ['create_banner'])) sub_menu();
+      
+      //package
+      if (item.name === 'Package payment history' && permissionVerify(permissions, ['package_payment_history'])) sub_menu();
+      
 
     }
     else sub_menu();

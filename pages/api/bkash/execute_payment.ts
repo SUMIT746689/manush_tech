@@ -117,12 +117,12 @@ const index = async (req, res, refresh_token) => {
                         })
                         const account = await prisma.accounts.findFirstOrThrow({
                             where: {
-                                id: Number(2)
+                                id: Number(1)
                             },
                             include: {
                                 payment_method: {
                                     where: {
-                                        id: Number(4)
+                                        id: Number(1)
                                     }
                                 }
                             }
@@ -131,8 +131,8 @@ const index = async (req, res, refresh_token) => {
                             student_id,
                             fee_id,
                             collected_amount,
-                            account_id: 2,
-                            payment_method_id: 4,
+                            account_id: 1,
+                            payment_method_id: 1,
                             payment_method: account?.payment_method[0]?.title,
                             collected_by: Number(collected_by_user),
                             total_payable: Number(total_payable)

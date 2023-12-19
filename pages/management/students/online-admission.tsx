@@ -53,6 +53,7 @@ import PageHead from 'src/content/Management/Students/OnlineAddmission/PageHeade
 import PageTitleWrapper from '@/components/PageTitleWrapper';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { customizeDateWithTime } from '@/utils/customizeDate';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -314,6 +315,7 @@ const Results = () => {
                   <TableRow>
                     <TableCell align={'center'}>{t('Class')}</TableCell>
                     <TableCell align={'center'}>{t('Academic year')}</TableCell>
+                    <TableCell align={'center'}>{t('Submission Time')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -332,6 +334,12 @@ const Results = () => {
                         <TableCell align={'center'}>
                           <Typography variant="h5">
                             {i?.student?.academic_year_id}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align={'center'}>
+                          <Typography variant="h5">
+                            {customizeDateWithTime(i?.student?.admission_date)}
                           </Typography>
                         </TableCell>
 

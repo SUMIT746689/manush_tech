@@ -207,13 +207,13 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
         });
       })
       .catch((err) => {
-        console.log({ err });
+        console.log(err);
 
         setNotification({
           open: true,
           vertical: 'top',
           horizontal: 'right',
-          message: 'Log in failed'
+          message: err.message
         });
        
       });

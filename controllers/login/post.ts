@@ -81,12 +81,27 @@ export default async function post(req, res) {
       user['permissions'] = user.role?.permissions;
       delete user['role']['permissions'];
     }
-
+    
     if (user?.role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
-      if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) isSubscriptionActive = true;
-      if (!isSubscriptionActive) throw new Error('Your subscription has expired or not active');
+      if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
+
+          isSubscriptionActive = true;
+        
+      }
+      else{
+        if (user?.role?.title === 'ADMIN') {
+        
+          isSubscriptionActive = true;
+          console.log(isSubscriptionActive,"user?.role?.title__",user?.role?.title,);
+          user['permissions'] = user['permissions'].filter(i => i.value === 'package_request')
+        }
+      }
+      if (!isSubscriptionActive) {
+
+        throw new Error('Your subscription has expired or not active');
+      }
     }
 
 
@@ -98,7 +113,6 @@ export default async function post(req, res) {
 
       if (!result) throw new Error(`Invalid username or password`);
     }
-
 
     const access_token = jwt.sign(
       { name: user.username, id: user.id, school_id: user.school_id, role: user.role },
@@ -140,7 +154,7 @@ export default async function post(req, res) {
     }
     else if (academic_year?.school_id && academic_year?.school_id !== user.school_id) {
       const maxAge = 0;
-      cookies.push(makeCookie(serialize, 'academic_year','', maxAge))
+      cookies.push(makeCookie(serialize, 'academic_year', '', maxAge))
     }
 
     res.setHeader('Set-Cookie', cookies);

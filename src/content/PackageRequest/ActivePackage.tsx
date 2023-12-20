@@ -3,11 +3,13 @@ import { Card, DialogTitle, Grid, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useTranslation } from 'next-i18next';
 
-const ActivePackage = ({school}) => {
+const ActivePackage = ({ school }) => {
   const { t }: { t: any } = useTranslation();
+  const { user } = useAuth()
+  console.log({user});
   
   return (
-    <Card sx={{height:'auto',md:{minHeight:315} }} >
+    <Card sx={{ height: 'auto', md: { minHeight: 315 } }} >
       <DialogTitle
         sx={{
           p: 3
@@ -20,14 +22,14 @@ const ActivePackage = ({school}) => {
           {t('Fill in the fields below to show active package')}
         </Typography>
       </DialogTitle>
-      <Grid display={'grid'} padding={3} borderTop={1} gap={1} sx={{borderColor:'lightGray'}}>
+      <Grid display={'grid'} padding={3} borderTop={1} gap={1} sx={{ borderColor: 'lightGray' }}>
 
         <Typography noWrap variant="h5">
           {/* @ts-ignore */}
           Amount: {school?.package?.price}
         </Typography>
         <Typography noWrap variant="h5">
-           {/* @ts-ignore */}
+          {/* @ts-ignore */}
           Start Date: {school?.start_date && dayjs(school?.start_date).format('DD-MM-YYYY')}
         </Typography>
         <Typography
@@ -40,7 +42,7 @@ const ActivePackage = ({school}) => {
               : 'primary'
           }
         >
-           {/* @ts-ignore */}
+          {/* @ts-ignore */}
           End Date: {school?.end_date && dayjs(school?.end_date).format('DD-MM-YYYY')}
         </Typography>
       </Grid>

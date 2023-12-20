@@ -28,6 +28,28 @@ async function get(req: any, res: any, refresh_token: any) {
     }
     delete user['password'];
 
+    if (user?.role?.title !== 'SUPER_ADMIN') {
+      let isSubscriptionActive = false;
+      // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
+      if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
+
+          isSubscriptionActive = true;
+        
+      }
+      else{
+        if (user?.role?.title === 'ADMIN') {
+        
+          isSubscriptionActive = true;
+          console.log(isSubscriptionActive,"user?.role?.title__",user?.role?.title,);
+          user['permissions'] = user['permissions'].filter(i => i.value === 'package_request')
+        }
+      }
+      if (!isSubscriptionActive) {
+
+        throw new Error('Your subscription has expired or not active');
+      }
+    }
+
 
     if (user?.school?.subscription[0]?.package?.is_std_cnt_wise) {
       const student_cnt = await prisma.student.aggregate({

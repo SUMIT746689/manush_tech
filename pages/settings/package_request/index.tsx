@@ -7,9 +7,54 @@ import { Grid } from '@mui/material';
 import Head from 'next/head';
 import ActivePackage from '@/content/PackageRequest/ActivePackage';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
+import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
+import prisma from '@/lib/prisma_client';
 
-const Packages = () => {
-  const { data: packages } = useClientFetch('/api/packages');
+export async function getServerSideProps(context: any) {
+  let school;
+  try {
+
+    const refresh_token: any = serverSideAuthentication(context);
+    if (!refresh_token) return { redirect: { destination: '/login' } };
+
+    school = await prisma.subscription.findFirst({
+      where: {
+        school_id: refresh_token?.school_id,
+        is_active: true
+      },
+      include: {
+        package: true
+      }
+    })
+    if (school?.package?.is_std_cnt_wise) {
+
+      const student_cnt = await prisma.student.aggregate({
+        where: {
+          student_info: {
+            school_id:  refresh_token?.school_id,
+            user: {
+              deleted_at: null
+            }
+          },
+        },
+        _count: {
+          id: true
+        }
+      })
+
+      school.package.price = student_cnt._count.id * school?.package?.price
+    }
+
+  } catch (err) {
+    console.log(err)
+  }
+  const parseJson = JSON.parse(JSON.stringify(school));
+
+  return { props: { school: parseJson } }
+}
+const Packages = ({ school }) => {
+  console.log({ school });
+
   return (
     <>
       <Head>
@@ -23,11 +68,11 @@ const Packages = () => {
           px={1}
         >
           <Grid sx={{ maxWidth: 500, pt: 4 }}>
-            <ActivePackage />
+            <ActivePackage school={school} />
           </Grid>
 
           <Grid sx={{ maxWidth: 500, pt: 4 }}>
-            <Request packages={packages} />
+            <Request school={school} />
           </Grid>
         </Grid>
 

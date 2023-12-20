@@ -61,7 +61,7 @@ async function seed() {
           { id: create_user_permission.id },
           { id: pendingSmsPermissionforSchool.id },
           { id: administratorPermission.id },
-          { id: createBanners },
+          { id: createBanners.id },
           { id: package_payment_history.id },
         ]
       }
@@ -208,7 +208,6 @@ async function seed() {
 
   const createPackage = await prisma.package.create({
     data: {
-      title: 'Monthly',
       price: 1000,
       duration: 30,
       student_count: 10

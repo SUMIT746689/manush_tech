@@ -178,6 +178,7 @@ const index = async (req, res, refresh_token) => {
                                 status,
                                 school_id: refresh_token.school_id
                             })
+                            //@ts-ignore
                             return res.status(200).json({ bkashURL: tr.bkashURL })
                         }
 
@@ -197,6 +198,7 @@ const index = async (req, res, refresh_token) => {
                             status,
                             school_id: refresh_token.school_id
                         })
+                        //@ts-ignore
                         return res.status(200).json({ bkashURL: tr.bkashURL })
                     }
                 }

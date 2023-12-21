@@ -7,6 +7,7 @@ import { authenticate } from 'middleware/authenticate';
 const handleTransaction = ({ session, paymentVerifyData }) => {
     return new Promise(async (resolve, reject) => {
         try {
+            console.log({ session,paymentVerifyData });
 
             await prisma.$transaction(async (trans) => {
 
@@ -33,15 +34,21 @@ const handleTransaction = ({ session, paymentVerifyData }) => {
                     }
                 });
 
-                const end = new Date(session.subscription_end)
-                end.setDate(end.getDate() + session.subscription_duration);
+                const end = new Date(session.data.subscription_end)
+                end.setDate(end.getDate() + session.data.subscription_duration);
 
                 await trans.subscription.update({
                     where: {
-                        id: session.subscription_id
+                        id: session.data.subscription_id
                     },
                     data: {
-                        end_date: end
+                        end_date: end,
+                        Subscription_history: {
+                            create: {
+                                edited_at: new Date(),
+                                edited_by: session.user_id
+                            }
+                        }
                     }
                 })
 

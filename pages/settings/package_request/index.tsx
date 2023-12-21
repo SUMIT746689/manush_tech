@@ -9,6 +9,9 @@ import ActivePackage from '@/content/PackageRequest/ActivePackage';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
+import { useRouter } from 'next/router'
+import useNotistick from '@/hooks/useNotistick';
+import { useEffect } from 'react';
 
 export async function getServerSideProps(context: any) {
   let school;
@@ -31,7 +34,7 @@ export async function getServerSideProps(context: any) {
       const student_cnt = await prisma.student.aggregate({
         where: {
           student_info: {
-            school_id:  refresh_token?.school_id,
+            school_id: refresh_token?.school_id,
             user: {
               deleted_at: null
             }
@@ -53,7 +56,13 @@ export async function getServerSideProps(context: any) {
   return { props: { school: parseJson } }
 }
 const Packages = ({ school }) => {
+  const { showNotification } = useNotistick()
   console.log({ school });
+  const router = useRouter()
+
+  useEffect(() => {
+    router?.query?.message && showNotification(router?.query?.message)
+  }, [])
 
   return (
     <>

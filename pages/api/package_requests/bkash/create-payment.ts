@@ -62,7 +62,7 @@ const handleTransaction = ({ collected_amount, refresh_token }) => {
                         school_id: refresh_token.school_id,
                         subscription_id: prev_sub.id,
                         subscription_end: prev_sub.end_date,
-                        subscription_duration: prev_sub.package.duration
+                        subscription_duration: prev_sub.package.duration,
                     }
                 }
             })

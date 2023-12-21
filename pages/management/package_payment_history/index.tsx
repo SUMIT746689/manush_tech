@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
-import { Autocomplete, Box, Button, Card, Dialog, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Card, Dialog, DialogContent, DialogTitle, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
@@ -19,6 +19,11 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import prisma from '@/lib/prisma_client';
+import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { TextFieldWrapper } from '@/components/TextFields';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -54,7 +59,7 @@ export async function getServerSideProps(context: any) {
     return { props: { schoolList: parseJson } }
 }
 function FeesPaymentReport({ schoolList }) {
-console.log({schoolList});
+    console.log({ schoolList });
 
     const { t }: { t: any } = useTranslation();
     const [datas, setDatas] = useState<any>([]);
@@ -99,7 +104,7 @@ console.log({schoolList});
         setPaginatedTransection(paginatedTransaction);
     }, [datas, filter, page])
 
- 
+
 
 
     const getData = (startDate, endDate) => {
@@ -137,7 +142,7 @@ console.log({schoolList});
     const handleCreateClassClose = () => {
         setOpen(false);
     };
- 
+
 
     return (
         <>
@@ -145,8 +150,130 @@ console.log({schoolList});
                 <title>Package payment history</title>
             </Head>
             <PageTitleWrapper>
-                <PageHeader title={'Package payment history'} />
+                {/* <PageHeader title={'Package payment history'} /> */}
+                <PageHeaderTitleWrapper
+                    name="Package payment history"
+                    handleCreateClassOpen={handleCreateClassOpen}
+                />
             </PageTitleWrapper>
+            <Dialog
+                fullWidth
+                maxWidth="xs"
+                open={open}
+                onClose={handleCreateClassClose}
+            >
+                <DialogTitle
+                    sx={{
+                        p: 3
+                    }}
+                >
+                    <Typography variant="h4" gutterBottom>
+                        {t('Create manual Package payment')}
+                    </Typography>
+                    <Typography variant="subtitle2">
+                        {t('Fill in the fields below to create and create manual Package payment')}
+                    </Typography>
+                </DialogTitle>
+                <Formik
+                    initialValues={{
+                        school_id: undefined,
+                        collected_amount: undefined,
+                        submit: null
+                    }}
+                    validationSchema={Yup.object().shape({
+                        school_id: Yup.number()
+                            .min(1)
+                            .required(t('School is required')),
+                        collected_amount: Yup.number()
+                            .min(1)
+                            .required(t('Collected amount is required')),
+                    })}
+                    onSubmit={async (
+                        _values,
+                        { resetForm, setErrors, setStatus, setSubmitting }
+                    ) => {
+                        try {
+                            const successResponse = (message) => {
+                                showNotification(message)
+                                resetForm();
+                                setStatus({ success: true });
+                                setSubmitting(false);
+                                handleCreateClassClose()
+                            };
+
+                            const res = await axios.post(`/api/package_payment_history`, _values);
+                            successResponse(res.data.message);
+
+                        } catch (err) {
+                            console.error(err);
+
+                            setStatus({ success: false });
+                            //@ts-ignore
+                            setErrors({ submit: err.message });
+                            setSubmitting(false);
+
+                            // showNotification(err.message,'error')
+                            showNotification(err?.response?.data?.message, 'error')
+                        }
+                    }}
+                >
+                    {({
+                        errors,
+                        handleBlur,
+                        handleChange,
+                        handleSubmit,
+                        isSubmitting,
+                        touched,
+                        values,
+                        setFieldValue
+                    }) => {
+                        return (
+                            <form onSubmit={handleSubmit}>
+                                <DialogContent
+                                    dividers
+                                    sx={{
+                                        p: 3
+                                    }}
+                                >
+                                    <Grid container spacing={2}>
+
+                                        <AutoCompleteWrapper
+                                            minWidth="100%"
+                                            label={t('Select school')}
+                                            placeholder={t('School...')}
+                                            limitTags={2}
+                                            required={true}
+                                            options={schoolList || []}
+                                            value={schoolList.find(i => i.id === values.school_id)}
+                                            handleChange={(e, v) => setFieldValue('school_id', v?.id)}
+                                        />
+
+                                        <TextFieldWrapper
+                                            name="collected_amount"
+                                            errors={errors?.collected_amount}
+                                            touched={touched?.collected_amount}
+                                            label={t(`Collected amount`)}
+                                            handleBlur={handleBlur}
+                                            handleChange={handleChange}
+                                            type='number'
+                                            value={values?.collected_amount}
+                                        />
+
+                                    </Grid>
+                                </DialogContent>
+
+                                <DialogActionWrapper
+                                    title="manual payment"
+                                    handleCreateClassClose={handleCreateClassClose}
+                                    editData={undefined}
+                                    errors={errors}
+                                    isSubmitting={isSubmitting}
+                                />
+                            </form>
+                        );
+                    }}
+                </Formik>
+            </Dialog>
 
 
             <form onSubmit={handlePaymentHistoryFind}>
@@ -254,8 +381,8 @@ console.log({schoolList});
                                                 <TableCell>{t('merchantInvoiceNumber')}</TableCell>
                                                 <TableCell>{t('paymentID')}</TableCell>
                                                 <TableCell>{t('paymentExecuteTime')}</TableCell>
-                                                
-                                               
+
+
 
 
                                             </TableRow>
@@ -305,9 +432,9 @@ console.log({schoolList});
                                                                     {i?.paymentID}
                                                                 </Typography>
                                                             </TableCell>
-                                                            
 
-                                                            
+
+
                                                             <TableCell>
                                                                 <Typography noWrap variant="h5">
                                                                     {dayjs(i?.paymentExecuteTime).format(
@@ -338,7 +465,7 @@ console.log({schoolList});
 
 
             </Grid>
-            
+
 
             <Footer />
 

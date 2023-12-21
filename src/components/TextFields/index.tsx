@@ -1,7 +1,7 @@
 import { Button, Card, FormControl, Grid, InputLabel, TextField } from '@mui/material';
 import { FC } from 'react';
 
-export const TextFieldWrapper = ({ label, name, value, type = "string", touched, errors, handleChange, handleBlur, required = false, disabled = false, ...params }) => {
+export const TextFieldWrapper = ({ label, name, value, type = "text", touched, errors, handleChange, handleBlur, required = false, disabled = false, ...params }) => {
   return (
     <Grid item container pb={1}>
       <TextField

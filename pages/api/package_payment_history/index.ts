@@ -1,7 +1,11 @@
 import prisma from '@/lib/prisma_client';
+import { unique_tracking_number } from '@/utils/utilitY-functions';
+import axios from 'axios';
+import { authenticate } from 'middleware/authenticate';
 import dayjs from 'dayjs';
+import superadminCheck from 'middleware/superadminCheck';
 
-const index = async (req, res) => {
+const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
 
@@ -31,7 +35,59 @@ const index = async (req, res) => {
 
                 res.status(200).json(data)
                 break;
+            case 'POST':
 
+                if (!req.body.collected_amount || !req.body.school_id) {
+                    throw new Error('student or collected amount missing !!')
+                }
+                await prisma.$transaction(async (trans) => {
+
+                    const subscription = await trans.subscription.findFirstOrThrow({
+                        where: {
+                            school_id: Number(req.body.school_id)
+                        },
+                        include: {
+                            package: true
+                        }
+                    })
+
+                    await trans.package_transaction.create({
+                        data: {
+                            package_id: subscription.package_id,
+                            paymentID: `${refresh_token.name}-${Date.now()}`,
+                            amount: Number(req.body.collected_amount),
+                            paymentExecuteTime: new Date(),
+                            pay_via: 'Cash',
+                            trxID: `user_id=${refresh_token.id}`,
+                            merchantInvoiceNumber: '',
+                            customerMsisdn: '',
+                            school_id: Number(req.body.school_id)
+                        }
+                    });
+
+                    const end = new Date(subscription.end_date)
+                    end.setDate(end.getDate() + subscription.package.duration);
+
+                    await trans.subscription.update({
+                        where: {
+                            id: subscription.id
+                        },
+                        data: {
+                            end_date: end,
+                            Subscription_history: {
+                                create: {
+                                    edited_at: new Date(),
+                                    edited_by: refresh_token.id
+                                }
+                            }
+                        }
+                    })
+
+                    
+                })
+                res.status(200).json({ message:'manual Package payment created successfully !' })
+
+                break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
                 res.status(405).end(`Method ${method} Not Allowed`);
@@ -42,5 +98,5 @@ const index = async (req, res) => {
     }
 };
 
-export default index;
+export default authenticate(superadminCheck(index));
 

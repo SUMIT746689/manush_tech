@@ -28,6 +28,13 @@ const ActivePackage = ({ school }) => {
           {/* @ts-ignore */}
           Amount: {school?.package?.price}
         </Typography>
+        {
+          school?.package?.is_std_cnt_wise === true && <Typography noWrap variant="h5">
+          {/* @ts-ignore */}
+          Package type: Student count wise
+        </Typography>
+        }
+        
         <Typography noWrap variant="h5">
           {/* @ts-ignore */}
           Start Date: {school?.start_date && dayjs(school?.start_date).format('DD-MM-YYYY')}

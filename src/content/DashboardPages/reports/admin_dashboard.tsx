@@ -21,7 +21,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   const { banners: banners_ } = blockCount || {};
   const { banners } = banners_ || {};
   const { left_banners, right_banners } = banners || {};
-console.log({blockCount});
+  console.log({ blockCount });
 
   const { t }: { t: any } = useTranslation();
   // console.log({ right_banners: right_banners && right_banners[0] })
@@ -40,7 +40,7 @@ console.log({blockCount});
             }}>
               <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
               <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Address: {blockCount?.school?.address}</Grid>
-              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Package: {blockCount?.school?.subscription[0]?.package.title}, End date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
+              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 200 }}> Package price: {blockCount?.school?.subscription[0]?.package.price}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} End date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
             </Grid>
           </Card>
 

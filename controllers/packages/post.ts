@@ -14,7 +14,6 @@ export default async function post(req: any, res: any) {
     if (!title || !price || !duration || !student_count) throw new Error('provided all required datas');
     const response = await prisma.package.create({
       data: {
-        title: title,
         price: parseFloat(price),
         duration: parseInt(duration),
         student_count: parseInt(student_count)

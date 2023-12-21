@@ -8,32 +8,32 @@ const handleTransaction = ({ collected_amount, refresh_token }) => {
     return new Promise(async (resolve, reject) => {
         try {
 
-            const token = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant', {
-                app_key: "4f6o0cjiki2rfm34kfdadl1eqq",
-                app_secret: "2is7hdktrekvrbljjh44ll3d9l1dtjo4pasmjvs5vl5qr3fug4b"
+            const token = await axios.post(process.env.bkash_grant_token_url, {
+                app_key: process.env.bkash_app_key,
+                app_secret: process.env.bkash_app_secret
             }, {
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    username: 'sandboxTokenizedUser02',
-                    password: 'sandboxTokenizedUser02@12345',
+                    username: process.env.bkash_username,
+                    password: process.env.bkash_password,
                 }
             })
 
-            const payment = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create', {
+            const payment = await axios.post(process.env.bkash_create_payment_url, {
                 mode: '0011',
                 payerReference: "fee payment",
                 callbackURL: `${process.env.NEXT_PUBLIC_BASE_API}/api/package_requests/bkash/execute_payment`,
                 amount: Number(collected_amount),
                 currency: "BDT",
                 intent: 'sale',
-                merchantInvoiceNumber: 'Inv' + '134235'
+                merchantInvoiceNumber: Date.now().toString()
             }, {
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                     authorization: token.data.id_token,
-                    'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq',
+                    'x-app-key': process.env.bkash_X_App_Key,
                 }
             })
             console.log("payment__", payment.data);

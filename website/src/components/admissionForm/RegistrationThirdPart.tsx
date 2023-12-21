@@ -18,14 +18,16 @@ import useNotistick from '../../hooks/useNotistick';
 import { FileUploadFieldWrapper } from '../reuseable/fileUpload';
 import { useRouter } from 'next/navigation';
 
-function RegistrationFirstPart({
+function RegistrationThirdPart({
   school_id,
   totalFormData,
   setTotalFormData,
   setActiveStep,
   handleCreateClassClose,
   setUsersFlag,
-  serverHost
+  serverHost,
+  setPdfDatas,
+  handlePrint
 }) {
   const router = useRouter()
   const { t }: { t: any } = useTranslation();
@@ -78,6 +80,7 @@ function RegistrationFirstPart({
             }
 
             await axios.post(`${serverHost}/api/onlineAdmission`, formData)
+            setPdfDatas(() => _values)
 
             resetForm();
             setTotalFormData({})
@@ -87,8 +90,13 @@ function RegistrationFirstPart({
             setActiveStep(0);
             showNotification('Online Admission form submitted !!');
             router.push('/online-admission');
+            
+            setTimeout(() => {
+              handlePrint()
+            }, 2000);
 
           } catch (err) {
+            setPdfDatas({});
             console.log(err);
             showNotification(err.response?.data?.message, 'error');
             setStatus({ success: false });
@@ -517,4 +525,4 @@ function RegistrationFirstPart({
   );
 }
 
-export default RegistrationFirstPart;
+export default RegistrationThirdPart;

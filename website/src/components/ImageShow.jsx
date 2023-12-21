@@ -8,8 +8,8 @@ export const ShowImage = ({ file, alt }) => {
     console.log({ phototUrl })
     return (
         <Image src={phototUrl}
-            height={200}
-            width={200}
+            height={100}
+            width={100}
             alt={alt}
             loading='lazy'
             objectFit="contain"

@@ -20,21 +20,20 @@ const Item = ({ data, serverHost }) => {
 
         <Grid sx={{ mt: 1 }}>{t(`${data?.headLine}`)}</Grid>
         <Link
-          
+
           target="_blank"
           href={`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`}
         >
           <Grid
-          sx={{
-            mt: 1,
-            p: 1,
-            border: 1,
-            borderRadius: 1,
-            borderColor: 'primary.main',
-            color: 'primary.main'
-          }}
-        >
-
+            sx={{
+              mt: 1,
+              p: 1,
+              border: 1,
+              borderRadius: 1,
+              borderColor: 'primary.main',
+              color: 'primary.main'
+            }}
+          >
             {data?.title}
 
           </Grid>

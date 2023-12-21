@@ -11,6 +11,8 @@ import RegistrationThirdPart from './admissionForm/RegistrationThirdPart';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import PdfDatas from './admissionForm/PdfDatas';
+import { useReactToPrint } from 'react-to-print';
+
 
 const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studentAdmissionForm }) => {
     console.log("classes,academicYears__", classes, academicYears);
@@ -20,12 +22,18 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
     const [totalFormData, setTotalFormData] = useState({});
     const [classesFlag, setClassesFlag] = useState(false);
     const registration3rdPart = useRef(null)
+    const componentRef = useRef(null);
+    const central = useRef(null);
+    const [pdfDatas, setPdfDatas] = useState({});
 
-    const central = useRef(null)
+
     const handleCreateClassClose = () => {
-
         router.push('/online-admission');
     };
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
 
     return (
         <>
@@ -93,8 +101,9 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
                                     setUsersFlag={setClassesFlag}
                                     serverHost={serverHost}
                                     ref={registration3rdPart}
+                                    setPdfDatas={setPdfDatas}
+                                    handlePrint={handlePrint}
                                 />
-
                             )}
                         </Grid>
 
@@ -104,11 +113,24 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
                 </Grid>
             </LocalizationProvider>
 
-            <PdfDatas
-                school={studentAdmissionForm?.school}
-                values={totalFormData}
-                serverHost={serverHost}
-            />
+            {
+
+                Object.keys(pdfDatas).length > 0 &&
+                <Grid display="grid" sx={{ width: "100%", pb: 8 }}>
+                    <Button variant="outlined" onClick={handlePrint} sx={{ mx: "auto" }}>Download Submission Form</Button>
+                </Grid>
+            }
+
+            <Grid sx={{ height: 0, overflow: "hidden" }}>
+                <Grid ref={componentRef}
+                >
+                    <PdfDatas
+                        school={studentAdmissionForm?.school}
+                        values={pdfDatas}
+                        serverHost={serverHost}
+                    />
+                </Grid>
+            </Grid>
 
         </>
     );

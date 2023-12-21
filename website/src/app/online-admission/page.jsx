@@ -38,7 +38,7 @@ export default async function Admission() {
         }
     });
 
-    console.log({ studentAdmissionForm })
+    // console.log({ studentAdmissionForm })
     return (
         <div>
             <OnlineAdmission

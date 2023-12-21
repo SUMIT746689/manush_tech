@@ -2,10 +2,83 @@ import prisma from "@/lib/prisma_client";
 import { unique_tracking_number } from "@/utils/utilitY-functions";
 
 
-const handleTransaction = ({ data, status, account, voucher, refresh_token }) => {
+const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
+
+  const currentDate = new Date().getTime();
+  const sms_shoot_id = [String(school_id), String(currentDate), String(index)].join("_");
+
+  prisma.$transaction([
+    prisma.tbl_queued_sms.create({
+      data: {
+        sms_shoot_id,
+        user_id: parseInt(user_id),
+        school_id,
+        school_name,
+        sender_id,
+        sms_type,
+        sms_text,
+        // // sender_id: 1,
+        // // sender_name: "",
+        submission_time: new Date(submission_time),
+        contacts,
+        pushed_via: '',
+        // // status: status,
+        // // route_id: 1,
+        // // coverage_id: 1,
+        charges_per_sms,
+        total_count: 1,
+        number_of_sms_parts
+        // // is_black_list: 2,
+        //fail_count: 3,
+        //priority: 4
+      }
+    }),
+    prisma.tbl_sent_sms.create({
+      data: {
+        sms_shoot_id,
+        user_id: parseInt(user_id),
+        school_id,
+        school_name,
+        sender_id,
+        sms_type,
+        sms_text,
+        // // sender_id: 1,
+        // // sender_name: "",
+        submission_time: new Date(submission_time),
+        contacts,
+        pushed_via: '',
+        // // status: status,
+        // // route_id: 1,
+        // // coverage_id: 1,
+        charges_per_sms,
+        total_count: 1,
+        number_of_sms_parts
+        // // is_black_list: 2,
+        //fail_count: 3,
+        //priority: 4
+      }
+    }),
+    prisma.school.update({
+      where: { id: school_id },
+      data: {
+        masking_sms_count: sms_type === "masking" ? { decrement: 1 } : undefined,
+        non_masking_sms_count: sms_type === "non_masking" ? { decrement: 1 } : undefined
+      }
+    })
+  ])
+    .then(res => { console.log(`tbl_queue_sms, tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
+    .catch(err => { console.log("error tbl_queue_sms or tbl_sent_sms create", err) })
+
+  // .then(res => { logFile.error(`tbl_queue_sms, tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
+  // .catch(err => { logFile.error("error tbl_queue_sms or tbl_sent_sms create", err) })
+}
+
+
+const handleTransaction = ({ data, status, account, voucher, refresh_token, sent_sms }) => {
   return new Promise(async (resolve, reject) => {
     try {
-
+      // console.log({ sent_sms })
+      // createSmsQueueTableHandler(user)
       await prisma.$transaction(async (trans) => {
         const tracking_number = unique_tracking_number('st-')
 
@@ -67,13 +140,19 @@ const handleTransaction = ({ data, status, account, voucher, refresh_token }) =>
     }
   })
 }
+
+
 export const post = async (req, res, refresh_token) => {
   try {
     const { student_id, fee_id,
       account_id,
       payment_method_id,
       collected_by_user,
-      transID, total_payable }: any = req.body;
+      transID,
+      total_payable,
+      sent_sms,
+    }: any = req.body;
+    // console.log({ sent_sms })
     const collected_amount = Number(req.body.collected_amount);
 
     if (!student_id || !fee_id || !collected_amount) throw new Error('provide valid informations');
@@ -105,7 +184,8 @@ export const post = async (req, res, refresh_token) => {
         id: student_id,
       },
       select: {
-        discount: true
+        discount: true,
+        
       }
     })
     console.log("AllDiscount__", AllDiscount);
@@ -133,8 +213,8 @@ export const post = async (req, res, refresh_token) => {
         created_at: true
       }
     })
-    console.log("isAlreadyAvaliable__",isAlreadyAvaliable);
-    
+    console.log("isAlreadyAvaliable__", isAlreadyAvaliable);
+
     //  return res.send(isAlreadyAvaliable)
 
     const data = {
@@ -183,7 +263,9 @@ export const post = async (req, res, refresh_token) => {
       else if (totalPaidAmount < feeAmount + late_fee) {
         if (collected_amount + totalPaidAmount > feeAmount + late_fee) throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`)
         else {
-          const tr = await handleTransaction({ data, account, status, voucher, refresh_token })
+          // console.log({ data, account, status, voucher, refresh_token });
+          const tr = await handleTransaction({ data, account, status, voucher, refresh_token, sent_sms })
+          console.log({ tr })
           res.status(200).json({
             success: true,
             // @ts-ignore
@@ -197,12 +279,13 @@ export const post = async (req, res, refresh_token) => {
       if (totalPaidAmount === feeAmount) throw new Error('Already Paid !')
       else if (totalPaidAmount + collected_amount > feeAmount) throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`)
       else {
-        const tr = await handleTransaction({ data, account, status, voucher, refresh_token })
+        const tr = await handleTransaction({ data, account, status, voucher, refresh_token, sent_sms })
         res.status(200).json({
           success: true,
           // @ts-ignore
           ...tr
         });
+        console.log({ ssssssssssss: tr })
       }
     }
 

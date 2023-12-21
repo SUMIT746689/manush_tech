@@ -69,6 +69,7 @@ function RegistrationFirstPart({
               ...totalFormData,
               school_id: school_id
             };
+            console.log({ _values })
 
             const formData = new FormData();
 

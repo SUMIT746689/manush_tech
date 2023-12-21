@@ -10,6 +10,7 @@ import RegistrationSecondPart from './admissionForm/RegistrationSecondPart';
 import RegistrationThirdPart from './admissionForm/RegistrationThirdPart';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import PdfDatas from './admissionForm/PdfDatas';
 
 const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studentAdmissionForm }) => {
     console.log("classes,academicYears__", classes, academicYears);
@@ -27,82 +28,89 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
     };
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <Grid py={8}>
-                <h1 className=' text-center text-3xl text-sky-700 font-semibold'>Online Admission</h1>
-                <br />
-                {
-                    studentAdmissionForm?.file_url &&
-                    <Grid mx="auto" sx={{ display: 'flex', justifyContent: "center" }}>
+        <>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Grid py={8}>
+                    <h1 className=' text-center text-3xl text-sky-700 font-semibold'>Online Admission</h1>
+                    <br />
+                    {
+                        studentAdmissionForm?.file_url &&
+                        <Grid mx="auto" sx={{ display: 'flex', justifyContent: "center" }}>
 
-                        <Link href={`${serverHost}/api/get_file/${studentAdmissionForm?.file_url}`} target='_blank' download={true} >
-                            <Button variant='contained' color='warning'>Download Form</Button>
-                        </Link>
+                            <Link href={`${serverHost}/api/get_file/${studentAdmissionForm?.file_url}`} target='_blank' download={true} >
+                                <Button variant='contained' color='warning'>Download Form</Button>
+                            </Link>
+                        </Grid>
+                    }
+                    <br />
+
+                    <Grid>
+                        <Steps activeStep={activeStep} setActiveStep={setActiveStep} />
                     </Grid>
-                }
-                <br />
-
-                <Grid>
-                    <Steps activeStep={activeStep} setActiveStep={setActiveStep} />
-                </Grid>
-                <Grid container sx={{
-                    px: '10%',
-                    borderRadius: 1
-                }}
-                >
-                    <Grid
-                        sx={{
-                            backgroundColor: 'white',
-                            p: 2,
-                            boxShadow: 3,
-                            mt: 3
-                        }}
+                    <Grid container sx={{
+                        px: '10%',
+                        borderRadius: 1
+                    }}
                     >
-                        {activeStep === 0 && (
+                        <Grid
+                            sx={{
+                                backgroundColor: 'white',
+                                p: 2,
+                                boxShadow: 3,
+                                mt: 3
+                            }}
+                        >
+                            {activeStep === 0 && (
 
-                            <RegistrationFirstPart
-                                setTotalFormData={setTotalFormData}
-                                setActiveStep={setActiveStep}
-                                handleCreateClassClose={handleCreateClassClose}
-                            />
+                                <RegistrationFirstPart
+                                    setTotalFormData={setTotalFormData}
+                                    setActiveStep={setActiveStep}
+                                    handleCreateClassClose={handleCreateClassClose}
+                                />
 
 
-                        )}
-                        {activeStep === 1 && (
-                            <RegistrationSecondPart
-                                totalFormData={totalFormData}
-                                setTotalFormData={setTotalFormData}
-                                setActiveStep={setActiveStep}
-                                handleCreateClassClose={handleCreateClassClose}
-                                classes={classes}
-                                academicYears={academicYears}
+                            )}
+                            {activeStep === 1 && (
+                                <RegistrationSecondPart
+                                    totalFormData={totalFormData}
+                                    setTotalFormData={setTotalFormData}
+                                    setActiveStep={setActiveStep}
+                                    handleCreateClassClose={handleCreateClassClose}
+                                    classes={classes}
+                                    academicYears={academicYears}
 
-                            />
+                                />
 
-                        )}
-                        {activeStep === 2 && (
+                            )}
+                            {activeStep === 2 && (
 
-                            <RegistrationThirdPart
-                                totalFormData={totalFormData}
-                                setTotalFormData={setTotalFormData}
-                                school_id={school_id}
-                                setActiveStep={setActiveStep}
-                                handleCreateClassClose={handleCreateClassClose}
-                                setUsersFlag={setClassesFlag}
-                                serverHost={serverHost}
-                                ref={registration3rdPart}
-                            />
+                                <RegistrationThirdPart
+                                    totalFormData={totalFormData}
+                                    setTotalFormData={setTotalFormData}
+                                    school_id={school_id}
+                                    setActiveStep={setActiveStep}
+                                    handleCreateClassClose={handleCreateClassClose}
+                                    setUsersFlag={setClassesFlag}
+                                    serverHost={serverHost}
+                                    ref={registration3rdPart}
+                                />
 
-                        )}
+                            )}
+                        </Grid>
+
+                        {/* <Data ref={central}>{marged?.map(i=><React.Fragment>{i}</React.Fragment>)}</Data> */}
+
                     </Grid>
-
-                    {/* <Data ref={central}>{marged?.map(i=><React.Fragment>{i}</React.Fragment>)}</Data> */}
-
                 </Grid>
-            </Grid>
-        </LocalizationProvider>
+            </LocalizationProvider>
 
+            <PdfDatas
+                school={studentAdmissionForm?.school}
+                values={totalFormData}
+                serverHost={serverHost}
+            />
 
+        </>
     );
 };
 

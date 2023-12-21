@@ -126,6 +126,7 @@ const Results = ({
   const [limit, setLimit] = useState<number>(5);
   const [filter, setFilter] = useState<string>('all');
   const [paginatedfees, setPaginatedfees] = useState<any>([]);
+  const [sentSms, setSentSms] = useState<number[]>([])
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -303,10 +304,11 @@ const Results = ({
       payment_method_id: selectedGateway?.id,
       collected_amount: amount,
       transID: transID,
-      total_payable: fee?.payableAmount
+      total_payable: fee?.payableAmount,
+      sent_sms: !!sentSms.find(id => id === fee.id)
     })
       .then((res) => {
-        console.log("res.data__", res.data);
+        // console.log("res.data__", res.data);
         // setPrintFees([])
         if (res.data.err) throw new Error(res.data.err);
         setPrintFees([{
@@ -357,6 +359,7 @@ const Results = ({
       </TableRow>
     );
   };
+
   const handleClassSelect = (event, newValue) => {
     setSessions([])
     setSelectedFees([]);
@@ -387,6 +390,15 @@ const Results = ({
       setSelectedStudent(null);
     }
   };
+
+  const handleSentSms = (fee_id: any) => {
+    setSentSms((values) => {
+      const findSentSmsIds = values.find((id) => id === fee_id)
+      if (!findSentSmsIds) return [...values, fee_id]
+      return values.filter((id) => id !== fee_id)
+    })
+    // showNotification("not implemented", "error");
+  }
 
   return (
     <>
@@ -669,15 +681,26 @@ const Results = ({
                         </Typography>
                       </TableCell>
 
-                      <TableCell align="center" sx={{ p: 0.5 }}>
-                        <Typography noWrap>
-                          <AmountCollection
-                            accounts={accounts}
-                            accountsOption={accountsOption}
-                            due={fee?.due}
-                            fee={fee}
-                            handleCollection={handleCollection}
-                          />
+                      <TableCell align="center">
+                        <Typography noWrap display="flex" my="auto" >
+                          <Grid color="darkblue" my="auto" pr={1} >
+                            <Checkbox checked={!!sentSms.find(id => id === fee.id)} onClick={() => handleSentSms(fee.id)} />
+                            Sent Sms
+                          </Grid>
+                          <Grid pt={1} >
+                            <AmountCollection
+                              accounts={accounts}
+                              accountsOption={accountsOption}
+                              due={fee?.due}
+                              fee={fee}
+                              handleCollection={handleCollection}
+                            />
+                          </Grid>
+
+                          {/* <Button onClick={handleSentSms} variant='outlined' size='small' sx={{ borderRadius: 0.5, fontSize: 13, px: 4, py: 0.8, my: 'auto' }} >
+                            Sent Sms
+                          </Button> */}
+
                           {/* <Tooltip title={t('Edit')} arrow>
                                 <IconButton
                                   onClick={() =>
@@ -808,7 +831,7 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
         display: 'grid',
         gridTemplateColumns: "130px 130px",
         gap: 1,
-        p: 1,
+        // p: 1,
       }}>
         <AutoCompleteWrapper
           label={t('Account')}
@@ -850,7 +873,7 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
       {
         selectedGateway && selectedAccount?.label?.toLowerCase() !== 'cash' && <Grid item sx={{
           minWidth: '130px',
-          p: 1
+          // p: 1
         }}>
           <TextFieldWrapper
             label="trans ID"
@@ -866,7 +889,9 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
 
         </Grid>
       }
-      <Grid item minWidth={120} p={1} >
+      <Grid item minWidth={120}
+      // p={1} 
+      >
         <TextFieldWrapper
           label="Amount"
           name=""
@@ -879,7 +904,9 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
         />
       </Grid>
 
-      <Grid item pt={0.8}>
+      <Grid item
+      // pt={0.8}
+      >
         <Button
           variant="contained"
           disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label?.toLowerCase() !== 'cash' && transID || selectedAccount?.label?.toLowerCase() === 'cash' && !transID) ? false : true}

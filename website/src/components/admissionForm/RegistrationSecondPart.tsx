@@ -70,6 +70,7 @@ function RegistrationSecondPart({
 
   const handleClassSelect = (event, value, setFieldValue) => {
     setFieldValue("class_id", value?.id)
+    setFieldValue("class_name",value?.label)
     setselectedClass(value);
     if (value) {
       const targetClassSections = classes?.find(i => i.id == value.id)
@@ -357,6 +358,7 @@ function RegistrationSecondPart({
                         onChange={(event, value) => {
                           setSelecetedAcademicYear(value)
                           setFieldValue('academic_year_id', value?.id);
+                          setFieldValue('academic_year_title', value?.label);
                         }}
                       />
                     </Grid>

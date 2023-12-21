@@ -32,9 +32,13 @@ export default async function Admission() {
     const studentAdmissionForm = await prisma.studentAdmissionForm.findFirst({
         where: {
             school: { domain }
+        },
+        include: {
+            school: { select: { name: true, address: true, websiteui: { select: { header_image: true } } } },
         }
-    })
-    
+    });
+
+    console.log({ studentAdmissionForm })
     return (
         <div>
             <OnlineAdmission

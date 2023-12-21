@@ -40,6 +40,16 @@ const handleTransaction = ({ collected_amount, refresh_token }) => {
 
             if (!payment.data?.paymentID || !token.data?.id_token) throw Error(payment.data.statusMessage)
 
+            const prev_sub = await prisma.subscription.findFirstOrThrow({
+                where: {
+                    school_id: refresh_token.school_id,
+                    is_active: true,
+                },
+                include: {
+                    package: true
+                }
+            })
+
             await prisma.session_store.create({
 
                 data: {
@@ -49,7 +59,10 @@ const handleTransaction = ({ collected_amount, refresh_token }) => {
                     token: token.data.id_token,
                     data: {
                         collected_amount,
-                        school_id: refresh_token.school_id
+                        school_id: refresh_token.school_id,
+                        subscription_id: prev_sub.id,
+                        subscription_end: prev_sub.end_date,
+                        subscription_duration: prev_sub.package.duration
                     }
                 }
             })
@@ -80,6 +93,7 @@ const index = async (req, res, refresh_token) => {
                     collected_amount,
                     refresh_token
                 })
+                //@ts-ignore
                 return res.status(200).json({ bkashURL: tr.bkashURL })
 
                 break;

@@ -29,9 +29,9 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import { useRouter } from 'next/navigation';
 
 
-function PageHeader({ packages }) {
+function PageHeader({school}) {
   const { t }: { t: any } = useTranslation();
-  const [open, setOpen] = useState(false);
+ 
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
   const theme = useTheme();
@@ -39,9 +39,7 @@ function PageHeader({ packages }) {
   const router = useRouter()
 
   const { showNotification } = useNotistick()
-  useEffect(() => {
-    if (packages) handleCreateClassOpen();
-  }, [packages]);
+
 
   const [publicProfile, setPublicProfile] = useState({
     public: true
@@ -54,25 +52,6 @@ function PageHeader({ packages }) {
     });
   };
 
-  const handleCreateClassOpen = () => {
-    setOpen(true);
-  };
-
-  const handleCreateClassClose = () => {
-    setOpen(false);
-  };
-
-  const handleCreateUserSuccess = () => {
-    // enqueueSnackbar(t('The user account was created successfully'), {
-    //   variant: 'success',
-    //   anchorOrigin: {
-    //     vertical: 'top',
-    //     horizontal: 'right'
-    //   },
-    //   TransitionComponent: Zoom
-    // });
-    setOpen(false);
-  };
 
   const handleValidationSchema = Yup.object().shape({
     package_id: Yup.number()
@@ -108,7 +87,6 @@ function PageHeader({ packages }) {
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
-        handleCreateUserSuccess();
       };
       console.log({ _values });
       const formData = new FormData();
@@ -194,8 +172,8 @@ function PageHeader({ packages }) {
             backgroundColor: '#42a5f5',
           }}
             variant='contained'
-            disabled={Number(user?.school?.subscription[0]?.package?.price) ? false : true}
-            onClick={() => handlePayment({ collected_amount: Number(user?.school?.subscription[0]?.package?.price) })}>
+            disabled={Number(school?.package?.price) ? false : true}
+            onClick={() => handlePayment({ collected_amount: Number(school?.package?.price) })}>
 
             <Image src={'/BKash-Icon-Logo.wine.svg'} alt={'bkash'} width={35} height={35} />
             Pay

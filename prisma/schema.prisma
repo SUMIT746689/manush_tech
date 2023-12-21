@@ -634,12 +634,11 @@ model StudentResultDetails {
 }
 
 model Package {
-  id            Int    @id @default(autoincrement())
-  title         String
-  price         Float
-  duration      Int
-  student_count Int
-
+  id                  Int                   @id @default(autoincrement())
+  price               Float
+  duration            Int
+  student_count       Int?
+  is_std_cnt_wise     Boolean               @default(false)
   subscription        Subscription[]
   RequestPackage      RequestPackage[]
   Package_transaction Package_transaction[]

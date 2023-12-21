@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import 'react-quill/dist/quill.snow.css';
 
-import { Grid, Dialog, DialogTitle, DialogContent, Typography, TextField, CircularProgress, Autocomplete, useTheme } from '@mui/material';
+import { Grid, Dialog, DialogTitle, DialogContent, Typography, TextField, CircularProgress, Autocomplete, useTheme, Checkbox } from '@mui/material';
 import axios from 'axios';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { currency_list } from '@/static_data/currency_list';
@@ -16,10 +16,11 @@ import Image from 'next/image';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
+  console.log({editSchool});
+  
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const [logo, setLogo] = useState(null)
-
   const theme = useTheme();
   const { showNotification } = useNotistick();
   const handleCreateProjectOpen = () => {
@@ -55,7 +56,11 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
         reFetchData();
         handleCreateProjectClose();
       };
+
+      console.log("_values__", _values);
+
       if (editSchool) {
+        _values['subscription_id'] = editSchool?.subscription[0]?.id
         const res = await axios.patch(`/api/school/${editSchool.id}`, _values);
         if (res?.data?.success) {
           handleSubmitSuccess(t('A school has been updated successfully'));
@@ -84,7 +89,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
       />
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth='md'
         open={open}
         onClose={handleCreateProjectClose}
       >
@@ -106,9 +111,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             phone: editSchool?.phone ? editSchool.phone : undefined,
             email: editSchool?.email ? editSchool.email : undefined,
             address: editSchool?.address ? editSchool.address : undefined,
-            admin_ids: editSchool?.admins
-              ? Array.from(editSchool.admins, (x: any) => x.id)
-              : undefined,
+            admin_ids: editSchool?.admins ? Array.from(editSchool.admins, (x: any) => x.id) : undefined,
             currency: editSchool?.currency ? editSchool.currency : null,
             domain: editSchool?.domain ? editSchool?.domain : null,
             main_balance: editSchool?.main_balance ? editSchool?.main_balance : null,
@@ -116,6 +119,13 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             non_masking_sms_count: editSchool?.non_masking_sms_count ? editSchool?.non_masking_sms_count : null,
             masking_sms_price: editSchool?.masking_sms_price ? editSchool?.masking_sms_price : null,
             non_masking_sms_price: editSchool?.non_masking_sms_price ? editSchool?.non_masking_sms_price : null,
+
+
+            is_std_cnt_wise: editSchool?.subscription[0]?.package?.is_std_cnt_wise,
+            package_price: editSchool?.subscription[0]?.package?.price,
+            package_duration: editSchool?.subscription[0]?.package?.duration,
+            package_student_count: editSchool?.subscription[0]?.package?.student_count,
+
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -135,6 +145,14 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
               Yup.number().required(t('The admin_ids field must be number'))
             ).required('Please select admin.'),
             domain: Yup.string().nullable(),
+
+
+
+            is_std_cnt_wise: Yup.boolean(),
+            package_price: Yup.number().min(1).required(t('The price field is required')),
+            package_duration: Yup.number().min(1).required(t('The duration field is required')),
+
+
           })}
           onSubmit={async (
             _values,
@@ -158,202 +176,279 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             touched,
             values,
             setFieldValue
-          }) => (
-            <form onSubmit={handleSubmit}>
-              <DialogContent
-                dividers
-                sx={{
-                  p: 3
-                }}
-              >
-                <Grid container spacing={0}>
-
-                  <TextFieldWrapper
-                    errors={errors.name}
-                    touched={touched.name}
-                    label="School Name"
-                    name="name"
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.name}
-                  />
-
-                  <TextFieldWrapper
-                    errors={errors.phone}
-                    touched={touched.phone}
-                    name="phone"
-                    label={t('Phone Number')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.phone}
-                  />
-
-                  <TextFieldWrapper
-                    errors={errors.email}
-                    touched={touched.email}
-                    name="email"
-                    label={t('Email')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.email}
-                  />
-
-                  <TextFieldWrapper
-                    errors={errors.address}
-                    touched={touched.address}
-                    name="address"
-                    label={t('School Eddress')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.address}
-                  />
-
-                  <Grid
-                    item
-                    width={'100%'}
-                    justifyContent="flex-end"
-                    textAlign={{ sm: 'right' }}
-                    mb={1}
-                  >
-
-                    {/* <AdminSelect
-                      setFieldValue={setFieldValue}
-                      oldSelectedAdminID={values.admin_id}
-                    /> */}
-                    <SelectAdmin
-                      setFieldValue={setFieldValue}
-                      oldSelectedAdminID={values.admin_ids}
+          }) => {
+            console.log("values__",values);
+            
+            return (
+              <form onSubmit={handleSubmit}>
+                <DialogContent
+                  dividers
+                  sx={{
+                    p: 3
+                  }}
+                >
+                  <Grid container spacing={0}>
+  
+                    <TextFieldWrapper
+                      errors={errors.name}
+                      touched={touched.name}
+                      label="School Name"
+                      name="name"
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.name}
                     />
-                  </Grid>
-
-                  <Grid
-                    item
-                    width="100%"
-                    gap={1}
-                    display="grid"
-                    gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }}
-                  >
-                    <Autocomplete
-                      size='small'
-                      id="tags-outlined"
-
-                      disablePortal
-                      value={
-                        currency_list.find(
-                          (academic) => academic.code === values.currency
-                        ) || null
-                      }
-                      options={currency_list}
-                      isOptionEqualToValue={(option: any, value: any) =>
-                        option.code === value.code
-                      }
-                      getOptionLabel={(option) =>
-                        option?.name + ' - ' + option?.code
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          sx={{
-                            // maxHeight:100,
-                            [`& fieldset`]: {
-                              borderRadius: 0.6,
-                            }
-                          }}
-                          {...params}
-                          fullWidth
-                          error={Boolean(touched?.currency && errors?.currency)}
-                          helperText={touched?.currency && errors?.currency}
-                          name="currency"
-                          label={t('Select Currency ')}
+  
+                    <TextFieldWrapper
+                      errors={errors.phone}
+                      touched={touched.phone}
+                      name="phone"
+                      label={t('Phone Number')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.phone}
+                    />
+  
+                    <TextFieldWrapper
+                      errors={errors.email}
+                      touched={touched.email}
+                      name="email"
+                      label={t('Email')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.email}
+                    />
+  
+                    <TextFieldWrapper
+                      errors={errors.address}
+                      touched={touched.address}
+                      name="address"
+                      label={t('School Eddress')}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      value={values.address}
+                    />
+  
+                    <Grid
+                      container
+                      width={'100%'}
+                      display={'grid'}
+                      gridTemplateColumns={'2% 98%'}
+                      gap={2}
+                      py={1}
+                      pb={1}
+                    >
+                      <Checkbox
+                        sx={{ p: 0 }}
+                        checked={values?.is_std_cnt_wise}
+                        onChange={(event) => {
+                          setFieldValue('is_std_cnt_wise', event.target.checked);
+                        }}
+                      />
+                      <Typography variant="h6">
+                        Student count package?
+                      </Typography>
+  
+                    </Grid>
+  
+                    <Grid sx={{
+                      display: 'grid',
+                      gridTemplateColumns: {
+                        md: `${values?.is_std_cnt_wise ? '1fr 1fr' : '1fr 1fr 1fr'}`
+                      },
+                      width: '100%',
+                      gap: 1
+                    }}>
+                      <TextFieldWrapper
+                        errors={errors?.package_price}
+                        touched={touched?.package_price}
+                        label={`${values?.is_std_cnt_wise ? 'Per student Price' : 'Package price'}`}
+                        name="package_price"
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.package_price}
+                        type='number'
+                      />
+  
+                      <TextFieldWrapper
+                        errors={errors?.package_duration}
+                        touched={touched?.package_duration}
+                        name="package_duration"
+                        label="Duration"
+                        type="number"
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.package_duration}
+                      />
+                      {
+                        !values?.is_std_cnt_wise && <TextFieldWrapper
+                          errors={errors?.package_student_count}
+                          touched={touched?.package_student_count}
+                          required={true}
+                          name="package_student_count"
+                          label="Student Count"
+                          type="number"
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values?.package_student_count}
                         />
-                      )}
-                      // @ts-ignore
-                      onChange={(e, value: any) =>
-                        setFieldValue('currency', value?.code || 0)
                       }
-                    />
-
+                    </Grid>
+  
+                    <Grid
+                      item
+                      width={'100%'}
+                      justifyContent="flex-end"
+                      textAlign={{ sm: 'right' }}
+                      mb={1}
+                    >
+  
+                      {/* <AdminSelect
+                        setFieldValue={setFieldValue}
+                        oldSelectedAdminID={values.admin_id}
+                      /> */}
+                      <SelectAdmin
+                        setFieldValue={setFieldValue}
+                        oldSelectedAdminID={values.admin_ids}
+                      />
+                    </Grid>
+  
+                    <Grid
+                      item
+                      width="100%"
+                      gap={1}
+                      display="grid"
+                      gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }}
+                    >
+                      <Autocomplete
+                        size='small'
+                        id="tags-outlined"
+  
+                        disablePortal
+                        value={
+                          currency_list.find(
+                            (academic) => academic.code === values.currency
+                          ) || null
+                        }
+                        options={currency_list}
+                        isOptionEqualToValue={(option: any, value: any) =>
+                          option.code === value.code
+                        }
+                        getOptionLabel={(option) =>
+                          option?.name + ' - ' + option?.code
+                        }
+                        renderInput={(params) => (
+                          <TextField
+                            sx={{
+                              // maxHeight:100,
+                              [`& fieldset`]: {
+                                borderRadius: 0.6,
+                              }
+                            }}
+                            {...params}
+                            fullWidth
+                            error={Boolean(touched?.currency && errors?.currency)}
+                            helperText={touched?.currency && errors?.currency}
+                            name="currency"
+                            label={t('Select Currency ')}
+                          />
+                        )}
+                        // @ts-ignore
+                        onChange={(e, value: any) =>
+                          setFieldValue('currency', value?.code || 0)
+                        }
+                      />
+  
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.main_balance}
+                        touched={touched.main_balance}
+                        name="main_balance"
+                        label={t('Balance Amount ')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.main_balance}
+                      />
+                    </Grid>
+  
+  
                     <TextFieldWrapper
-                      type="number"
-                      errors={errors.main_balance}
-                      touched={touched.main_balance}
-                      name="main_balance"
-                      label={t('Balance Amount ')}
+                      errors={errors.domain}
+                      touched={touched.domain}
+                      name="domain"
+                      label={t('School domain ')}
                       handleBlur={handleBlur}
                       handleChange={handleChange}
-                      value={values.main_balance}
+                      value={values.domain}
                     />
+  
+                    <Grid container display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} columnGap={1}>
+  
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.masking_sms_price}
+                        touched={touched.masking_sms_price}
+                        name="masking_sms_price"
+                        label={t('Masking Sms Price')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.masking_sms_price}
+                      />
+  
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.non_masking_sms_price}
+                        touched={touched.non_masking_sms_price}
+                        name="non_masking_sms_price"
+                        label={t('Non Masking Sms Price')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.non_masking_sms_price}
+                      />
+  
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.masking_sms_count}
+                        touched={touched.masking_sms_count}
+                        name="masking_sms_count"
+                        label={t('Masking Sms Count')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.masking_sms_count}
+                      />
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.non_masking_sms_count}
+                        touched={touched.non_masking_sms_count}
+                        name="non_masking_sms_count"
+                        label={t('Non Masking Sms Count')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.non_masking_sms_count}
+                      />
+                    </Grid>
+  
+  
                   </Grid>
-
-
-                  <TextFieldWrapper
-                    errors={errors.domain}
-                    touched={touched.domain}
-                    name="domain"
-                    label={t('School domain ')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.domain}
-                  />
-
-                  <Grid container display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} columnGap={1}>
-
-                    <TextFieldWrapper
-                      type="number"
-                      errors={errors.masking_sms_price}
-                      touched={touched.masking_sms_price}
-                      name="masking_sms_price"
-                      label={t('Masking Sms Price')}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      value={values.masking_sms_price}
-                    />
-
-                    <TextFieldWrapper
-                      type="number"
-                      errors={errors.non_masking_sms_price}
-                      touched={touched.non_masking_sms_price}
-                      name="non_masking_sms_price"
-                      label={t('Non Masking Sms Price')}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      value={values.non_masking_sms_price}
-                    />
-
-                    <TextFieldWrapper
-                      type="number"
-                      errors={errors.masking_sms_count}
-                      touched={touched.masking_sms_count}
-                      name="masking_sms_count"
-                      label={t('Masking Sms Count')}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      value={values.masking_sms_count}
-                    />
-                    <TextFieldWrapper
-                      type="number"
-                      errors={errors.non_masking_sms_count}
-                      touched={touched.non_masking_sms_count}
-                      name="non_masking_sms_count"
-                      label={t('Non Masking Sms Count')}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      value={values.non_masking_sms_count}
-                    />
-                  </Grid>
-
-
-                </Grid>
-              </DialogContent>
-              <DialogActionWrapper
-                handleCreateClassClose={handleCreateProjectClose}
-                errors={errors}
-                editData={editSchool}
-                title={"School"}
-                isSubmitting={isSubmitting}
-              />
-            </form>
-          )}
+                </DialogContent>
+                <DialogActionWrapper
+                  handleCreateClassClose={handleCreateProjectClose}
+                  errors={errors}
+                  editData={editSchool}
+                  title={"School"}
+                  isSubmitting={isSubmitting}
+                />
+              </form>
+            )
+          }
+          }
         </Formik>
+
+
+
+
+
+
       </Dialog>
     </>
   );

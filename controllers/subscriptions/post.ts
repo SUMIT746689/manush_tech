@@ -9,17 +9,12 @@ export default async function post(req: any, res: any) {
 
     if (!refresh_token) throw new Error('invalid user');
 
-    const { school_id, package_id, end_date } = req.body;
+    const { school_id, subscription_id, end_date } = req.body;
     console.log(req.body);
 
-    if (!school_id || !package_id)
+    if (!school_id || !subscription_id)
       throw new Error('provided all required datas');
 
-    const resPackage = await prisma.package.findFirst({
-      where: { id: Number(package_id) }
-    });
-
-    if (!resPackage) throw new Error('Package not founds');
 
     // await prisma.subscription.updateMany({
     //   where: { school_id: parseInt(school_id) },
@@ -28,48 +23,42 @@ export default async function post(req: any, res: any) {
     //   }
     // });
 
-    const prev_subscription = await prisma.subscription.findFirst({
-      where: { school_id: parseInt(school_id) }
-    })
+    //     const prev_subscription = await prisma.subscription.findFirst({
+    //       where: {
+    //         id: Number(subscription_id)
+    //       },
+    //       select: {
+    //         start_date: true,
+    //         end_date: true
+    //       }
+    //     })
+    //     const end = new Date(end_date);
+    //     const start = new Date(prev_subscription.start_date)
 
+    // console.log({start,end});
 
-
-    if (!prev_subscription) {
-      const start_date = new Date(Date.now());
-
-      let end_date_provided;
-      if (end_date) {
-        end_date_provided = new Date(end_date)
-      }
-      else {
-        end_date_provided = new Date(Date.now());
-        end_date_provided.setDate(end_date_provided.getDate() + resPackage.duration);
-      }
-
-      await prisma.subscription.create({
-        data: {
-          school_id,
-          package_id,
-          start_date,
-          end_date: end_date_provided,
-          is_active: true
+    await prisma.subscription.update({
+      where: {
+        id: Number(subscription_id)
+      },
+      data: {
+        end_date: new Date(end_date),
+        is_active: true,
+        Subscription_history: {
+          create: {
+            edited_at: new Date(),
+            edited_by: refresh_token.id
+          }
         }
-      });
-    }
-    else {
-      if (prev_subscription.package_id !== Number(package_id)) throw new Error('Can not assign another package');
+        // package: {
+        //   update: {
+        //     //@ts-ignore
+        //     duration:  (end - start)/ (1000 * 60 * 60 * 24)
+        //   }
+        // }
+      }
+    });
 
-      await prisma.subscription.update({
-        where: {
-          id: prev_subscription.id
-        },
-        data: {
-          school_id,
-          end_date: new Date(end_date),
-          is_active: true
-        }
-      });
-    }
     res.status(201).json({ success: 'created successfully' });
   } catch (error) {
     console.log(error.message);

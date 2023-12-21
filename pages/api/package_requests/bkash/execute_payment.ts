@@ -10,7 +10,7 @@ const handleTransaction = ({ session, paymentVerifyData }) => {
 
             await prisma.$transaction(async (trans) => {
 
-                const subscription = await prisma.subscription.findFirstOrThrow({
+                const subscription = await trans.subscription.findFirstOrThrow({
                     where: {
                         school_id: session.data.school_id
                     },
@@ -32,6 +32,18 @@ const handleTransaction = ({ session, paymentVerifyData }) => {
                         school_id: session.data.school_id
                     }
                 });
+
+                const end = new Date(session.subscription_end)
+                end.setDate(end.getDate() + session.subscription_duration);
+
+                await trans.subscription.update({
+                    where: {
+                        id: session.subscription_id
+                    },
+                    data: {
+                        end_date: end
+                    }
+                })
 
                 resolve('done')
             })

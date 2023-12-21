@@ -33,7 +33,6 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
   const theme = useTheme();
-  const { data: packages } = useClientFetch('/api/packages');
 
   const handleCreateProjectClose = () => {
     setOpen(false);
@@ -65,15 +64,16 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
       };
 
       const res = await axios.post('/api/subscriptions', {
-        school_id: open.id,
+        school_id: open?.id,
+        subscription_id: open?.subscription[0]?.id,
         ..._values
       });
       if (res.data?.success) {
         handleSubmitSuccess(t('School package added successfully'));
-      } 
+      }
     } catch (err) {
       console.log(err);
-      
+
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -104,15 +104,10 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
         <Formik
           initialValues={{
             name: open?.name,
-            package_id: subscriptionLength && open.subscription[0].package_id,
             end_date: subscriptionLength && open?.subscription[0].end_date,
             submit: null
           }}
-          validationSchema={Yup.object().shape({
-            package_id: Yup.number()
-              .max(255)
-              .required(t('The package field is required'))
-          })}
+
           onSubmit={async (
             _values,
             { resetForm, setErrors, setStatus, setSubmitting }
@@ -145,63 +140,9 @@ function ManageSubcriptions({ open, setOpen, reFetchData }): any {
               >
                 <Grid container spacing={2}>
 
-                  <TextFieldWrapper
-                    errors={errors.name}
-                    touched={touched.name}
-                    name="name"
-                    label={t('School')}
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values.name}
-                  />
+                 <Typography variant='h4' width={'100%'} pl={2}>{values.name}</Typography>
 
-                  <Grid
-                    display={"grid"}
-                    item
-                    width={"100%"}
-                  >
-                    <Autocomplete
-                      disablePortal
-                      size='small'
-                      value={
-                        packages?.data?.find(
-                          (pkg: any) => pkg.id === values.package_id
-                        ) || null
-                      }
-                      options={packages?.success ? packages.data : []}
-                      isOptionEqualToValue={(option: any, value: any) =>
-                        option.title === value.title
-                      }
-                      getOptionLabel={(option) =>
-                        option?.title +
-                        ' - ' +
-                        option?.price +
-                        ' ' +
-                        open?.currency
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          sx={{
-                            [`& fieldset`]: {
-                              borderRadius: 0.6,
-                            }
-                          }}
-                          fullWidth
-                          error={Boolean(
-                            touched?.package_id && errors?.package_id
-                          )}
-                          helperText={touched?.package_id && errors?.package_id}
-                          name="package_id"
-                          label={t('Select Package ')}
-                        />
-                      )}
-                      // @ts-ignore
-                      onChange={(e, value: any) => {
-                        setFieldValue('package_id', value?.id || 0);
-                      }}
-                    />
-                  </Grid>
+
 
                   <Grid
                     display={"grid"}

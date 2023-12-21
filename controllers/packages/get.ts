@@ -9,7 +9,7 @@ export default async function get(req: any, res: any) {
   
     if (!refresh_token) throw new Error('invalid user');
   
-    const response = await prisma.package.findMany({});    
+    const response = await prisma.package.findMany();    
      
     res.status(200).json({ data: response, success: true });
   } catch (err) {

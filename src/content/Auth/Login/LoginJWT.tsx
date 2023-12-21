@@ -100,7 +100,7 @@ export const LoginJWT: FC = (props) => {
           router.push(backTo);
         }
       } catch (err) {
-        console.error(err);
+        console.log(err);
         if (isMountedRef()) {
           helpers.setStatus({ success: false });
           helpers.setErrors({ submit: err.message });

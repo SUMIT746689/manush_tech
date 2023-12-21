@@ -166,7 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-console.log({permissions});
+// console.log({permissions});
 
   const sub_menu = () => {
     ev.push(

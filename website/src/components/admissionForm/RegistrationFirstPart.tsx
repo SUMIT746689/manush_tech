@@ -39,7 +39,7 @@ function RegistrationFirstPart({
           first_name: undefined,
           middle_name: '',
           last_name: '',
-          admission_date: null,
+          admission_date: new Date(),
           date_of_birth: null,
           gender: 'male',
           blood_group: '',
@@ -55,7 +55,6 @@ function RegistrationFirstPart({
             .required(t('First name field is required')),
           middle_name: Yup.string().max(255).nullable(true),
           last_name: Yup.string().max(255).nullable(true),
-          admission_date: Yup.date().required(t('Admission date is required!')),
           date_of_birth: Yup.date().required(t('Date of birth is required!')),
           gender: Yup.string().required(t('select a gender')),
           blood_group: Yup.string().nullable(true),
@@ -196,7 +195,7 @@ function RegistrationFirstPart({
                     </Grid> */}
 
                     {/* admission_date */}
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
 
                       <MobileDateTimePicker
                         label="admission Date"
@@ -235,7 +234,7 @@ function RegistrationFirstPart({
                       {
                         errors.admission_date && <span style={{ color: 'red' }}> Admission date are required</span>
                       }
-                    </Grid>
+                    </Grid> */}
 
                     {/* date_of_birth */}
                     <Grid item xs={12} md={6}>
@@ -279,7 +278,7 @@ function RegistrationFirstPart({
                     </Grid>
 
                     {/* Gender */}
-                    <Grid item xs={12}>
+                    <Grid item xs={12}  md={6}>
                       <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">
                           Select Gender *

@@ -1,6 +1,4 @@
 "use client"
-import Head from 'next/head';
-// import { headers } from 'next/headers';
 import { SnackbarProvider } from 'notistack';
 import React from 'react';
 

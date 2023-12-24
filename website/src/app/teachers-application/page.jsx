@@ -18,6 +18,7 @@ export default async function Admission() {
         },
     });
     return (
+        
         <div className=' max-w-5xl mx-auto px-5'>
             <TeachersApplication
                 serverHost={`${process.env.SERVER_HOST}`}

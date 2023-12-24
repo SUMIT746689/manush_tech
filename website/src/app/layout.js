@@ -9,7 +9,6 @@ import { headers } from 'next/headers';
 import SchoolNotFound from '../components/SchoolNotFound'
 import React from 'react';
 
-
 export default async function RootLayout({ children }) {
 
   const headersList = headers();
@@ -46,6 +45,8 @@ export default async function RootLayout({ children }) {
           <title>Home</title>
         </Head>
         <body >
+
+
           {/* <LayoutWrapper> */}
           <div className=' px-4'>
             <Header
@@ -57,8 +58,8 @@ export default async function RootLayout({ children }) {
               serverhost={`${process.env.SERVER_HOST}`}
             />
             <Nav serverhost={`${process.env.SERVER_HOST}`} />
-
-            {children}
+            
+              {children} 
           </div>
 
           {/* </LayoutWrapper> */}

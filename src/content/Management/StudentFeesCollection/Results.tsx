@@ -683,10 +683,10 @@ const Results = ({
 
                       <TableCell align="center">
                         <Typography noWrap display="flex" my="auto" >
-                          <Grid color="darkblue" my="auto" pr={1} >
+                          {/* <Grid color="darkblue" my="auto" pr={1} >
                             <Checkbox checked={!!sentSms.find(id => id === fee.id)} onClick={() => handleSentSms(fee.id)} />
                             Sent Sms
-                          </Grid>
+                          </Grid> */}
                           <Grid pt={1} >
                             <AmountCollection
                               accounts={accounts}

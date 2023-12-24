@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
-import { Card, Grid } from '@mui/material';
+import { Button, Card, Grid } from '@mui/material';
 import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/StudentFeesCollection/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
@@ -97,7 +97,7 @@ function Managementschools() {
         </Grid>
       </Grid>
       <Grid px={4} mt={1}>
-        <Card sx={{ pt: 1, px: 1, display: 'grid', gridTemplateColumns: { xs: " 1fr", md: "1fr 1fr" }, justifyContent: 'center', fontSize: 0.1, columnGap: 1 }}>
+        <Card sx={{ pt: 1, px: 1, display: 'grid', gridTemplateColumns: { xs: " 1fr", md: "1fr 1fr 1fr" }, justifyContent: 'center', fontSize: 0.1, columnGap: 1 }}>
           <ButtonWrapper
             handleClick={() => setPrintFees([])}
             color="warning"
@@ -123,6 +123,10 @@ function Managementschools() {
           >
             {'Print All'}
           </ButtonWrapper> */}
+
+          <ButtonWrapper handleClick={() => { }}>
+            Sent Sms
+          </ButtonWrapper>
 
           <ButtonWrapper
             sx={{

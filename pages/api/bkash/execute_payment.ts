@@ -80,10 +80,10 @@ const index = async (req, res, refresh_token) => {
 
     if (status === 'cancel') {
         await prisma.session_store.delete({ where: { paymentID: paymentID } })
-        res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${status}`)
+        res.redirect(`${process.env.base_url}/management/fees/student_payment?message=${status}`)
     }
     else if (status === 'failure') {
-        res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${status}`)
+        res.redirect(`${process.env.base_url}/management/fees/student_payment?message=${status}`)
     }
     else if (status === 'success') {
         try {
@@ -142,9 +142,9 @@ const index = async (req, res, refresh_token) => {
 
                         await prisma.session_store.delete({ where: { paymentID: session.paymentID } })
 
-                        return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${status}`)
+                        return res.redirect(`${process.env.base_url}/management/fees/student_payment?message=${status}`)
                     } else {
-                        return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/management/fees/student_payment?message=${paymentVerify.data.statusMessage}`)
+                        return res.redirect(`${process.env.base_url}/management/fees/student_payment?message=${paymentVerify.data.statusMessage}`)
                     }
                     break;
                 default:
@@ -154,7 +154,7 @@ const index = async (req, res, refresh_token) => {
         }
         catch (error) {
             console.log(error)
-            return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/error?message=${error.message}`)
+            return res.redirect(`${process.env.base_url}/error?message=${error.message}`)
         }
 
     }

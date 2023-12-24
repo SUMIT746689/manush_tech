@@ -27,7 +27,7 @@ const handleTransaction = ({ student_id, user_id,
             const payment = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create', {
                 mode: '0011',
                 payerReference: "fee payment",
-                callbackURL: `${process.env.NEXT_PUBLIC_BASE_API}/api/bkash/execute_payment`,
+                callbackURL: `${process.env.base_url}/api/bkash/execute_payment`,
                 amount: Number(collected_amount),
                 currency: "BDT",
                 intent: 'sale',

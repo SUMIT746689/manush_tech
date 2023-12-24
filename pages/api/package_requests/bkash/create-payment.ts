@@ -23,7 +23,7 @@ const handleTransaction = ({ collected_amount, refresh_token }) => {
             const payment = await axios.post(process.env.bkash_create_payment_url, {
                 mode: '0011',
                 payerReference: "fee payment",
-                callbackURL: `${process.env.NEXT_PUBLIC_BASE_API}/api/package_requests/bkash/execute_payment`,
+                callbackURL: process.env.base_url + '/api/package_requests/bkash/execute_payment',
                 amount: Number(collected_amount),
                 currency: "BDT",
                 intent: 'sale',

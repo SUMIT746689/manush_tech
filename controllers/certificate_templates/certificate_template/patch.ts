@@ -9,7 +9,7 @@ async function post(req, res, refresh_token) {
     const { id } = req.query;
 
     const uploadFolderName = "certificate_templates";
-    const fileUrl = `${process.env.NEXT_PUBLIC_BASE_API}/api/get_file/${uploadFolderName}`;
+    const fileUrl = `${process.env.base_url}/api/get_file/${uploadFolderName}`;
 
     await certificateTemplateFolder(uploadFolderName);
 

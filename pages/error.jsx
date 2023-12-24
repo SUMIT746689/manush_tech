@@ -1,12 +1,13 @@
 import React from 'react';
 import { useRouter } from 'next/router'
+import { Grid } from '@mui/material';
 const error = () => {
     const router = useRouter()
     console.log(router.query);
     return (
-        <div>
+        <Grid >
             {router?.query?.message}
-        </div>
+        </Grid>
     );
 };
 

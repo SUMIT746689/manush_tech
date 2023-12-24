@@ -23,7 +23,7 @@ export default async function Admission() {
                 serverHost={`${process.env.SERVER_HOST}`}
                 departments={departments?.map(i => ({
                     label: i.title,
-                    value: i.ids
+                    value: i.id
                 })) || []}
             />
         </div>

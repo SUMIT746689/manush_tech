@@ -686,7 +686,7 @@ enum RequestPakcageStatus {
 
 model Subscription {
   id         Int      @id @default(autoincrement())
-  school_id  Int
+  school_id  Int      @unique
   package_id Int
   start_date DateTime @db.Date
   end_date   DateTime @db.Date
@@ -696,7 +696,6 @@ model Subscription {
   package              Package                @relation(fields: [package_id], references: [id])
   Subscription_history Subscription_history[]
 
-  @@unique([school_id, package_id])
   @@map("subscriptions")
 }
 

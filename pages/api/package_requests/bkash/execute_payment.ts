@@ -7,7 +7,7 @@ import { authenticate } from 'middleware/authenticate';
 const handleTransaction = ({ session, paymentVerifyData }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log({ session,paymentVerifyData });
+            console.log({ session, paymentVerifyData });
 
             await prisma.$transaction(async (trans) => {
 
@@ -71,10 +71,10 @@ const index = async (req, res, refresh_token) => {
 
     if (status === 'cancel') {
         await prisma.session_store.delete({ where: { paymentID: paymentID } })
-        res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/settings/package_request?message=${status}`)
+        res.redirect(process.env.base_url + `/settings/package_request?message=${status}`)
     }
     else if (status === 'failure') {
-        res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/settings/package_request?message=${status}`)
+        res.redirect(process.env.base_url + `/settings/package_request?message=${status}`)
     }
     else if (status === 'success') {
         try {
@@ -86,12 +86,12 @@ const index = async (req, res, refresh_token) => {
                         },
                     })
 
-                    const paymentVerify = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute', { paymentID }, {
+                    const paymentVerify = await axios.post(process.env.bkash_execute_payment_url, { paymentID }, {
                         headers: {
                             "Content-Type": "application/json",
                             Accept: "application/json",
                             authorization: session.token,
-                            'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq'
+                            'x-app-key': process.env.bkash_X_App_Key
                         }
                     })
                     console.log("exe data__", paymentVerify.data);
@@ -105,9 +105,9 @@ const index = async (req, res, refresh_token) => {
 
                         await prisma.session_store.delete({ where: { paymentID: session.paymentID } })
 
-                        return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/settings/package_request?message=${status}`)
+                        return res.redirect(process.env.base_url + `/settings/package_request?message=${status}`)
                     } else {
-                        return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/settings/package_request?message=${paymentVerify.data.statusMessage}`)
+                        return res.redirect(process.env.base_url + `/settings/package_request?message=${paymentVerify.data.statusMessage}`)
                     }
                     break;
                 default:
@@ -117,7 +117,7 @@ const index = async (req, res, refresh_token) => {
         }
         catch (error) {
             console.log(error)
-            return res.redirect(`${process.env.NEXT_PUBLIC_BASE_API}/error?message=${error.message}`)
+            return res.redirect(process.env.base_url + `/error?message=${error.message}`)
         }
 
     }

@@ -76,6 +76,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
             console.log("res?.data__", res?.data);
             showNotification(res?.data?.message)
             successProcess()
+            resetForm();
             handleCreateClassClose()
 
         } catch (err) {
@@ -148,7 +149,8 @@ const TeachersApplication = ({ departments, serverHost }) => {
                     isSubmitting,
                     touched,
                     values,
-                    setFieldValue
+                    setFieldValue,
+                    resetForm
                 }) => {
                     console.log("errors__", errors);
                     return (
@@ -189,7 +191,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('first name here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.first_name}
+                                            value={values.first_name || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -226,7 +228,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('middle name here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.middle_name}
+                                            value={values.middle_name || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -263,7 +265,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('last name here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.last_name}
+                                            value={values.last_name || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -304,7 +306,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('national id here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.national_id}
+                                            value={values.national_id || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -333,10 +335,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             size="small"
                                             disablePortal
                                             value={
-                                                departments?.find(
-                                                    (department) =>
-                                                        department.value === values.department_id
-                                                ) || null
+                                                departments?.find(i =>i.value === values.department_id) || null
                                             }
                                             options={departments}
                                             isOptionEqualToValue={(option, value) =>
@@ -401,7 +400,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('phone number here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.phone}
+                                            value={values.phone || ''}
                                             error={Boolean(touched.phone && errors.phone)}
                                             helperText={touched.phone && errors.phone}
                                             variant="outlined"
@@ -435,7 +434,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             <Select
                                                 labelId="demo-simple-select-helper-label"
                                                 id="demo-simple-select-helper"
-                                                value={values.gender}
+                                                value={values.gender  || ''}
                                                 name="gender"
                                                 label="Select Gender"
                                                 onChange={handleChange}
@@ -483,7 +482,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             <Select
                                                 labelId="demo-simple-select-helper-label"
                                                 id="demo-simple-select-helper"
-                                                value={values.blood_group}
+                                                value={values.blood_group  || ''}
                                                 name="blood_group"
                                                 label="Select Blood Group"
                                                 onChange={handleChange}
@@ -569,7 +568,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                         <MobileDatePicker
                                             label="Provide birth date"
                                             inputFormat='dd/MM/yyyy'
-                                            value={values.date_of_birth}
+                                            value={values.date_of_birth || null}
                                             onChange={(n) => {
                                                 const value = dayjs(n);
                                                 if (n) {
@@ -636,7 +635,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('present address here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.present_address}
+                                            value={values.present_address  || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -681,7 +680,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('permanent address here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.permanent_address}
+                                            value={values.permanent_address  || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -719,7 +718,7 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                             placeholder={t('provide email here...')}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            value={values.email}
+                                            value={values.email  || ''}
                                             variant="outlined"
                                         />
                                     </Grid>
@@ -828,7 +827,11 @@ const TeachersApplication = ({ departments, serverHost }) => {
                                     p: 3
                                 }}
                             >
-                                <Button color="secondary" onClick={handleCreateClassClose}>
+                                <Button color="secondary" onClick={()=>{
+                                    handleCreateClassClose()
+                                    resetForm()
+                                }
+                                }>
                                     {t('Cancel')}
                                 </Button>
                                 <Button

@@ -9,12 +9,12 @@ export default async function patch(req: any, res: any) {
 
     if (!refresh_token) throw new Error('invalid user');
 
-    const { title, price, duration,student_count } = req.body;
+    const { price, duration,student_count } = req.body;
     const data = {};
 
-    if (!title && !price && !duration && !student_count) throw new Error('provide nothing to update');
+    if (!price && !duration && !student_count) throw new Error('provide nothing to update');
 
-    if (title) data['title'] = title;
+  
     if (price) data['price'] = parseInt(price);
     if (duration) data['duration'] = parseInt(duration);
     if (student_count) data['student_count'] = parseInt(student_count);

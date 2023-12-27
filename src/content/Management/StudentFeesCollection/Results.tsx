@@ -391,14 +391,14 @@ const Results = ({
     }
   };
 
-  const handleSentSms = (fee_id: any) => {
-    setSentSms((values) => {
-      const findSentSmsIds = values.find((id) => id === fee_id)
-      if (!findSentSmsIds) return [...values, fee_id]
-      return values.filter((id) => id !== fee_id)
-    })
-    // showNotification("not implemented", "error");
-  }
+  // const handleSentSms = (fee_id: any) => {
+  //   setSentSms((values) => {
+  //     const findSentSmsIds = values.find((id) => id === fee_id)
+  //     if (!findSentSmsIds) return [...values, fee_id]
+  //     return values.filter((id) => id !== fee_id)
+  //   })
+  //   // showNotification("not implemented", "error");
+  // }
 
   return (
     <>
@@ -513,6 +513,7 @@ const Results = ({
           </Grid>
         </Card>
       }
+      
       <Card sx={{ minHeight: 'calc(100vh - 358px) !important' }}>
 
         <Box

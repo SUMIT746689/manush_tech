@@ -9,7 +9,9 @@ import Results from 'src/content/Management/StudentFeesCollection/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
 import { useReactToPrint } from 'react-to-print';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
 
 function Managementschools() {
   const [datas, setDatas] = useState([]);
@@ -18,8 +20,8 @@ function Managementschools() {
   const [prinCollectedtFees, setPrinCollectedtFees] = useState([]);
   const [filteredFees, setFilteredFees] = useState<any>([]);
   const [selectedFees, setSelectedFees] = useState<any[]>([]);
-
-
+  const { showNotification } = useNotistick();
+  const [isSentSmsLoading, setIsSentSmsLoading] = useState(false);
   const { data: accounts } = useClientFetch(`/api/account`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
 
@@ -61,6 +63,27 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
+  console.log({ printFees, prinCollectedtFees })
+
+  const handleSentSms = () => {
+    setIsSentSmsLoading(true);
+    const sms_text = `${prinCollectedtFees[0].title} fees, paid amount: ${printFees[0].paidAmount} TK(${printFees[0].status}), due: ${prinCollectedtFees[0].due} TK. Tracking number: ${printFees[0].tracking_number}`
+    console.log("print-fees--", { sms_text })
+    console.log({ selectedStudent })
+    if (!selectedStudent?.guardian_phone) {
+      showNotification("guardian phone number not founds", "error")
+      setIsSentSmsLoading(false);
+    }
+    axios.post("/api/sent_sms/student_fees", { sms_text, contacts: selectedStudent?.guardian_phone })
+      .then(({ data }) => {
+        if (data?.success) showNotification("sending sms successfully")
+      })
+      .catch((err) => {
+        showNotification("faild to sending sms ", "error")
+        console.log({ err });
+      })
+      .finally(() => { setIsSentSmsLoading(false); })
+  }
 
   return (
     <>
@@ -124,9 +147,13 @@ function Managementschools() {
             {'Print All'}
           </ButtonWrapper> */}
 
-          <ButtonWrapper handleClick={() => { }}>
+          <SearchingButtonWrapper
+            isLoading={isSentSmsLoading}
+            handleClick={handleSentSms}
+            disabled={printFees.length === 0 || prinCollectedtFees.length === 0}
+          >
             Sent Sms
-          </ButtonWrapper>
+          </SearchingButtonWrapper>
 
           <ButtonWrapper
             sx={{

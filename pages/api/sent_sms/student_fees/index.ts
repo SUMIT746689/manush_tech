@@ -1,4 +1,5 @@
 import get from 'controllers/sent_sms/student_fees/get';
+import post from 'controllers/sent_sms/student_fees/post';
 
 const index = async (req, res) => {
   try {
@@ -8,9 +9,12 @@ const index = async (req, res) => {
       case 'GET':
         get(req, res);
         break;
-      
+      case 'POST':
+        post(req, res);
+        break;
+
       default:
-        res.setHeader('Allow', ['GET']);
+        res.setHeader('Allow', ['GET', 'POST']);
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {

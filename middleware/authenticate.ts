@@ -1,9 +1,10 @@
+import { logFile } from 'utilities_api/handleLogFile';
 import { dcrypt } from 'utilities_api/hashing';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export const authenticate = (handler: Function) => {
 
-  
+
   return async (req, res) => {
     try {
       if (!req.cookies.refresh_token)
@@ -17,6 +18,7 @@ export const authenticate = (handler: Function) => {
 
       return handler(req, res, refresh_token);
     } catch (err) {
+      logFile.error("authenticate failed", err.message)
       res.status(401).json({ message: err.message });
     }
   };

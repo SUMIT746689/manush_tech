@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 1
+    },
+    "auditLog": "/home/mehedi/projects/School-SAAS/logs/.3cdad7d5a8ed9e3d2803e03402597d07295a110e-audit.json",
+    "files": [
+        {
+            "date": 1703659961936,
+            "name": "/home/mehedi/projects/School-SAAS/logs/attendance-2023-12-27.log",
+            "hash": "2c47dd955468925ca115656b218acead950d51a43848d2394f16f5dceca9c609"
+        }
+    ],
+    "hashType": "sha256"
+}

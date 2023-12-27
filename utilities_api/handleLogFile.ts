@@ -10,7 +10,7 @@ const handleLogFile = () => {
     const logfilePath = process.env.SCRIPT_ATTENDANCE_LOG_PATH || path.join(__filename, '../../logs');
 
     const fileRotateTransport = new winston.transports.DailyRotateFile({
-        filename:  `${logfilePath}/sent_sms-%DATE%.log`,
+        filename:  `${logfilePath}/attendance-%DATE%.log`,
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,
         maxFiles: '1d',
@@ -27,21 +27,6 @@ const handleLogFile = () => {
         ),
         transports: [fileRotateTransport],
     });
-
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    let mm = today.getMonth() + 1; // month is zero-based
-    let dd = today.getDate();
-
-    // const __filename = fileURLToPath(import.meta.url);
-    // const logfilePath = process.env.SCRIPT_ATTENDANCE_LOG_PATH || path.join(__filename, '../../logs');
-    // logger.add(new winston.transports.File({
-    //     // filename: `${logfilePath}/attendance_${mm}_${dd}_${yyyy}.log`, 
-    //     filename: 'logs/application-%DATE%.log',
-    //     datePattern: `YYYY-MM-DD-HH`,
-    //     zippedArchive: true,
-    //     maxFiles: "5d",
-    // }));
 
     return logger;
 }

@@ -23,7 +23,7 @@ export const Authenticated: FC<AuthenticatedProps> = (props) => {
     auth?.user?.permissions?.length > 0
       ? auth?.user?.permissions?.map((permission: any) => permission.group)
       : [];
-  console.log("permissionsArray__", permissionsArray);
+  // console.log("permissionsArray__", permissionsArray);
 
   useEffect(() => {
     if (!router.isReady) {

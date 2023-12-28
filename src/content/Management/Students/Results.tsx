@@ -582,6 +582,8 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         <Grid ref={idCard} display={'grid'} gridTemplateColumns={'1fr 1fr'} container gap={1.5}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i, index) => {
+              console.log({i});
+              
               const user = {
                 id: i?.class_roll_no,
                 class_registration_no: i?.class_registration_no,
@@ -592,7 +594,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                 section: i?.section?.class?.has_section ? i?.section?.name : 'No section',
                 blood_group: i?.student_info?.blood_group,
                 academicYear: i?.academic_year?.title,
-                phone: i?.phone,
+                phone: i?.student_info?.phone,
                 birthDate: dayjs(i?.student_info?.date_of_birth).format('DD/MM/YYYY'),
                 photo: i?.student_photo ? getFile(i?.student_photo) : '/dumy_student.png'
               };

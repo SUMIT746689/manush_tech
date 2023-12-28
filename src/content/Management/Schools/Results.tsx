@@ -256,11 +256,7 @@ const Results: FC<ResultsProps> = ({
       </Card>
 
       <Card>
-        {selectedBulkActions && (
-          <Box p={2}>
-            <BulkActions />
-          </Box>
-        )}
+        
         {!selectedBulkActions && (
           <Box
             p={2}
@@ -307,15 +303,7 @@ const Results: FC<ResultsProps> = ({
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedAllschools}
-                        indeterminate={selectedSomeschools}
-                        onChange={handleSelectAllschools}
-                      />
-                    </TableCell>
                     <TableCell>{t('Name')}</TableCell>
-                    <TableCell>{t('Subscription')}</TableCell>
                     <TableCell>{t('Subscription Start')}</TableCell>
                     <TableCell>{t('Subscription End')}</TableCell>
                     <TableCell>{t('Contact Number')}</TableCell>
@@ -325,32 +313,19 @@ const Results: FC<ResultsProps> = ({
                 </TableHead>
                 <TableBody>
                   {paginatedschools?.map((school) => {
-                    const isschoolselected = selectedItems.includes(school.id);
                     return (
                       <TableRow
                         hover
                         key={school.id}
-                        selected={isschoolselected}
+                       
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isschoolselected}
-                            onChange={(event) =>
-                              handleSelectOneProject(event, school.id)
-                            }
-                            value={isschoolselected}
-                          />
-                        </TableCell>
+                        
                         <TableCell>
                           <Typography noWrap variant="h5">
                             {school?.name}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {school?.subscription[0]?.package?.title}
-                          </Typography>
-                        </TableCell>
+                        
                         <TableCell>
                           <Typography noWrap variant="h5">
                             {school?.subscription[0]?.start_date &&

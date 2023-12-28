@@ -25,6 +25,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
 
   const { t }: { t: any } = useTranslation();
   // console.log({ right_banners: right_banners && right_banners[0] })
+  const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0
   return (
     <>
 
@@ -111,7 +112,9 @@ function AdminDashboardReportsContent({ blockCount = null }) {
 
       {/* banners */}
       {/* <Grid sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, p: 2 }}> */}
-      <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
+      
+    {
+      banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
         <Card sx={{
           width: "100",
           borderRadius: 0,
@@ -122,12 +125,12 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         </Card>
         <Card sx={{ width: "100", borderRadius: 0 }}>
           {
-            (Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ?
+            (right_banner_check && right_banners[0]?.redirectUrl) ?
               <Link target='_blank' href={right_banners[0].redirectUrl} >
                 <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
               </Link>
               :
-              <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+              right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
           }
           {/* <Link
             target='_blank'
@@ -137,6 +140,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           </Link> */}
         </Card>
       </Grid>
+    }
 
       {/* notice board and calander */}
       < Grid sx={{ display: 'grid', width: "100%", height: "100%", gridTemplateColumns: { md: '1fr 1fr' }, px: 2, gap: 2 }

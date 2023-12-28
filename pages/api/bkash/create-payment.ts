@@ -12,19 +12,23 @@ const handleTransaction = ({ student_id, user_id,
     return new Promise(async (resolve, reject) => {
         try {
 
-            const token = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant', {
-                app_key: "4f6o0cjiki2rfm34kfdadl1eqq",
-                app_secret: "2is7hdktrekvrbljjh44ll3d9l1dtjo4pasmjvs5vl5qr3fug4b"
-            }, {
+            const bkash_credential = await prisma.payment_gateway_credential.findFirstOrThrow({
+                where: {
+                    title: 'bkash',
+                    school_id
+                }
+            })
+            // @ts-ignore
+            const token = await axios.post(bkash_credential?.details?.grant_token_url, { app_key: bkash_credential?.details?.X_App_Key, app_secret: bkash_credential?.details?.app_secret }, {
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    username: 'sandboxTokenizedUser02',
-                    password: 'sandboxTokenizedUser02@12345',
+                    // @ts-ignore
+                    username: bkash_credential?.details?.username, password: bkash_credential?.details?.password,
                 }
             })
-
-            const payment = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create', {
+            // @ts-ignore
+            const payment = await axios.post(bkash_credential?.details?.create_payment_url, {
                 mode: '0011',
                 payerReference: "fee payment",
                 callbackURL: `${process.env.base_url}/api/bkash/execute_payment`,
@@ -36,8 +40,9 @@ const handleTransaction = ({ student_id, user_id,
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    authorization: token.data.id_token,
-                    'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq',
+                    authorization: token?.data?.id_token,
+                    // @ts-ignore
+                    'x-app-key': bkash_credential?.details?.X_App_Key,
                 }
             })
             console.log("payment__", payment.data);
@@ -55,10 +60,12 @@ const handleTransaction = ({ student_id, user_id,
                         student_id,
                         collected_by_user,
                         fee_id,
+                        account_id: bkash_credential.account_id,
                         collected_amount,
                         total_payable,
                         status,
-                        school_id
+                        school_id,  // @ts-ignore
+                        execute_payment_url: bkash_credential?.details?.execute_payment_url, X_App_Key: bkash_credential?.details?.X_App_Key
                     }
                 }
             })

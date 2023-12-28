@@ -16,21 +16,20 @@ const handleTransaction = ({ data, status, account, voucher, school_id }) => {
                         student: { connect: { id: data.student_id } },
                         fee: { connect: { id: data.fee_id } },
                         collected_amount: data.collected_amount,
-                        payment_method: data.payment_method,
+                        payment_method: 'Online Bkash',
                         transID: data.transID,
-                        account: { connect: { id: data.account_id } },
-                        payment_method_list: { connect: { id: data.payment_method_id } },
+                        account: { connect: { id: account.id } },
+                        // payment_method_list: { connect: { id: data.payment_method_id } },
                         collected_by_user: { connect: { id: data.collected_by } },
                         transaction: {
                             create: {
                                 amount: data.collected_amount,
                                 account_id: account.id,
-                                payment_method_id: account?.payment_method[0]?.id,
                                 voucher_id: voucher.id,
                                 transID: data.transID,
                                 school_id: school_id,
                                 created_at: data.created_at,
-                                payment_method: account?.payment_method[0]?.title,
+                                payment_method: 'Online Bkash',
                                 account_name: account.title,
                                 acccount_number: account.account_number,
                                 voucher_type: voucher.type,
@@ -59,12 +58,14 @@ const handleTransaction = ({ data, status, account, voucher, school_id }) => {
                     last_payment_date: temp.created_at,
                     account_name: account.title,
                     transID: data.transID,
-                    payment_method: account?.payment_method[0]?.title,
+                    payment_method: 'Online Bkash',
                     status: temp.status
                 })
             })
 
         } catch (err) {
+            console.log(err);
+            
             reject(new Error(`${err.message}`))
         }
     })
@@ -95,12 +96,14 @@ const index = async (req, res, refresh_token) => {
                         },
                     })
 
-                    const paymentVerify = await axios.post('https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute', { paymentID }, {
+                    //@ts-ignore
+                    const paymentVerify = await axios.post(session?.data?.execute_payment_url, { paymentID }, {
                         headers: {
                             "Content-Type": "application/json",
                             Accept: "application/json",
                             authorization: session.token,
-                            'x-app-key': '4f6o0cjiki2rfm34kfdadl1eqq'
+                            //@ts-ignore
+                            'x-app-key': session?.data?.X_App_Key
                         }
                     })
                     console.log("exe data__", paymentVerify.data);
@@ -117,23 +120,20 @@ const index = async (req, res, refresh_token) => {
                         })
                         const account = await prisma.accounts.findFirstOrThrow({
                             where: {
-                                id: Number(1)
+                                //@ts-ignore
+                                id: session?.data?.account_id
                             },
-                            include: {
-                                payment_method: {
-                                    where: {
-                                        id: Number(1)
-                                    }
-                                }
-                            }
                         })
                         const data = {
                             student_id,
                             fee_id,
                             collected_amount,
-                            account_id: 1,
-                            payment_method_id: 1,
-                            payment_method: account?.payment_method[0]?.title,
+                            //@ts-ignore
+                            // account_id: account.id,
+                            // payment_method_id: 1,
+                            //@ts-ignore
+                            // payment_method: account?.payment_method[0]?.title,
+                            transID: paymentVerify.data.trxID,
                             collected_by: Number(collected_by_user),
                             total_payable: Number(total_payable)
                         }

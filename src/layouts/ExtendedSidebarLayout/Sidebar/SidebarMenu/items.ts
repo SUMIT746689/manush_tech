@@ -510,16 +510,16 @@ export const menuItems: MenuItems[] = [
         link: '/banners',
         icon: ViewCarouselIcon
       },
-      {
-        name: 'Package',
-        icon: ShoppingBagIcon,
-        link: '/packages',
-      },
-      {
-        name: 'Pending Package',
-        icon: ShoppingBagIcon,
-        link: '/pending_packages',
-      },
+      // {
+      //   name: 'Package',
+      //   icon: ShoppingBagIcon,
+      //   link: '/packages',
+      // },
+      // {
+      //   name: 'Pending Package',
+      //   icon: ShoppingBagIcon,
+      //   link: '/pending_packages',
+      // },
       {
         name: 'Package payment history',
         icon: HistoryIcon,

@@ -95,6 +95,7 @@ model School {
   ExamTerm                   ExamTerm[]
   StudentAdmissionForm       StudentAdmissionForm?
   Package_transaction        Package_transaction[]
+  Payment_gateway_credential Payment_gateway_credential[]
 
   // routines Routine[]
   @@map("schools")
@@ -754,7 +755,7 @@ model SmsGateway {
   title     String
   details   Json
   is_active Boolean
-  school_id Int
+  school_id Int     @unique
 
   school       School         @relation(fields: [school_id], references: [id])
   smsCampaigns SmsCampaigns[]
@@ -954,17 +955,18 @@ model payment_method {
 }
 
 model Accounts {
-  id             Int              @id @default(autoincrement())
-  title          String
-  created_at     DateTime         @default(now())
-  account_number String
-  description    String           @db.Text
-  balance        Float
-  school_id      Int
-  school         School           @relation(fields: [school_id], references: [id])
-  Transaction    Transaction[]
-  payment_method payment_method[]
-  StudentFee     StudentFee[]
+  id                         Int                          @id @default(autoincrement())
+  title                      String
+  created_at                 DateTime                     @default(now())
+  account_number             String
+  description                String                       @db.Text
+  balance                    Float
+  school_id                  Int
+  school                     School                       @relation(fields: [school_id], references: [id])
+  Transaction                Transaction[]
+  payment_method             payment_method[]
+  StudentFee                 StudentFee[]
+  Payment_gateway_credential Payment_gateway_credential[]
 
   @@unique([school_id, title])
   @@map("accounts")
@@ -1352,10 +1354,33 @@ model Banners {
 model StudentAdmissionForm {
   id        Int    @id @default(autoincrement())
   file_url  String
-  school_id Int
+  school_id Int    @unique
 
   school School @relation(fields: [school_id], references: [id])
 
-  @@unique([school_id])
   @@map("student_admission_forms")
+}
+
+model Payment_gateway_credential {
+  id        Int                   @id @default(autoincrement())
+  title     payment_gateway_title
+  details   Json
+  is_active Boolean
+  school_id Int
+  account_id Int
+
+  account Accounts @relation(fields: [account_id], references: [id])
+  school  School   @relation(fields: [school_id], references: [id])
+
+  @@unique([title, school_id])
+  @@map("payment_gateway_credential")
+}
+
+enum payment_gateway_title {
+  bkash
+  nagad
+  nexus
+  amarPay
+  surjoPay
+  sslcommerz
 }

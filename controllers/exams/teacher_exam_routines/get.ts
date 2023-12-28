@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { academicYearVerify } from "middleware/authenticate";
+import { logFile } from "utilities_api/handleLogFile";
 
 const get = async (req, res, refresh_token, academic_year) => {
     try {
@@ -61,6 +62,7 @@ const get = async (req, res, refresh_token, academic_year) => {
 
         return res.status(200).json(resTeacherSyllabus);
     } catch (err) {
+        logFile.error(err.message)
         console.log(err);
         res.status(500).json({ message: err.message });
     }

@@ -2,6 +2,7 @@ import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import path from 'path';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const delete_ = async (req: any, res: any, refresh_token) => {
@@ -34,6 +35,7 @@ const delete_ = async (req: any, res: any, refresh_token) => {
         res.status(200).json({ success: 'deleted successfully' });
 
     } catch (err) {
+        logFile.error(err.message);
         console.log(err.message);
         res.status(404).json({ err: err.message });
     }

@@ -3,6 +3,7 @@ import { fileUpload } from "@/utils/upload";
 import path from 'path';
 import fs from 'fs';
 import fsP from 'fs/promises';
+import { logFile } from "utilities_api/handleLogFile";
 
 export const config = {
     api: {
@@ -19,8 +20,6 @@ const Question = async (req, res) => {
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
 
-    console.log({ files, fields })
-    console.log({ error })
     try {
         const { method } = req;
         const id = parseInt(req.query.id);
@@ -75,7 +74,8 @@ const Question = async (req, res) => {
                 break;
 
             default:
-                res.setHeader('Allow', ['GET', 'PATCH', 'DELETE']);
+                res.setHeader('Allow', ['PATCH', 'DELETE']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
@@ -83,6 +83,7 @@ const Question = async (req, res) => {
             deleteFiles(files[i].filepath)
         }
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };
@@ -103,6 +104,7 @@ const prevDelete = async (id) => {
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
     }
 }
 const deleteFiles = (path) => {

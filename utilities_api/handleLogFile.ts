@@ -10,7 +10,7 @@ const handleLogFile = () => {
     const logfilePath = process.env.SCRIPT_ATTENDANCE_LOG_PATH || path.join(__filename, '../../logs');
 
     const fileRotateTransport = new winston.transports.DailyRotateFile({
-        filename:  `${logfilePath}/attendance-%DATE%.log`,
+        filename:  `${logfilePath}/school-%DATE%.log`,
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,
         maxFiles: '1d',

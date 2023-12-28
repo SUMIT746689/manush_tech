@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const FinalResultAll = async (req, res) => {
     try {
@@ -24,7 +25,7 @@ const FinalResultAll = async (req, res) => {
                     throw new Error('section_id or student_id_list missing !');
                 }
 
-               
+
                 const examList = await prisma.exam.findMany({
                     where: {
                         section_id: parseInt(section_id),
@@ -150,7 +151,7 @@ const FinalResultAll = async (req, res) => {
                                 // @ts-ignore
                                 singleSubjectCalculetedMark = (flag.mark_obtained * parseFloat(exam?.final_percent)) / 100;
                                 // console.log(exam?.final_percent,"   ",flag.mark_obtained,"    ",singleSubjectCalculetedMark);
-                                
+
                             } else {
                                 singleSubjectCalculetedMark = 0
                             }
@@ -173,11 +174,13 @@ const FinalResultAll = async (req, res) => {
                 res.status(200).json(allFinalResult);
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['POST']);
+                logFile.error(`Method ${method} Not Allowed`);
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

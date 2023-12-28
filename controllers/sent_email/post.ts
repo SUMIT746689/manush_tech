@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { Prisma } from '@prisma/client';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const insertDataToSentSmsDetails = ({ responseSentSms_id, status, user }) => {
@@ -214,6 +215,7 @@ async function post(req, res, refresh_token) {
     return res.json({ message: 'success' });
 
   } catch (err) {
+    logFile.error(err.message);
     res.status(404).json({ error: err.message });
   }
 }

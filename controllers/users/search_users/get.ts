@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const get = async (req, res, refresh_token) => {
   try {
@@ -11,7 +12,6 @@ const get = async (req, res, refresh_token) => {
       }
     });
     const { by, token, limit } = req.query;
-    console.log({ by, token, limit });
     const AND = [];
 
     if (by) AND.push({ [by]: { contains: token || '' } });
@@ -54,6 +54,7 @@ const get = async (req, res, refresh_token) => {
 
     res.status(200).json(users);
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 };

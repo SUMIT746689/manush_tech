@@ -1,4 +1,5 @@
 import patch from 'controllers/sms_gateways/sms_gateway/patch';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const index = async (req, res) => {
@@ -12,6 +13,7 @@ const index = async (req, res) => {
       break;
     default:
       res.setHeader('Allow', ['PATCH']);
+      logFile.error(`Method ${method} Not Allowed`)
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

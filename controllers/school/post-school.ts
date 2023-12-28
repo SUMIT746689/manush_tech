@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const postSchool = async (req, res, authenticate_user) => {
   try {
@@ -16,7 +17,7 @@ const postSchool = async (req, res, authenticate_user) => {
     const { name, phone, email, address, admin_ids, currency, domain,
       main_balance, masking_sms_price, non_masking_sms_price,
       masking_sms_count, non_masking_sms_count,
-       package_price, package_duration, package_student_count,is_std_cnt_wise
+      package_price, package_duration, package_student_count, is_std_cnt_wise
     } = req.body;
 
     if (!name || !phone || !email || !address) throw new Error('provide valid data');
@@ -44,7 +45,7 @@ const postSchool = async (req, res, authenticate_user) => {
     const end_date_provided = new Date(Date.now());
     end_date_provided.setDate(end_date_provided.getDate() + package_duration);
 
-   const response = await prisma.subscription.create({
+    const response = await prisma.subscription.create({
       data: {
         school: {
           create: {
@@ -67,7 +68,7 @@ const postSchool = async (req, res, authenticate_user) => {
             price: Number(package_price),
             duration: Number(package_duration),
             student_count: Number(package_student_count),
-            is_std_cnt_wise 
+            is_std_cnt_wise
           }
         },
         start_date,
@@ -76,13 +77,10 @@ const postSchool = async (req, res, authenticate_user) => {
       }
     })
     if (!response) throw new Error('Failed to create school');
-    // const userSddSchool = await prisma.user.update({
-    //   where: { id: admin_id },
-    //   data: { school_id: response.id }
-    // });
-    // if (!userSddSchool) throw new Error('Failed to add school in user');
     res.status(200).json({ success: true, message: 'Successfully created school' });
+    
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ error: err.message });
   }

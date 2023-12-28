@@ -7,6 +7,7 @@ import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 
 import { fileRename, fileUpload } from '@/utils/upload';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const postHandle = async (req, res, refresh_token) => {
   try {
@@ -232,9 +233,9 @@ const postHandle = async (req, res, refresh_token) => {
     }
 
     // res.status(200).json({ success: 'student created successfully but sms sending failed' });
-  } catch (error) {
-    console.log(error);
-    res.status(404).json({ message: error.message });
+  } catch (err) {
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };
 

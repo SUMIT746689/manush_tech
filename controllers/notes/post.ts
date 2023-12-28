@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
+import { logFile } from "utilities_api/handleLogFile";
 
 
 const post = async (req, res, refresh_token) => {
@@ -74,6 +75,7 @@ const post = async (req, res, refresh_token) => {
     // res.json(resNote);
   }
   catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message })
     res.status(500).json({ error: err.message });
   }

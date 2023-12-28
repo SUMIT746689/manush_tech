@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export default async function patchSchool(req, res, refresh_token) {
   try {
@@ -9,7 +10,6 @@ export default async function patchSchool(req, res, refresh_token) {
       masking_sms_price, non_masking_sms_price,
       package_price, package_duration, package_student_count, is_std_cnt_wise
     } = req.body;
-    console.log({ subscription_id });
 
     let data = {};
     if (name) data['name'] = name;
@@ -123,8 +123,8 @@ export default async function patchSchool(req, res, refresh_token) {
     // else throw new Error('Invalid to create school');
 
   } catch (err) {
+    logFile.error(err.message)
     console.log(err);
-
     res.status(404).json({ error: err.message });
   }
 }

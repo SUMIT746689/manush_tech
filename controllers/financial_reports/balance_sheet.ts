@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function get(req, res, refresh_token) {
@@ -38,6 +39,7 @@ GROUP BY
 
     res.status(200).json({ data: [totalamount], success: true });
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

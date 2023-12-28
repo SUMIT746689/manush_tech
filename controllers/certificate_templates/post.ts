@@ -2,12 +2,13 @@ import { authenticate } from 'middleware/authenticate';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 import fs from 'fs';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
   try {
     const uploadFolderName = "certificate_templates";
     const fileUrl = `/${uploadFolderName}`;
-    
+
     await certificateTemplateFolder(uploadFolderName);
 
     const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -95,6 +96,7 @@ async function post(req, res, refresh_token) {
 
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message });
     res.status(404).json({ error: err.message });
   }

@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 const index = async (req, res) => {
@@ -8,14 +9,14 @@ const index = async (req, res) => {
     const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
     if (!refresh_token) throw new Error('invalid user');
-  
+
     const userInfo = await prisma.user.findFirst({
       where: { id: refresh_token.id },
       include: {
         role: true
       }
     });
-  
+
     const { method } = req;
 
     switch (method) {
@@ -41,7 +42,7 @@ const index = async (req, res) => {
           };
           totalCount['teachers'] = {
             count: await prisma.teacher.count({
-              where: { school_id: userInfo?.school_id,deleted_at: null }
+              where: { school_id: userInfo?.school_id, deleted_at: null }
             })
           };
         }
@@ -56,10 +57,12 @@ const index = async (req, res) => {
         break;
       default:
         res.setHeader('Allow', ['GET', 'POST']);
+        logFile.error(`Method ${method} Not Allowed`)
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {
     console.log(err);
+    logFile.error(err.message)
     res.status(500).json({ message: err.message });
   }
 };

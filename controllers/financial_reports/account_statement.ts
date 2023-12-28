@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function get(req, res, refresh_token) {
@@ -24,7 +25,7 @@ async function get(req, res, refresh_token) {
     // LEFT JOIN vouchers
     // ON transactions.voucher_id = vouchers.id WHERE vouchers.type IN ('credit','debit') GROUP BY vouchers.type`)
 
-    
+
     const totalamountCal: Array<any> = await prisma.$queryRaw`SELECT
   vouchers.type,
   SUM(transactions.amount) AS totalAmmout
@@ -55,6 +56,7 @@ GROUP BY
 
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

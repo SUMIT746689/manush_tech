@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate"
+import { logFile } from "utilities_api/handleLogFile";
 import { convertToDate } from "utilities_api/mysqlDateConverter";
 
 const get = async (req, res, refresh_token) => {
@@ -75,6 +76,7 @@ const get = async (req, res, refresh_token) => {
     }
   }
   catch (err) {
+    logFile.error(err.message)
     console.error({ err: err.message });
     res.status(500).json({ error: err.message });
   }

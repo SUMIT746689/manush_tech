@@ -3,6 +3,7 @@ import { fileUpload } from '@/utils/upload';
 import path from 'path';
 import prisma from '@/lib/prisma_client';
 import fsP from 'fs/promises'
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
   try {
@@ -52,6 +53,7 @@ async function post(req, res, refresh_token) {
 
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message });
     res.status(404).json({ error: err.message });
   }

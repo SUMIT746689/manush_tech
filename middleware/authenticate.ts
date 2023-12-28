@@ -18,7 +18,7 @@ export const authenticate = (handler: Function) => {
 
       return handler(req, res, refresh_token);
     } catch (err) {
-      logFile.error("authenticate failed", err.message)
+      logFile.error(err.message);
       res.status(401).json({ message: err.message });
     }
   };
@@ -36,6 +36,7 @@ export const academicYearVerify = (handler: Function) => {
       return handler(req, res, refresh_token, dcryptAcademicYear);
 
     } catch (err) {
+      logFile.error(err.message);
       res.status(401).json({ error: err.message });
     }
   };

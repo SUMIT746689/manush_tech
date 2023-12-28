@@ -3,6 +3,7 @@ import path from 'path';
 import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 // export const config = {
 //     api: {
@@ -61,6 +62,7 @@ const post = async (req: any, res: any, refresh_token) => {
         return res.status(200).json({ success: 'added successfully' });
 
     } catch (err) {
+        logFile.error(err.message)
         console.log(err.message);
         res.status(404).json({ err: err.message });
     }

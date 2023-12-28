@@ -3,6 +3,7 @@ import { fileUpload } from "@/utils/upload";
 import { unique_tracking_number } from "@/utils/utilitY-functions";
 import { authenticate } from "middleware/authenticate";
 import path from "path";
+import { logFile } from "utilities_api/handleLogFile";
 
 export const config = {
     api: {
@@ -34,7 +35,7 @@ const index = async (req, res, refresh_token) => {
                         id: Number(voucher_id)
                     }
                 })
-                if(voucher.type !== 'credit') throw new Error('Only Income voucher acceptable !')
+                if (voucher.type !== 'credit') throw new Error('Only Income voucher acceptable !')
                 const account = await prisma.accounts.findFirstOrThrow({
                     where: {
                         id: Number(account_id)
@@ -72,7 +73,7 @@ const index = async (req, res, refresh_token) => {
                     if (description) data['description'] = description
                     if (attachment) data['attachment'] = path.join(uploadFolderName, attachment?.newFilename)
 
-                    const transaction_amount =  Number(amount)
+                    const transaction_amount = Number(amount)
 
                     await trans.transaction.create({
                         data
@@ -91,10 +92,12 @@ const index = async (req, res, refresh_token) => {
 
             default:
                 res.setHeader('Allow', ['POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
 
     }

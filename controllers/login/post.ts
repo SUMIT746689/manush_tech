@@ -5,6 +5,7 @@ import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import prisma from '@/lib/prisma_client';
 import { dcrypt, encrypt } from 'utilities_api/hashing';
 import { makeCookie } from 'utilities_api/handleCookies';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export default async function post(req, res) {
   try {
@@ -162,6 +163,7 @@ export default async function post(req, res) {
 
     res.status(200).json({ user });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err);
     res.status(404).json({ err: err.message });
   }

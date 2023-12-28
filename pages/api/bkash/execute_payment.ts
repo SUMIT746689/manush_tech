@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { unique_tracking_number } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const handleTransaction = ({ data, status, account, voucher, school_id }) => {
@@ -153,6 +154,7 @@ const index = async (req, res, refresh_token) => {
             }
         }
         catch (error) {
+            logFile.error(error.message);
             console.log(error)
             return res.redirect(`${process.env.base_url}/error?message=${error.message}`)
         }

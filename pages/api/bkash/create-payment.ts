@@ -3,6 +3,7 @@ import { unique_tracking_number } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
 import dayjs from 'dayjs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const handleTransaction = ({ student_id, user_id,
     collected_by_user,
@@ -214,6 +215,7 @@ const index = async (req, res, refresh_token) => {
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message);
         res.status(500).json({ message: err.message });
     }
 };

@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export const patch = async (req, res) => {
@@ -49,6 +50,7 @@ export const patch = async (req, res) => {
     res.status(200).json({ message: 'User Status updated Successfully' });
    
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ error: err.message });
   }

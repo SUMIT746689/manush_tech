@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export default async function patchSchool(req, res) {
   try {
@@ -15,10 +16,10 @@ export default async function patchSchool(req, res) {
       voucher_data['title'] = `${title} exam fee`;
     }
     if (_for) data['for'] = _for;
-    if (amount){
+    if (amount) {
       data['amount'] = amount;
       voucher_data['amount'] = amount;
-    } 
+    }
     if (last_date) data['last_date'] = new Date(last_date);
     if (session_id) data['session_id'] = session_id;
     if (class_id) data['class_id'] = class_id;
@@ -46,12 +47,12 @@ export default async function patchSchool(req, res) {
         data: voucher_data
       })
 
-      if (response) return res.json({ fee: response, success: true });
-      else throw new Error('Invalid to create school');
-
+      if (!response) throw new Error('Invalid to create school');
+      return res.json({ fee: response, success: true });
     } else throw new Error('provide valid data');
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

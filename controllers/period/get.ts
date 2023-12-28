@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from "utilities_api/handleLogFile";
 
 const Get = async (req, res, refresh_token) => {
     try {
@@ -57,6 +58,7 @@ const Get = async (req, res, refresh_token) => {
         }));
 
     } catch (err) {
+        logFile.error(err.message)
         console.log(err.message);
         res.status(404).json({ error: err.message });
     }

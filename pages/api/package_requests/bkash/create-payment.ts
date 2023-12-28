@@ -3,6 +3,7 @@ import { unique_tracking_number } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
 import dayjs from 'dayjs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const handleTransaction = ({ collected_amount, refresh_token }) => {
     return new Promise(async (resolve, reject) => {
@@ -98,15 +99,14 @@ const index = async (req, res, refresh_token) => {
 
                 break;
 
-
-
-
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

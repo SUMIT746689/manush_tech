@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
@@ -125,7 +126,7 @@ const index = async (req, res, refresh_token) => {
             // break;
 
             case 'POST':
-        
+
                 const exam_id = parseInt(req.body.exam_id);
                 const student_id = parseInt(req.body.student_id)
                 const subject_total = parseFloat(req.body.subject_total)
@@ -231,11 +232,13 @@ const index = async (req, res, refresh_token) => {
                 break;
 
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

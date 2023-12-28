@@ -1,5 +1,6 @@
 import get from 'controllers/certificate_templates/get';
 import post from 'controllers/certificate_templates/post';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 export const config = {
@@ -26,6 +27,7 @@ const index = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+    logFile.error(err.message);
     res.status(500).json({ message: err.message });
   }
 };

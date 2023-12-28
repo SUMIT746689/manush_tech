@@ -3,6 +3,7 @@ import path from 'path';
 import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import { verifyNumber } from 'utilities_api/verify';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
   api: {
@@ -30,9 +31,8 @@ const post = async (req: any, res: any, refresh_token) => {
     const { masking_count, non_masking_count } = fields;
 
     if (!document_photo) return res.status(404).json({ message: 'file missing !!' });
-    if (!masking_count && !non_masking_count)
-      return res.status(404).json({ message: 'field value missing !!' });
-    
+    if (!masking_count && !non_masking_count) return res.status(404).json({ message: 'field value missing !!' });
+
 
     const upload_path = path.join(uploadFolderName, document_photo?.newFilename);
     const response = await prisma.requestBuySms.create({
@@ -49,6 +49,7 @@ const post = async (req: any, res: any, refresh_token) => {
     res.status(201).json({ success: 'created successfully' });
     // });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

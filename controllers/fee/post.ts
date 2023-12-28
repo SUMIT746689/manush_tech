@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 export default async function post(req, res, refresh_token) {
@@ -83,6 +84,7 @@ export default async function post(req, res, refresh_token) {
 
     res.status(200).json({ success: true });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

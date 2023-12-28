@@ -1,5 +1,6 @@
 import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const post = async (req, res, refresh_token) => {
   try {
@@ -13,6 +14,7 @@ const post = async (req, res, refresh_token) => {
     })
     res.status(200).json({ message: 'New voucher created !' });
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err });
     res.status(404).json({ err: err.message });
   }

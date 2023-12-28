@@ -1,3 +1,4 @@
+import { logFile } from 'utilities_api/handleLogFile';
 import get from '../../../controllers/account/get';
 import post from '../../../controllers/account/post';
 
@@ -16,6 +17,7 @@ const userHandler = (req, res) => {
     // break;
     default:
       res.setHeader('Allow', ['GET', 'POST']);
+      logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }

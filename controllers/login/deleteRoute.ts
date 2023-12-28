@@ -1,4 +1,5 @@
 import { serialize } from 'cookie';
+import { logFile } from 'utilities_api/handleLogFile';
 import { access_token_varify, refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export default function deleteRoute(req: any, res: any) {
@@ -15,6 +16,7 @@ export default function deleteRoute(req: any, res: any) {
     ]);
     res.status(200).json({ success: true });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

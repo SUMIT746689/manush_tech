@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 async function post(req, res, refresh_token) {
@@ -17,9 +18,10 @@ async function post(req, res, refresh_token) {
       }
     });
 
-    if (!response) throw new Error('Invalid to create room');
+    if (!response) throw new Error('Invalid to create exam term');
     res.json({ success: true });
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

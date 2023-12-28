@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import patch from 'controllers/students/patch';
 import Delete from 'controllers/students/delete';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -54,11 +55,13 @@ const id = async (req, res) => {
                 Delete(req, res);
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'PATCH']);
+                res.setHeader('Allow', ['GET', 'PATCH', 'DELETE']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
 
     }

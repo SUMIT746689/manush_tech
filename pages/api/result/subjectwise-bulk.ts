@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { formidable } from 'formidable';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 import { readFile, utils } from "xlsx";
 
 export const config = {
@@ -224,16 +225,18 @@ const index = async (req, res, refresh_token) => {
 
                     }
                 }
-            
+
                 res.status(200).json({ success: true, message: `${prevInserted.length ? 'Some result result inserted !' : 'Student result details inserted!'}`, prevInserted })
                 break;
 
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['POST'])
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

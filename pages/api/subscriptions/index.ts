@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next/types';
 import { PrismaClient } from '@prisma/client';
 import get from 'controllers/subscriptions/get';
 import post from 'controllers/subscriptions/post';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,7 @@ const index = async (req: NextApiRequest, res: NextApiResponse) => {
 
     default:
       res.setHeader('Allow', ['GET', 'POST']);
+      logFile.error(`Method ${method} Not Allowed`)
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

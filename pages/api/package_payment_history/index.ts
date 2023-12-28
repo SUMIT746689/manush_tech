@@ -4,6 +4,7 @@ import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
 import dayjs from 'dayjs';
 import superadminCheck from 'middleware/superadminCheck';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const index = async (req, res, refresh_token) => {
     try {
@@ -83,17 +84,19 @@ const index = async (req, res, refresh_token) => {
                         }
                     })
 
-                    
+
                 })
-                res.status(200).json({ message:'manual Package payment created successfully !' })
+                res.status(200).json({ message: 'manual Package payment created successfully !' })
 
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res,refresh_token) {
   try {
@@ -18,10 +19,11 @@ async function post(req, res,refresh_token) {
           school_id: user.school_id
         }
       });
-      if (response) return res.json({ success: true });
-      else throw new Error('Invalid to create school');
-    
+      if (!response) throw new Error('Invalid to create school');
+      res.json({ success: true });
+      
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

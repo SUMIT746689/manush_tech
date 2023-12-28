@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { fileUpload } from '@/utils/upload';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
+import { logFile } from 'utilities_api/handleLogFile';
 export const config = {
     api: {
         bodyParser: false,
@@ -28,7 +29,7 @@ const index = async (req, res, refresh_token) => {
                         }
                     },
                     include: {
-                        
+
                         exam_details: {
                             select: {
                                 id: true,
@@ -96,10 +97,12 @@ const index = async (req, res, refresh_token) => {
 
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

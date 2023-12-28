@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 // @ts-ignore
 async function get(req, res, refresh_token) {
@@ -9,7 +10,7 @@ async function get(req, res, refresh_token) {
         if (!school_id) throw new Error('invalid user');
 
         const { exam_details_id, room_id } = req.query;
-        console.log({exam_details_id,room_id})
+        console.log({ exam_details_id, room_id })
 
         const response = await prisma.seatPlan.findFirst({
             where: {
@@ -23,6 +24,7 @@ async function get(req, res, refresh_token) {
 
         // } else throw new Error('provide valid data');
     } catch (err) {
+        logFile.error(err.message)
         res.status(404).json({ error: err.message });
     }
 }

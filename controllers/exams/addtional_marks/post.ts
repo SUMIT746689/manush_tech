@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 const post = async (req, res, refresh_token) => {
     try {
         if (!refresh_token?.school_id) throw new Error("permission denied")
@@ -17,6 +18,7 @@ const post = async (req, res, refresh_token) => {
 
         res.status(200).json({ message: 'Addtional marking catagory created successfully' });
     } catch (err) {
+        logFile.error(err.message)
         console.log(err);
         res.status(500).json({ message: err.message });
     }

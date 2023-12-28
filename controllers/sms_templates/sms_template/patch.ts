@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function patch(req, res, refresh_token) {
   try {
@@ -24,6 +25,7 @@ async function patch(req, res, refresh_token) {
     // else throw new Error('Invalid to find school');
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

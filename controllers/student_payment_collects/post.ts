@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { unique_tracking_number } from "@/utils/utilitY-functions";
+import { logFile } from "utilities_api/handleLogFile";
 
 
 const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
@@ -290,7 +291,7 @@ export const post = async (req, res, refresh_token) => {
     }
 
   } catch (err) {
-    console.log(err.message);
-    res.status(404).json({ err: err.message });
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };

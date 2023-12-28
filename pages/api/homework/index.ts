@@ -3,6 +3,8 @@ import { fileUpload, unknownFileDelete } from "@/utils/upload";
 import { imagePdfDocType } from "@/utils/utilitY-functions";
 import { authenticate } from "middleware/authenticate";
 import path from 'path';
+import { logFile } from "utilities_api/handleLogFile";
+
 export const config = {
     api: {
         bodyParser: false,
@@ -79,10 +81,12 @@ const index = async (req, res, refresh_token) => {
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

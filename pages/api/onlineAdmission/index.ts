@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import path from 'path';
 import get from 'controllers/onlineAdmission/get';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -84,6 +85,7 @@ const index = async (req, res) => {
                 break;
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
+                logFile.error(`Method ${method} Not Allowed`);
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
@@ -91,6 +93,7 @@ const index = async (req, res) => {
             fs.unlinkSync(path.join(process.cwd(), filePathQuery[i]))
         }
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

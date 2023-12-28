@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export default async function deleteRoom(req, res,refresh_token) {
   try {
@@ -13,6 +14,7 @@ export default async function deleteRoom(req, res,refresh_token) {
     })
     res.status(200).json({ message: 'Department deleted successfully' })
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

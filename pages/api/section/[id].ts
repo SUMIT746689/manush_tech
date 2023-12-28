@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const section = async (req, res) => {
   try {
@@ -54,10 +55,12 @@ const section = async (req, res) => {
 
       default:
         res.setHeader('Allow', ['GET', 'PATCH', 'DELETE']);
+        logFile.error(`Method ${method} Not Allowed`)
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {
     console.log(err);
+    logFile.error(err.message)
     res.status(500).json({ message: err.message });
   }
 };

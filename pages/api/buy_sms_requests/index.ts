@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next/types';
 import get from 'controllers/buy_sms_requests/get';
 import post from 'controllers/buy_sms_requests/post';
 import patch from 'controllers/buy_sms_requests/buy_sms_request/patch';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
   api: {
@@ -22,6 +23,7 @@ const index = async (req: NextApiRequest, res: NextApiResponse) => {
 
     default:
       res.setHeader('Allow', ['GET', 'POST']);
+      logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

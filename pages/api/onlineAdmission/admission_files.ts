@@ -1,5 +1,6 @@
 import post from 'controllers/onlineAdmission/admission_files/post';
 import get from 'controllers/onlineAdmission/admission_files/get';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -8,7 +9,7 @@ export const config = {
 };
 
 const index = async (req, res) => {
-    try {
+    // try {
         const { method } = req;
 
         switch (method) {
@@ -20,13 +21,14 @@ const index = async (req, res) => {
                 break;
             default:
                 res.setHeader('Allow', ['GET','POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ message: err.message });
+    // } catch (err) {
+    //     console.log(err);
+    //     res.status(500).json({ message: err.message });
 
-    }
+    // }
 }
 
 export default index

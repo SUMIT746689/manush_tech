@@ -1,6 +1,7 @@
 import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
 import { verifyUser } from 'utilities_api/verify';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const patch = async (req: any, res: any, refresh_token) => {
@@ -34,25 +35,26 @@ const patch = async (req: any, res: any, refresh_token) => {
         }
       })
       const resSchool = await tx.school.update({
-          where: { id: resBuySms.school_id },
-          data: {
-            masking_sms_count: { increment: resBuySms.masking_count || 0 },
-            non_masking_sms_count: { increment: resBuySms.non_masking_count || 0 },
-          }
-        })
-        if(!resSchool) throw new Error("failed to find school")
-        await tx.smsTransaction.create({
-          data: {
-            masking_count: resSchool.masking_sms_count + (resBuySms.masking_count || 0),
-            non_masking_count: resSchool.non_masking_sms_count + (resBuySms.non_masking_count || 0),
-            prev_masking_count: resSchool.masking_sms_count,
-            prev_non_masking_count: resSchool.non_masking_sms_count,
-            school_id: resBuySms.school_id
-          }
-        })
+        where: { id: resBuySms.school_id },
+        data: {
+          masking_sms_count: { increment: resBuySms.masking_count || 0 },
+          non_masking_sms_count: { increment: resBuySms.non_masking_count || 0 },
+        }
+      })
+      if (!resSchool) throw new Error("failed to find school")
+      await tx.smsTransaction.create({
+        data: {
+          masking_count: resSchool.masking_sms_count + (resBuySms.masking_count || 0),
+          non_masking_count: resSchool.non_masking_sms_count + (resBuySms.non_masking_count || 0),
+          prev_masking_count: resSchool.masking_sms_count,
+          prev_non_masking_count: resSchool.non_masking_sms_count,
+          school_id: resBuySms.school_id
+        }
+      })
     })
     res.status(201).json({ success: 'created successfully' });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

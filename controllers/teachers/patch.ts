@@ -5,6 +5,7 @@ import fs from 'fs';
 import adminCheck from 'middleware/adminCheck';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const patch = async (req, res) => {
   try {
@@ -26,7 +27,6 @@ const patch = async (req, res) => {
     if (error) throw new Error('Error')
 
     const { resume, photo } = files;
-console.log(files);
 
     const {
       username,
@@ -119,14 +119,15 @@ console.log(files);
     }
 
   } catch (err) {
-    console.log({ err });
-    res.status(404).json({ err: err.message });
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };
 export default authenticate(adminCheck(patch));
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {
+    logFile.error(err)
     console.log({ err });
   });
 };

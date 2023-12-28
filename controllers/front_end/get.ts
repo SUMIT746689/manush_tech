@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 export default async function get(req, res) {
@@ -31,6 +32,7 @@ export default async function get(req, res) {
     }
 
   } catch (error) {
+    logFile.error(error.message)
     res.status(404).json({ Error: error.message });
   }
 }

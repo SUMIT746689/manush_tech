@@ -1,4 +1,5 @@
 import get from 'controllers/banners/get';
+import { logFile } from 'utilities_api/handleLogFile';
 
 // export const config = {
 //     api: {
@@ -19,6 +20,7 @@ const index = async (req, res) => {
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
+        logFile.error(err.message);
         console.log(err);
         res.status(500).json({ message: err.message });
     }

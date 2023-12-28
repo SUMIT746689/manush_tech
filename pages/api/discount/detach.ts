@@ -1,11 +1,10 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
+import { logFile } from "utilities_api/handleLogFile";
 
 const index = async (req, res, token) => {
     try {
         const { method } = req;
-        console.log(method);
-
 
         switch (method) {
             case 'PUT':
@@ -26,11 +25,13 @@ const index = async (req, res, token) => {
                 return res.json({ message: "permission detached" })
 
             default:
-                // res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['PUT']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
 
     }

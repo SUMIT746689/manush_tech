@@ -1,4 +1,5 @@
 import get from "controllers/certificate_templates/dynamic_content/get";
+import { logFile } from "utilities_api/handleLogFile";
 
 
 const index = async (req, res) => {
@@ -12,6 +13,7 @@ const index = async (req, res) => {
 
       default:
         res.setHeader('Allow', ['GET']);
+        logFile.error(`Method ${method} Not Allowed`);
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {

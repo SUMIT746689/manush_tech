@@ -34,7 +34,7 @@ function PdfDatas({ school, values, serverHost }) {
     console.log({ values, school })
     return (
         <>
-            <Grid display="grid" sx={{ p: 8, pageBreakBefore: "always",pageBreakInside:"avoid" }} >
+            <Grid display="grid" sx={{ p: 8, pageBreakBefore: "always", pageBreakInside: "avoid" }} >
                 <Grid display="grid" gridTemplateColumns="1fr 1fr 1fr" justifyContent="space-between"   >
                     <Grid sx={{ borderRadius: 1, overflow: "hidden", border: "5px solid white", height: 150, width: 150 }}>
                         <Image
@@ -228,8 +228,26 @@ function PdfDatas({ school, values, serverHost }) {
                             />
                         </Grid>
 
+                        {/* national_id */}
+                        <Grid item xs={6}>
+                            <TextField
+                                size="small"
+                                sx={{
+                                    '& fieldset': {
+                                        borderRadius: '3px'
+                                    }
+                                }}
+                                fullWidth
+                                label={t('Birth certificate Id')}
+                                name="national_id"
+                                type="text"
+                                value={values.national_id ?? ''}
+                                variant="outlined"
+                            />
+                        </Grid>
+
                         {/* phone */}
-                        <Grid item xs={12} >
+                        <Grid item xs={6} >
                             <TextField
                                 size="small"
                                 sx={{
@@ -262,24 +280,6 @@ function PdfDatas({ school, values, serverHost }) {
                                 name="email"
                                 type="email"
                                 value={values.email ?? ''}
-                                variant="outlined"
-                            />
-                        </Grid>
-
-                        {/* national_id */}
-                        <Grid item xs={12} >
-                            <TextField
-                                size="small"
-                                sx={{
-                                    '& fieldset': {
-                                        borderRadius: '3px'
-                                    }
-                                }}
-                                fullWidth
-                                label={t('Birth certificate Id')}
-                                name="national_id"
-                                type="text"
-                                value={values.national_id ?? ''}
                                 variant="outlined"
                             />
                         </Grid>
@@ -400,7 +400,7 @@ function PdfDatas({ school, values, serverHost }) {
                         </Grid>
 
                         {/* father_phone */}
-                        <Grid item xs={6} >
+                        <Grid item xs={6}>
                             <TextField
                                 size="small"
                                 sx={{
@@ -438,14 +438,14 @@ function PdfDatas({ school, values, serverHost }) {
                         </Grid>
 
                         {/* father_photo */}
-                        <Grid item xs={12} >
+                        <Grid item xs={12} mt={11} >
                             <Grid item>Father Photo:</Grid>
                             {
                                 values?.father_photo
                                 &&
-                                <Card sx={{boxShadow:1, width:"10",height:"10"}}>
-                                    <ShowImage file={values?.father_photo} alt={"Father Photo"} />
-                                </Card>
+                                // <Card sx={{boxShadow:1, width:"10",height:"10",mx:"auto"}}>
+                                <ShowImage file={values?.father_photo} alt={"Father Photo"} />
+                                // </Card>
                             }
 
                         </Grid>

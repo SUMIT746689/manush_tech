@@ -33,7 +33,7 @@ export default async function Home(props) {
     }
   })
 
-  console.log("notice__", notice);
+  // console.log("notice__", notice);
 
   return (
     <div>

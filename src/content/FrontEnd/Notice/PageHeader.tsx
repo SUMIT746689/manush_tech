@@ -64,7 +64,7 @@ function PageHeader({ editData, setEditData, reFetchData }) {
       setPhoto(null)
     }
     catch (err) {
-      console.error(err);
+      console.log(err);
       showNotification(err?.response?.data?.message, 'error');
       setStatus({ success: false });
       //@ts-ignore

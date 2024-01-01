@@ -52,8 +52,8 @@ async function post(req, res, refresh_token) {
 
 
   } catch (err) {
-    console.log({ err: err.message });
-    res.status(404).json({ error: err.message });
+    console.log(err);
+    res.status(404).json({ message: err.message });
   }
 }
 

@@ -1,5 +1,5 @@
 'use client';
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { HiOutlineMail } from 'react-icons/hi';
@@ -19,10 +19,16 @@ const Item = ({ data, serverHost }) => {
           quality={100} src={`/${data.image}`} className=" object-contain" /> */}
 
         <Grid sx={{ mt: 1 }}>{t(`${data?.headLine}`)}</Grid>
+        {/* <Button
+                onClick={() => window.open(`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`,
+                  'Popup', 'location,status,scrollbars,resizable,width=600, height=600')}
+              >pppp</Button> */}
+              <object data= {`/api/file/${data?.file_url?.replace(/\\/g, '/')}`} width={'100%'} height={'100vh'}></object>
         <Link
 
           target="_blank"
-          href={`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`}
+          href={`/api/file/${data?.file_url?.replace(/\\/g, '/')}`}
+          // prefetch={false}
         >
           <Grid
             sx={{

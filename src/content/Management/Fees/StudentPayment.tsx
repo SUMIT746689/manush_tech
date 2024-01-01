@@ -27,7 +27,7 @@ import { TextFieldWrapper, UncontrolledTextFieldWrapper } from '@/components/Tex
 import { formatNumber } from '@/utils/numberFormat';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import Image from "next/image"
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -111,6 +111,7 @@ const StudentPayment = ({
 }) => {
   const { t }: { t: any } = useTranslation();
   const router = useRouter()
+  const params = useSearchParams();
   const { showNotification } = useNotistick();
   const { user } = useAuth();
   const [page, setPage] = useState<number>(0);
@@ -129,10 +130,11 @@ const StudentPayment = ({
     setLimit(parseInt(event.target.value));
   };
   useEffect(() => {
+    const message =  params.get('message')
     // @ts-ignore
-    if (router.query?.message) {
+    if (message) {
       // @ts-ignore
-      router.query?.message == 'success' ? showNotification(router.query?.message) : showNotification(router.query?.message, 'error')
+      message === 'success' ? showNotification(message) : showNotification(message, 'error')
     }
     // @ts-ignore
   }, [router?.query])
@@ -181,37 +183,37 @@ const StudentPayment = ({
         <UncontrolledTextFieldWrapper label="Section" value={sessions.name} />
         <UncontrolledTextFieldWrapper label="Class" value={sessions.class} />
         <UncontrolledTextFieldWrapper label="Section" value={sessions.section} />
-      
-          <FormControl  >
-            <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
-            <Select
-              fullWidth
-              size="small"
-              label="Filter By"
 
-              sx={{
-                [`& fieldset`]: {
-                  borderRadius: 0.6
-                },
-                px: '10px',
-                minWidth: '50px',
-              }}
+        <FormControl  >
+          <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
+          <Select
+            fullWidth
+            size="small"
+            label="Filter By"
 
-              value={filter}
-              onChange={(e: any) => {
-                setFilter(e.target.value);
-              }}
-            >
-              <MenuItem value={'all'}>ALL</MenuItem>
-              <MenuItem value={'paid'}>PAID</MenuItem>
-              <MenuItem value={'paid late'}>PAID LATE</MenuItem>
-              <MenuItem value={'partial paid'}>PARTIAL PAID</MenuItem>
-              <MenuItem value={'unpaid'}>UNPAID</MenuItem>
-            </Select>
+            sx={{
+              [`& fieldset`]: {
+                borderRadius: 0.6
+              },
+              px: '10px',
+              minWidth: '50px',
+            }}
 
-          </FormControl>
+            value={filter}
+            onChange={(e: any) => {
+              setFilter(e.target.value);
+            }}
+          >
+            <MenuItem value={'all'}>ALL</MenuItem>
+            <MenuItem value={'paid'}>PAID</MenuItem>
+            <MenuItem value={'paid late'}>PAID LATE</MenuItem>
+            <MenuItem value={'partial paid'}>PARTIAL PAID</MenuItem>
+            <MenuItem value={'unpaid'}>UNPAID</MenuItem>
+          </Select>
 
-       
+        </FormControl>
+
+
 
       </Card>
 

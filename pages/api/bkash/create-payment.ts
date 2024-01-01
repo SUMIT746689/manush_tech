@@ -73,6 +73,8 @@ const handleTransaction = ({ student_id, user_id,
             resolve({ bkashURL: payment.data.bkashURL })
 
         } catch (err) {
+            console.log(err);
+            
             reject(new Error(`${err.message}`))
         }
     })

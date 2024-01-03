@@ -33,11 +33,6 @@ export default async function Home(props) {
     }
   })
 
-<<<<<<< HEAD:website/src/app/notice/page.jsx
-  // console.log("notice__", notice);
-
-=======
->>>>>>> api_logfile_add:website/src/app/(default)/notice/page.jsx
   return (
     <div>
       <Notice serverHost={`${process.env.SERVER_HOST}`} notice={notice || []} />

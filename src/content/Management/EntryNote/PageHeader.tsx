@@ -37,9 +37,10 @@ function PageHeader({ periods }): any {
     setIsLoading(true);
     // const todayString = getToday();
     // const date = new Date(); 
-    const { subject_id, id:period_id } = selectedPeriod;
+    const { subject_id, id: period_id } = selectedPeriod;
     axios.get(`/api/notes?period_id=${period_id}&subject_id=${subject_id}&get_type=individual`)
-      .then(({ data }) => {
+      .then((res: any) => {
+        const { data } = res;
         if (data) setNote(() => data)
         // console.log({ response: data });
       })
@@ -59,7 +60,7 @@ function PageHeader({ periods }): any {
         // reFetchData();
         resetForm();
       };
-      const { subject_id, id:period_id } = selectedPeriod;
+      const { subject_id, id: period_id } = selectedPeriod;
       if (!subject_id || !period_id) showNotification("required subject id", "error");
 
       _values["subject_id"] = subject_id;

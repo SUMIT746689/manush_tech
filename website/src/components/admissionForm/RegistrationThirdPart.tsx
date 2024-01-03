@@ -222,10 +222,12 @@ function RegistrationThirdPart({
                         htmlFor="father_photo"
                         label="Select Father's photo::"
                         name="father_photo"
+                        // @ts-ignore
                         value={values?.father_photo?.name || ''}
                         handleChangeFile={(e) => {
                           if (e.target?.files?.length) {
                             const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            // @ts-ignore
                             setFather_photo(photoUrl)
                             setFieldValue('father_photo', e.target.files[0])
                           }
@@ -329,10 +331,12 @@ function RegistrationThirdPart({
                         htmlFor="mother_photo"
                         label="Select Mother's photo::"
                         name="mother_photo"
+                        // @ts-ignore
                         value={values?.mother_photo?.name || ''}
                         handleChangeFile={(e) => {
                           if (e.target?.files?.length) {
                             const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            // @ts-ignore
                             setMother_photo(photoUrl)
                             setFieldValue('mother_photo', e.target.files[0])
                           }
@@ -442,10 +446,12 @@ function RegistrationThirdPart({
                         htmlFor="guardian_photo"
                         label="Select Guardian's photo:"
                         name="guardian_photo"
+                        // @ts-ignore
                         value={values?.guardian_photo?.name || ''}
                         handleChangeFile={(e) => {
                           if (e.target?.files?.length) {
                             const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            // @ts-ignore
                             setGuardian_photo(photoUrl)
                             setFieldValue('guardian_photo', e.target.files[0])
                           }

@@ -42,7 +42,7 @@
     "**/*.tsx",
     "src/app/school_not_found.js",
     "src/components/OnlineAdmission.jsx"
-, "src/app/(showFile)/layout.js"  ],
+, "src/app/(showFile)/layout.js", "src/app/layout.js"  ],
   "exclude": [
     "node_modules"
   ]

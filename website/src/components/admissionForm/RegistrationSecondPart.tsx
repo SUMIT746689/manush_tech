@@ -38,7 +38,7 @@ function RegistrationSecondPart({
   const { showNotification } = useNotistick();
 
   const [selectedClass, setselectedClass] = useState(null);
-  const [selecetedSection, setSelecetedSection] = useState(null);
+  const [selecetedSection, setSelecetedSection] = useState<any>(null);
   const [selecetedAcademicYear, setSelecetedAcademicYear] = useState(null);
 
   const [sectionsForSelectedClass, setSectionsForSelectedClass] = useState([]);
@@ -70,7 +70,7 @@ function RegistrationSecondPart({
 
   const handleClassSelect = (event, value, setFieldValue) => {
     setFieldValue("class_id", value?.id)
-    setFieldValue("class_name",value?.label)
+    setFieldValue("class_name", value?.label)
     setselectedClass(value);
     if (value) {
       const targetClassSections = classes?.find(i => i.id == value.id)
@@ -84,7 +84,7 @@ function RegistrationSecondPart({
       }))
       if (!value.has_section) {
         setSelecetedSection({
-          label: targetClassSections?.sections[0]?.name,
+          label: targetClassSections?.sections[0]?.name || '',
           id: targetClassSections?.sections[0]?.id
         })
         setFieldValue('section_id', targetClassSections?.sections[0]?.id);
@@ -264,7 +264,7 @@ function RegistrationSecondPart({
                     <Grid item xs={12} md={6}>
                       <Autocomplete
                         disablePortal
-                        options={classesOptions}
+                        options={classesOptions || []}
                         value={selectedClass}
                         renderInput={(params) => (
                           <TextField
@@ -336,17 +336,19 @@ function RegistrationSecondPart({
                       <Autocomplete
                         size="small"
                         disablePortal
-                        options={academicYearsOptions}
+                        options={academicYearsOptions || []}
                         value={selecetedAcademicYear}
                         renderInput={(params) => (
                           <TextField
                             required
+                            // @ts-ignore
                             size="small"
                             sx={{
                               '& fieldset': {
                                 borderRadius: '3px'
                               }
                             }}
+                            // @ts-ignore
                             fullWidth
                             name="academic_year_id"
                             {...params}
@@ -355,7 +357,7 @@ function RegistrationSecondPart({
                           //  helperText={'The session is required'}
                           />
                         )}
-                        onChange={(event, value) => {
+                        onChange={(event, value: any) => {
                           setSelecetedAcademicYear(value)
                           setFieldValue('academic_year_id', value?.id);
                           setFieldValue('academic_year_title', value?.label);
@@ -524,10 +526,12 @@ function RegistrationSecondPart({
                         htmlFor="student_photo"
                         label="Select Student photo:"
                         name="student_photo"
+                        // @ts-ignore
                         value={values?.student_photo?.name || ''}
                         handleChangeFile={(e) => {
                           if (e.target?.files?.length) {
                             const photoUrl = URL.createObjectURL(e.target.files[0]);
+                            // @ts-ignore
                             setStudent_photo(photoUrl)
                             setFieldValue('student_photo', e.target.files[0])
                           }

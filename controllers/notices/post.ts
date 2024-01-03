@@ -53,14 +53,9 @@ async function post(req, res, refresh_token) {
 
 
   } catch (err) {
-<<<<<<< HEAD
-    console.log(err);
-    res.status(404).json({ message: err.message });
-=======
     logFile.error(err.message)
     console.log({ err: err.message });
     res.status(404).json({ error: err.message });
->>>>>>> api_logfile_add
   }
 }
 

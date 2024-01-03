@@ -49,6 +49,7 @@ async function seed() {
   const package_payment_history = await prisma.permission.create({
     data: { name: 'package payment history', value: 'package_payment_history', group: 'package_payment_history' }
   });
+
   const createSuperAdminRole = await prisma.role.create({
     data: {
       title: "SUPER_ADMIN",
@@ -170,6 +171,9 @@ async function seed() {
           value: 'package_payment_history'
         }
       ]
+    },
+    select:{
+      id:true,
     }
   });
 

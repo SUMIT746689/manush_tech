@@ -40,7 +40,9 @@ function PageHeader({ periods }): any {
     const { subject_id, id: period_id } = selectedPeriod;
     axios.get(`/api/notes?period_id=${period_id}&subject_id=${subject_id}&get_type=individual`)
       .then((res: any) => {
+        // @ts-ignore
         const { data } = res;
+        // @ts-ignore
         if (data) setNote(() => data)
         // console.log({ response: data });
       })

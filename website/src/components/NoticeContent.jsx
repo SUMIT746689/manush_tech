@@ -17,12 +17,14 @@ const Item = ({ data, serverHost }) => {
           height={500}
           width={500}
           quality={100} src={`/${data.image}`} className=" object-contain" /> */}
-
+        
+        
         <Grid sx={{ mt: 1 }}>{t(`${data?.headLine}`)}</Grid>
         <Link
-
           target="_blank"
-          href={`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`}
+          // href={`${serverHost}/api/get_file/${data?.file_url?.replace(/\\/g, '/')}`}
+          href={`file?path=${data?.file_url?.replace(/\\/g, '/')}`}
+
         >
           <Grid
             sx={{
@@ -64,7 +66,7 @@ const itemData = [
 function Notice({ serverHost, notice }) {
   const [showBookNotice, setshowBookNotice] = useState(false);
   const [showNewNotice, setshowNewNotice] = useState(false);
-
+  
   return (
     <div className="flex gap-4 flex-col p-8 min-h-[calc(100vh-400px)]">
       {/* <div>
@@ -81,7 +83,7 @@ function Notice({ serverHost, notice }) {
         </div>
       </div> */}
       {
-        notice?.map(i => <SingleNotice serverHost={serverHost} data={i} />)
+        notice?.map((i,index) => <SingleNotice key={index} serverHost={serverHost} data={i} />)
       }
 
 

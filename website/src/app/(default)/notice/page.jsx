@@ -1,6 +1,6 @@
-import Notice from "../../components/NoticeContent";
+import Notice from "@/components/NoticeContent";
 
-import prisma from '../../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
@@ -32,8 +32,6 @@ export default async function Home(props) {
       file_url: true
     }
   })
-
-  console.log("notice__", notice);
 
   return (
     <div>

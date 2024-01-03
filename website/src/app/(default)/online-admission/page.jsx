@@ -1,6 +1,6 @@
-import prisma from '../../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
-import OnlineAdmission from "../../components/OnlineAdmission";
+import OnlineAdmission from "@/components/OnlineAdmission";
 
 
 export default async function Admission() {

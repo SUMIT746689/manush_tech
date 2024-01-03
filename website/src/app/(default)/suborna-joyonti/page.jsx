@@ -47,7 +47,8 @@ const মুক্তিযুদ্ধেরস্থিরচিত্র = [
 const page = () => {
     return (
         <div>
-            <h2 className='text-3xl p-4'>suborna joyonti</h2>
+            <br/>
+            {/* <h2 className='text-3xl p-4'>suborna joyonti</h2> */}
             <p className=' text-center font-bold text-3xl'>সুবর্ণজয়ন্তী কর্ণার</p>
             <h3 className=' h-12 bg-slate-300 text-center pt-3 m-4 font-bold'>
                 বঙ্গবন্ধুর ৭ই মার্চের ভাষণ

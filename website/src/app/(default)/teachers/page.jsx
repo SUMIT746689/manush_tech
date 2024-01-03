@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
-import prisma from '../../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 
 
@@ -40,7 +40,6 @@ async function getData() {
 async function page() {
   const data = await getData();
   console.log("data__", data);
-
   return (
     <div className=' container mx-auto'>
 

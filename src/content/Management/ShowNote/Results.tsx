@@ -192,8 +192,9 @@ const Results: FC<ResultsProps> = ({ classes, notes, setNotes }) => {
     setIsLoading(true)
     try {
       const { id: section_id } = selectedSection;
-      const result = await axios.get(`/api/notes?get_type=all&section_id=${section_id}&start_date=${startDate}&end_date=${endDate}`);
+      const result:any = await axios.get(`/api/notes?get_type=all&section_id=${section_id}&start_date=${startDate}&end_date=${endDate}`);
       const { data } = result;
+      // console.log({result})
       setNotes(() => data || [])
     }
     catch (err) {

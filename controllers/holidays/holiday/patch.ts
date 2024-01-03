@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import adminCheck from 'middleware/adminCheck';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 async function patch(req, res, refresh_token) {
@@ -25,6 +26,7 @@ async function patch(req, res, refresh_token) {
 
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import dayjs from 'dayjs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const index = async (req, res) => {
     try {
@@ -7,7 +8,7 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-                const { from_date, to_date, payment_method, collected_by, account_id,student_id } = req.query;
+                const { from_date, to_date, payment_method, collected_by, account_id, student_id } = req.query;
                 const query = {};
                 if (payment_method) {
                     query['payment_method'] = payment_method
@@ -91,11 +92,13 @@ const index = async (req, res) => {
                 break;
 
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

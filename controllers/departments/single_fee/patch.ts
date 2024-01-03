@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export default async function patchSchool(req, res) {
   try {
@@ -21,13 +22,14 @@ export default async function patchSchool(req, res) {
         where: { id: Number(id) },
         data
       });
-    
+
       if (response) return res.json({ fee: response, success: true });
       else throw new Error('Invalid to create school');
 
     } else throw new Error('provide valid data');
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

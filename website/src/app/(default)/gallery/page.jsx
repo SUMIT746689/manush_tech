@@ -1,7 +1,7 @@
 
 import React from 'react';
-import Gallery from "../../components/GalleryContent";
-import prisma from '../../../../src/lib/prisma_client';
+import Gallery from "@/components/GalleryContent";
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 
 const page = async () => {

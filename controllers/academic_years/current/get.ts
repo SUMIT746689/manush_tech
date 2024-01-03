@@ -1,5 +1,6 @@
 // import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 import { dcrypt } from 'utilities_api/hashing';
 
 async function get(req, res, refresh_token) {
@@ -27,6 +28,7 @@ async function get(req, res, refresh_token) {
         if (err) throw Error(err);
         res.status(200).json({ success: true, data: academic_year_cookie_data })
     } catch (err) {
+        logFile.error(err.message)
         res.status(404).json({ error: err.message });
     }
 }

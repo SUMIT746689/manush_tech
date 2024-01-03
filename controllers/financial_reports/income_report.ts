@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function get(req, res, refresh_token) {
   try {
@@ -33,6 +34,7 @@ async function get(req, res, refresh_token) {
 
     res.status(200).json({ data: findSchool, success: true, totalAmount });
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

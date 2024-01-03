@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma_client';
 import { Prisma } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import { createCampaign, getUsers, sentSms } from './postContent/postContent';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function post(req, res, refresh_token) {
@@ -135,6 +136,7 @@ async function post(req, res, refresh_token) {
     return res.json({ message: 'success' });
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message })
     res.status(404).json({ error: err.message });
   }

@@ -1,6 +1,6 @@
-import Notice from "../../components/NoticeContent";
+import Notice from "@/components/NoticeContent";
 
-import prisma from '../../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
@@ -33,8 +33,11 @@ export default async function Home(props) {
     }
   })
 
+<<<<<<< HEAD:website/src/app/notice/page.jsx
   // console.log("notice__", notice);
 
+=======
+>>>>>>> api_logfile_add:website/src/app/(default)/notice/page.jsx
   return (
     <div>
       <Notice serverHost={`${process.env.SERVER_HOST}`} notice={notice || []} />

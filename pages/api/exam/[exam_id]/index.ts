@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const exam_id = async (req, res) => {
     try {
@@ -35,13 +36,15 @@ const exam_id = async (req, res) => {
                 })
                 res.status(200).json(user);
                 break;
-                
+
             default:
                 res.setHeader('Allow', ['GET', 'POST']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message);
         res.status(500).json({ message: err.message });
 
     }

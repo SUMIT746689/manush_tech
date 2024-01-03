@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import fsP from 'fs/promises';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function patch(req, res, refresh_token) {
@@ -71,6 +72,7 @@ async function patch(req, res, refresh_token) {
     res.end()
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message });
     res.status(404).json({ error: err.message });
   }

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types';
 import patch from 'controllers/notices/notice/patch';
 import Delete from 'controllers/notices/notice/delete';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
   api: {
@@ -18,7 +19,8 @@ const index = async (req: NextApiRequest, res: NextApiResponse) => {
       Delete(req, res)
       break;
     default:
-      res.setHeader('Allow', ['PATCH','DELETE']);
+      res.setHeader('Allow', ['PATCH', 'DELETE']);
+      logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

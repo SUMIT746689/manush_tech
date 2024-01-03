@@ -4,6 +4,7 @@ import { fileUpload } from '@/utils/upload';
 import fspromises from 'fs/promises'
 import path from 'path';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const post = async (req, res) => {
   try {
@@ -109,6 +110,7 @@ export const post = async (req, res) => {
     res.status(200).json({ message: `${parseRole.role_title} Created Successfully` });
     // res.status(200).json({ data });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ error: err.message });
   }

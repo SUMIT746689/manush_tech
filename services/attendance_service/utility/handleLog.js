@@ -14,7 +14,7 @@ const handleLogFile = () => {
         filename:  `${logfilePath}/attendance-%DATE%.log`,
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,
-        maxFiles: '5d',
+        maxFiles: '1d',
     });
 
     const logger = winston.createLogger({

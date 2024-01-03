@@ -1,12 +1,16 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
   try {
     const { class_id, section_id, academic_year_id } = req.query;
     console.log({ class_id, section_id, academic_year_id });
 
-    if (!class_id || !academic_year_id) return res.status(400).json({ "error": " required field is not found" });
+    if (!class_id || !academic_year_id) {
+      logFile.error("required field is not found")
+      return res.status(400).json({ "error": " required field is not found" });
+    }
     // const whereSection = {};
     // if (section_id) whereSection["id"] = parseInt(section_id);
 
@@ -61,6 +65,7 @@ async function post(req, res, refresh_token) {
     return res.json({ message: "successfully sending messages...", success: true });
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message });
     res.status(404).json({ error: err.message });
   }

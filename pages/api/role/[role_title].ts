@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { Prisma } from "@prisma/client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const tables = Prisma.ModelName;
 
@@ -29,8 +30,8 @@ const role_title = async (req, res) => {
                             school_id: parseInt(req.query.school_id)
                         },
                         select: {
-                            id:true,
-                            user_id:true,
+                            id: true,
+                            user_id: true,
                             first_name: true,
                             middle_name: true,
                             last_name: true
@@ -47,11 +48,13 @@ const role_title = async (req, res) => {
                 break;
 
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
 
     }

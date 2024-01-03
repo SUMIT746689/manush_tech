@@ -5,6 +5,7 @@ import fspromises from 'fs/promises'
 import fs from 'fs';
 import path from 'path';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 
@@ -108,6 +109,7 @@ export const patch = async (req, res) => {
     res.status(200).json({ message: `user updated Successfully` });
     // res.status(200).json({ data });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ error: err.message });
   }

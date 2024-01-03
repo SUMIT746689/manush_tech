@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -19,12 +20,13 @@ export default async function put(req, res) {
       // });
       const result = await bcrypt.compare(req.body.password, user.password);
       if (result) {
-        const jwtRes = await jwt.sign("mehedi",process.env.JWT_SECRET_KEY,{algorithm:'RS256'});
-        console.log({jwtRes})
+        const jwtRes = await jwt.sign("mehedi", process.env.JWT_SECRET_KEY, { algorithm: 'RS256' });
+        // console.log({ jwtRes })
         res.status(200).json({ user });
       } else throw new Error(`Invalid username and password`);
     } else throw new Error(`Invalid Authorization`);
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ err: err.message });
   }
 }

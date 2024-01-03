@@ -1,6 +1,7 @@
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
 import { authenticate } from './authenticate';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
  const superadminCheck = (handler: Function) => {
  
@@ -21,6 +22,7 @@ import prisma from '@/lib/prisma_client';
             return handler(req, res, refresh_token);
         } catch (err) {
             console.log(err);
+            logFile.error(err.message);
             res.status(401).json({ error: err.message });
         }
     };

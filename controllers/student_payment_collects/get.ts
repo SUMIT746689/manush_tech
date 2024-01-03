@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export const get = async (req, res) => {
   try {
@@ -31,7 +32,7 @@ export const get = async (req, res) => {
 
     res.status(200).json({ data: student_fee, success: true });
   } catch (err) {
-    console.log(err.message);
-    res.status(404).json({ err: err.message });
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };

@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export default async function get(req: any, res: any, refresh_token) {
   try {
@@ -29,6 +30,7 @@ export default async function get(req: any, res: any, refresh_token) {
     // delete user['password'];
     res.status(200).json({ data: fee, success: true });
   } catch (err) {
+    logFile.error(err.message)
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

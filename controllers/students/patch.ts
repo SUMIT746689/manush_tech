@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 
 import { fileDelete, fileRename, fileUpload } from '@/utils/upload';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const patchHandle = async (req, res, authenticate_user) => {
     try {
@@ -189,10 +190,10 @@ const patchHandle = async (req, res, authenticate_user) => {
         })
 
         res.status(200).json({ success: 'student updated successfully but sms sending failed' });
-    } catch (error) {
-        console.log(error);
-        res.status(404).json({ error: error.message });
-    }
+    } catch (err) {
+        logFile.error(err.message)
+        res.status(404).json({ error: err.message });
+      }
 };
 
 export default authenticate(patchHandle);

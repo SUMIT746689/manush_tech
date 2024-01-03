@@ -1,12 +1,12 @@
 import Head from 'next/head';
-import './globals.css';
-import Footer from '../layout/Footer';
-import Header from '../layout/Header';
-import LayoutWrapper from '../layout/LayoutWrapper';
-import Nav from '../layout/Nav';
-import prisma from '../../../src/lib/prisma_client';
+import '../globals.css';
+import Footer from '@/layout/Footer';
+import Header from '@/layout/Header';
+import LayoutWrapper from '@/layout/LayoutWrapper';
+import Nav from '@/layout/Nav';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
-import SchoolNotFound from '../components/SchoolNotFound'
+import SchoolNotFound from '@/components/SchoolNotFound'
 import React from 'react';
 
 export default async function RootLayout({ children }) {

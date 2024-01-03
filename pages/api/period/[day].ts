@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma_client";
 import deletePeriod from "controllers/period/deletePeriod";
 import { authenticate } from "middleware/authenticate";
+import { logFile } from "utilities_api/handleLogFile";
 
 const Day = async (req, res, refresh_token) => {
     try {
@@ -42,14 +43,16 @@ const Day = async (req, res, refresh_token) => {
                 res.status(200).json(schedule);
                 break;
             case 'DELETE':
-                deletePeriod(req, res,refresh_token);
+                deletePeriod(req, res, refresh_token);
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET', 'DELETE']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
 
     }

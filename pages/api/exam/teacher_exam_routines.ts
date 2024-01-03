@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const index = async (req, res, refresh_token) => {
     try {
@@ -16,7 +17,7 @@ const index = async (req, res, refresh_token) => {
                 if (role.title !== "ADMIN" && role.title !== "TEACHER") throw new Error("unauthorized user")
 
                 const { exam_term_id, teacher_id } = req.query;
-                const where = {deleted_at:null};
+                const where = { deleted_at: null };
 
                 if (role.title === "TEACHER") where["user_id"] = id;
                 else if (role.title === "ADMIN") where["user_id"] = parseInt(teacher_id);
@@ -65,10 +66,12 @@ const index = async (req, res, refresh_token) => {
 
             default:
                 res.setHeader('Allow', ['GET']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };

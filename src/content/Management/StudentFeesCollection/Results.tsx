@@ -130,8 +130,9 @@ const Results = ({
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const { user: { school: { currency } } = {} } = {} = useAuth();
-
+  // const { user: { school: { currency } } = {} } = {} = useAuth();
+  const { school } = user || {};
+  const { currency } = school || {};
   const handleStudentPaymentCollect = () => {
     if (selectedStudent && academicYear) {
       axios.get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
@@ -198,6 +199,7 @@ const Results = ({
         });
     }
   };
+  
   useEffect(() => {
     if (selectedStudent) {
       handleStudentPaymentCollect();
@@ -513,7 +515,7 @@ const Results = ({
           </Grid>
         </Card>
       }
-      
+
       <Card sx={{ minHeight: 'calc(100vh - 358px) !important' }}>
 
         <Box

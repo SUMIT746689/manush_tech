@@ -1,5 +1,6 @@
 import post from 'controllers/banners/right_banners/post';
 import delete_ from 'controllers/banners/right_banners/delete_';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -23,6 +24,7 @@ const index = async (req, res) => {
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
+        logFile.error(err.message);
         console.log(err);
         res.status(500).json({ message: err.message });
     }

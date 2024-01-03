@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { academicYearVerify, authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 // @ts-ignore
 async function get(req, res, refresh_token, academic_year) {
@@ -17,9 +18,11 @@ async function get(req, res, refresh_token, academic_year) {
       }
     });
 
-    if (response) return res.json({ success: true, data: response });
-    else throw new Error('Invalid to create school');
+    if (!response) throw new Error('invalid to get exam terms');
+    res.json({ success: true, data: response });
+
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import dayjs from 'dayjs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const get = async (req, res) => {
   try {
@@ -145,7 +146,7 @@ export const get = async (req, res) => {
 
     res.status(200).json({ data, success: true });
   } catch (err) {
-    console.log(err.message);
-    res.status(404).json({ err: err.message });
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };

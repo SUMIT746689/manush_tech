@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate";
+import { logFile } from "utilities_api/handleLogFile";
 
 const index = async (req, res, refresh_token) => {
   try {
@@ -22,7 +23,7 @@ const index = async (req, res, refresh_token) => {
           where: {
             section_id: responseStudent.section.id,
             school_id: refresh_token.school_id,
-            room:{deleted_at: null}
+            room: { deleted_at: null }
           },
           select: {
             day: true,
@@ -58,11 +59,13 @@ const index = async (req, res, refresh_token) => {
         res.status(200).json({ routine, class: responseStudent.section.class.name, section: responseStudent.section.class.has_section ? responseStudent.section.name : 'no section' });
         break;
       default:
-        res.setHeader('Allow', ['GET', 'POST']);
+        res.setHeader('Allow', ['GET']);
+        logFile.error(`Method ${method} Not Allowed`)
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {
     console.log(err);
+    logFile.error(err.message)
     res.status(404).json({ message: err.message });
   }
 };

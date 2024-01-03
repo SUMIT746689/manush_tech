@@ -10,6 +10,7 @@ import { read } from "xlsx";
 import * as XLSX from 'xlsx/xlsx.mjs';
 import { getSheetBodies, getSheetHeaders } from '@/utils/sheet';
 import { findMatches } from '@/utils/findMatches';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function post(req, res, refresh_token) {
@@ -110,6 +111,7 @@ async function post(req, res, refresh_token) {
     })
 
   } catch (err) {
+    logFile.error(err.message)
     console.log({ err: err.message })
     res.status(404).json({ error: err.message });
   }

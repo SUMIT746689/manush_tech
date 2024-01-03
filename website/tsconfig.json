@@ -6,9 +6,15 @@
       "esnext"
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/public/*": ["./public/*"],
-        "react": [ "./node_modules/@types/react" ],
+      "@/*": [
+        "./src/*"
+      ],
+      "@/public/*": [
+        "./public/*"
+      ],
+      "react": [
+        "./node_modules/@types/react"
+      ]
     },
     "allowJs": true,
     "skipLibCheck": true,
@@ -26,14 +32,17 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "src/app/school_not_found.js", "src/components/OnlineAdmission.jsx"  ],
+    "**/*.tsx",
+    "src/app/school_not_found.js",
+    "src/components/OnlineAdmission.jsx"
+, "src/app/(showFile)/layout.js"  ],
   "exclude": [
     "node_modules"
   ]

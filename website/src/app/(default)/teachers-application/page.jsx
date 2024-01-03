@@ -1,7 +1,7 @@
-import prisma from '../../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
-import TeachersApplication from "../../components/TeachersApplication";
+import TeachersApplication from "@/components/TeachersApplication";
 
 
 export default async function Admission() {

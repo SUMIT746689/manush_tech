@@ -6,6 +6,7 @@ import { authenticate } from 'middleware/authenticate';
 import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import prisma from '@/lib/prisma_client';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -371,10 +372,9 @@ const handlePost = async (req, res, refresh_token) => {
 
         return res.status(200).json({ message: 'All students data inserted', faildedSmS, successSmS });
     } catch (err) {
-        console.log(err);
-
-        return res.status(400).send(err);
-    }
+        logFile.error(err.message)
+        res.status(404).json({ error: err.message });
+      }
 };
 
 export default authenticate(handlePost);

@@ -3,6 +3,7 @@ import path from 'path';
 import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
+import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {
     api: {
@@ -30,7 +31,10 @@ const post = async (req: any, res: any, refresh_token) => {
 
         const { banners } = files;
 
-        if (!banners) return res.status(404).json({ message: 'file missing !!' });
+        if (!banners) {
+            logFile.error('file missing !!' )
+            return res.status(404).json({ message: 'file missing !!' });
+        }
 
         const uploaPaths: any = [];
         // @ts-ignore
@@ -81,6 +85,7 @@ const post = async (req: any, res: any, refresh_token) => {
         res.status(200).json({ success: 'created successfully' });
 
     } catch (err) {
+        logFile.error(err.message);
         console.log(err.message);
         res.status(404).json({ err: err.message });
     }

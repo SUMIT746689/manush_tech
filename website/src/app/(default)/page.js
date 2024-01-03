@@ -1,6 +1,6 @@
-import HomeContent from "../components/HomeContent";
+import HomeContent from "@/components/HomeContent";
 
-import prisma from '../../../src/lib/prisma_client';
+import prisma from '@/lib/prisma_client';
 import { headers } from 'next/headers';
 import { redirect } from "next/navigation";
 
@@ -9,7 +9,7 @@ export default async function Home() {
 
   const headersList = headers();
   const domain = headersList.get('host')
-console.log({domain});
+
   const school_info = await prisma.websiteUi.findFirst({
     where: {
       school: {

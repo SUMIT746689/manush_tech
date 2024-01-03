@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const index = async (req, res) => {
   try {
@@ -10,8 +11,8 @@ const index = async (req, res) => {
         const { name, class_id } = req.body;
         const data = {};
 
-        if(name) data["name"]= name;
-        if(class_id) data["class_id"]= class_id;
+        if (name) data["name"] = name;
+        if (class_id) data["class_id"] = class_id;
 
         await prisma.subject.update({
           where: { id: parseInt(id) },
@@ -22,10 +23,12 @@ const index = async (req, res) => {
         break;
       default:
         res.setHeader('Allow', ['PATCH']);
+        logFile.error(`Method ${method} Not Allowed`)
         res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (err) {
     console.log(err);
+    logFile.error(err.message)
     res.status(500).json({ message: err.message });
   }
 };

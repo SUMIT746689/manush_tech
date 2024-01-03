@@ -3,6 +3,7 @@ import { authenticate } from 'middleware/authenticate';
 import { serialize } from 'cookie';
 import { encrypt } from 'utilities_api/hashing';
 import { makeCookie } from 'utilities_api/handleCookies';
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function patch(req, res, refresh_token) {
     try {
@@ -25,6 +26,7 @@ async function patch(req, res, refresh_token) {
         res.setHeader('Set-Cookie', cookies);
         res.status(200).json({ success: true })
     } catch (err) {
+        logFile.error(err.message)
         res.status(404).json({ error: err.message });
     }
 }

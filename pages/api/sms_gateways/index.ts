@@ -1,5 +1,6 @@
 import get from 'controllers/sms_gateways/get';
 import post from 'controllers/sms_gateways/post';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const index = async (req, res) => {
@@ -15,6 +16,7 @@ const index = async (req, res) => {
       break;
     default:
       res.setHeader('Allow', ['GET', 'POST']);
+      logFile.error(`Method ${method} Not Allowed`)
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

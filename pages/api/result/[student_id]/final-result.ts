@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const id = async (req, res) => {
     try {
@@ -50,10 +51,10 @@ const id = async (req, res) => {
                                         select: {
                                             id: true,
                                             name: true,
-                                            
+
                                         }
                                     },
-                                    subject_total:true
+                                    subject_total: true
                                 }
                             },
                             student_results: {
@@ -82,8 +83,8 @@ const id = async (req, res) => {
                     let allSubjectCalculatedMark = []
                     let totalMark = 0
                     for (const studetGivenExam of data.exam_details) {
-                         console.log(studetGivenExam);
-                        
+                        console.log(studetGivenExam);
+
                         const flag = data.student_results[0].result_details.find(i => i.exam_details.subject.id == studetGivenExam.subject.id);
                         let singleSubjectCalculetedMark;
                         if (flag) {
@@ -95,7 +96,7 @@ const id = async (req, res) => {
                         allSubjectCalculatedMark.push({
                             subject_id: studetGivenExam.subject.id,
                             subject_name: studetGivenExam.subject.name,
-                             subject_total:studetGivenExam.subject_total,
+                            subject_total: studetGivenExam.subject_total,
                             singleSubjectCalculetedMark: singleSubjectCalculetedMark
                         })
                         totalMark += singleSubjectCalculetedMark;
@@ -147,13 +148,15 @@ const id = async (req, res) => {
                 res.status(200).json({ student: student, termWiseTotalMark: termWiseTotalMark });
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.error(err.message)
         res.status(500).json({ message: err.message });
     }
 };
 
-export default authenticate(id) ;
+export default authenticate(id);

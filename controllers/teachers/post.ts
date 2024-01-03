@@ -5,6 +5,7 @@ import path from 'path';
 import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
 import adminCheck from 'middleware/adminCheck';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const post = async (req, res, refresh_token) => {
   const uploadFolderName = 'teacher';
@@ -17,7 +18,6 @@ const post = async (req, res, refresh_token) => {
   }
 
   const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
-  console.log("files, fields__", files, fields);
 
   if (error) throw new Error('Error')
 
@@ -76,7 +76,6 @@ const post = async (req, res, refresh_token) => {
       password,
       Number(process.env.SALTROUNDS)
     );
-    console.log({ encrypePassword });
 
     const optionalQuery = {
       middle_name: middle_name && middle_name,
@@ -98,7 +97,6 @@ const post = async (req, res, refresh_token) => {
         title: 'TEACHER'
       }
     })
-    console.log("date_of_birth__", date_of_birth);
 
     const filePathQuery = {}
 
@@ -144,8 +142,7 @@ const post = async (req, res, refresh_token) => {
     });
     return res.status(200).json({ teacher: teacher, success: true });
   } catch (err) {
-    console.log("teacher__", err);
-
+    logFile.error(err.message)
     if (resume) deleteFiles(resume.filepath);
     if (photo) deleteFiles(photo.filepath);
     res.status(404).json({ error: err.message });
@@ -157,6 +154,7 @@ export default authenticate(adminCheck(post))
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {
+    logFile.error(err)
     console.log({ err });
   });
 };

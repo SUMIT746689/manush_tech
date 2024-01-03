@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next/types';
 import patch from 'controllers/subscriptions/packageRequest/patch';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const index = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -11,6 +12,7 @@ const index = async (req: NextApiRequest, res: NextApiResponse) => {
 
     default:
       res.setHeader('Allow', ['PATCH']);
+      logFile.error(`Method ${method} Not Allowed`)
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 };

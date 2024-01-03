@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 const handleDelete = async (req, res) => {
@@ -47,11 +48,10 @@ const handleDelete = async (req, res) => {
         })
         res.status(200).json({ message: 'Student deleted successfully !' })
 
-    } catch (error) {
-        console.log(error);
-
-        res.status(404).json({ Error: error.message });
-    }
+    } catch (err) {
+        logFile.error(err.message)
+        res.status(404).json({ error: err.message });
+      }
 }
 
 export default authenticate(handleDelete) 

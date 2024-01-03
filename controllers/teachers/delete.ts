@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 export const deleteTeacher = async (req, res, refresh_token) => {
   try {
@@ -14,7 +15,7 @@ export const deleteTeacher = async (req, res, refresh_token) => {
     })
     res.status(200).json({ success: true });
   } catch (err) {
-    console.log(err.message);
-    res.status(404).json({ err: err.message });
+    logFile.error(err.message)
+    res.status(404).json({ error: err.message });
   }
 };

@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 const FinalResultAll = async (req, res, refresh_token) => {
     try {
@@ -104,11 +105,11 @@ const FinalResultAll = async (req, res, refresh_token) => {
 
                         j['termTotalCountedMark'] = termTotalCountedMark
                         j['termTotalCountedPoint'] = termTotalCountedPoint
-                         delete j['result_details']
+                        delete j['result_details']
                         return j
                     })
                     i['total_counted_mark'] = total_counted_mark
-                    i['total_counted_point'] = total_counted_point/examsLenght
+                    i['total_counted_point'] = total_counted_point / examsLenght
                     i['results'] = result
                     return i
                 })
@@ -116,11 +117,13 @@ const FinalResultAll = async (req, res, refresh_token) => {
                 res.status(200).json({ examList: exams, student_result_list: temp });
                 break;
             default:
-                res.setHeader('Allow', ['GET', 'POST']);
+                res.setHeader('Allow', ['GET']);
+                logFile.error(`Method ${method} Not Allowed`)
                 res.status(405).end(`Method ${method} Not Allowed`);
         }
     } catch (err) {
         console.log(err);
+        logFile.log(err.message)
         res.status(500).json({ message: err.message });
     }
 };

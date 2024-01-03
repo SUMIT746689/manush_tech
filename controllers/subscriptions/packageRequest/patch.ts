@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 const patchHandle = async (req, res) => {
   try {
     const { status, id, school_id, package_id } = req.body;
@@ -55,7 +56,7 @@ const patchHandle = async (req, res) => {
     if (subscriptionUpdate) return res.json({ success: true });
     else throw new Error('failed to update request package');
   } catch (err) {
-    console.error(err.message);
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 };

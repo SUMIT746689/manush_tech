@@ -4,6 +4,7 @@ import {  fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import fsP from "fs/promises";
+import { logFile } from 'utilities_api/handleLogFile';
 
 async function put(req, res, refresh_token) {
     const uploadFolderName = "frontendPhoto";
@@ -338,6 +339,7 @@ async function put(req, res, refresh_token) {
                 fs.unlinkSync(filePath)
             }
         }
+        logFile.error(error.message)
         res.status(404).json({ Error: error.message });
     }
 }

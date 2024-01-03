@@ -1,23 +1,23 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from 'utilities_api/handleLogFile';
 
 
 async function patch(req, res, refresh_token) {
   try {
     const { name, body } = req.body;
-    const {id} = req.query;
-    console.log({id})
+    const { id } = req.query;
 
-    if(!refresh_token.school_id) throw new Error('invalid user')
+    if (!refresh_token.school_id) throw new Error('invalid user')
     if (!name && !body) throw new Error("provide required data for update")
 
     const data = {};
-    if(name) data["name"] = name;
-    if(body) data["body"] = body;
+    if (name) data["name"] = name;
+    if (body) data["body"] = body;
 
     const response = await prisma.emailTemplate.update({
       // @ts-ignore
-      where: {id: Number(id)},
+      where: { id: Number(id) },
       data
     })
 
@@ -25,6 +25,7 @@ async function patch(req, res, refresh_token) {
     // else throw new Error('Invalid to find school');
 
   } catch (err) {
+    logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }

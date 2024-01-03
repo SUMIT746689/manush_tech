@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from 'middleware/authenticate';
+import { logFile } from "utilities_api/handleLogFile";
 
 const post = async (req, res, refresh_token) => {
     try {
@@ -20,6 +21,7 @@ const post = async (req, res, refresh_token) => {
         */
 
         if (req.body.start_time == req.body.end_time) {
+            logFile.error("start and end times should not be equel")
             return res.status(406).send({ message: "start and end times should not be equel" });
         }
         // const start_time = new Date(Date.parse(req.body.start_time + "+0000"));
@@ -28,6 +30,7 @@ const post = async (req, res, refresh_token) => {
         const end_time = new Date(req.body.end_time);
 
         if (start_time > end_time) {
+            logFile.error("start time must be smaller then end time")
             return res.status(406).send({ message: "start time must be smaller then end time" })
         }
         if (req.body.subject_id) {
@@ -39,7 +42,10 @@ const post = async (req, res, refresh_token) => {
                     }
                 }
             })
-            if (!subject) return res.status(409).send({ message: "Invalid subject !" })
+            if (!subject) {
+                logFile.error("Invalid subject !")
+                return res.status(409).send({ message: "Invalid subject !" })
+            }
         }
         // filter period for perticular day and room
 
@@ -91,6 +97,7 @@ const post = async (req, res, refresh_token) => {
 
             // period overlap checking
             if ((reqStartTime >= storedStartTime && reqStartTime <= storedEndTime) || (reqEndTime >= storedStartTime && reqEndTime <= storedEndTime)) {
+                logFile.error("schedule booked. choose another")
                 return res.status(409).send({ message: "schedule booked. choose another" })
             }
         }
@@ -121,6 +128,7 @@ const post = async (req, res, refresh_token) => {
 
                 // period overlap checking
                 if ((reqStartTime >= storedStartTime && reqStartTime <= storedEndTime) || (reqEndTime >= storedStartTime && reqEndTime <= storedEndTime)) {
+                    logFile.error("This teacher has another calss in this time !!")
                     return res.status(409).send({ message: "This teacher has another calss in this time !!" })
                 }
 
@@ -144,6 +152,7 @@ const post = async (req, res, refresh_token) => {
         res.status(200).json({ message: "period created successfull!!" });
 
     } catch (err) {
+        logFile.error(err.message)
         console.log(err.message);
         res.status(404).json({ error: err.message });
     }

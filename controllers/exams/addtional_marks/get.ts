@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma_client";
+import { logFile } from "utilities_api/handleLogFile";
 
 const get = async (req, res, refresh_token) => {
     try {
@@ -16,6 +17,7 @@ const get = async (req, res, refresh_token) => {
 
         res.status(200).json(resAddMarks);
     } catch (err) {
+        logFile.error(err.message)
         console.log(err);
         res.status(500).json({ message: err.message });
     }

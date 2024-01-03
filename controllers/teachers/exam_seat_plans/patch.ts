@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma_client";
 import { authenticate } from "middleware/authenticate"
+import { logFile } from "utilities_api/handleLogFile";
 
 const patch = async (req, res, token_data) => {
     try {
@@ -15,12 +16,12 @@ const patch = async (req, res, token_data) => {
                 }
             }
         });
-        console.log({ resSeatPlan })
 
         res.status(200).json({ success: "successfully added" })
     }
     catch (err) {
-        res.status(500).json({ error: err.message })
+        logFile.error(err.message)
+        res.status(500).json({ error: err.message });
     }
 }
 

@@ -3,6 +3,7 @@ import { createAttendance, stdAlreadyAttendance, updateAttendance } from "./util
 import { deleteTblAttendanceQueues, resStdAttendanceQueues, userWiseAttendanceQueues, userWiseAttendanceQueuesWithStatus } from "./utility/handleAttendanceQueue.js";
 import { handleResStdInfo } from "./utility/handleUserInfo.js";
 import { logFile } from "./utility/handleLog.js";
+import { sentSms } from "./utility/sent_sms.js";
 
 export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }) => {
 
@@ -13,13 +14,20 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
         const { user_id } = userAttend;
 
         const { error, data: resStudent } = await handleResStdInfo({ user_id });
-        if (error) logFile.error(error)
+        if (error) return logFile.error(error);
 
         const { id, guardian_phone, section, student_info, class_roll_no } = resStudent ?? {};
 
         if (!id || !section?.std_entry_time) return logFile.error(`user_id(${user_id}) is not found`);
 
         const isAlreadyAttendanceEntry = await stdAlreadyAttendance({ student_id: id, min_attend_datetime, max_attend_datetime })
+
+        // sent sms
+        console.log({ resStudent });
+        console.log({ resStudent: resStudent.student_info.school });
+        const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
+        sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent,user_id)
+        return;
 
         if (isAlreadyAttendanceEntry && isAlreadyAttendanceEntry?.id) {
 

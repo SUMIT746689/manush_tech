@@ -12,6 +12,7 @@ export const handleResStdInfo = async ({ user_id }) => {
                 id: true,
                 guardian_phone: true,
                 class_roll_no: true,
+                guardian_phone:true,
                 section: {
                     select:
                     {
@@ -29,7 +30,15 @@ export const handleResStdInfo = async ({ user_id }) => {
                     {
                         first_name: true,
                         middle_name: true,
-                        last_name: true, school_id: true
+                        last_name: true,
+                        school_id: true,
+                        school: {
+                            select: {
+                                name: true,
+                                AutoAttendanceSentSms: true,
+                                SmsGateway:true
+                            }
+                        }
                     }
                 }
             }

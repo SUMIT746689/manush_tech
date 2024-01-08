@@ -33,31 +33,31 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         //priority: 4
       }
     }),
-    prisma.tbl_sent_sms.create({
-      data: {
-        sms_shoot_id,
-        user_id: parseInt(user_id),
-        school_id,
-        school_name,
-        sender_id,
-        sms_type,
-        sms_text,
-        // // sender_id: 1,
-        // // sender_name: "",
-        submission_time: new Date(submission_time),
-        contacts,
-        pushed_via: '',
-        // // status: status,
-        // // route_id: 1,
-        // // coverage_id: 1,
-        charges_per_sms,
-        total_count: 1,
-        number_of_sms_parts
-        // // is_black_list: 2,
-        //fail_count: 3,
-        //priority: 4
-      }
-    }),
+    // prisma.tbl_sent_sms.create({
+    //   data: {
+    //     sms_shoot_id,
+    //     user_id: parseInt(user_id),
+    //     school_id,
+    //     school_name,
+    //     sender_id,
+    //     sms_type,
+    //     sms_text,
+    //     // // sender_id: 1,
+    //     // // sender_name: "",
+    //     submission_time: new Date(submission_time),
+    //     contacts,
+    //     pushed_via: '',
+    //     // // status: status,
+    //     // // route_id: 1,
+    //     // // coverage_id: 1,
+    //     charges_per_sms,
+    //     total_count: 1,
+    //     number_of_sms_parts
+    //     // // is_black_list: 2,
+    //     //fail_count: 3,
+    //     //priority: 4
+    //   }
+    // }),
     prisma.school.update({
       where: { id: school_id },
       data: {

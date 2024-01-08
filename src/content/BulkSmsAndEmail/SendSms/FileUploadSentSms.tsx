@@ -423,8 +423,7 @@ function PageHeader({ sms_gateway }) {
                       handleChange={(v) => {
                         if (v.target.value.length > 1000) return;
                         handleChange(v)
-                      }
-                      }
+                      }}
                       handleBlur={handleBlur}
                     />
                     <Grid sx={{ pb: 1, ml: 'auto' }}>

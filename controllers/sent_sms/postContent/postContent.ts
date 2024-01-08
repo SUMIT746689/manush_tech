@@ -8,11 +8,11 @@ export const sentSms = (dataObj) => {
         ...dataObj
       }
     }),
-    prisma.tbl_sent_sms.create({
-      data: {
-        ...dataObj
-      }
-    })
+    // prisma.tbl_sent_sms.create({
+    //   data: {
+    //     ...dataObj
+    //   }
+    // })
   ])
 };
 

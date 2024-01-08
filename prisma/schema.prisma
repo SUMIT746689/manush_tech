@@ -96,6 +96,7 @@ model School {
   StudentAdmissionForm       StudentAdmissionForm?
   Package_transaction        Package_transaction[]
   Payment_gateway_credential Payment_gateway_credential[]
+  AutoAttendanceSentSms      AutoAttendanceSentSms[]
 
   // routines Routine[]
   @@map("schools")
@@ -1362,11 +1363,11 @@ model StudentAdmissionForm {
 }
 
 model Payment_gateway_credential {
-  id        Int                   @id @default(autoincrement())
-  title     payment_gateway_title
-  details   Json
-  is_active Boolean
-  school_id Int
+  id         Int                   @id @default(autoincrement())
+  title      payment_gateway_title
+  details    Json
+  is_active  Boolean
+  school_id  Int
   account_id Int
 
   account Accounts @relation(fields: [account_id], references: [id])
@@ -1383,4 +1384,16 @@ enum payment_gateway_title {
   amarPay
   surjoPay
   sslcommerz
+}
+
+model AutoAttendanceSentSms {
+  id        Int     @id @default(autoincrement())
+  body      String
+  is_active Boolean @default(false)
+  every_hit Boolean @default(false)
+  school_id Int @unique
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("auto_attendance_sent_sms")
 }

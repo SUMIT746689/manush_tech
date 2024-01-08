@@ -1,13 +1,12 @@
 import { Authenticated } from '@/components/Authenticated';
 import Footer from '@/components/Footer';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
-import { Button, ButtonGroup, Card, Grid } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import SmsPage from '@/content/BulkSmsAndEmail/SendSms/SmsPage';
 import IndividualSmsPage from '@/content/BulkSmsAndEmail/SendSms/IndividualSmsPage';
 import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadSentSms';
-import { useContext, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { BasicTabWrapper } from '@/components/Tab/Tab';
 import { useClientDataFetch } from '@/hooks/useClientFetch';
@@ -15,11 +14,9 @@ import { useClientDataFetch } from '@/hooks/useClientFetch';
 const Packages = () => {
   // const [type, setType] = useState("INDIVIDUAL_SMS");
   const { user } = useAuth();
-  console.log({ user });
   const { school } = user || {};
-  console.log({ school });
   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
-  console.log({ sms_gateway })
+  
   return (
     <>
       <Head>

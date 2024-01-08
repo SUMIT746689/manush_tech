@@ -60,13 +60,13 @@ async function post(req, res, refresh_token) {
       const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
 
       if (excelArrayDatas.length > 30000) return res.status(404).json({ error: "large file, maximum support 30,000 row" })
-      
+
       let error = null;
 
       const resSentSms = excelArrayDatas.map((value, index) => {
         let body = fields.body;
         let contacts = value[fields.contact_column];
-        
+
         if (!contacts) {
           error = "selected contact field is missing";
         }
@@ -74,7 +74,7 @@ async function post(req, res, refresh_token) {
         for (const element of allMatchesArray) {
           body = body.replaceAll(`#${element}#`, value[element])
         }
-        
+
         return {
           sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
           user_id: parseInt(id),
@@ -92,14 +92,15 @@ async function post(req, res, refresh_token) {
 
       if (error) return res.status(404).json({ error })
 
-      await prisma.$transaction([
-        prisma.tbl_queued_sms.createMany({
-          data: resSentSms
-        }),
-        prisma.tbl_sent_sms.createMany({
-          data: resSentSms
-        })
-      ])
+      // await prisma.$transaction([
+      prisma.tbl_queued_sms.createMany({
+        data: resSentSms
+      })
+        // ,
+        // prisma.tbl_sent_sms.createMany({
+        //   data: resSentSms
+        // })
+        // ])
         .then(res => { console.log("tbl_queue_sms", res) })
         .catch(err => { console.log("tbl_queue_sms", err) });
 

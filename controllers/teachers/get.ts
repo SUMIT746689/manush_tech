@@ -13,7 +13,6 @@ export const get = async (req, res) => {
           domain: req.headers.host
         }
       }
-
     }
     else {
       console.log("req.cookies.refresh_token___", req.cookies.refresh_token);

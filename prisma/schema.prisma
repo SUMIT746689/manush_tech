@@ -36,6 +36,7 @@ model User {
   approved_user        Leave[]                @relation("approved_by")
   banners              Banners[]
   Subscription_history Subscription_history[]
+  OtherUsersInfo       OtherUsersInfo?
 
   @@map("users")
 }
@@ -97,6 +98,7 @@ model School {
   Package_transaction        Package_transaction[]
   Payment_gateway_credential Payment_gateway_credential[]
   AutoAttendanceSentSms      AutoAttendanceSentSms[]
+  OtherUsersInfo             OtherUsersInfo[]
 
   // routines Routine[]
   @@map("schools")
@@ -1391,9 +1393,38 @@ model AutoAttendanceSentSms {
   body      String
   is_active Boolean @default(false)
   every_hit Boolean @default(false)
-  school_id Int @unique
+  school_id Int     @unique
 
   school School @relation(fields: [school_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
+}
+
+model OtherUsersInfo {
+  id                Int       @id @default(autoincrement())
+  first_name        String
+  middle_name       String?
+  last_name         String?
+  national_id       String?
+  phone             String?
+  email             String?
+  gender            Gender
+  blood_group       String?   @db.VarChar(20)
+  religion          String?
+  date_of_birth     DateTime  @db.Date
+  present_address   String
+  permanent_address String
+  joining_date      DateTime  @db.Date
+  resume            String?
+  photo             String?
+  deleted_at        DateTime?
+
+  employee_id String?
+  user_id     Int     @unique
+  school_id   Int
+
+  user   User   @relation(fields: [user_id], references: [id])
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("other_users_info")
 }

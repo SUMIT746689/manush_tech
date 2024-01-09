@@ -12,7 +12,7 @@ export const handleResStdInfo = async ({ user_id }) => {
                 id: true,
                 guardian_phone: true,
                 class_roll_no: true,
-                guardian_phone:true,
+                guardian_phone: true,
                 section: {
                     select:
                     {
@@ -36,7 +36,9 @@ export const handleResStdInfo = async ({ user_id }) => {
                             select: {
                                 name: true,
                                 AutoAttendanceSentSms: true,
-                                SmsGateway:true
+                                SmsGateway: true,
+                                masking_sms_count: true,
+                                non_masking_sms_count: true,
                             }
                         }
                     }

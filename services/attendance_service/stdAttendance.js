@@ -9,7 +9,6 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
 
     const { error, data } = await resStdAttendanceQueues();
     if (error) return logFile.error(error)
-
     data.forEach(async (userAttend) => {
         const { user_id } = userAttend;
 
@@ -18,16 +17,9 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
 
         const { id, guardian_phone, section, student_info, class_roll_no } = resStudent ?? {};
 
-        if (!id || !section?.std_entry_time) return logFile.error(`user_id(${user_id}) is not found`);
+        if (!id || !section?.std_entry_time) return logFile.error(`student user_id(${user_id}) or section_id(${section.id}) entry time not found`);
 
         const isAlreadyAttendanceEntry = await stdAlreadyAttendance({ student_id: id, min_attend_datetime, max_attend_datetime })
-
-        // sent sms
-        console.log({ resStudent });
-        console.log({ resStudent: resStudent.student_info.school });
-        const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
-        sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent,user_id)
-        return;
 
         if (isAlreadyAttendanceEntry && isAlreadyAttendanceEntry?.id) {
 
@@ -79,5 +71,10 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
             if (errorDeletetblAttQueues) return logFile.error(errorDeletetblAttQueues);
             logFile.info("tbl_attendance_queue delete successfull");
         }
+
+        // sent sms
+        const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
+        sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id)
+        
     })
 } 

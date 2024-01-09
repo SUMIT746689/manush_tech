@@ -67,6 +67,7 @@ const StudentAutoSentSms = () => {
         const successResponse = () => {
             showNotification('autometic attendance sent sms settings updated!')
             resetForm();
+            reFetchData();
             setStatus({ success: true });
         };
 

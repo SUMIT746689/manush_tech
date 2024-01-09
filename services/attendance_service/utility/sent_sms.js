@@ -4,37 +4,36 @@ import { logFile } from "./handleLog.js";
 
 export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id) => {
     try {
-
-        const { details } = Array.isArray(studentDatas.student_info?.school?.SmsGateway) && studentDatas.student_info?.school?.SmsGateway?.length > 0 ? studentDatas.student_info?.school?.SmsGateway[0] : {};
+        
+        const { name, AutoAttendanceSentSms, SmsGateway, masking_sms_count, non_masking_sms_count } = studentDatas?.student_info?.school ?? {};
+        const { details } = Array.isArray(SmsGateway) && SmsGateway?.length > 0 ? SmsGateway[0] : {};
         const { sender_id } = details ?? {};
-        if (0) return logFile.error({ "server": err.message })
-        console.log({ details })
-        if (!data.is_active) return;
-        if (!data.every_hit && isAlreadyAttendanceEntry?.id) return;
-
-        const allMatchesArray = findMatches(data.body);
+        if (!sender_id) return logFile.error(`student sent sms, user_id(${user_id}) sender_id not founds`);
+        if (!data.is_active) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) automatic attendance is not active`);
+        if (!data.every_hit && isAlreadyAttendanceEntry?.id) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) every_hit(${data.every_hit}) already sent sms automatic attendance`);
+        if (!studentDatas.guardian_phone) return logFile.error(`student sent sms, user_id(${user_id}) guardian_phone not founds`)
 
         let body = data.body;
+        const allMatchesArray = findMatches(data.body);
         for (const element of allMatchesArray) {
             body = body.replaceAll(`#${element}#`, studentDatas[element] || studentDatas.student_info[element] || '')
         }
-        console.log({ body })
-        const number_of_sms_parts = body.length <= 160 ? 1 : Math.ceil(body.length / 153)
-        const resSmsGateWay = ''
+        const number_of_sms_parts = body.length <= 160 ? 1 : Math.ceil(body.length / 153);
+        if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) masking sms count is ${masking_sms_count}`);
+
         const smsQTableHandlerDatas = {
             user_id,
             contacts: studentDatas.guardian_phone,
             sms_text: body,
             submission_time: Date.now(),
             school_id: studentDatas.student_info.school_id,
-            school_name: studentDatas.student_info.school.name,
+            school_name: name,
             sender_id,
             sms_type: "masking",
             index: user_id,
             number_of_sms_parts,
-            charges_per_sms
+            charges_per_sms: 0
         };
-
         createSmsQueueTableHandler(smsQTableHandlerDatas);
     }
     catch (err) {

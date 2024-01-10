@@ -8,13 +8,13 @@ import adminCheck from 'middleware/adminCheck';
 import { logFile } from 'utilities_api/handleLogFile';
 
 const post = async (req, res, refresh_token) => {
-  const uploadFolderName = 'teacher';
+  const uploadFolderName = 'other_users';
 
-  const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+  const resumeFileType = ['application/pdf, application/vnd.ms-excel'];
+  const photoFileType = ['image/jpeg', 'image/jpg', 'image/png',]
   const filterFiles = {
-    logo: fileType,
-    signature: fileType,
-    background_image: fileType,
+    resume: resumeFileType,
+    photo: photoFileType,
   }
 
   const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
@@ -24,20 +24,17 @@ const post = async (req, res, refresh_token) => {
   const { resume, photo } = files;
   try {
 
-    if (files && resume || fields?.resume) {
-      if (photo) {
-        if (
-          ['image/jpeg', 'image/jpg', 'image/png'].includes(resume.mimetype)
-        )
-          return res.json('Only png, jpg & jpeg is supported');
-      }
-      if (!resume && !fields?.resume) deleteFiles(photo.filepath);
+    if (photo || resume) {
+      if (photo && !['image/jpeg', 'image/jpg', 'image/png'].includes(resume.mimetype))
+        return res.json('Only png, jpg & jpeg is supported');
+
+      // if (!resume && !fields?.resume) deleteFiles(photo.filepath);
     }
-    else {
-      // console.log({ files });
-      if (photo) deleteFiles(photo.filepath);
-      return res.json('require resume');
-    }
+    // else {
+    //   // console.log({ files });
+    //   if (photo) deleteFiles(photo.filepath);
+    //   return res.json('require resume');
+    // }
     const {
       username,
       password,
@@ -64,17 +61,15 @@ const post = async (req, res, refresh_token) => {
       !gender ||
       !date_of_birth ||
       !present_address ||
-      !permanent_address ||
-      !national_id
+      !permanent_address
+      // ||
+      // !national_id
     )
       return res.json({
         message: 'username || password || first_name || gender || date_of_birth || present_address || permanent_address is missing'
       });
-
-    const encrypePassword = await bcrypt.hash(
-      password,
-      Number(process.env.SALTROUNDS)
-    );
+      console.log({permanent_address})
+    const encrypePassword = await bcrypt.hash(password, Number(process.env.SALTROUNDS));
 
     const optionalQuery = {
       middle_name: middle_name && middle_name,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +33,7 @@ import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { generateUsername, getFile } from '@/utils/utilitY-functions';
 import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
+import { useAuth } from '@/hooks/useAuth';
 
 const BoxUploadWrapper = styled(Box)(
   ({ theme }) => `
@@ -54,6 +55,14 @@ const BoxUploadWrapper = styled(Box)(
 `
 );
 
+const permissons = [
+  // { label: 'Admin', role: 'ADMIN', value: 'create_admin' },
+  // { label: 'Guardian', role: 'GURDIAN', value: 'create_gurdian' },
+  { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
+  { label: 'Accountant', role: 'ACCOUNTANT', value: 'create_accountant' },
+  { label: 'Librarian', role: 'LIBRARIAN', value: 'create_librarian' },
+  { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' },
+];
 
 function PageHeader({
   editSchool,
@@ -66,9 +75,19 @@ function PageHeader({
   const [previewResume, setPreviewResume] = useState([]);
   const [photo, setPhoto] = useState([]);
   const [previewPhoto, setPreviewPhoto] = useState([]);
+  const { user }: any = useAuth();
 
   const { showNotification } = useNotistick();
   const theme = useTheme();
+
+
+  const available_permissions = user?.permissions?.map(
+    (permission) => permission.value
+  );
+
+  const userPrermissionRoles = permissons.filter((role) =>
+    available_permissions?.includes(role.value)
+  );
 
   useEffect(() => {
     if (editSchool) {
@@ -101,10 +120,10 @@ function PageHeader({
     setSubmitting
   ) => {
     try {
-      const resume: any = [];
-      Array.prototype.forEach.call(_values.resume, function (file) {
-        resume.push(file);
-      });
+      // const resume: any = [];
+      // Array.prototype.forEach.call(_values.resume, function (file) {
+      //   resume.push(file);
+      // });
       const formData = new FormData();
       formData.append('first_name', _values.first_name);
       formData.append('middle_name', _values.middle_name);
@@ -118,15 +137,16 @@ function PageHeader({
       formData.append('date_of_birth', _values.date_of_birth);
       formData.append('present_address', _values.present_address);
       formData.append('permanent_address', _values.permanent_address);
+      // formData.append('permanent_address', _values.permanent_address);
 
       if (_values.password !== '') {
         formData.append('password', _values.password);
       }
 
       formData.append('email', _values.email);
-      if (resume) formData.append('resume', _values.resume);
+      if (resume.length > 0) formData.append('resume', resume[0]);
 
-      formData.append('photo', _values.photo);
+      if (photo.length > 0) formData.append('photo', photo[0]);
 
       const successProcess = (message) => {
         resetForm();
@@ -139,7 +159,7 @@ function PageHeader({
       if (editSchool) {
         const result = await axios({
           method: 'PATCH',
-          url: `/api/teacher?teacher_id=${editSchool.id}`,
+          url: `/api/other_users?other_user_id=${editSchool.id}`,
           data: formData,
           headers: {
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`
@@ -152,7 +172,7 @@ function PageHeader({
         formData.append('username', _values.username)
         const res = await axios({
           method: 'POST',
-          url: '/api/teacher',
+          url: '/api/other_users',
           data: formData,
           headers: {
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`
@@ -177,25 +197,34 @@ function PageHeader({
       setPreviewFile(() => []);
       return;
     }
-    setFile(() => e.target.files);
+    // setFile(() => e.target.files[0]);
     const imgPrev = [];
+    const img = [];
     Array.prototype.forEach.call(e.target.files, (file) => {
+      img.push(file);
       const objectUrl = URL.createObjectURL(file);
       imgPrev.push({ name: file.name, src: objectUrl })
       // console.log({ objectUrl });
       // console.log({ file: file.name })
     });
+    setFile(img);
     setPreviewFile(() => imgPrev)
   }
 
-  const handleRemove = (setPreviewFile) => {
+  const handleRemove = (setPreviewFile, setFile) => {
     return (index) => {
       setPreviewFile((images) => {
         const imagesFilter = images.filter((image, imgIndex) => imgIndex !== index);
         return imagesFilter;
       })
+      setFile((images) => {
+        const imagesFilter = images.filter((image, imgIndex) => imgIndex !== index);
+        return imagesFilter;
+      })
     }
   }
+  // const temp = userPrermissionRoles.find(i => i.role === editUser?.user_role?.title);
+
   return (
     <>
 
@@ -239,8 +268,11 @@ function PageHeader({
             employee_id: editSchool?.employee_id || undefined,
             national_id: editSchool?.national_id || '',
             email: editSchool?.email || '',
-            resume: editSchool?.resume || '',
-            photo: '',
+            role: undefined,
+            // role: temp ? {
+            //   role_title: temp?.role,
+            //   permission: temp?.value
+            // } : undefined,
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -263,13 +295,10 @@ function PageHeader({
             permanent_address: Yup.string().required(
               t('The parmanent_address field is required')
             ),
-            department_id: Yup.number().required(
-              t('The depardment field is required')
-            ),
             national_id: Yup.number().required(
               t('The national id field is required')
             ),
-            resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
+            // resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
           })}
           onSubmit={async (
             _values,
@@ -293,849 +322,860 @@ function PageHeader({
             touched,
             values,
             setFieldValue
-          }) => (
-            <form onSubmit={handleSubmit}>
-              <DialogContent
-                dividers
-                sx={{
-                  p: 3
-                }}
-              >
-                <Grid container columnSpacing={1}>
-                  <Grid
-                    container
-                    sx={{
-                      background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
-                      p: 1,
-                      color: 'white',
-                      mb: 1
-                    }}
-                  >
-                    Basic Information:
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('First Name')}:*</b>
-                      </Box>
-                    </Grid>
+          }) => {
+            console.log({ values, errors })
+            return (
+              <form onSubmit={handleSubmit}>
+                <DialogContent
+                  dividers
+                  sx={{
+                    p: 3
+                  }}
+                >
+                  <Grid container columnSpacing={1}>
                     <Grid
+                      container
                       sx={{
-                        mb: `${theme.spacing(3)}`
+                        background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
+                        p: 1,
+                        color: 'white',
+                        mb: 1
                       }}
-                      item
-                      xs={12}
                     >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        error={Boolean(touched.first_name && errors.first_name)}
-                        fullWidth
-                        helperText={touched.first_name && errors.first_name}
-                        name="first_name"
-                        placeholder={t('first name here...')}
-                        onBlur={handleBlur}
-                        onBlurCapture={(v) => {
-                          if (v) {
-                            const temp = generateUsername(values.first_name)
-                            if (!editSchool?.user?.username) {
+                      Basic Information:
+                    </Grid>
 
-                              setFieldValue('password', temp)
-                            }
-                            setFieldValue('username', temp)
-                          }
-                        }}
-                        onChange={handleChange}
-                        value={values.first_name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Middle Name')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        fullWidth
-                        name="middle_name"
-                        placeholder={t('middle name here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.middle_name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Last Name')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        fullWidth
-                        name="last_name"
-                        placeholder={t('last name here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.last_name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('National Id')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        error={Boolean(
-                          touched.national_id && errors.national_id
-                        )}
-                        fullWidth
-                        helperText={touched.national_id && errors.national_id}
-                        name="national_id"
-                        placeholder={t('national id here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.national_id}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Employee Id')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        error={Boolean(
-                          touched.employee_id && errors.employee_id
-                        )}
-                        fullWidth
-                        helperText={touched.employee_id && errors.employee_id}
-                        name="employee_id"
-                        placeholder={t('employee id here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.employee_id}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Phone Number')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        fullWidth
-                        name="phone"
-                        placeholder={t('phone number here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.phone}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Gender')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">
-                          Select Gender
-                        </InputLabel>
-                        <Select
-                          labelId="demo-simple-select-helper-label"
-                          id="demo-simple-select-helper"
-                          value={values.gender}
-                          name="gender"
-                          label="Select Gender"
-                          onChange={handleChange}
-                          error={Boolean(touched.gender && errors.gender)}
-                          onBlur={handleBlur}
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid>
+                        <Box
+                          pr={3}
                           sx={{
-                            '& fieldset': {
-                              borderRadius: '3px'
-                            }
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
                           }}
+                          alignSelf="center"
                         >
-                          <MenuItem value={'male'}>Male</MenuItem>
-                          <MenuItem value={'female'}>Female</MenuItem>
-                        </Select>
-                        <FormHelperText sx={{ color: 'red' }}>
-                          {touched.gender && errors.gender}
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
+                          <b>{t('First Name')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
                         sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
+                          mb: `${theme.spacing(3)}`
                         }}
-                        alignSelf="center"
+                        item
+                        xs={12}
                       >
-                        <b>{t('Blood Group')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">
-                          Select Blood Group
-                        </InputLabel>
-                        <Select
-                          labelId="demo-simple-select-helper-label"
-                          id="demo-simple-select-helper"
-                          value={values.blood_group}
-                          name="blood_group"
-                          label="Select Blood Group"
-                          onChange={handleChange}
+                        <TextField
                           sx={{
                             '& fieldset': {
                               borderRadius: '3px'
                             }
                           }}
-                        >
-                          <MenuItem value={'a+'}>A+</MenuItem>
-                          <MenuItem value={'a-'}>A-</MenuItem>
-                          <MenuItem value={'b+'}>B+</MenuItem>
-                          <MenuItem value={'b-'}>B-</MenuItem>
-                          <MenuItem value={'o+'}>O+</MenuItem>
-                          <MenuItem value={'o-'}>O-</MenuItem>
-                          <MenuItem value={'ab+'}>AB+</MenuItem>
-                          <MenuItem value={'ab-'}>AB-</MenuItem>
-                        </Select>
-                        <FormHelperText>
-                          {touched.gender && errors.gender}
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Religion')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        value={values.religion}
-                        size="small"
-                        fullWidth
-                        name="religion"
-                        placeholder={t('provide religion here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        // value={values.resume.name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Date Of Birth')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <MobileDatePicker
-                        label="Provide birth date"
-                        inputFormat='dd/MM/yyyy'
-                        value={values.date_of_birth}
-                        onChange={(n) => {
-                          const value = dayjs(n);
-                          if (n) {
-                            setFieldValue('date_of_birth', value)
-                          }
-                        }}
-                        renderInput={(params) => <TextField
-                          size='small'
-                          sx={{
-                            '& fieldset': {
-                              borderRadius: '3px'
-                            }
-                          }}
+                          size="small"
+                          error={Boolean(touched.first_name && errors.first_name)}
                           fullWidth
-                          {...params}
+                          helperText={touched.first_name && errors.first_name}
+                          name="first_name"
+                          placeholder={t('first name here...')}
+                          onBlur={handleBlur}
+                          onBlurCapture={(v) => {
+                            if (v) {
+                              const temp = generateUsername(values.first_name)
+                              if (!editSchool?.user?.username) {
+
+                                setFieldValue('password', temp)
+                              }
+                              setFieldValue('username', temp)
+                            }
+                          }}
+                          onChange={handleChange}
+                          value={values.first_name}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Middle Name')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          fullWidth
+                          name="middle_name"
+                          placeholder={t('middle name here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.middle_name}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Last Name')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          fullWidth
+                          name="last_name"
+                          placeholder={t('last name here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.last_name}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Select Role')}:*</b>
+                        </Box>
+                      </Grid>
+
+                      <Autocomplete
+                        disablePortal
+                        size='small'
+                        // @ts-ignore
+                        value={userPrermissionRoles.find((permRole) => permRole.value === values?.role?.permission) || null}
+                        options={userPrermissionRoles}
+                        isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
+                        getOptionLabel={(option) => option?.label}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            sx={{
+                              [`& fieldset`]: {
+                                borderRadius: 0.6,
+                              }
+                            }}
+                            name="role"
+                            label={t('')}
+                            placeholder='select a role...'
+                            error={Boolean(touched.role && errors.role)}
+                            helperText={touched.role && errors.role}
+                            onBlur={handleBlur}
+                          />
+                        )}
+                        // @ts-ignore
+                        onChange={(event, value: any) => { setFieldValue('role', { role_title: value?.role, permission: value?.value } || ''); }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('National Id')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
                           error={Boolean(
-                            touched?.date_of_birth && errors?.date_of_birth
+                            touched.national_id && errors.national_id
                           )}
+                          fullWidth
+                          helperText={touched.national_id && errors.national_id}
+                          name="national_id"
+                          placeholder={t('national id here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.national_id}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Employee Id')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          error={Boolean(
+                            touched.employee_id && errors.employee_id
+                          )}
+                          fullWidth
+                          helperText={touched.employee_id && errors.employee_id}
+                          name="employee_id"
+                          placeholder={t('employee id here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.employee_id}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Phone Number')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          fullWidth
+                          name="phone"
+                          placeholder={t('phone number here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.phone}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Gender')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <FormControl fullWidth size="small">
+                          {/* <InputLabel id="demo-simple-select-helper-label">
+                            Select Gender
+                          </InputLabel> */}
+                          <Select
+                            labelId="demo-simple-select-helper-label"
+                            id="demo-simple-select-helper"
+                            value={values.gender}
+                            name="gender"
+                            // label="Select Gender"
+                            onChange={handleChange}
+                            error={Boolean(touched.gender && errors.gender)}
+                            onBlur={handleBlur}
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                          >
+                            <MenuItem value={'male'}>Male</MenuItem>
+                            <MenuItem value={'female'}>Female</MenuItem>
+                          </Select>
+                          <FormHelperText sx={{ color: 'red' }}>
+                            {touched.gender && errors.gender}
+                          </FormHelperText>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Blood Group')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <FormControl fullWidth size="small">
+                          <Select
+                            labelId="demo-simple-select-helper-label"
+                            id="demo-simple-select-helper"
+                            value={values.blood_group}
+                            name="blood_group"
+                            label=""
+                            onChange={handleChange}
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                          >
+                            <MenuItem value={'a+'}>A+</MenuItem>
+                            <MenuItem value={'a-'}>A-</MenuItem>
+                            <MenuItem value={'b+'}>B+</MenuItem>
+                            <MenuItem value={'b-'}>B-</MenuItem>
+                            <MenuItem value={'o+'}>O+</MenuItem>
+                            <MenuItem value={'o-'}>O-</MenuItem>
+                            <MenuItem value={'ab+'}>AB+</MenuItem>
+                            <MenuItem value={'ab-'}>AB-</MenuItem>
+                          </Select>
+                          <FormHelperText>
+                            {touched.gender && errors.gender}
+                          </FormHelperText>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Religion')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          value={values.religion}
+                          size="small"
+                          fullWidth
+                          name="religion"
+                          placeholder={t('provide religion here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          // value={values.resume.name}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Date Of Birth')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <MobileDatePicker
+                          // label="Provide birth date"
+                          inputFormat='dd/MM/yyyy'
+                          value={values.date_of_birth}
+                          onChange={(n) => {
+                            const value = dayjs(n);
+                            if (n) {
+                              setFieldValue('date_of_birth', value)
+                            }
+                          }}
+                          renderInput={(params) => <TextField
+                            size='small'
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                            fullWidth
+                            {...params}
+                            error={Boolean(
+                              touched?.date_of_birth && errors?.date_of_birth
+                            )}
+                            helperText={
+                              touched?.date_of_birth && errors?.date_of_birth
+                            }
+                          />}
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid item sm={4}></Grid>
+                    <Grid item xs={12} md={6}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Present Address')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          multiline
+                          rows={3}
+                          error={Boolean(
+                            touched.present_address && errors.present_address
+                          )}
+                          fullWidth
                           helperText={
-                            touched?.date_of_birth && errors?.date_of_birth
+                            touched.present_address && errors.present_address
                           }
-                        />}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid item sm={6}></Grid>
-                  <Grid item xs={12} md={6}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Present Address')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        multiline
-                        rows={3}
-                        error={Boolean(
-                          touched.present_address && errors.present_address
-                        )}
-                        fullWidth
-                        helperText={
-                          touched.present_address && errors.present_address
-                        }
-                        name="present_address"
-                        placeholder={t('present address here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.present_address}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Permanent Address')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        multiline
-                        rows={3}
-                        error={Boolean(
-                          touched.permanent_address && errors.permanent_address
-                        )}
-                        fullWidth
-                        helperText={
-                          touched.permanent_address && errors.permanent_address
-                        }
-                        name="permanent_address"
-                        placeholder={t('permanent address here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.permanent_address}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid
-                    container
-                    sx={{
-                      background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
-                      p: 1,
-                      color: 'white',
-                      mb: 1
-                    }}
-                  >
-                    Academic Information:
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Username')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        error={Boolean(touched.username && errors.username)}
-                        fullWidth
-                        helperText={touched.username && errors.username}
-                        name="username"
-                        placeholder={t('Teacher username here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        disabled
-                        value={values.username}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Passsword')}:*</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        error={Boolean(touched.password && errors.password)}
-                        fullWidth
-                        helperText={touched.password && errors.password}
-                        name="password"
-                        placeholder={t('Password here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.password}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(1)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Email')}:</b>
-                      </Box>
-                    </Grid>
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      <TextField
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        size="small"
-                        fullWidth
-                        type="email"
-                        name="email"
-                        placeholder={t('provide email here...')}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.email}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Resume')}:</b>
-                      </Box>
-                    </Grid>
-
-                    <NewFileUploadFieldWrapper
-                      htmlFor="resume"
-                      // name="left_images"
-                      // multiple={true}
-                      accept="application/pdf, application/vnd.ms-excel"
-                      handleChangeFile={(e) => handleFileChange(e, setResume, setPreviewResume)}
-                    />
-                    <Grid
-                      sx={{
-                        mb: `${theme.spacing(3)}`
-                      }}
-                      item
-                    >
-                      {/* <BoxUploadWrapper>
-                        <TextField
-                          type="file"
-                          accessKey='application/pdf'
-                          error={Boolean(touched.resume && errors.resume)}
-                          fullWidth
-                          helperText={touched.resume && errors.resume}
-                          name="resume"
-                          placeholder={t('Resume here...')}
+                          name="present_address"
+                          placeholder={t('present address here...')}
                           onBlur={handleBlur}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => setFieldValue('resume', event.target?.files[0])}
+                          onChange={handleChange}
+                          value={values.present_address}
                           variant="outlined"
                         />
-                      </BoxUploadWrapper> */}
+                      </Grid>
+                    </Grid>
 
-                      {resume?.map((image, index) => (
-                        <iframe src={image} key={index} width="100%" />
-                        // <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove(setPreviewResume)} />
-                      ))}
+                    <Grid item xs={12} md={6}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Permanent Address')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          multiline
+                          rows={3}
+                          error={Boolean(
+                            touched.permanent_address && errors.permanent_address
+                          )}
+                          fullWidth
+                          helperText={
+                            touched.permanent_address && errors.permanent_address
+                          }
+                          name="permanent_address"
+                          placeholder={t('permanent address here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.permanent_address}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
 
-                      {editSchool?.resume && (
-                        <>
-                          <Grid sx={{ mt: 1 }}>{t('Current Resume:')}</Grid>
-                          <Grid
-                            sx={{
-                              mt: 1,
-                              p: 1,
-                              border: 1,
-                              borderRadius: 1,
-                              borderColor: 'primary.main',
-                              color: 'primary.main'
-                            }}
-                          >
-                            <a
-                              style={{ width: '50px' }}
-                              href={getFile(editSchool?.resume)}
-                              target='_blank'
+                    <Grid
+                      container
+                      sx={{
+                        background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
+                        p: 1,
+                        color: 'white',
+                        mb: 1
+                      }}
+                    >
+                      Academic Information:
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Username')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          error={Boolean(touched.username && errors.username)}
+                          fullWidth
+                          helperText={touched.username && errors.username}
+                          name="username"
+                          placeholder={t('Teacher username here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          disabled
+                          value={values.username}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Passsword')}:*</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          error={Boolean(touched.password && errors.password)}
+                          fullWidth
+                          helperText={touched.password && errors.password}
+                          name="password"
+                          placeholder={t('Password here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.password}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(1)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Email')}:</b>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+                        <TextField
+                          sx={{
+                            '& fieldset': {
+                              borderRadius: '3px'
+                            }
+                          }}
+                          size="small"
+                          fullWidth
+                          type="email"
+                          name="email"
+                          placeholder={t('provide email here...')}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          value={values.email}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(2)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Resume')}:</b>
+                        </Box>
+                      </Grid>
+
+                      <NewFileUploadFieldWrapper
+                        htmlFor="resume"
+                        // name="left_images"
+                        // multiple={true}
+                        accept="application/pdf, application/vnd.ms-excel"
+                        handleChangeFile={(e) => handleFileChange(e, setResume, setPreviewResume)}
+                      />
+                      <Grid
+                        sx={{
+                          mb: `${theme.spacing(3)}`
+                        }}
+                        item
+                      >
+
+                        {previewResume?.map((image, index) => (
+                          <React.Fragment key={index} >
+                            <iframe src={image.src} width="100%" />
+                            <Button onClick={() => handleRemove(setPreviewResume, setResume)(index)} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button>
+                          </React.Fragment>
+                        ))}
+
+                        {editSchool?.resume && (
+                          <>
+                            <Grid sx={{ mt: 1 }}>{t('Current Resume:')}</Grid>
+                            <Grid
+                              sx={{
+                                mt: 1,
+                                p: 1,
+                                border: 1,
+                                borderRadius: 1,
+                                borderColor: 'primary.main',
+                                color: 'primary.main'
+                              }}
                             >
-                              {editSchool.resume}
-                            </a>
-                          </Grid>
-                        </>
-                      )}
+                              <a
+                                style={{ width: '50px' }}
+                                href={getFile(editSchool?.resume)}
+                                target='_blank'
+                              >
+                                {editSchool.resume}
+                              </a>
+                            </Grid>
+                          </>
+                        )}
+                      </Grid>
                     </Grid>
-                  </Grid>
 
-                  <Grid
-                    container
-                    sx={{
-                      background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
-                      p: 1,
-                      color: 'white',
-                      mb: 1
-                    }}
-                  >
-                    Other Information:
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid item>
-                      <Box
-                        pr={3}
-                        sx={{
-                          pt: `${theme.spacing(2)}`,
-                          pb: { xs: 1, md: 0 }
-                        }}
-                        alignSelf="center"
-                      >
-                        <b>{t('Photo')}:</b>
-                      </Box>
-                    </Grid>
-                    <NewFileUploadFieldWrapper
-                      htmlFor="photo"
-                      // name="left_images"
-                      // multiple={true}
-                      accept="image"
-                      handleChangeFile={(e) => handleFileChange(e, setPhoto, setPreviewPhoto)}
-                    />
                     <Grid
+                      container
                       sx={{
-                        mb: `${theme.spacing(1)}`
+                        background: `linear-gradient(to right bottom,${theme.colors.primary.main}, ${theme.colors.alpha.white[50]} )`,
+                        p: 1,
+                        color: 'white',
+                        mb: 1
                       }}
-                      item
                     >
-                      {/* <BoxUploadWrapper
+                      Other Information:
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Grid item>
+                        <Box
+                          pr={3}
+                          sx={{
+                            pt: `${theme.spacing(2)}`,
+                            pb: { xs: 1, md: 0 }
+                          }}
+                          alignSelf="center"
+                        >
+                          <b>{t('Photo')}:</b>
+                        </Box>
+                      </Grid>
+                      <NewFileUploadFieldWrapper
+                        htmlFor="photo"
+                        // name="left_images"
+                        // multiple={true}
+                        accept="image"
+                        handleChangeFile={(e) => handleFileChange(e, setPhoto, setPreviewPhoto)}
+                      />
+                      <Grid
                         sx={{
-                          position: 'relative'
+                          mb: `${theme.spacing(1)}`
                         }}
+                        item
                       >
 
-                        <TextField
-                          type="file"
-                          error={Boolean(touched.photo && errors.photo)}
-                          fullWidth
-                          helperText={touched.photo && errors.photo}
-                          name="photo"
-                          placeholder={t('Photo here...')}
-                          onBlur={handleBlur}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => setFieldValue('photo', event.target?.files[0])}
-                          variant="outlined"
-                        />
-                      </BoxUploadWrapper> */}
-                      {previewPhoto?.map((image, index) => (
-                        <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove(setPreviewPhoto)} />
-                      ))}
-                      {editSchool?.photo && (
-                        <>
-                          <Grid sx={{ mt: 1 }}>{t('Current Photo:')}</Grid>
-                          <Grid
-                            sx={{
-                              mt: 1,
-                              p: 1,
-                              border: 1,
-                              borderRadius: 1,
-                              borderColor: 'primary.main',
-                              color: 'primary.main'
-                            }}
-                            style={{ width: 'fit-content' }}
-                          >
-                            <img
-                              style={{ width: '50px' }}
-                              src={getFile(editSchool?.photo)}
-                            />
-                          </Grid>
-                        </>
-                      )}
+                        {previewPhoto?.map((image, index) => (
+                          <PreviewImageCard data={image} index={index} key={index} handleRemove={handleRemove(setPreviewPhoto, setPhoto)} />
+                        ))}
+                        {editSchool?.photo && (
+                          <>
+                            <Grid sx={{ mt: 1 }}>{t('Current Photo:')}</Grid>
+                            <Grid
+                              sx={{
+                                mt: 1,
+                                p: 1,
+                                border: 1,
+                                borderRadius: 1,
+                                borderColor: 'primary.main',
+                                color: 'primary.main'
+                              }}
+                              style={{ width: 'fit-content' }}
+                            >
+                              <img
+                                style={{ width: '50px' }}
+                                src={getFile(editSchool?.photo)}
+                              />
+                            </Grid>
+                          </>
+                        )}
 
 
+                      </Grid>
                     </Grid>
-                  </Grid>
 
-                </Grid>
-              </DialogContent>
-              <DialogActionWrapper
-                title="Teacher"
-                errors={errors}
-                editData={editSchool}
-                handleCreateClassClose={handleCreateProjectClose}
-                isSubmitting={isSubmitting}
-              />
-            </form>
-          )}
+                  </Grid>
+                </DialogContent>
+                <DialogActionWrapper
+                  title="Other Users"
+                  errors={errors}
+                  editData={editSchool}
+                  handleCreateClassClose={handleCreateProjectClose}
+                  isSubmitting={isSubmitting}
+                />
+              </form>
+            )
+          }}
         </Formik>
 
       </Dialog>

@@ -231,7 +231,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                   )
                 }}
                 onChange={handleQueryChange}
-                placeholder={t('Search by teacher name, username or phone number...')}
+                placeholder={t('Search by other users, username or phone number...')}
                 value={query}
                 fullWidth
                 variant="outlined"
@@ -250,7 +250,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
 
         {paginatedschools.length === 0 ? (
           <TableEmptyWrapper
-            title="Teacher"
+            title="other users"
           />
         ) : (
           <>

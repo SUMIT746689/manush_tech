@@ -108,6 +108,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "build-mehedi": "export NODE_OPTIONS=--max-old-space-size=6144 && next build",
     "start": "next start",
     "export": "next export",
     "lint": "next lint",

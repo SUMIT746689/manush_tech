@@ -104,11 +104,14 @@ function PageHeader({
   const handleCreateProjectClose = () => {
     setOpen(false);
     setEditSchool(null);
+    setResume([])
+    setPreviewResume([])
+    setPhoto([])
+    setPreviewPhoto([])
   };
 
   const handleCreateProjectSuccess = (message) => {
     showNotification(message);
-
     setOpen(false);
   };
 
@@ -155,11 +158,12 @@ function PageHeader({
         handleCreateProjectSuccess(message);
         setEditSchool(null);
         reFetchData();
+        handleCreateProjectClose()
       };
       if (editSchool) {
         const result = await axios({
           method: 'PATCH',
-          url: `/api/other_users?other_user_id=${editSchool.id}`,
+          url: `/api/other_users/${editSchool.id}`,
           data: formData,
           headers: {
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`

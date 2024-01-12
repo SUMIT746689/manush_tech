@@ -6,6 +6,8 @@ import { authenticate } from 'middleware/authenticate';
 import prisma from '@/lib/prisma_client';
 import adminCheck from 'middleware/adminCheck';
 import { logFile } from 'utilities_api/handleLogFile';
+import { verifyPermissions } from 'utilities_api/verifyPermissions';
+import { TextRotationAngledownRounded } from '@mui/icons-material';
 
 const post = async (req, res, refresh_token) => {
   try {
@@ -47,8 +49,14 @@ const post = async (req, res, refresh_token) => {
         present_address,
         permanent_address,
         joining_date,
-        employee_id
+        employee_id,
+        role
       }: any = fields;
+
+      // const rolePrase = role ? JSON.parse(role) : {};
+      const permissionRole = `create_${role}`.toLowerCase();
+      const { isPermitted } = await verifyPermissions([permissionRole], refresh_token)
+      if (!isPermitted) throw new Error("user permission denied")
 
       if (
         !username ||
@@ -83,7 +91,7 @@ const post = async (req, res, refresh_token) => {
       }
       const teacher_role = await prisma.role.findFirst({
         where: {
-          title: 'TEACHER'
+          title: role.toUpperCase()
         }
       })
 
@@ -101,7 +109,7 @@ const post = async (req, res, refresh_token) => {
           console.log('Successfully moved file!')
         })
       }
-
+      console.log({employee_id})
       const resOtherUsersInfo = await prisma.otherUsersInfo.create({
         // @ts-ignore
         data: {
@@ -116,7 +124,7 @@ const post = async (req, res, refresh_token) => {
           // @ts-ignore
           resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : (filePathQuery?.resume || ''),
           school: { connect: { id: refresh_token.school_id } },
-          employee_id,
+          employee_id: employee_id,
           user: {
             create: {
               username: username,
@@ -144,7 +152,9 @@ const post = async (req, res, refresh_token) => {
     res.status(404).json({ err: err.message });
   }
 };
-export default authenticate(adminCheck(post))
+
+// export default authenticate(adminCheck(post))
+export default authenticate(post)
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {

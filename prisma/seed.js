@@ -86,7 +86,7 @@ async function seed() {
       { name: 'create academic years', value: 'create_academic_yaers', group: 'academic_years' },
       { name: 'create student', value: 'create_student', group: 'student' },
       { name: 'create gurdian', value: 'create_gurdian', group: 'guardian' },
-      { name: 'create stuff', value: 'create_stuff', group: 'stuff' },
+      { name: 'create staff', value: 'create_staff', group: 'staff' },
       { name: 'create accountant', value: 'create_accountant', group: 'accountant' },
       { name: 'create librarian', value: 'create_librarian', group: 'librarian' },
       { name: 'create receptionist', value: 'create_receptionist', group: 'receptionist' },

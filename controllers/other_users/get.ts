@@ -38,9 +38,10 @@ const get = async (req, res, refresh_token) => {
             id: true,
             username: true,
             school_id: true,
-            school: true
+            school: true,
+            user_role: true,
           }
-        }
+        },
       }
     });
 

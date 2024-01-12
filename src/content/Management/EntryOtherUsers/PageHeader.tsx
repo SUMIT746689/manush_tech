@@ -58,7 +58,7 @@ const BoxUploadWrapper = styled(Box)(
 const permissons = [
   // { label: 'Admin', role: 'ADMIN', value: 'create_admin' },
   // { label: 'Guardian', role: 'GURDIAN', value: 'create_gurdian' },
-  { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
+  { label: 'Staff', role: 'STAFF', value: 'create_staff' },
   { label: 'Accountant', role: 'ACCOUNTANT', value: 'create_accountant' },
   { label: 'Librarian', role: 'LIBRARIAN', value: 'create_librarian' },
   { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' },
@@ -140,7 +140,7 @@ function PageHeader({
       formData.append('date_of_birth', _values.date_of_birth);
       formData.append('present_address', _values.present_address);
       formData.append('permanent_address', _values.permanent_address);
-      // formData.append('permanent_address', _values.permanent_address);
+      formData.append('role', _values.role.role_title);
 
       if (_values.password !== '') {
         formData.append('password', _values.password);
@@ -170,8 +170,8 @@ function PageHeader({
           }
         });
         if (result.data?.success)
-          successProcess(t('A teacher has been updated successfully'));
-        else throw new Error('edit teacher failed');
+          successProcess(t(' Updated successfully'));
+        else throw new Error('update failed');
       } else {
         formData.append('username', _values.username)
         const res = await axios({
@@ -185,13 +185,14 @@ function PageHeader({
         // console.log({ res });
         if (res.data?.success)
           successProcess(t('A new teacher has been created successfully'));
-        else throw new Error('created teacher failed');
+        else throw new Error('created  failed');
       }
     } catch (err) {
       console.error(err);
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
+      showNotification("failed ","error")
     }
   };
 
@@ -227,8 +228,8 @@ function PageHeader({
       })
     }
   }
-  // const temp = userPrermissionRoles.find(i => i.role === editUser?.user_role?.title);
-
+  const temp = userPrermissionRoles.find(role_ => role_.role === editSchool?.user?.user_role?.title);
+  // console.log({userPrermissionRoles,editSchool:editSchool?.user?.user_role?.title,temp})
   return (
     <>
 
@@ -269,10 +270,13 @@ function PageHeader({
             date_of_birth: editSchool?.date_of_birth || '',
             present_address: editSchool?.present_address || '',
             permanent_address: editSchool?.permanent_address || '',
-            employee_id: editSchool?.employee_id || undefined,
+            employee_id: editSchool?.employee_id || '',
             national_id: editSchool?.national_id || '',
             email: editSchool?.email || '',
-            role: undefined,
+            role: temp ? {
+              role_title: temp?.role,
+              permission: temp?.value
+            } : undefined,
             // role: temp ? {
             //   role_title: temp?.role,
             //   permission: temp?.value
@@ -327,7 +331,7 @@ function PageHeader({
             values,
             setFieldValue
           }) => {
-            console.log({ values, errors })
+            // console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

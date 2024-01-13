@@ -160,7 +160,10 @@ const Results: FC<ResultsProps> = ({
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-  const { user: { school: { currency } } = {} } = {} = useAuth();
+
+  const { user } = useAuth();
+  const { school } = user ?? {};
+  const { currency } = school ?? {};
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -239,7 +242,7 @@ const Results: FC<ResultsProps> = ({
         <Grid container>
           <Grid item xs={12}>
             <Box p={0.5}>
-            <DebounceInput
+              <DebounceInput
                 debounceTimeout={1000}
                 handleDebounce={(v) => setQuery(v)}
                 label={'Search by fees title, id or amount......'}

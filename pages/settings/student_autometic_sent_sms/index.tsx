@@ -107,7 +107,7 @@ const StudentAutoSentSms = () => {
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-                        console.log({ values, isSubmitting })
+                        // console.log({ values, isSubmitting })
                         return (
 
                             <Card sx={{
@@ -241,7 +241,7 @@ const StudentAutoSentSms = () => {
 
 StudentAutoSentSms.getLayout = (page) => {
     return (
-        <Authenticated name='sms_gateway'>
+        <Authenticated requiredPermissions={['modify_student_auto_sent_sms']}>
             <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
         </Authenticated>
     );

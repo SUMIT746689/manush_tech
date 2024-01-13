@@ -570,6 +570,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Pending Package' ||
       item.name === 'Pending Buy Sms' ||
       item.name === 'Users' ||
+      item.name === 'Other Users' ||
 
       item.name === 'Students Attendence' ||
       item.name === 'Exam Attendence' ||
@@ -593,7 +594,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Teacher Exam Routine' ||
 
       item.name === 'Banners'||
-      item.name === 'Package payment history'
+      item.name === 'Package payment history'||
+
+      item.name === 'Student Auto Sent Sms'      
 
 
     ) {
@@ -634,7 +637,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
 
       //validate using permissions values
-      //bu sms
+
+      // admistrator
+      if(item.name === 'Other Users' && permissionVerify(permissions, ['create_staff','create_accountant','create_librarian','create_receptionist'])) sub_menu();
+      
+      //buy sms
       if (item.name === 'Pending Buy Sms' && permissionVerify(permissions, ['pending_buy_sms'])) sub_menu();
 
       // attendence
@@ -679,7 +686,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       //package
       if (item.name === 'Package payment history' && permissionVerify(permissions, ['package_payment_history'])) sub_menu();
       
-
+      //settings
+      if (item.name === 'Student Auto Sent Sms' && permissionVerify(permissions, ['modify_student_auto_sent_sms'])) sub_menu();
+      
     }
     else sub_menu();
     // {

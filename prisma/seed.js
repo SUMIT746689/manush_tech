@@ -148,7 +148,7 @@ async function seed() {
       { name: 'create syllabus', value: 'create_syllabus', group: 'syllabus' },
       { name: 'show syllabus', value: 'show_syllabus', group: 'syllabus' },
       { name: 'home work', value: 'homework', group: 'homework' },
-
+      { name: 'student auto sent sms', value: 'modify_student_auto_sent_sms', group: 'student_auto_sent_sms' },
     ]
   });
 
@@ -172,8 +172,9 @@ async function seed() {
         }
       ]
     },
-    select:{
-      id:true,
+    select: {
+      id: true,
+      value: true
     }
   });
 
@@ -184,7 +185,7 @@ async function seed() {
     data: {
       title: "ADMIN",
       permissions: {
-        connect: permissions
+        connect: permissions.map(({ id }) => ({ id }))
       }
     }
   })
@@ -248,7 +249,7 @@ async function seed() {
       teacherPermissions.push({ id: i.id })
     }
   }
-
+  console.log({ teacherPermissions })
 
   const createTeacherRole = await prisma.role.create({
     data: {

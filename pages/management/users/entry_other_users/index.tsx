@@ -52,7 +52,7 @@ function Managementschools() {
 }
 
 Managementschools.getLayout = (page) => (
-    <Authenticated name="teacher">
+    <Authenticated requiredPermissions={['create_staff','create_accountant','create_librarian','create_receptionist']}>
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

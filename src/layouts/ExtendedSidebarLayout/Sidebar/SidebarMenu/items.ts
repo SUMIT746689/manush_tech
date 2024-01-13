@@ -130,6 +130,11 @@ export const menuItems: MenuItems[] = [
             icon: AssignmentIndTwoToneIcon,
             link: '/management/users',
           },
+          {
+            name: 'Other Users',
+            icon: AssignmentIndTwoToneIcon,
+            link: '/management/users/entry_other_users',
+          },
         ]
       },
       {
@@ -627,6 +632,11 @@ export const menuItems: MenuItems[] = [
           {
             name: 'SMS',
             link: '/settings/sms',
+            icon: RequestQuoteIcon
+          },
+          {
+            name: 'Student Auto Sent Sms',
+            link: '/settings/student_autometic_sent_sms',
             icon: RequestQuoteIcon
           },
         ]

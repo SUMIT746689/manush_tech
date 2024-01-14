@@ -22,7 +22,7 @@ const Packages = () => {
           gap={2}
           px={1}
         >
-          <Grid sx={{ maxWidth: 500, pt: 4 }}>
+          <Grid sx={{ maxWidth: 500,height:"100%", pt: 4 }}>
             <ActiveSms />
           </Grid>
 
@@ -38,7 +38,7 @@ const Packages = () => {
 };
 
 Packages.getLayout = (page) => (
-  <Authenticated name="teacher">
+  <Authenticated requiredPermissions={['request_buy_sms']}>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

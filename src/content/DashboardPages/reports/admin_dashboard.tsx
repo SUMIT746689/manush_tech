@@ -21,10 +21,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   const { banners: banners_ } = blockCount || {};
   const { banners } = banners_ || {};
   const { left_banners, right_banners } = banners || {};
-  console.log({ blockCount });
-
   const { t }: { t: any } = useTranslation();
-  // console.log({ right_banners: right_banners && right_banners[0] })
   const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0
   return (
     <>
@@ -75,14 +72,14 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           </Button>
 
           <Card sx={{ color: colorBlue, px: 3, py: 4.5 }}>
-            <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700, textAlign: "center" }}>SMS Balance</Grid>
+            <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
             <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between', pt: 3, pb: 2 }}>
-              <span>Total Balance:</span>
-              <span>1000</span>
+              <span>Masking Sms:</span>
+              <span>{blockCount?.school?.masking_sms_count || 0}</span>
             </Grid>
             <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between' }}>
-              <span>Remaining Balance:</span>
-              <span>250</span>
+              <span>Non Masking Sms:</span>
+              <span>{blockCount?.school?.non_masking_sms_count || 0}</span>
             </Grid>
           </Card>
         </Grid>
@@ -112,35 +109,35 @@ function AdminDashboardReportsContent({ blockCount = null }) {
 
       {/* banners */}
       {/* <Grid sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, p: 2 }}> */}
-      
-    {
-      banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
-        <Card sx={{
-          width: "100",
-          borderRadius: 0,
-          // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
-          overflow: "hidden"
-        }} >
-          <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
-        </Card>
-        <Card sx={{ width: "100", borderRadius: 0 }}>
-          {
-            (right_banner_check && right_banners[0]?.redirectUrl) ?
-              <Link target='_blank' href={right_banners[0].redirectUrl} >
-                <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-              </Link>
-              :
-              right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-          }
-          {/* <Link
+
+      {
+        banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
+          <Card sx={{
+            width: "100",
+            borderRadius: 0,
+            // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
+            overflow: "hidden"
+          }} >
+            <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
+          </Card>
+          <Card sx={{ width: "100", borderRadius: 0 }}>
+            {
+              (right_banner_check && right_banners[0]?.redirectUrl) ?
+                <Link target='_blank' href={right_banners[0].redirectUrl} >
+                  <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+                </Link>
+                :
+                right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+            }
+            {/* <Link
             target='_blank'
             href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : ''}
           >
             <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
           </Link> */}
-        </Card>
-      </Grid>
-    }
+          </Card>
+        </Grid>
+      }
 
       {/* notice board and calander */}
       < Grid sx={{ display: 'grid', width: "100%", height: "100%", gridTemplateColumns: { md: '1fr 1fr' }, px: 2, gap: 2 }

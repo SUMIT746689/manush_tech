@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { DialogTitle, DialogActions, DialogContent, Typography, CircularProgress
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 // import { DropDownSelectWrapper } from '@/components/DropDown';
-import { TextFieldWrapper } from '@/components/TextFields';
+import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 
 
 function PageHeader({ packages }) {
@@ -26,6 +26,8 @@ function PageHeader({ packages }) {
   const [publicProfile, setPublicProfile] = useState({
     public: true
   });
+  const [resume, setResume] = useState([]);
+  const [previewResume, setPreviewResume] = useState([]);
 
   const handlePublicProfile = (event) => {
     setPublicProfile({
@@ -60,7 +62,7 @@ function PageHeader({ packages }) {
     // package_id: Yup.number()
     //   .min(1)
     //   .required(t('The package field is required')),
-    document_photo: Yup.mixed().required('A file is required')
+    document_photo: Yup.array().min(1, "a file is required").max(1, "only one file can upload").required('A file is required')
     // .test(
     //   "fileSize",
     //   "File too large",
@@ -88,7 +90,7 @@ function PageHeader({ packages }) {
       };
 
       const formData = new FormData();
-      formData.append('document_photo', _values.document_photo);
+      formData.append('document_photo', _values.document_photo[0]);
       formData.append('masking_count', _values.masking_count);
       formData.append('non_masking_count', _values.non_masking_count);
 
@@ -115,13 +117,48 @@ function PageHeader({ packages }) {
     }
   };
 
+
   const FILE_SIZE = 160 * 1024;
   const SUPPORTED_FORMATS = [
     'image/jpg',
     'image/jpeg',
     'image/gif',
-    'image/png'
+    'image/png',
+    'application/pdf',
+    'application/vnd.ms-excel'
   ];
+
+  const handleFileChange = (e, setFile, setPreviewFile) => {
+    if (e?.target?.files?.length === 0) {
+      setFile('document_photo', []);
+      setPreviewFile(() => []);
+      return;
+    }
+    // setFile(() => e.target.files[0]);
+    const imgPrev = [];
+    const img = [];
+    Array.prototype.forEach.call(e.target.files, (file) => {
+      img.push(file);
+      const objectUrl = URL.createObjectURL(file);
+      imgPrev.push({ name: file.name, src: objectUrl, type: file.type })
+      // console.log({ objectUrl });
+      // console.log({ file })
+    });
+    setFile('document_photo', img);
+    setPreviewFile(() => imgPrev)
+  }
+
+  const handleRemove = (values, setFile, setPreviewFile) => {
+    return (index) => {
+      setPreviewFile((images) => {
+        const imagesFilter = images.filter((image, imgIndex) => imgIndex !== index);
+        return imagesFilter;
+      })
+      const imagesFilter = values.document_photo.filter((image, imgIndex) => imgIndex !== index);
+      console.log({ imagesFilter })
+      setFile('document_photo', imagesFilter)
+    }
+  }
 
   return (
     <>
@@ -164,7 +201,7 @@ function PageHeader({ packages }) {
             values,
             setFieldValue
           }) => {
-            console.log({errors})
+            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -173,54 +210,6 @@ function PageHeader({ packages }) {
                     p: 3
                   }}
                 >
-                  {/* <Grid container spacing={1}> */}
-                  {/* <Grid
-                      item
-                      container
-                      sx={{
-                        mb: `${theme.spacing(1)}`
-                      }}
-                    >
-                      <Autocomplete
-                        disablePortal
-                        fullWidth
-                        value={
-                          packages?.data?.find(
-                            (pkg: any) => pkg.id === values.package_id
-                          ) || null
-                        }
-                        options={packages?.success ? packages.data : []}
-                        isOptionEqualToValue={(option: any, value: any) =>
-                          option.title === value.title
-                        }
-                        getOptionLabel={
-                          (option) =>
-                            option?.title + ' - ' + option?.price + ' '
-                          // +
-                          // option?.currency
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            fullWidth
-                            error={Boolean(
-                              touched?.package_id && errors?.package_id
-                            )}
-                            helperText={
-                              touched?.package_id && errors?.package_id
-                            }
-                            name="package_id"
-                            label={t('Select Package ')}
-                          />
-                        )}
-                        // @ts-ignore
-                        onChange={(e, value: any) => {
-                          console.log({ value });
-                          setFieldValue('package_id', value?.id || 0);
-                        }}
-                      />
-                    </Grid> */}
-
 
                   <TextFieldWrapper
                     label="No Of Sms ( Masking )"
@@ -244,32 +233,48 @@ function PageHeader({ packages }) {
                     type="number"
                   />
 
-                  <Grid container item >
-                    <TextField
-                      // sx={{backgroundColor:'red',height:'100%',textDecoration:"none"}}
-                      type="file"
-                      id="outlined-basic"
-                      error={Boolean(touched?.document_photo && errors?.document_photo)}
-                      fullWidth
-                      helperText={
-                        touched?.document_photo && errors?.document_photo
-                      }
-                      name="document_photo"
-                      // placeholder={t(`select related document here...`)}
-                      onBlur={handleBlur}
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        console.log(event.target.files[0]);
-                        setFieldValue(
-                          'document_photo',
-                          event.target?.files[0]
-                        );
-                      }}
-                      // value={values?.document_photo}
-                      variant="outlined"
+                  <Grid item>
+                    <Grid item>
+                      <b>{t('Document')}:</b>
+                    </Grid>
+
+                    <NewFileUploadFieldWrapper
+                      htmlFor="document"
+                      // name="left_images"
+                      // multiple={true}
+                      accept={SUPPORTED_FORMATS.join(',')}
+                      handleChangeFile={(e) => handleFileChange(e, setFieldValue, setPreviewResume)}
                     />
+
+                    {previewResume?.length > 0 &&
+                      <Grid>
+                        Preview:
+                      </Grid>
+                    }
+
+                    <Grid item >
+
+                      {previewResume?.map((image, index) => (
+                        <React.Fragment key={index} >
+                          {
+                            image.type === 'application/pdf' ?
+                              <>
+                                <iframe src={image.src} width="100%" />
+                                <Button onClick={() => handleRemove(values, setFieldValue, setPreviewResume)(index)} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button>
+                              </>
+                              :
+                              // <Card sx={{p:0.5,width:"300", height:"300px", overflow:"hidden"}}>
+                              // <img src={image.src} alt={image.name} style={{ border:"1px solid gray",borderRadius:5,padding:10,boxShadow:"1p", objectFit:"contain",objectPosition:"center"}} />
+                              // </Card>
+                              <PreviewImageCard data={image} index={index} handleRemove={handleRemove(values, setFieldValue, setPreviewResume)} />
+                            // ))}
+                          }
+                        </React.Fragment>
+                      ))}
+                      <Grid color="red">{touched?.document_photo && errors?.document_photo && errors.document_photo}</Grid>
+                    </Grid>
                   </Grid>
+
                   {/* </Grid> */}
                 </DialogContent>
                 <DialogActions

@@ -149,6 +149,7 @@ async function seed() {
       { name: 'show syllabus', value: 'show_syllabus', group: 'syllabus' },
       { name: 'home work', value: 'homework', group: 'homework' },
       { name: 'student auto sent sms', value: 'modify_student_auto_sent_sms', group: 'student_auto_sent_sms' },
+      {name:'request buy sms',value:'request_buy_sms',group:'buy_sms'}
     ]
   });
 
@@ -169,6 +170,9 @@ async function seed() {
         },
         {
           value: 'package_payment_history'
+        },
+        {
+          value:'create_banner'
         }
       ]
     },

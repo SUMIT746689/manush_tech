@@ -166,7 +166,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
   const key = item.name;
   const partialMatch = path.includes(item.link);
   const exactMatch = path === item.link;
-// console.log({permissions});
+  // console.log({permissions});
 
   const sub_menu = () => {
     ev.push(
@@ -593,10 +593,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       item.name === 'Teacher Exam Routine' ||
 
-      item.name === 'Banners'||
-      item.name === 'Package payment history'||
+      item.name === 'Banners' ||
+      item.name === 'Package payment history' ||
 
-      item.name === 'Student Auto Sent Sms'      
+      item.name === 'Sms Request' ||
+      item.name === 'Student Auto Sent Sms'
 
 
     ) {
@@ -639,8 +640,8 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       //validate using permissions values
 
       // admistrator
-      if(item.name === 'Other Users' && permissionVerify(permissions, ['create_staff','create_accountant','create_librarian','create_receptionist'])) sub_menu();
-      
+      if (item.name === 'Other Users' && permissionVerify(permissions, ['create_staff', 'create_accountant', 'create_librarian', 'create_receptionist'])) sub_menu();
+
       //buy sms
       if (item.name === 'Pending Buy Sms' && permissionVerify(permissions, ['pending_buy_sms'])) sub_menu();
 
@@ -682,13 +683,14 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Home work' && permissionVerify(permissions, ['homework'])) sub_menu();
       // banners
       if (item.name === 'Banners' && permissionVerify(permissions, ['create_banner'])) sub_menu();
-      
+
       //package
       if (item.name === 'Package payment history' && permissionVerify(permissions, ['package_payment_history'])) sub_menu();
-      
+
       //settings
+      if (item.name === 'Sms Request' && permissionVerify(permissions, ['request_buy_sms'])) sub_menu();
       if (item.name === 'Student Auto Sent Sms' && permissionVerify(permissions, ['modify_student_auto_sent_sms'])) sub_menu();
-      
+
     }
     else sub_menu();
     // {

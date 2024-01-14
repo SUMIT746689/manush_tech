@@ -48,9 +48,10 @@ export const Authenticated: FC<AuthenticatedProps> = (props) => {
           break;
         }
       };
+      console.log({ isPermitted })
+      if(isPermitted) setVerified(true)
+      else router.back();
 
-      isPermitted ? setVerified(true) : router.back();
-    
     } else if (name && !permissionsArray.includes(name)) {
       router.back();
     } else {

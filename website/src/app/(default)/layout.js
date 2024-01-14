@@ -37,6 +37,7 @@ export default async function RootLayout({ children }) {
       youtube_link: true
     }
   })
+  console.log({domain})
 
   return (
     school_info ?

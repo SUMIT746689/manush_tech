@@ -20,7 +20,7 @@ export function DropDownSelectWrapper({ value, name = '', label, handleChange, m
           label={required ? label + ' *' : label}
           onChange={handleChange}
         >
-          {menuItems.map(menuItem => <MenuItem value={menuItem}>{menuItem}</MenuItem>)}
+          {menuItems.map((menuItem, index) => <MenuItem key={index} value={menuItem}>{menuItem}</MenuItem>)}
         </Select>
       </FormControl>
     </Grid>

@@ -9,14 +9,19 @@ import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 // import { DropDownSelectWrapper } from '@/components/DropDown';
 import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
+import { DropDownSelectWrapper } from '@/components/DropDown';
+import { formatNumber } from '@/utils/numberFormat';
 
 
 function PageHeader({ packages }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   // const { enqueueSnackbar } = useSnackbar();
-  // const { user } = useAuth();
+  const { user } = useAuth();
   const theme = useTheme();
+  const { school } = user || {};
+  const { masking_sms_price, non_masking_sms_price, currency } = school || {};
+  console.log({ school });
   // const [documentFile, setDocumentFile] = useState();
   const { showNotification } = useNotistick()
   useEffect(() => {
@@ -57,25 +62,9 @@ function PageHeader({ packages }) {
   };
 
   const handleValidationSchema = Yup.object().shape({
-    // masking_count:  Yup.number()  ,
-    // non_masking_count:  Yup.number()  ,
-    // package_id: Yup.number()
-    //   .min(1)
-    //   .required(t('The package field is required')),
-    document_photo: Yup.array().min(1, "a file is required").max(1, "only one file can upload").required('A file is required')
-    // .test(
-    //   "fileSize",
-    //   "File too large",
-    //   value => {
-    //     console.log({value})
-    //     return value && value?.size <= FILE_SIZE
-    //   }
-    // )
-    // .test(
-    //   "fileFormat",
-    //   "Unsupported Format",
-    //   value => value && SUPPORTED_FORMATS.includes(value.type)
-    // )
+    sms_type: Yup.string().min(1, "sms type required").required('sms type field is required'),
+    amount: Yup.number().min(1, "number required").required('amount field is required'),
+    document_photo: Yup.array().min(1, "a file is required").max(1, "only one file can upload").required('a file is required')
   });
 
   const handleSubmit = async (_values, resetForm, setErrors, setStatus, setSubmitting) => {
@@ -87,12 +76,13 @@ function PageHeader({ packages }) {
         setStatus({ success: true });
         setSubmitting(false);
         handleCreateUserSuccess();
+        setPreviewResume(()=>[])
       };
 
       const formData = new FormData();
+      formData.append('sms_type', _values.sms_type);
+      formData.append('amount', _values.amount);
       formData.append('document_photo', _values.document_photo[0]);
-      formData.append('masking_count', _values.masking_count);
-      formData.append('non_masking_count', _values.non_masking_count);
 
       const response = await axios({
         method: 'post',
@@ -102,8 +92,8 @@ function PageHeader({ packages }) {
       });
 
       if (response) {
-        console.log("response___XXXXXXX____", response);
-        successResponse('created');
+        // console.log("response___XXXXXXX____", response);
+        successResponse('submit successfully');
       }
 
     } catch (err) {
@@ -113,7 +103,7 @@ function PageHeader({ packages }) {
       //@ts-ignore
       setErrors({ submit: err.message });
       setSubmitting(false);
-      showNotification(err?.response?.data?.message, 'error')
+      showNotification(err?.response?.data?.error, 'error')
     }
   };
 
@@ -150,15 +140,14 @@ function PageHeader({ packages }) {
   const handleRemove = (values, setFile, setPreviewFile) => {
     return (index) => {
       setPreviewFile((images) => {
-        const imagesFilter = images.filter((image, imgIndex) => imgIndex !== index);
+        const imagesFilter = images?.filter((image, imgIndex) => imgIndex !== index);
         return imagesFilter;
       })
-      const imagesFilter = values.document_photo.filter((image, imgIndex) => imgIndex !== index);
-      console.log({ imagesFilter })
+      const imagesFilter = values.document_photo?.filter((image, imgIndex) => imgIndex !== index);
+      // console.log({ imagesFilter })
       setFile('document_photo', imagesFilter)
     }
   }
-
   return (
     <>
       <Card>
@@ -176,8 +165,8 @@ function PageHeader({ packages }) {
         </DialogTitle>
         <Formik
           initialValues={{
-            masking_count: undefined,
-            non_masking_count: undefined,
+            sms_type: undefined,
+            amount: undefined,
             document_photo: undefined,
             submit: null
           }}
@@ -199,7 +188,7 @@ function PageHeader({ packages }) {
             values,
             setFieldValue
           }) => {
-            console.log({ values, errors })
+            // console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -208,32 +197,39 @@ function PageHeader({ packages }) {
                     p: 3
                   }}
                 >
+                  <DropDownSelectWrapper
+                    label="Sms Type*"
+                    name="sms_type"
+                    value={values.sms_type || ''}
+                    menuItems={['masking', 'non-masking']}
+                    // touched={touched.sms_type}
+                    // errors={errors.sms_type}
+                    handleChange={handleChange}
+                  // handleBlur={handleBlur}
+                  // required={true}
+                  />
+                  {<Grid color="red" pb={1} fontWeight={600} fontSize={13} pl={1}>{touched?.sms_type && errors?.sms_type && errors.sms_type}</Grid>}
 
                   <TextFieldWrapper
-                    label="No Of Sms ( Masking )"
-                    errors={errors?.masking_count}
-                    touched={touched?.masking_count}
-                    name="masking_count"
+                    label="Amount*"
+                    errors={errors?.amount}
+                    touched={touched?.amount}
+                    name="amount"
                     handleBlur={handleBlur}
                     handleChange={handleChange}
-                    value={values?.masking_count}
+                    value={values?.amount || ''}
                     type="number"
+                  // required={true}
                   />
-
-                  <TextFieldWrapper
-                    label="No Of Sms ( Non Masking )"
-                    errors={errors?.non_masking_count}
-                    touched={touched?.non_masking_count}
-                    name="non_masking_count"
-                    handleBlur={handleBlur}
-                    handleChange={handleChange}
-                    value={values?.non_masking_count}
-                    type="number"
-                  />
+                  {<Grid color="green" pb={1} fontWeight={600} fontSize={13} pl={1}>
+                    Sms Qty({values.sms_type}): 
+                    {values.sms_type === "masking" && formatNumber(Math.round((values.amount || 0) / (masking_sms_price || 0)))}
+                    {values.sms_type === "non-masking" && formatNumber(Math.round((values.amount || 0) / (non_masking_sms_price || 0)))}
+                  </Grid>}
 
                   <Grid item>
                     <Grid item>
-                      <b>{t('Document')}:</b>
+                      <b>{t('Document')}:*</b>
                     </Grid>
 
                     <NewFileUploadFieldWrapper
@@ -270,7 +266,7 @@ function PageHeader({ packages }) {
                           }
                         </React.Fragment>
                       ))}
-                      <Grid color="red">{touched?.document_photo && errors?.document_photo && errors.document_photo}</Grid>
+                      <Grid color="red" pb={1} fontWeight={600} fontSize={13} pl={1}>{touched?.document_photo && errors?.document_photo && errors.document_photo}</Grid>
                     </Grid>
                   </Grid>
 

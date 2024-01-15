@@ -117,7 +117,6 @@ function PageHeader({ packages }) {
     }
   };
 
-
   const FILE_SIZE = 160 * 1024;
   const SUPPORTED_FORMATS = [
     'image/jpg',
@@ -177,7 +176,6 @@ function PageHeader({ packages }) {
         </DialogTitle>
         <Formik
           initialValues={{
-
             masking_count: undefined,
             non_masking_count: undefined,
             document_photo: undefined,
@@ -246,7 +244,8 @@ function PageHeader({ packages }) {
                       handleChangeFile={(e) => handleFileChange(e, setFieldValue, setPreviewResume)}
                     />
 
-                    {previewResume?.length > 0 &&
+                    {
+                      previewResume?.length > 0 &&
                       <Grid>
                         Preview:
                       </Grid>

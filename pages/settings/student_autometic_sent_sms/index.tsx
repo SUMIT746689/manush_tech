@@ -52,6 +52,7 @@ const dynamicStudentDataKeys = [
     // 'guardian_photo',
     'relation_with_guardian',
     'student_present_address',
+    'submission_time'
     // 'created_at'
 ];
 

@@ -1428,3 +1428,32 @@ model OtherUsersInfo {
 
   @@map("other_users_info")
 }
+
+model MehediDummy {
+  id        Int     @id @default(autoincrement())
+  body      String
+  is_active Boolean @default(false)
+  every_hit Boolean @default(false)
+  school_id Int     @unique
+
+}
+
+model RidoyDummy {
+  id        Int     @id @default(autoincrement())
+  body      String
+  is_active Boolean @default(false)
+  every_hit Boolean @default(false)
+  school_id Int     @unique
+
+  @@map("ridoydummy")
+}
+
+model FirozDummy {
+  id        Int     @id @default(autoincrement())
+  body      String
+  is_active Boolean @default(false)
+  every_hit Boolean @default(false)
+  school_id Int     @unique
+
+  @@map("Firoz_Dummy")
+}

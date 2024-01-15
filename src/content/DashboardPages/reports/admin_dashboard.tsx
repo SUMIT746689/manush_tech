@@ -8,6 +8,7 @@ import Notices from '../admin_notices';
 import { Attendance } from '../attendance';
 import ImageSlider from '@/components/ImageSlider/ImageSlider';
 import dayjs from 'dayjs';
+import { formatNumber } from '@/utils/numberFormat';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -75,11 +76,11 @@ function AdminDashboardReportsContent({ blockCount = null }) {
             <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
             <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between', pt: 3, pb: 2 }}>
               <span>Masking Sms:</span>
-              <span>{blockCount?.school?.masking_sms_count || 0}</span>
+              <span>{blockCount?.school?.masking_sms_count ? formatNumber(blockCount?.school?.masking_sms_count) : 0}</span>
             </Grid>
             <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between' }}>
               <span>Non Masking Sms:</span>
-              <span>{blockCount?.school?.non_masking_sms_count || 0}</span>
+              <span>{blockCount?.school?.non_masking_sms_count ? formatNumber(blockCount?.school?.non_masking_sms_count) : 0}</span>
             </Grid>
           </Card>
         </Grid>

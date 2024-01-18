@@ -6,13 +6,16 @@ ENV PORT 3000
 RUN mkdir -p /app
 WORKDIR /app
 
-# Installing dependencies
+# Copying source files
 COPY . /app
+
+# Installing dependencies
 # COPY package*.json /app
 RUN npm install -g npm@latest
 RUN npm install --legacy-peer-deps
 
-# Copying source files
+#environment variable
+ENV NODE_ENV=production
 
 RUN npx prisma generate 
 # RUN npx prisma migrate dev

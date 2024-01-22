@@ -109,9 +109,9 @@ export const headers = async () => {
   ]
 }
 
-// const nextConfig = {
-//   reactStrictMode: true,
-//   output: "standalone",
-// }
+const nextConfig = {
+  // reactStrictMode: true,
+  output: "standalone",
+}
 
-// export default nextConfig
+export default nextConfig

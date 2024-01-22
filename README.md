@@ -7,7 +7,7 @@
 <!-- docker build command -->
 
 <!-- create docker image -->
-sudo docker build --no-cache --progress plain -t school-admin:1.0 --network=host -f MehediDockerfile .
+sudo docker build --no-cache --progress plain -t ridoy235/elitbuzz:school_admin_v1 --network=host -f MehediDockerfile .
 
 <!-- build container -->
-docker run -d --name school -p 3000:3000 f1e64f13f0770
+docker run -d --name school_admin_v1 -p  3000:3000 ridoy235/elitbuzz:school_admin_v1

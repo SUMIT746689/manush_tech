@@ -1,20 +1,46 @@
 version: '3'
 services:
-  db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: mypassword
-    ports:
-      - "3306:3306"
-    restart: unless-stopped
-  app:
-    build:
-      dockerfile: Dockerfile
-    environment:
-      DATABASE_URL: mysql://root:mypassword@db:3306/school
-    ports:
-      - "3000:3000"
-    # todo: need to persist files
-    #map ports
-    #tell to use system network, if I use system network then should I need to map?
+  # db:
+  #   image: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: mypassword
+  #   ports:
+  #     - "3306:3306"
+  #   restart: unless-stopped
+  admin:
+    image: ridoy235/elitbuzz:school_admin_v1.1
+    pull_policy: always
     # network_mode: host
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql://root:mypassword@192.168.11.169:3306/school?parseTime=true
+      - SALTROUNDS=${SALTROUNDS}
+      - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
+      - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
+      - API_KEY=${API_KEY}
+      - SENDER_ID=${SENDER_ID}
+      - FILESFOLDER=${FILESFOLDER}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
+      - bkash_username=${bkash_username}
+      - bkash_password=${bkash_password}
+      - bkash_app_key=${bkash_app_key}
+      - bkash_app_secret=${bkash_app_secret}
+      - bkash_X_App_Key=${bkash_X_App_Key}
+      - bkash_grant_token_url=${bkash_grant_token_url}
+      - bkash_create_payment_url=${bkash_create_payment_url}
+      - bkash_execute_payment_url=${bkash_execute_payment_url}
+      - NEXT_PUBLIC_BASE_API=${NEXT_PUBLIC_BASE_API}
+      - base_url=${base_url}
+    ports:
+      - 3000:3000
+    volumes:
+      - AllFiles:/app/AllFiles
+volumes:
+  AllFiles:
+      # todo: need to persist files
+      #map ports
+      #tell to use system network, if I use system network then should I need to map?
+      # network_mode: host

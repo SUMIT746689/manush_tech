@@ -14,7 +14,7 @@ RUN npm i --legacy-peer-deps
 # 2. Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
-COPY --from=DEPS /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules ./node_modules
 # Copying prisma source files
 COPY . .
 COPY ../prisma .

@@ -52,8 +52,8 @@ model School {
   main_balance          Float?
   masking_sms_count     Int     @default(0) //no_of_sms_available
   non_masking_sms_count Int     @default(0) //no_of_sms_available
-  masking_sms_price     Float?
-  non_masking_sms_price Float?
+  masking_sms_price     Float?  @default(0)
+  non_masking_sms_price Float?  @default(0)
   // school should not be created without an existing user
   // admin_id Int     @unique
   // sms_balance           Int? //no_of_sms
@@ -1079,32 +1079,6 @@ enum DiscountType {
   flat
 }
 
-// model tbl_manual_attendace_queue {
-//   id         Int      @id @default(autoincrement())
-//   user_id    Int
-//   created_at DateTime @default(now())
-
-//   user User @relation(fields: [user_id], references: [id])
-// }
-
-// model tbl_sms_queued {
-//   id            Int      @id @default(autoincrement())
-//   name          String
-//   campaign_name String
-//   body          String
-//   phone         String
-//   sender_id     String
-//   api_key       String
-//   user_id       Int
-//   school_id     Int
-//   created_at    DateTime @default(now())
-
-//   school School @relation(fields: [school_id], references: [id])
-//   user   User   @relation(fields: [user_id], references: [id])
-
-//   @@map("tbl_sms_queued")
-// }
-
 model tbl_student_sent_sms_queue {
   id               Int      @id @default(autoincrement())
   class_id         Int
@@ -1142,8 +1116,8 @@ model tbl_queued_sms {
   school_name         String
   user_id             Int
   user_name           String?
-  sender_id           String
-  sender_name         String?
+  sender_id           String //sms gateway => id 
+  sender_name         String? //sms gateway => json => sender_id 
   contacts            String    @db.LongText
   pushed_via          String
   charges_per_sms     Float     @default(0)
@@ -1154,8 +1128,8 @@ model tbl_queued_sms {
   submission_time     DateTime?
   status              Int       @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
   sms_gateway_status  String?
+  priority            Int       @default(5) // 1-> highest
   // fail_count          Int       @default(0)
-  // priority            Int       @default(5) // 1-> highest
   //campaign_id           Int?
   //route_id              Int
   //route_name            String?
@@ -1437,7 +1411,7 @@ model MehediDummy {
   school_id Int     @unique
 
   ridoyDummy RidoyDummy[] @relation("MehediToRidoy")
-  firoz FirozDummy[] @relation("mehedi_to_firoz")
+  firoz      FirozDummy[] @relation("mehedi_to_firoz")
 }
 
 model RidoyDummy {
@@ -1454,13 +1428,13 @@ model RidoyDummy {
 }
 
 model FirozDummy {
-  id         Int          @id @default(autoincrement())
-  body       String
-  is_active  Boolean      @default(false)
-  every_hit  Boolean      @default(false)
-  school_id  Int          @unique
-  
-  ridoyDummy RidoyDummy[]
+  id        Int     @id @default(autoincrement())
+  body      String
+  is_active Boolean @default(false)
+  every_hit Boolean @default(false)
+  school_id Int     @unique
+
+  ridoyDummy  RidoyDummy[]
   mehediDummy MehediDummy[] @relation("mehedi_to_firoz")
 
   @@map("Firoz_Dummy")

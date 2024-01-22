@@ -37,14 +37,14 @@ export default async function Admission() {
             school: { select: { name: true, address: true, websiteui: { select: { header_image: true } } } },
         }
     });
-    const serverHost =  JSON.stringify(process.env.server_host);
+    const serverHost =  JSON.stringify(process.env.SERVER_HOST);
     console.log({serverHost,classes})
     return (
         <div>
             <OnlineAdmission
                 classes={classes || []}
                 academicYears={academicYear || []}
-                serverHost={`${process.env.server_host}` || ''}
+                serverHost={`${process.env.SERVER_HOST}` || ''}
                 studentAdmissionForm={studentAdmissionForm}
             />
         </div>

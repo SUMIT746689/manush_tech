@@ -1,16 +1,16 @@
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Formik } from 'formik';
-import { Button, Card, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, TextField, Typography } from '@mui/material';
+import { Card, CircularProgress, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import * as Yup from 'yup';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
 import { TextFieldWrapper } from '@/components/TextFields';
-import { DialogTitleWrapper } from '@/components/DialogWrapper';
 import Footer from '@/components/Footer';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { verifyIsMasking } from 'utilities_api/verify';
 
 
 const SMSSettings = () => {
@@ -128,18 +128,21 @@ const SMSSettings = () => {
                           value={values?.sms_api_key}
 
                         />
+                        <Grid>
+                          {/* sender_id */}
+                          <TextFieldWrapper
+                            label="Sender Id"
+                            errors={errors?.sender_id}
+                            touched={touched?.sender_id}
+                            name="sender_id"
+                            //  placeholder={t(`sender_id here...`)}
+                            handleBlur={handleBlur}
+                            handleChange={handleChange}
+                            value={values?.sender_id}
+                          />
+                          {values?.sender_id && <Grid fontWeight={600}>Sms Type: <span style={{ fontSize: '15px', color: "#a21caf" }}>{verifyIsMasking(values?.sender_id) ? 'Masking' : 'Non Masking'}</span></Grid>}
+                        </Grid>
 
-                        {/* sender_id */}
-                        <TextFieldWrapper
-                          label="Sender Id"
-                          errors={errors?.sender_id}
-                          touched={touched?.sender_id}
-                          name="sender_id"
-                          //  placeholder={t(`sender_id here...`)}
-                          handleBlur={handleBlur}
-                          handleChange={handleChange}
-                          value={values?.sender_id}
-                        />
                       </DialogContent>
 
                       <DialogActions sx={{

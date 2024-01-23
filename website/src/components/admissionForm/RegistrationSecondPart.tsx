@@ -276,6 +276,7 @@ function RegistrationSecondPart({
                                 borderRadius: '3px'
                               }
                             }}
+                            variant='outlined'
                             fullWidth
                             error={Boolean(touched.class_id && errors.class_id)}
                             // @ts-ignore

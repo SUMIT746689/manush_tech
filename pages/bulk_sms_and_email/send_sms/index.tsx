@@ -10,13 +10,13 @@ import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadS
 import { useAuth } from '@/hooks/useAuth';
 import { BasicTabWrapper } from '@/components/Tab/Tab';
 import { useClientDataFetch } from '@/hooks/useClientFetch';
+import { formatNumber } from '@/utils/numberFormat';
+
+const colorBlue = "#0052B4"
 
 const Packages = () => {
-  // const [type, setType] = useState("INDIVIDUAL_SMS");
-  const { user } = useAuth();
-  const { school } = user || {};
   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
-  
+
   return (
     <>
       <Head>
@@ -31,38 +31,35 @@ const Packages = () => {
             width="100%"
           >
             {sms_gateway && <BasicTabWrapper items={[
-              { label: "INDIVIDUAL SMS", value: <IndividualSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> },
-              { label: "GROUP SMS", value: <SmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> },
-              { label: "FILE UPLOAD", value: <FileUploadSentSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} /> }
+              {
+                label: "INDIVIDUAL SMS", value:
+                  <SendSmsWrapper>
+                    <IndividualSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                    <SmsQuantityCard />
+                  </SendSmsWrapper>
+              },
+              {
+                label: "GROUP SMS", value:
+                  <SendSmsWrapper>
+                    <SmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                    <SmsQuantityCard />
+                  </SendSmsWrapper>
+              },
+              {
+                label: "FILE UPLOAD", value:
+                  <SendSmsWrapper>
+                    <FileUploadSentSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                    <SmsQuantityCard />
+                  </SendSmsWrapper>
+              }
             ]} />
             }
-            {/* <Grid display="flex" justifyContent="center">
-              <ButtonGroup
-                disableElevation
-                variant="contained"
-                aria-label="Disabled elevation buttons"
-                sx={{ borderRadius: 0.5, mt: 1 }}
-              >
-                <Button onClick={() => { setType("INDIVIDUAL_SMS") }} variant={type === "INDIVIDUAL_SMS" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> INDIVIDUAL SMS</Button>
-                <Button onClick={() => { setType("GROUP_SMS") }} variant={type === "GROUP_SMS" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> GROUP SMS</Button>
-                <Button onClick={() => { setType("FILE_UPLOAD") }} variant={type === "FILE_UPLOAD" ? "contained" : "outlined"} sx={{ borderRadius: 0.5 }}> FILE UPLOAD</Button>
-              </ButtonGroup>
-            </Grid> */}
-
-            {/* {type === "INDIVIDUAL_SMS" && <IndividualSmsPage />}
-            {type === "GROUP_SMS" && <SmsPage />}
-            {type === "FILE_UPLOAD" && < FileUploadSentSmsPage />} */}
           </Grid>
 
-          <Grid width={400} mt={7} >
-            <Card sx={{ padding: 2, height: 'fit', fontWeight: 600, fontSize: 16, borderRadius: 0.5 }}>
-              <Grid color="darkcyan">Masking Sms Count: {school?.masking_sms_count} </Grid>
-              <Grid color="darkkhaki">Non Masking Sms Count: {school?.non_masking_sms_count}</Grid>
-            </Card>
-          </Grid>
+
         </Grid>
         <Footer />
-      </PageBodyWrapper>
+      </PageBodyWrapper >
     </>
   );
 };
@@ -74,3 +71,29 @@ Packages.getLayout = (page) => (
 );
 
 export default Packages;
+
+const SmsQuantityCard = () => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  return (
+    <Card sx={{ color: colorBlue, px: 3, py: 4.5, minWidth: 400, mt: 1, mb: 'auto' }}>
+      <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
+      <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between', pt: 3, pb: 2 }}>
+        <span>Masking Sms:</span>
+        <span>{school?.masking_sms_count ? formatNumber(school?.masking_sms_count) : 0}</span>
+      </Grid>
+      <Grid sx={{ fontSize: 16, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Non Masking Sms:</span>
+        <span>{school?.non_masking_sms_count ? formatNumber(school?.non_masking_sms_count) : 0}</span>
+      </Grid>
+    </Card>
+  )
+}
+
+const SendSmsWrapper = ({ children }) => {
+  return (
+    <Grid display="flex" columnGap={1}>
+      {children}
+    </Grid>
+  )
+} 

@@ -1,14 +1,16 @@
 import * as Yup from 'yup';
 import { Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, TextField } from '@mui/material';
+import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
-import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
+import { useClientDataFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
+import Link from 'next/dist/client/link';
+import { verifyIsUnicode } from 'utilities_api/verify';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -127,7 +129,7 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none",mb:'auto' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
@@ -135,7 +137,7 @@ function PageHeader({ sms_gateway }) {
           enableReinitialize={true}
           initialValues={{
             campaign_name: '',
-            sms_gateway: sms_gateway?.title || undefined,
+            sms_gateway: sms_gateway?.details?.sender_id || '',
             sms_gateway_id: sms_gateway?.id || undefined,
             template_id: undefined,
             body: '',
@@ -175,9 +177,9 @@ function PageHeader({ sms_gateway }) {
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
-                  sx={{ p: 3 }}
+                  sx={{ p: 3, }}
                 >
-                  <Grid container>
+                  <Grid container rowGap={1}>
 
                     <TextFieldWrapper
                       label="Campaign Name"
@@ -191,40 +193,51 @@ function PageHeader({ sms_gateway }) {
                     />
 
                     {
-                      sms_gateway && <DisableTextWrapper
-                        label="Selected Sms Gateway"
-                        touched={values.sms_gateway}
-                        errors={errors.sms_gateway}
-                        value={values.sms_gateway}
-                      />
+                      // sms_gateway &&
+                      <Grid container>
+                        <DisableTextWrapper
+                          label="Selected Sms Gateway"
+                          touched={values.sms_gateway}
+                          errors={errors.sms_gateway}
+                          value={values.sms_gateway}
+                        />
+                        {
+                          Boolean(
+                            // touched.sms_gateway_id 
+                            // && 
+                            errors.sms_gateway_id
+                          ) &&
+                          <Grid display="flex" columnGap={2} justifyContent="space-between">
+                            <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                            <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
+                          </Grid>
+
+                        }
+                      </Grid>
                     }
                     {/* <GateWaySelect /> */}
 
                     <DynamicSelectTemplate />
 
-                    <TextAreaWrapper
-                      sx={{ pb: 0 }}
-                      name="body"
-                      value={values.body}
-                      touched={touched.body}
-                      errors={errors.body}
-                      handleChange={(v) => {
-                        if (v.target.value.length > 1000) return;
-                        handleChange(v)
-                      }
-                      }
-                      handleBlur={handleBlur}
-                    />
-                    <Grid sx={{ pb: 1, ml: 'auto' }}>
-                      {`
-                      ${values.body?.length ?? 0} characters | 
-                      ${1000 - (values.body?.length ?? 0)} characters left |
-                      ${!values.body?.length || values.body?.length === 0 ?
-                          0
-                          :
-                          values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
-                      `}
+                    <Grid container>
+                      <TextAreaWrapper
+                        sx={{ pb: 0 }}
+                        name="body"
+                        value={values.body}
+                        touched={touched.body}
+                        errors={errors.body}
+                        handleChange={(v) => {
+                          if (v.target.value.length > 1000) return;
+                          handleChange(v)
+                        }
+                        }
+                        handleBlur={handleBlur}
+                      />
+                      <Grid sx={{ ml: 'auto' }}>
+                        <SmsHelpInfoWrapper value={values.body} />
+                      </Grid>
                     </Grid>
+
 
                     {/* <DynamicTypeSelect /> */}
 
@@ -266,3 +279,20 @@ function PageHeader({ sms_gateway }) {
 
 export default PageHeader;
 
+const SmsHelpInfoWrapper = ({ value }) => {
+  const isUnicode = verifyIsUnicode(value);
+  console.log({ isUnicode })
+  const updatedValue = isUnicode ? value * 2 : value;
+  return (
+    <Grid sx={{ ml: 'auto' }}>
+      {`
+        ${updatedValue?.length ?? 0} characters | 
+        ${1000 - (updatedValue?.length ?? 0)} characters left |
+        ${!updatedValue?.length || updatedValue?.length === 0 ?
+          0
+          :
+          updatedValue?.length <= 160 ? 1 : Math.ceil(updatedValue?.length / 153)} SMS                
+        `}
+    </Grid>
+  )
+}

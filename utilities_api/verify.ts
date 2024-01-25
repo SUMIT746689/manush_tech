@@ -29,3 +29,22 @@ export const verifyIsMasking = (sender_id: string): boolean => {
 
   return true;
 }
+export const verifyIsUnicode = (str): boolean => {
+  const finalStrig = str.split(' ').join('');
+  if (finalStrig.length === 0) return;
+  console.log({ finalStrig })
+  const matchRegx = /^[a-z0-9]+$/gi;
+  return finalStrig.match(matchRegx) ? false : true;
+};
+
+export const verifyIsBangla = (str: string): boolean => {
+  if (str.length === 0) return;
+  const minBanglaHtmlEntity = 2432;
+  const maxBanglaHtmlEntity = 2558;
+
+  for (var i = 0, n = str.length; i < n; i++) {
+    const htmlEntity = str.charCodeAt(i);
+    (minBanglaHtmlEntity <= htmlEntity && htmlEntity <= maxBanglaHtmlEntity) ? true : false
+  }
+  return false;
+}

@@ -28,11 +28,11 @@ const SMSSettings = () => {
           sms_gateway: data?.data[0]?.details?.sms_gateway || '',
           sms_api_key: data?.data[0]?.details?.sms_api_key || '',
           sender_id: data?.data[0]?.details?.sender_id || '',
-          title: data?.data[0]?.title || 'elitbuzz',
+          // title: data?.data[0]?.title || 'mram',
           submit: null
         }}
         validationSchema={Yup.object().shape({
-          title: Yup.string().max(255).required(t('The title field is required')),
+          // title: Yup.string().max(255).required(t('The title field is required')),
           // sms_gateway: Yup.string().max(255).required(t('The sms_gateway field is required')),
           sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
           sender_id: Yup.string().max(255).required(t('The sender_id field is required')),
@@ -47,7 +47,7 @@ const SMSSettings = () => {
 
             const v = {
               id: _values.id,
-              title: _values.title,
+              // title: _values.title,
               details: {
                 // sms_gateway: _values.sms_gateway,
                 sms_api_key: _values.sms_api_key,

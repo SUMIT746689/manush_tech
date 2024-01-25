@@ -18,7 +18,7 @@ async function post(req, res, refresh_token) {
     }
 
     // response from sms gateway response
-    const smsGatewayRes = prisma.smsGateway.findFirst({ where: { school_id: school_id } })
+    const smsGatewayRes = prisma.smsGateway.findFirst({ where: { school_id: school_id, id: sms_gateway_id } })
 
     // school information
     const schoolInfoRes = prisma.school.findFirst({ where: { id: school_id }, select: { name: true } })
@@ -29,7 +29,7 @@ async function post(req, res, refresh_token) {
     const resQueries = await Promise.all([smsGatewayRes, schoolInfoRes, userRes])
 
     const { details }: any = resQueries[0];
-    const { sender_id, sms_api_key: api_key } = details ?? {};
+    const { sender_id, sms_api_key: api_key,is_masking } = details ?? {};
     if (!sender_id && !api_key) throw new Error("sender_id or api_key missing");
 
     const date = Date.now();
@@ -43,10 +43,10 @@ async function post(req, res, refresh_token) {
       school_name,
       user_id: id,
       user_name: username,
-      sender_id,
-      // sender_name: username,
+      sender_id:sms_gateway_id,
+      sender_name: sender_id,
       pushed_via: "gui",
-      sms_type: "masking",
+      sms_type: is_masking? 'masking':'non_masking',
       sms_text: custom_body,
       submission_time: new Date(),
       sms_gateway_status: "pending",

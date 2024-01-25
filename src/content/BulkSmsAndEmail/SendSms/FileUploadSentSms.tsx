@@ -12,6 +12,7 @@ import { fetchData } from '@/utils/post';
 import { read, utils } from "xlsx";
 import { getSheetHeaders } from '@/utils/sheet';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import Link from 'next/dist/client/link';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -260,14 +261,14 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none" }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
         <Formik
           initialValues={{
             campaign_name: '',
-            sms_gateway: sms_gateway?.title || undefined,
+            sms_gateway: sms_gateway?.details?.sender_id || '',
             sms_gateway_id: sms_gateway?.id || undefined,
             contact_column: null,
             // template_id: undefined,
@@ -308,7 +309,7 @@ function PageHeader({ sms_gateway }) {
                 <DialogContent
                   sx={{ p: 3 }}
                 >
-                  <Grid container>
+                  <Grid container rowGap={1}>
 
                     <TextFieldWrapper
                       label="Campaign Name"
@@ -321,14 +322,26 @@ function PageHeader({ sms_gateway }) {
                       required={true}
                     />
 
-                    <DisableTextWrapper
-                      label="Selected Sms Gateway"
-                      touched={values.sms_gateway}
-                      errors={errors.sms_gateway}
-                      value={values.sms_gateway}
-                    />
-                    {/* <GateWaySelect /> */}
+                    <Grid container>
+                      <DisableTextWrapper
+                        label="Selected Sms Gateway"
+                        touched={values.sms_gateway}
+                        errors={errors.sms_gateway}
+                        value={values.sms_gateway}
+                      />
+                      {
+                        Boolean(
+                          // touched.sms_gateway_id 
+                          // && 
+                          errors.sms_gateway_id
+                        ) &&
+                        <Grid display="flex" columnGap={2} justifyContent="space-between">
+                          <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                          <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
+                        </Grid>
 
+                      }
+                    </Grid>
 
                     <FileUploadFieldWrapper
                       htmlFor="files"

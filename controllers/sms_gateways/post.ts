@@ -5,20 +5,27 @@ import { verifyIsMasking } from 'utilities_api/verify';
 
 async function post(req, res, refresh_token) {
   try {
-    const { title, details, id } = req.body;
+    const { details, id } = req.body;
 
-    if (!title || !details) throw new Error("provide valid data")
+    if (
+      // !title || 
+      !details
+    ) throw new Error("provide valid data")
 
-    const { sender_id } = details;
+    const { sender_id, sms_api_key } = details;
+
+    const query = {
+      title: 'mram',
+      details: {},
+    };
 
     const smsType = verifyIsMasking(sender_id);
+    const update_sender_id = !smsType && sender_id.length === 11 ? 88 + sender_id : sender_id;
 
-    details['is_masking'] = smsType ? true : false;
-    
-    const query = {
-      title: title,
-      details: details,
-    };
+    query.details['is_masking'] = smsType ? true : false;
+    query.details['sender_id'] = update_sender_id || undefined;
+    query.details['sms_api_key'] = sms_api_key || undefined;
+
 
     const response = await prisma.smsGateway.upsert({
       where: {

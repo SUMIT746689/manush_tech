@@ -1116,7 +1116,7 @@ model tbl_queued_sms {
   school_name         String
   user_id             Int
   user_name           String?
-  sender_id           String //sms gateway => id 
+  sender_id           Int //sms gateway => id 
   sender_name         String? //sms gateway => json => sender_id 
   contacts            String    @db.LongText
   pushed_via          String
@@ -1149,7 +1149,7 @@ model tbl_sent_sms {
   school_name         String
   user_id             Int
   user_name           String?
-  sender_id           String
+  sender_id           Int
   sender_name         String?
   contacts            String    @db.LongText
   pushed_via          String

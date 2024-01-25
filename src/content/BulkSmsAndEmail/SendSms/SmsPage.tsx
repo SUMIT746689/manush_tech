@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import { Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, TextField } from '@mui/material';
+import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
@@ -9,6 +9,7 @@ import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } fr
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
+import Link from 'next/dist/client/link';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -33,19 +34,6 @@ const DynamicSelectTemplate = () => {
     </>
   )
 }
-
-// const GateWaySelect = () => {
-//   const { values, touched, errors, setFieldValue }: any = useFormikContext()
-//   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
-//   useEffect(() => {
-//     sms_gateway[0]?.id && setFieldValue("sms_gateway_id", sms_gateway[0]?.id)
-//   }, [sms_gateway])
-
-//   return values.sms_gateway_id ?
-//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={sms_gateway[0]?.title} />
-//     :
-//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={'No Gateway Selected'} />
-// }
 
 const TypeClass = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
@@ -116,52 +104,6 @@ const TypeGroup = () => {
   )
 }
 
-
-// const TypeIndividual = () => {
-//   const { values, touched, errors, setFieldValue }: any = useFormikContext()
-//   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
-//   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-//   const [selectNameList, setSelecteNameList]: any = useState([]);
-
-//   useEffect(() => {
-//     const customize_select_roleslist = roles?.map(role => ({ value: role.id, title: role.title }))
-//     customize_select_roleslist && setSelectRolesList(value => [...value, ...customize_select_roleslist]);
-//   }, [roles])
-
-//   const handleRoleSelect = async (e) => {
-//     const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${e.target.value}`, 'get', {});
-
-//     if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, title: user.username })));
-//     setFieldValue("name", []);
-//     const findSelectedTemplate = roles.find(data => data.id === e.target.value)
-//     if (!findSelectedTemplate) return;
-//     setFieldValue("role_id", e.target.value);
-//     if (!findSelectedTemplate.has_section) return;
-//     const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-//     setSelecteNameList((value) => customize_select_sectionlist)
-//     // setFieldValue("body", findSelectedTemplate.body)
-//     // handleBlur("body")
-
-//   };
-
-//   const handleNameSelect = (e) => {
-//     // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
-//     // if (!findSelectedTemplate) return;
-//     setFieldValue("name", e.target.value)
-//     // setFieldValue("body", findSelectedTemplate.body)
-//     // handleBlur("body")
-//   };
-
-//   return (
-//     <>
-//       <DynamicDropDownSelectWrapper label="Select Role" name="role_id" value={values.role_id} menuItems={selectRolesList} handleChange={handleRoleSelect} />
-
-//       <DynamicDropDownMuilipleSelectWrapper label="Select name" name="name" value={values.name} menuItems={selectNameList} handleChange={handleNameSelect} />
-//     </>
-//   )
-// }
-
-
 const DynamicTypeSelect = () => {
   // const { data: sms_datas } = useClientDataFetch("/api/")
   // const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue } = useFormikContext()
@@ -221,14 +163,14 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0.6, boxShadow: "" }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: 'none' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
         <Formik
           initialValues={{
             campaign_name: '',
-            sms_gateway: sms_gateway?.title || undefined,
+            sms_gateway: sms_gateway?.details?.sender_id || '',
             sms_gateway_id: sms_gateway?.id || undefined,
             template_id: undefined,
             body: '',
@@ -268,7 +210,7 @@ function PageHeader({ sms_gateway }) {
                 <DialogContent
                   sx={{ p: 3 }}
                 >
-                  <Grid container>
+                  <Grid container rowGap={1}>
 
                     <TextFieldWrapper
                       label="Campaign Name"
@@ -281,14 +223,27 @@ function PageHeader({ sms_gateway }) {
                       required={true}
                     />
 
-                    <DisableTextWrapper
-                      label="Selected Sms Gateway"
-                      touched={values.sms_gateway}
-                      errors={errors.sms_gateway}
-                      value={values.sms_gateway}
-                    />
+                    <Grid container>
+                      <DisableTextWrapper
+                        label="Selected Sms Gateway"
+                        touched={values.sms_gateway}
+                        errors={errors.sms_gateway}
+                        value={values.sms_gateway}
+                      />
+                      {
+                        Boolean(
+                          // touched.sms_gateway_id 
+                          // && 
+                          errors.sms_gateway_id
+                        ) &&
+                        <Grid display="flex" columnGap={2} justifyContent="space-between">
+                          <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                          <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
+                        </Grid>
+                      }
+                    </Grid>
                     {/* <GateWaySelect /> */}
-                    
+
 
                     <DynamicSelectTemplate />
 

@@ -30,8 +30,14 @@ async function post(req, res, refresh_token) {
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
     const { file_upload } = files;
     console.log({ fields })
-    if (!fields.contact_column) throw new Error("required fields missing")
+    if (!fields.contact_column) throw new Error("contact field is missing")
     if (!file_upload?.originalFilename) throw new Error("file not found")
+    if (!fields.sms_gateway_id) throw new Error('sms gateway filed is missing')
+
+    // response from sms gateway response
+    const smsGatewayRes = prisma.smsGateway.findFirst({ where: { school_id: school_id, id: fields.sms_gateway_id } })
+
+    console.log({ smsGatewayRes })
 
     const allMatchesArray = findMatches(fields.body);
 
@@ -85,7 +91,7 @@ async function post(req, res, refresh_token) {
           sms_text: body,
           submission_time: new Date(Date.now()),
           contacts: String(contacts),
-          pushed_via: '',
+          pushed_via: 'gui',
           total_count: 1,
         }
       })

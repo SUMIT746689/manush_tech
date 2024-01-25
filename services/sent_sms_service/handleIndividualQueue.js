@@ -14,7 +14,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
   // verify sms gateway
   const { error, data: smsGatewayData } = await handleSmsGateWay({ school_id });
   if (error) return (error);
-  const { sender_id } = smsGatewayData;
+  const { id: smsGatewayId, sender_id,is_masking } = smsGatewayData;
   const whereSection = {};
   if (section_id) whereSection["id"] = section_id;
 
@@ -24,7 +24,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
   const { school } = studentsViaClass;
   const { name: school_name, masking_sms_price, masking_sms_count, non_masking_sms_price, non_masking_sms_count } = school ?? {};
-  const sms_type = "masking";
+  const sms_type = is_masking ? 'masking' : 'non_masking' ;
   const sms_count = sms_type === "masking" ? masking_sms_count : non_masking_sms_count;
   const sms_price = sms_type === "masking" ? masking_sms_price : non_masking_sms_price;
 
@@ -64,7 +64,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         submission_time: created_at,
         school_id,
         school_name,
-        sender_id,
+        sender_id:smsGatewayId,
         index,
         sms_type,
         charges_per_sms: sms_price

@@ -47,14 +47,24 @@ const Packages = () => {
                   label: "GROUP SMS", value:
                     <SendSmsWrapper>
                       <SmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
-                      <SmsQuantityCard />
+                      <Grid maxWidth={350} display="grid" rowGap={1} >
+                        <SmsQuantityCard />
+                        <SmsNoticeCard />
+                        <SmsRecipientCard />
+                        <SmsContentInfoCard />
+                      </Grid>
                     </SendSmsWrapper>
                 },
                 {
                   label: "FILE UPLOAD", value:
                     <SendSmsWrapper>
                       <FileUploadSentSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
-                      <SmsQuantityCard />
+                      <Grid maxWidth={350} display="grid" rowGap={1} >
+                        <SmsQuantityCard />
+                        <SmsNoticeCard />
+                        <SmsRecipientCard />
+                        <SmsContentInfoCard />
+                      </Grid>
                     </SendSmsWrapper>
                 }
               ]} />
@@ -108,7 +118,7 @@ const SmsNoticeCard = () => {
 
 const SmsRecipientCard = () => {
   return (
-    <Card sx={{ boxShadow: 3, color: colorBlue, p: 2, minWidth: { xs: 'fit-content', md: 350 }, mb: 'auto', borderRadius: 0.5 }}>
+    <Card sx={{ boxShadow: 3, color: colorBlue, p: 3, minWidth: { xs: 'fit-content', md: 350 }, mb: 'auto', borderRadius: 0.5 }}>
       <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>SMS RECIPIENT</Grid>
       <Grid sx={{ fontSize: 14, pt: 2, textAlign: 'justify' }}>
         Before doing any campaign we recommend you to do a testing with the sender id to your number to ensure the sender id and SMS content is working fine.

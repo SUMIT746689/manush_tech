@@ -32,9 +32,12 @@ export const verifyIsMasking = (sender_id: string): boolean => {
 export const verifyIsUnicode = (str): boolean => {
   const finalStrig = str.split(' ').join('');
   if (finalStrig.length === 0) return;
-  console.log({ finalStrig })
+  // all special characters=>   `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~
+  const withoutSpecialChar = finalStrig.replace(/[`!@#$%&*()_+\-=\;':",.<>\/?]/g, '');
+  console.log({ withoutSpecialChar });
+  console.log({ finalStrig });
   const matchRegx = /^[a-z0-9]+$/gi;
-  return finalStrig.match(matchRegx) ? false : true;
+  return withoutSpecialChar.match(matchRegx) ? false : true;
 };
 
 export const verifyIsBangla = (str: string): boolean => {

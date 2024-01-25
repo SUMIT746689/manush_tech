@@ -261,7 +261,7 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none" }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none",mb:'auto' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 

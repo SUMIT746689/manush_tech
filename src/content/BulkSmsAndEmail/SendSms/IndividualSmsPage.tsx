@@ -129,7 +129,7 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none",mb:'auto' }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none", mb: 'auto' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
@@ -281,17 +281,17 @@ export default PageHeader;
 
 const SmsHelpInfoWrapper = ({ value }) => {
   const isUnicode = verifyIsUnicode(value);
-  console.log({ isUnicode })
-  const updatedValue = isUnicode ? value * 2 : value;
+  console.log({ isUnicode, value: value.length })
+  const updatedValue = isUnicode ? value?.length * 2 : value.length;
   return (
     <Grid sx={{ ml: 'auto' }}>
       {`
-        ${updatedValue?.length ?? 0} characters | 
-        ${1000 - (updatedValue?.length ?? 0)} characters left |
-        ${!updatedValue?.length || updatedValue?.length === 0 ?
+        ${updatedValue ?? 0} characters | 
+        ${1000 - (updatedValue ?? 0)} characters left |
+        ${!updatedValue || updatedValue === 0 ?
           0
           :
-          updatedValue?.length <= 160 ? 1 : Math.ceil(updatedValue?.length / 153)} SMS                
+          updatedValue <= 160 ? 1 : Math.ceil(updatedValue / 153)} SMS                
         `}
     </Grid>
   )

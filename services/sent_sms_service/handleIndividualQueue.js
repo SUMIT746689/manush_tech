@@ -3,6 +3,8 @@ import { handleClassWiseStudents } from "./utility/handleResClassWiseStudents.js
 import { handleSmsGateWay } from "./utility/handleSmsGateway.js";
 import prisma from "./utility/prismaClient.js";
 import { logFile } from "./utility/handleLog.js";
+import { verifyIsUnicode } from "./utility/handleVerifyUnicode.js";
+import { findMatches } from "./utility/findMatches.js";
 
 export const handleIndividualQueue = async ({ student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise }) => {
 
@@ -23,7 +25,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
   if (student_err) return logFile.error(student_err);
 
   const { school } = studentsViaClass;
-  const { name: school_name, masking_sms_price, masking_sms_count, non_masking_sms_price, non_masking_sms_count } = school ?? {};
+  const { name: school_name, masking_sms_price, masking_sms_count, non_masking_sms_price, non_masking_sms_count, AutoAttendanceSentSms } = school ?? {};
   const sms_type = is_masking ? 'masking' : 'non_masking';
   const sms_count = sms_type === "masking" ? masking_sms_count : non_masking_sms_count;
   const sms_price = sms_type === "masking" ? masking_sms_price : non_masking_sms_price;
@@ -68,11 +70,24 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         sender_name: sender_id,
         index,
         sms_type,
-        charges_per_sms: sms_price
+        charges_per_sms: sms_price,
+        text_sms: resAutoAttendanceSentSms.body
       };
 
-      smsQueueHandlerParameters["sms_text"] = `Dear Parents, Your ${gender === "male" ? "son" : "daughter"}, Class-${class_id}, Sec-${section_id}, Roll-${class_roll_no} is ${haveAttendance?.status || "absent"} ${new Date(created_at).toLocaleDateString('en-US')} in class. Principal, ${school_name}`;
-      smsQueueHandlerParameters["number_of_sms_parts"] = smsQueueHandlerParameters.sms_text?.length <= 160 ? 1 : Math.ceil(smsQueueHandlerParameters.sms_text?.length / 153)
+      // calculate part of sms
+      const resAutoAttendanceSentSms = Array.isArray((AutoAttendanceSentSms)) && AutoAttendanceSentSms.length > 0 ? AutoAttendanceSentSms[0] : {};
+      const bodyLength = verifyIsUnicode(resAutoAttendanceSentSms.body) ? resAutoAttendanceSentSms.body.length * 2 : resAutoAttendanceSentSms.body.length;
+
+      const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
+      if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${school_id}) masking sms count is ${masking_sms_count}`);
+
+      //dynamic values replace
+      const allMatchesArray = findMatches(resAutoAttendanceSentSms.body);
+      for (const element of allMatchesArray) {
+        smsQueueHandlerParameters.text_sms.replaceAll(`#${element}#`, student[element] || student_info[element] || '')
+      }
+
+      smsQueueHandlerParameters["number_of_sms_parts"] = number_of_sms_parts;
 
       // create sent sms queue, tbl sent sms and update school 
       createSmsQueueTableHandler(smsQueueHandlerParameters);

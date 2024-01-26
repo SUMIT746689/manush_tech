@@ -1,6 +1,7 @@
 import { createSmsQueueTableHandler } from "./createSmsQueueTableHandler.js";
 import { findMatches } from "./findMatches.js";
 import { logFile } from "./handleLog.js";
+import { verifyIsUnicode } from "./handleVerifyUnicode.js";
 
 export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id) => {
     try {
@@ -12,9 +13,10 @@ export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id) =
         if (!data.is_active) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) automatic attendance is not active`);
         if (!data.every_hit && isAlreadyAttendanceEntry?.id) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) every_hit(${data.every_hit}) already sent sms automatic attendance`);
         if (!studentDatas.guardian_phone) return logFile.error(`student sent sms, user_id(${user_id}) guardian_phone not founds`)
-
+        if (!data.body) return logFile.error(`student sent sms, user_id(${user_id}) sms body not found`)
+        
         let body = data.body;
-        const bodyLength = data.body.length;
+        const bodyLength = verifyIsUnicode(body) ? body.length * 2 : body.length;
 
         const allMatchesArray = findMatches(data.body);
         for (const element of allMatchesArray) {

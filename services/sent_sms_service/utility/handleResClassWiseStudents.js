@@ -14,7 +14,8 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                         masking_sms_price: true,
                         masking_sms_count: true,
                         non_masking_sms_price: true,
-                        non_masking_sms_count: true
+                        non_masking_sms_count: true,
+                        AutoAttendanceSentSms: true
                     }
                 },
                 sections: {
@@ -33,6 +34,9 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                                 class_roll_no: true,
                                 student_info: {
                                     select: {
+                                        first_name:true,
+                                        middle_name:true,
+                                        last_name:true,
                                         phone: true,
                                         user_id: true,
                                         gender: true

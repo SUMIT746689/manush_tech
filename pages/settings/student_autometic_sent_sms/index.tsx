@@ -1,7 +1,7 @@
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Formik } from 'formik';
-import { Card, Chip, CircularProgress, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, Stack, Switch, Tooltip, Typography, styled } from '@mui/material';
+import { Card, Chip, CircularProgress, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import * as Yup from 'yup';

@@ -15,7 +15,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
         const { error, data: resStudent } = await handleResStdInfo({ user_id });
         if (error) return logFile.error(error);
 
-        const { id, guardian_phone, section, student_info, class_roll_no } = resStudent ?? {};
+        const { id, guardian_phone, SmsGateway, section, student_info, class_roll_no } = resStudent ?? {};
 
         if (!id || !section?.std_entry_time) return logFile.error(`student user_id(${user_id}) or section_id(${section.id}) entry time not found`);
 

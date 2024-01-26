@@ -1363,15 +1363,21 @@ enum payment_gateway_title {
 }
 
 model AutoAttendanceSentSms {
-  id        Int     @id @default(autoincrement())
-  body      String
-  is_active Boolean @default(false)
-  every_hit Boolean @default(false)
-  school_id Int     @unique
+  id          Int         @id @default(autoincrement())
+  body        String
+  body_format body_format
+  is_active   Boolean     @default(false)
+  every_hit   Boolean     @default(false)
+  school_id   Int         @unique
 
   school School @relation(fields: [school_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
+}
+
+enum body_format {
+  text
+  unicode
 }
 
 model OtherUsersInfo {
@@ -1401,41 +1407,4 @@ model OtherUsersInfo {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("other_users_info")
-}
-
-model MehediDummy {
-  id        Int     @id @default(autoincrement())
-  body      String
-  is_active Boolean @default(false)
-  every_hit Boolean @default(false)
-  school_id Int     @unique
-
-  ridoyDummy RidoyDummy[] @relation("MehediToRidoy")
-  firoz      FirozDummy[] @relation("mehedi_to_firoz")
-}
-
-model RidoyDummy {
-  id        Int     @id @default(autoincrement())
-  body      String
-  is_active Boolean @default(false)
-  every_hit Boolean @default(false)
-  school_id Int     @unique
-
-  mehediDummy MehediDummy[] @relation("MehediToRidoy")
-  firoz       FirozDummy[]
-
-  @@map("ridoydummy")
-}
-
-model FirozDummy {
-  id        Int     @id @default(autoincrement())
-  body      String
-  is_active Boolean @default(false)
-  every_hit Boolean @default(false)
-  school_id Int     @unique
-
-  ridoyDummy  RidoyDummy[]
-  mehediDummy MehediDummy[] @relation("mehedi_to_firoz")
-
-  @@map("Firoz_Dummy")
 }

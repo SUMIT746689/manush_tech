@@ -11,6 +11,7 @@ import * as XLSX from 'xlsx/xlsx.mjs';
 import { getSheetBodies, getSheetHeaders } from '@/utils/sheet';
 import { findMatches } from '@/utils/findMatches';
 import { logFile } from 'utilities_api/handleLogFile';
+import { verifyIsUnicode } from 'utilities_api/verify';
 
 
 async function post(req, res, refresh_token) {
@@ -29,15 +30,22 @@ async function post(req, res, refresh_token) {
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
     const { file_upload } = files;
-    console.log({ fields })
+
     if (!fields.contact_column) throw new Error("contact field is missing")
     if (!file_upload?.originalFilename) throw new Error("file not found")
-    if (!fields.sms_gateway_id) throw new Error('sms gateway filed is missing')
+    // if (!fields.sms_gateway_id) throw new Error('sms gateway filed is missing')
 
     // response from sms gateway response
-    const smsGatewayRes = prisma.smsGateway.findFirst({ where: { school_id: school_id, id: fields.sms_gateway_id } })
-
+    const smsGatewayRes = await prisma.smsGateway.findFirst({
+      where: {
+        school_id: school_id,
+        // id: fields.sms_gateway_id 
+      }
+    })
+    // if(smsGatewayRes.)
     console.log({ smsGatewayRes })
+    const { id: smsGatewayId, details } = smsGatewayRes;
+    const { sender_id } = <any>details ?? {};
 
     const allMatchesArray = findMatches(fields.body);
 
@@ -81,13 +89,16 @@ async function post(req, res, refresh_token) {
           body = body.replaceAll(`#${element}#`, value[element])
         }
 
+        const isUnicode = verifyIsUnicode(body || '');
+
         return {
           sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
           user_id: parseInt(id),
           school_id,
           school_name: school.name,
-          sender_id: String(id),
-          sms_type: 'masking',
+          sender_id: smsGatewayId,
+          sender_name: sender_id,
+          sms_type: isUnicode ? 'unicode' : 'text',
           sms_text: body,
           submission_time: new Date(Date.now()),
           contacts: String(contacts),
@@ -96,23 +107,25 @@ async function post(req, res, refresh_token) {
         }
       })
 
-      if (error) return res.status(404).json({ error })
-
+      if (error) {
+        logFile.error(error);
+        return res.status(404).json({ error })
+      }
       // await prisma.$transaction([
-      prisma.tbl_queued_sms.createMany({
+      await prisma.tbl_queued_sms.createMany({
         data: resSentSms
       })
-        // ,
-        // prisma.tbl_sent_sms.createMany({
-        //   data: resSentSms
-        // })
-        // ])
-        .then(res => { console.log("tbl_queue_sms", res) })
-        .catch(err => { console.log("tbl_queue_sms", err) });
+      // ,
+      // prisma.tbl_sent_sms.createMany({
+      //   data: resSentSms
+      // })
+      // ])
+      // .then(res => { console.log("tbl_queue_sms", res) })
+      // .catch(err => { console.log("tbl_queue_sms", err) });
 
-      console.log({ buffer_part })
       res.status(200).end();
     });
+
     datas.on("error", () => {
       res.status(500).res.end();
     })

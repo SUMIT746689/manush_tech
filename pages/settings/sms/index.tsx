@@ -26,7 +26,7 @@ const SMSSettings = () => {
         initialValues={{
           id: data?.data[0]?.id || 0,
           sms_gateway: data?.data[0]?.details?.sms_gateway || '',
-          sms_api_key: data?.data[0]?.details?.sms_api_key || '',
+          // sms_api_key: data?.data[0]?.details?.sms_api_key || '',
           sender_id: data?.data[0]?.details?.sender_id || '',
           // title: data?.data[0]?.title || 'mram',
           submit: null
@@ -34,7 +34,7 @@ const SMSSettings = () => {
         validationSchema={Yup.object().shape({
           // title: Yup.string().max(255).required(t('The title field is required')),
           // sms_gateway: Yup.string().max(255).required(t('The sms_gateway field is required')),
-          sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
+          // sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
           sender_id: Yup.string().max(255).required(t('The sender_id field is required')),
         })}
         onSubmit={async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
@@ -50,7 +50,7 @@ const SMSSettings = () => {
               // title: _values.title,
               details: {
                 // sms_gateway: _values.sms_gateway,
-                sms_api_key: _values.sms_api_key,
+                // sms_api_key: _values.sms_api_key,
                 sender_id: _values.sender_id
               }
             }
@@ -117,7 +117,7 @@ const SMSSettings = () => {
                         /> */}
 
                         {/* sms_api_key */}
-                        <TextFieldWrapper
+                        {/* <TextFieldWrapper
                           label="Sms Api Key"
                           errors={errors?.sms_api_key}
                           touched={touched?.sms_api_key}
@@ -126,8 +126,7 @@ const SMSSettings = () => {
                           handleBlur={handleBlur}
                           handleChange={handleChange}
                           value={values?.sms_api_key}
-
-                        />
+                        /> */}
                         <Grid>
                           {/* sender_id */}
                           <TextFieldWrapper

@@ -24,7 +24,7 @@ async function post(req, res, refresh_token) {
 
     query.details['is_masking'] = smsType ? true : false;
     query.details['sender_id'] = update_sender_id || undefined;
-    query.details['sms_api_key'] = sms_api_key || undefined;
+    query.details['sms_api_key'] = sms_api_key || '';
 
 
     const response = await prisma.smsGateway.upsert({

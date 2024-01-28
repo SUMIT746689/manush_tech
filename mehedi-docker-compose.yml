@@ -13,7 +13,7 @@ services:
     # network_mode: host
     restart: unless-stopped
     environment:
-      - DATABASE_URL=mysql://root:mypassword@192.168.11.169:3306/school?parseTime=true
+      - DATABASE_URL=mysql://root:mypassword@192.168.10.181:3306/school?parseTime=true
       - SALTROUNDS=${SALTROUNDS}
       - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
       - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}

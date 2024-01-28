@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
+import { verifyIsUnicode } from 'utilities_api/verify';
 
 async function post(req, res, refresh_token) {
   try {
@@ -13,14 +14,18 @@ async function post(req, res, refresh_token) {
     console.log({ sms_text })
     const sms_shoot_id = [String(school_id), String(currentDate)].join("_");
 
-    const resSchool = await prisma.school.findFirst({ where: { id: school_id } });
+    const resSchool = await prisma.school.findFirst({ where: { id: school_id }, include: { SmsGateway: true } });
     // console.log({ resSchool })
-
+    const { SmsGateway } = resSchool;
+    const { id: smsGatewayId, details } = SmsGateway[0] || {};
+    const { sender_id, is_masking } = <any>details;
+    if (!smsGatewayId || !sender_id) throw new Error('sms gateway or sender id not founds ');
     const school_name = resSchool.name;
-    const sender_id = "1100";
-    const sms_type: "masking" | "non_masking" = "masking";
+    const isUnicode = verifyIsUnicode(sms_text || '');
+    const sms_type = isUnicode ? 'unicode' : 'text';
     const charges_per_sms = resSchool.masking_sms_price;
-    const number_of_sms_parts = sms_text?.length <= 160 ? 1 : Math.ceil(sms_text?.length / 153)
+    const sms_text_length = isUnicode ? sms_text?.length * 2 : sms_text?.length;
+    const number_of_sms_parts = sms_text_length <= 160 ? 1 : Math.ceil(sms_text_length / 153);
 
     const resStudent = await prisma.studentInformation.findFirst({ where: { user_id: id } });
 
@@ -31,14 +36,15 @@ async function post(req, res, refresh_token) {
           user_id: parseInt(id),
           school_id,
           school_name,
-          sender_id,
+          sender_id: smsGatewayId,
+          sender_name: sender_id,
           sms_type,
           sms_text,
           // // sender_id: 1,
           // // sender_name: "",
           submission_time: new Date(currentDate),
           contacts,
-          pushed_via: '',
+          pushed_via: 'gui',
           // // status: status,
           // // route_id: 1,
           // // coverage_id: 1,
@@ -78,9 +84,9 @@ async function post(req, res, refresh_token) {
       prisma.school.update({
         where: { id: school_id },
         data: {
-          masking_sms_count: sms_type === "masking" ? { decrement: 1 } : undefined,
+          masking_sms_count: is_masking ? { decrement: 1 } : undefined,
           // @ts-ignore
-          non_masking_sms_count: sms_type === "non_masking" ? { decrement: 1 } : undefined
+          non_masking_sms_count: !is_masking ? { decrement: 1 } : undefined
         }
       })
     ])

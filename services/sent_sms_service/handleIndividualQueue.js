@@ -5,13 +5,11 @@ import prisma from "./utility/prismaClient.js";
 import { logFile } from "./utility/handleLog.js";
 import { verifyIsUnicode } from "./utility/handleVerifyUnicode.js";
 import { findMatches } from "./utility/findMatches.js";
+import { customizeDateWithTime } from "./utility/dateTime.js";
 
 export const handleIndividualQueue = async ({ student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise }) => {
 
   const { id, class_id, section_id, school_id, academic_year_id, created_at } = student_attendace_queue;
-
-  // delete queue
-  prisma.tbl_student_sent_sms_queue.delete({ where: { id } }).catch(err => { logFile.error("error delete tbl_manual_student_attendace_queue", err) });
 
   // verify sms gateway
   const { error, data: smsGatewayData } = await handleSmsGateWay({ school_id });
@@ -32,7 +30,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
 
   // verify sms price
-  if (!sms_price || sms_price < 0) return logFile.error(`error school_id(${school_id}) have not ${sms_type} sms price`);
+  // if (!sms_price || sms_price < 0) return logFile.error(`error school_id(${school_id}) have not ${sms_type} sms price`);
 
   // verify school have enough balance 
   let totalSmsCount = 0;
@@ -42,16 +40,21 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
   if (sms_count < totalSmsCount) return logFile.error(`error school_id(${school_id}) have not enough ${sms_type} sms `);
 
+  if (AutoAttendanceSentSms.length === 0) return logFile.error(`error school_id(${school_id}) auto_attendance_sent_sms table datas not founds  `);
+
+  // delete queue
+  prisma.tbl_student_sent_sms_queue.delete({ where: { id } }).catch(err => { logFile.error("error delete tbl_manual_student_attendace_queue", err) });
 
   studentsViaClass.sections.forEach((section, index) => {
     const { id: section_id } = section;
 
     section.students?.forEach(async student => {
+      console.log(student)
 
       const { id, guardian_phone, class_roll_no, student_info } = student;
       const { user_id, gender, phone } = student_info ?? {};
 
-      if (!guardian_phone) return logFile.error(`guardian_phone not found student_id(${id})`);
+      if (!phone) return logFile.error(`phone number not found student_id(${id})`);
 
       const haveAttendance = await prisma.attendance.findFirst({
         where: { AND: [{ student_id: student.id }, { date: { gte: std_min_attend_date_wise, lte: std_max_attend_date_wise } }] },
@@ -60,9 +63,11 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         }
       });
 
+      const resAutoAttendanceSentSms = Array.isArray((AutoAttendanceSentSms)) && AutoAttendanceSentSms.length > 0 ? AutoAttendanceSentSms[0] : {};
+
       const smsQueueHandlerParameters = {
         user_id,
-        contacts: guardian_phone,
+        contacts: phone,
         submission_time: created_at,
         school_id,
         school_name,
@@ -71,21 +76,30 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         index,
         sms_type,
         charges_per_sms: sms_price,
-        text_sms: resAutoAttendanceSentSms.body
+        sms_text: resAutoAttendanceSentSms.body
       };
 
+      //dynamic values replace
+      const allMatchesArray = findMatches(resAutoAttendanceSentSms.body);
+      // let sms_text = resAutoAttendanceSentSms.body;
+      for (const element of allMatchesArray) {
+        console.log(element, student_info[element], customizeDateWithTime(created_at))
+        smsQueueHandlerParameters.sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || element === 'submission_time' && customizeDateWithTime(created_at) || '')
+        // console.log({ sms_text });
+      }
+      // for (let i = 0; i < allMatchesArray.length; i++) {
+        // sms_text.replaceAll(`#${allMatchesArray[i]}#`, (student[allMatchesArray[i]] || student_info[allMatchesArray[i]] || ''));
+        // sms_text = sms_text
+      // }
+      // console.log({ sms_text })
+
       // calculate part of sms
-      const resAutoAttendanceSentSms = Array.isArray((AutoAttendanceSentSms)) && AutoAttendanceSentSms.length > 0 ? AutoAttendanceSentSms[0] : {};
-      const bodyLength = verifyIsUnicode(resAutoAttendanceSentSms.body) ? resAutoAttendanceSentSms.body.length * 2 : resAutoAttendanceSentSms.body.length;
+      const bodyLength = verifyIsUnicode(resAutoAttendanceSentSms.body) ? smsQueueHandlerParameters.sms_text.length * 2 : smsQueueHandlerParameters.sms_text.length;
 
       const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
       if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${school_id}) masking sms count is ${masking_sms_count}`);
 
-      //dynamic values replace
-      const allMatchesArray = findMatches(resAutoAttendanceSentSms.body);
-      for (const element of allMatchesArray) {
-        smsQueueHandlerParameters.text_sms.replaceAll(`#${element}#`, student[element] || student_info[element] || '')
-      }
+
 
       smsQueueHandlerParameters["number_of_sms_parts"] = number_of_sms_parts;
 

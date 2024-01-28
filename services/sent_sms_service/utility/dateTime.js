@@ -10,3 +10,10 @@ export const todayMinMaxDateTime = () => {
 
     return { std_min_attend_date_wise, std_max_attend_date_wise };
 };
+
+export const customizeDateWithTime = (date) => {
+    // if (typeof date !== 'string') return '';
+    const dateObj = new Date(date)
+    const formateDate_ = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium',timeStyle:"short" })
+    return formateDate_.format(dateObj)
+  }

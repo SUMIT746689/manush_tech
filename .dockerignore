@@ -7,3 +7,4 @@ old_attendance_microservice
 services
 AllFiles/*
 /website
+/node_modules

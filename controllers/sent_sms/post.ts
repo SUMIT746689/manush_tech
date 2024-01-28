@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { authenticate } from 'middleware/authenticate';
 import { createCampaign, getUsers, sentSms } from './postContent/postContent';
 import { logFile } from 'utilities_api/handleLogFile';
+import { verifyIsMasking, verifyIsUnicode } from 'utilities_api/verify';
 
 
 async function post(req, res, refresh_token) {
@@ -29,7 +30,7 @@ async function post(req, res, refresh_token) {
     const resQueries = await Promise.all([smsGatewayRes, schoolInfoRes, userRes])
 
     const { details }: any = resQueries[0];
-    const { sender_id, sms_api_key: api_key,is_masking } = details ?? {};
+    const { sender_id, sms_api_key: api_key, is_masking } = details ?? {};
     if (!sender_id && !api_key) throw new Error("sender_id or api_key missing");
 
     const date = Date.now();
@@ -37,16 +38,18 @@ async function post(req, res, refresh_token) {
     const { name: school_name } = resQueries[1];
     const { username } = resQueries[2];
 
+    const isUnicode = verifyIsUnicode(custom_body || '');
+
     const sentSmsData = {
       sms_shoot_id,
       school_id,
       school_name,
       user_id: id,
       user_name: username,
-      sender_id:sms_gateway_id,
+      sender_id: sms_gateway_id,
       sender_name: sender_id,
       pushed_via: "gui",
-      sms_type: is_masking? 'masking':'non_masking',
+      sms_type: isUnicode ? 'unicode' : 'text',
       sms_text: custom_body,
       submission_time: new Date(),
       sms_gateway_status: "pending",
@@ -81,7 +84,16 @@ async function post(req, res, refresh_token) {
           //get users for sending sms 
           singleGroupUsers = await getUsers({ where: { school_id: Number(school_id), NOT: { phone: null } }, role })
           if (!singleGroupUsers || singleGroupUsers.length === 0) continue;
-          const contacts_ = singleGroupUsers.map(user => user.phone);
+
+          const contacts_ = [];
+          singleGroupUsers.array.forEach(user => {
+            const isMasking = verifyIsMasking(user.phone);
+            if (typeof verifyIsMasking(user.phone) === 'boolean' && !isMasking) {
+              const updatePhoneNumber = user.phone.length === 11 ? 88 + user.phone : user.phone;
+              contacts_.push(updatePhoneNumber);
+            }
+          });
+
           contactsArr.push(...contacts_);
         };
 
@@ -103,9 +115,20 @@ async function post(req, res, refresh_token) {
           WHERE class_id = ${class_id} AND school_id = ${refresh_token.school_id} AND phone IS NOT null
           ${(Array.isArray(section_id) && section_id.length > 0) ? Prisma.sql`AND section_id IN (${sections})` : Prisma.empty}
         `
-        if (resUsers.length === 0) throw new Error("No contacts found")
+        if (resUsers.length === 0) throw new Error("No user founds");
 
-        sentSmsData["contacts"] = resUsers.map(resUser => resUser.phone).join(',');
+        const classContacts_ = [];
+        resUsers.forEach(user => {
+          const isMasking = verifyIsMasking(user.phone);
+          if (typeof verifyIsMasking(user.phone) === 'boolean' && !isMasking) {
+            const updatePhoneNumber = user.phone.length === 11 ? 88 + user.phone : user.phone;
+            classContacts_.push(updatePhoneNumber);
+          }
+        });
+
+        // contactsArr.push(...contacts_);
+
+        sentSmsData["contacts"] = classContacts_.join(',');
         sentSmsData["total_count"] = resUsers.length;
 
         break;
@@ -117,7 +140,16 @@ async function post(req, res, refresh_token) {
 
         if (resIndividualUsers.length === 0) throw new Error("No contacts founds")
 
-        sentSmsData["contacts"] = resIndividualUsers.map(resUser => resUser.phone).join(',');
+        const indContacts_ = [];
+        resIndividualUsers.forEach(user => {
+          const isMasking = verifyIsMasking(user.phone);
+          if (typeof verifyIsMasking(user.phone) === 'boolean' && !isMasking) {
+            const updatePhoneNumber = user.phone.length === 11 ? 88 + user.phone : user.phone;
+            indContacts_.push(updatePhoneNumber);
+          }
+        });
+
+        sentSmsData["contacts"] = indContacts_.join(',');
         sentSmsData["total_count"] = resIndividualUsers.length;
 
         break;

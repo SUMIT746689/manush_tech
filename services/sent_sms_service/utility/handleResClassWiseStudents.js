@@ -48,6 +48,7 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                 }
             }
         });
+        console.log(responseStudentsViaClass)
         if (!responseStudentsViaClass?.sections || responseStudentsViaClass.sections.length === 0) throw new Error("No students founds");
 
         return { error: null, data: responseStudentsViaClass };

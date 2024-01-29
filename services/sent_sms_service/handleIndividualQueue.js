@@ -81,7 +81,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
 
         const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
-        if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${school_id}) masking sms count is ${masking_sms_count}`);
+        // if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${school_id}) masking sms count is ${masking_sms_count}`);
 
 
         const smsQueueHandlerParameters = {

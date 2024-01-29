@@ -25,7 +25,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
 
                 const { error, data: stdAttendanceQ } = await userWiseAttendanceQueues({ user_id, min_attend_datetime, max_attend_datetime });
                 if (error) return logFile.error(error);
-                const { error: errorAttend } = updateAttendance({ id: isAlreadyAttendanceEntry.id, exit_time: stdAttendanceQ[0].exit_time })
+                const { error: errorAttend } = await updateAttendance({ id: isAlreadyAttendanceEntry.id, exit_time: stdAttendanceQ[0].exit_time })
                 if (errorAttend) return logFile.error(error);
 
                 logFile.info(`user_id(${user_id}) student update successfull`);
@@ -34,7 +34,11 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
                 const { error: errDeleteTblAttendanceQueues } = await deleteTblAttendanceQueues({ ids: deleteIds })
                 if (errDeleteTblAttendanceQueues) logFile.error(error);
 
-                logFile.info("tbl_attendance_queue delete successfull")
+                logFile.info("tbl_attendance_queue delete successfull");
+
+                // sent sms
+                const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
+                sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id, stdAttendanceQ[0].exit_time);
 
             }
             else {
@@ -70,11 +74,13 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
                 const { error: errorDeletetblAttQueues } = await deleteTblAttendanceQueues({ ids: deleteIds })
                 if (errorDeletetblAttQueues) return logFile.error(errorDeletetblAttQueues);
                 logFile.info("tbl_attendance_queue delete successfull");
+
+                // sent sms
+                const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
+                sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id, stdAttendanceQ[0].exit_time);
+
             }
 
-            // sent sms
-            const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
-            sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id);
 
         })
     }

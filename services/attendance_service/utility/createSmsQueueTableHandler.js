@@ -2,7 +2,7 @@ import { logFile } from "./handleLog.js";
 import prisma from "./prismaClient.js";
 
 
-export const createSmsQueueTableHandler = ({ is_masking, user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
+export const createSmsQueueTableHandler = ({ is_masking, user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id, sender_name, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
   const currentDate = new Date().getTime();
   const sms_shoot_id = [String(school_id), String(currentDate), String(index)].join("_");
 
@@ -14,13 +14,13 @@ export const createSmsQueueTableHandler = ({ is_masking, user_id, contacts, sms_
         school_id,
         school_name,
         sender_id,
+        sender_name,
         sms_type,
         sms_text,
-        // // sender_id: 1,
-        // // sender_name: "",
         submission_time: new Date(submission_time),
         contacts,
-        pushed_via: 'attendance_service',
+        pushed_via: 'attendance_script',
+        sms_gateway_status: 'pending',
         // // status: status,
         // // route_id: 1,
         // // coverage_id: 1,

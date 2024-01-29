@@ -2,7 +2,7 @@ import { logFile } from "./handleLog.js";
 import prisma from "./prismaClient.js";
 
 
-export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id,sender_name, sms_type, index, number_of_sms_parts, charges_per_sms }) => {
+export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submission_time, school_id, school_name, sender_id,sender_name, sms_type, index, number_of_sms_parts, charges_per_sms,is_masking }) => {
 
   const currentDate = new Date().getTime();
   const sms_shoot_id = [String(school_id), String(currentDate), String(index)].join("_");
@@ -20,7 +20,8 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
         sms_text,
         submission_time: new Date(submission_time),
         contacts,
-        pushed_via: '',
+        pushed_via: 'sent_sms_script',
+        sms_gateway_status:'pending',
         // // status: status,
         // // route_id: 1,
         // // coverage_id: 1,
@@ -60,8 +61,8 @@ export const createSmsQueueTableHandler = ({ user_id, contacts, sms_text, submis
     prisma.school.update({
       where: { id: school_id },
       data: {
-        masking_sms_count: sms_type === "masking" ? { decrement: 1 } : undefined,
-        non_masking_sms_count: sms_type === "non_masking" ? { decrement: 1 } : undefined
+        masking_sms_count: is_masking ? { decrement: number_of_sms_parts } : undefined,
+        non_masking_sms_count: !is_masking ? { decrement: number_of_sms_parts } : undefined
       }
     })
   ])

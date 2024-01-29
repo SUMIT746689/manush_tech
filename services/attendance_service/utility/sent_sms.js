@@ -1,9 +1,10 @@
 import { createSmsQueueTableHandler } from "./createSmsQueueTableHandler.js";
+import { customizeDateWithTime } from "./dateTime.js";
 import { findMatches } from "./findMatches.js";
 import { logFile } from "./handleLog.js";
 import { verifyIsUnicode } from "./handleVerifyUnicode.js";
 
-export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id) => {
+export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id, submission_time) => {
     try {
 
         const { name, SmsGateway, masking_sms_count, non_masking_sms_count } = studentDatas?.student_info?.school ?? {};
@@ -17,10 +18,10 @@ export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id) =
 
         let body = data.body;
         const isUnicode = verifyIsUnicode(body);
-        
+
         const allMatchesArray = findMatches(data.body);
         for (const element of allMatchesArray) {
-            body = body.replaceAll(`#${element}#`, studentDatas[element] || studentDatas.student_info[element] || '')
+            body = body.replaceAll(`#${element}#`, studentDatas[element] || studentDatas.student_info[element] || element === 'submission_time' && customizeDateWithTime(submission_time) || '')
         }
         // verify no of parts a sms
         const bodyLength = isUnicode ? body.length * 2 : body.length;

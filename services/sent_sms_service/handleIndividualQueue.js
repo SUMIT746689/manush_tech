@@ -68,14 +68,14 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
         const resAutoAttendanceSentSms = Array.isArray((AutoAttendanceSentSms)) && AutoAttendanceSentSms.length > 0 ? AutoAttendanceSentSms[0] : {};
 
-        let sms_text = JSON.parse(JSON.stringify(resAutoAttendanceSentSms.body));
+        let sms_text = resAutoAttendanceSentSms.body;
         //dynamic values replace
-
         const allMatchesArray = findMatches(resAutoAttendanceSentSms.body);
         for (const element of allMatchesArray) {
-          sms_text = sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || element === 'submission_time' && customizeDateWithTime(created_at) || '')
+          console.log(student[element], student_info[element])
+          sms_text= sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || element === 'submission_time' && customizeDateWithTime(created_at) || '')
         }
-        console.log({sms_text})
+        console.log({ sms_text })
 
         // calculate part of sms
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
@@ -95,7 +95,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
           index,
           sms_type,
           charges_per_sms: sms_price,
-          sms_text: resAutoAttendanceSentSms.body,
+          sms_text,
           is_masking,
           number_of_sms_parts
         };

@@ -13,7 +13,7 @@ const handleLogFile = () => {
         filename:  `${logfilePath}/sent_sms-%DATE%.log`,
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,
-        maxFiles: '1d',
+        maxFiles: '5d',
     });
 
     const logger = winston.createLogger({

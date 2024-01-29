@@ -37,7 +37,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
       if (Array.isArray(section?.students)) totalSmsCount += section?.students.length;
     });
 
-    if (sms_count < totalSmsCount) return logFile.error(`error school_id(${school_id}) have not enough ${sms_type} sms `);
+    if (sms_count < totalSmsCount) return logFile.error(`error school_id(${school_id}) have not enough ${is_masking ? 'masking' : 'non masking'} sms `);
 
     if (AutoAttendanceSentSms.length === 0) return logFile.error(`error school_id(${school_id}) auto_attendance_sent_sms table datas not founds  `);
 
@@ -76,7 +76,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
           sms_text = sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || element === 'submission_time' && customizeDateWithTime(created_at) || '')
         }
         console.log({sms_text})
-        
+
         // calculate part of sms
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
 

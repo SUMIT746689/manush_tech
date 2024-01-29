@@ -32,6 +32,7 @@ export const handleResStdInfo = async ({ user_id }) => {
                         middle_name: true,
                         last_name: true,
                         school_id: true,
+                        phone:true,
                         school: {
                             select: {
                                 name: true,

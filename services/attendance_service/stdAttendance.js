@@ -74,7 +74,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
 
             // sent sms
             const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
-            sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id)
+            sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id);
 
         })
     }

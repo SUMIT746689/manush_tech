@@ -93,7 +93,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         for (const element of allMatchesArray) {
           sms_text = sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || (element === 'attendance_status' && (attendance_status || 'late')) || element === 'submission_time' && customizeDateWithTime(created_at) || '')
         }
-        logFile.info("sms_text", JSON.stringify(sms_text))
+        logFile.info("sms_text" + JSON.stringify(sms_text))
         // calculate part of sms
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
         const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);

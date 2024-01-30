@@ -9,7 +9,7 @@ const main = async () => {
     prisma.tbl_student_sent_sms_queue.findMany()
       .then((res_tbl_student_sent_sms_queue) => {
         
-        if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) logFile.error("manual attendace queue is empty");
+        if (!res_tbl_student_sent_sms_queue || res_tbl_student_sent_sms_queue?.length === 0) logFile.info("manual attendace queue is empty");
 
         const { std_min_attend_date_wise, std_max_attend_date_wise } = todayMinMaxDateTime();
 

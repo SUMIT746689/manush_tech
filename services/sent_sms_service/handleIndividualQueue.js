@@ -62,7 +62,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         // find attendance
         const haveAttendance = await stdAlreadyAttendance({ student_id: student.id, gte: std_min_attend_date_wise, lte: std_max_attend_date_wise })
         const { id: attedanceId, status: attendance_status } = haveAttendance || {}
-        console.log({ haveAttendance });
+        logFile.info(JSON.stringify(haveAttendance));
         if (!attedanceId) {
           const createAttendaceDatas = {
             student_id: student.id,
@@ -115,7 +115,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
           number_of_sms_parts
         };
 
-        createSmsQueueTableHandler(smsQueueHandlerParameters);
+        // createSmsQueueTableHandler(smsQueueHandlerParameters);
       })
     })
   }

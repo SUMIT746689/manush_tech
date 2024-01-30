@@ -98,6 +98,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
         const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
 
+        // create sent sms queue, tbl sent sms and update school 
         const smsQueueHandlerParameters = {
           user_id,
           contacts: phone,
@@ -114,7 +115,6 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
           number_of_sms_parts
         };
 
-        // create sent sms queue, tbl sent sms and update school 
         createSmsQueueTableHandler(smsQueueHandlerParameters);
       })
     })

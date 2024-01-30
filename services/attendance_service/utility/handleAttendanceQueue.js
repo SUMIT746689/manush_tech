@@ -21,7 +21,6 @@ export const resStdAttendanceQueues = async () => {
         `
 
         if (!Array.isArray(res)) return { error: "student tbl_attendance_queue response is not array", data: null };
-        if (res.length === 0) return { error: "student tbl_attendance_queue response array length is 0", data: null };
         return { error: null, data: res };
     }
     catch (err) {
@@ -99,8 +98,6 @@ export const resEmpAttendanceQueues = async () => {
         SELECT * FROM attendance_queue;
     `
         if (!Array.isArray(res)) return { error: "tbl_attendance_queue response is not array", data: null };
-        if (res.length === 0) return { error: "today's employee tbl_attendance_queue response array length is 0 ", data: null };
-
         return { error: null, data: res };
     }
     catch (err) {

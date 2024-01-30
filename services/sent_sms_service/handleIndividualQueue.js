@@ -120,7 +120,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
           number_of_sms_parts
         };
 
-        // createSmsQueueTableHandler(smsQueueHandlerParameters);
+        createSmsQueueTableHandler(smsQueueHandlerParameters);
       })
     })
   }

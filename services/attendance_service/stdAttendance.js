@@ -8,13 +8,15 @@ import { sentSms } from "./utility/sent_sms.js";
 export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }) => {
     try {
         const { error, data } = await resStdAttendanceQueues();
-        if (error) return logFile.error(error)
+        if (error) return logFile.error(error);
+        if (data.length === 0) return logFile.info("student tbl_attendance_queue response array length is 0");
+
         data.forEach(async (userAttend) => {
             const { user_id } = userAttend;
 
             const { error, data: resStudent } = await handleResStdInfo({ user_id });
             if (error) return logFile.error(error);
-            console.log({ resStudent })
+
             const { id, guardian_phone, section, student_info, class_roll_no } = resStudent || {};
 
             if (!id || !section?.std_entry_time) return logFile.error(`student user_id(${user_id}) or section_id(${section?.id}) entry time not found`);

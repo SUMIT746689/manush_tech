@@ -8,6 +8,7 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                 id: class_id,
             },
             select: {
+                name: true,
                 school: {
                     select: {
                         name: true,
@@ -22,6 +23,7 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                     where: whereSection,
                     select: {
                         id: true,
+                        name: true,
                         std_entry_time: true,
                         std_exit_time: true,
                         students: {
@@ -34,9 +36,9 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                                 class_roll_no: true,
                                 student_info: {
                                     select: {
-                                        first_name:true,
-                                        middle_name:true,
-                                        last_name:true,
+                                        first_name: true,
+                                        middle_name: true,
+                                        last_name: true,
                                         phone: true,
                                         user_id: true,
                                         gender: true
@@ -48,7 +50,6 @@ export const handleClassWiseStudents = async ({ school_id, class_id, whereSectio
                 }
             }
         });
-        console.log(responseStudentsViaClass)
         if (!responseStudentsViaClass?.sections || responseStudentsViaClass.sections.length === 0) throw new Error("No students founds");
 
         return { error: null, data: responseStudentsViaClass };

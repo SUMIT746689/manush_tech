@@ -2,19 +2,12 @@ import { useContext, useEffect, useState } from 'react';
 
 import {
   Box,
-  alpha,
-  Stack,
-  lighten,
-  Divider,
   IconButton,
   Tooltip,
   styled,
-  useTheme,
   Grid,
   Autocomplete,
   TextField,
-  Container,
-  InputAdornment
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -34,7 +27,7 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import menuItems from '../Sidebar/SidebarMenu/items';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
-import { useClientDataFetch } from '@/hooks/useClientFetch';
+import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -60,11 +53,18 @@ function Header() {
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const auth = useAuth();
   const [menulist, setMenulist] = useState([])
   const router = useRouter();
   const { showNotification } = useNotistick();
   const { data } = useClientDataFetch(`/api/academic_years`)
+  const { data: current_active_academic_year, reFetchData } = useClientFetch(`/api/academic_years/current_active`)
+  console.log({ current_active_academic_year })
+  const auth: any = useAuth();
+  const { user } = auth;
+  const { school } = user || {};
+  const { academic_years } = school || {}
+
+  console.log({ academic_years })
 
   const handleFetchAcademicYear = () => {
     axios
@@ -97,7 +97,7 @@ function Header() {
         //   );
         // }
 
-        axios.get('/api/academic_years/current')
+        axios.get('/api/academic_years/current_user')
           .then(({ data }) => {
             console.log({ data })
             if (data?.success) setSelectedAcademicYear(() => ({ id: data.data.id, label: data.data.title }))
@@ -147,7 +147,7 @@ function Header() {
 
   const handleAcademicYearChange = async (event: any, newValue: { id: number, label: string } | null) => {
     if (!newValue?.id && !newValue?.label) return showNotification("academic year values not found", "error")
-    axios.patch(`/api/academic_years/${newValue.id}/change_current`)
+    axios.patch(`/api/academic_years/${newValue.id}/current_user`)
       .then(({ data }) => {
         if (!data?.success) return
         // localStorage.setItem('academicYear', JSON.stringify(newValue));
@@ -203,7 +203,7 @@ function Header() {
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-        <Box sx={{ display: { xs: "none", sm: "block" }, backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.5, fontWeight: 600, fontSize: 12 }}>
+        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.5, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
         </Box>
@@ -224,7 +224,11 @@ function Header() {
         </Grid>
       )}
 
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" justifyContent="right" width="100%">
+        {/* @ts-ignore */}
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
+          <Grid item pr={2} color="white">Current Active <br /> Academic Year: <b><i>{ current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></b> </Grid>
+        )}
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
           <Grid pt={1} minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
@@ -237,7 +241,6 @@ function Header() {
               options={academicYearList}
               handleChange={handleAcademicYearChange}
             />
-
           </Grid>
         )}
         {/* <HeaderButtons /> */}

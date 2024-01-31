@@ -95,10 +95,10 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         }
 
         // remove extra spaces
-        sms_text= sms_text.replace(/ +(?= )/g,'');
+        sms_text = sms_text.replace(/ +(?= )/g, '');
         logFile.info("test sent sms")
         logFile.info(JSON.stringify(sms_text))
-       
+
         // calculate part of sms
         const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
         const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);

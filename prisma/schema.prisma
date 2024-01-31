@@ -42,24 +42,26 @@ model User {
 }
 
 model School {
-  id                    Int     @id @default(autoincrement())
-  name                  String
-  address               String
-  phone                 String
-  email                 String
-  domain                String? @unique
-  currency              String?
-  main_balance          Float?
-  masking_sms_count     Int     @default(0) //no_of_sms_available
-  non_masking_sms_count Int     @default(0) //no_of_sms_available
-  masking_sms_price     Float?  @default(0)
-  non_masking_sms_price Float?  @default(0)
+  id                       Int     @id @default(autoincrement())
+  name                     String
+  address                  String
+  phone                    String
+  email                    String
+  domain                   String? @unique
+  currency                 String?
+  main_balance             Float?
+  masking_sms_count        Int     @default(0) //no_of_sms_available
+  non_masking_sms_count    Int     @default(0) //no_of_sms_available
+  masking_sms_price        Float?  @default(0)
+  non_masking_sms_price    Float?  @default(0)
+  current_academic_year_id Int?
   // school should not be created without an existing user
   // admin_id Int     @unique
   // sms_balance           Int? //no_of_sms
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
+  currentAcademicYear        AcademicYear?                @relation(fields: [current_academic_year_id], references: [id])
   admins                     User[]                       @relation("AdminUserSchool")
   teachers                   Teacher[]
   classes                    Class[]
@@ -69,7 +71,7 @@ model School {
   fees                       Fee[]
   exams                      Exam[]
   holidays                   Holiday[]
-  academic_years             AcademicYear[]
+  academic_years             AcademicYear[]               @relation("academic_year_to_school")
   attendances                Attendance[]
   subscription               Subscription[]
   websiteui                  WebsiteUi[]
@@ -461,7 +463,7 @@ model AcademicYear {
   curr_active Boolean   @default(false)
   deleted_at  DateTime?
 
-  school School @relation(fields: [school_id], references: [id])
+  school School @relation(fields: [school_id], references: [id], name: "academic_year_to_school")
 
   exams                      Exam[]
   students                   Student[]
@@ -471,6 +473,8 @@ model AcademicYear {
   Syllabus                   Syllabus[]
   ExamTerm                   ExamTerm[]
   Homework                   Homework[]
+  AutoAttendanceSentSms      AutoAttendanceSentSms[]
+  academicSchool             School[]
 
   @@map("academic_years")
 }
@@ -1363,14 +1367,16 @@ enum payment_gateway_title {
 }
 
 model AutoAttendanceSentSms {
-  id          Int         @id @default(autoincrement())
-  body        String
-  body_format body_format
-  is_active   Boolean     @default(false)
-  every_hit   Boolean     @default(false)
-  school_id   Int         @unique
+  id               Int         @id @default(autoincrement())
+  body             String
+  body_format      body_format
+  is_active        Boolean     @default(false)
+  every_hit        Boolean     @default(false)
+  school_id        Int         @unique
+  academic_year_id Int?
 
-  school School @relation(fields: [school_id], references: [id])
+  school       School        @relation(fields: [school_id], references: [id])
+  academicYear AcademicYear? @relation(fields: [academic_year_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
 }

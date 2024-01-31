@@ -1,7 +1,7 @@
 import prisma from "./prismaClient.js"
 
 export const stdAlreadyAttendance = async ({ student_id, min_attend_datetime, max_attend_datetime }) => {
-    console.log({ student_id, min_attend_datetime, min_attend_datetime })
+    console.log(JSON.stringify({ student_id, min_attend_datetime, min_attend_datetime }))
     const haveAttendance = await prisma.attendance.findFirst({
         where: { AND: [{ student_id }, { date: { gte: min_attend_datetime, lte: max_attend_datetime } }] },
         select: {

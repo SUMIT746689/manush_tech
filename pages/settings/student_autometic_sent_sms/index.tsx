@@ -5,20 +5,20 @@ import { Card, Chip, CircularProgress, DialogActions, DialogContent, DialogTitle
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import * as Yup from 'yup';
-import { useClientFetch } from '@/hooks/useClientFetch';
+import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
-import { TextAreaWrapper } from '@/components/TextFields';
+import { TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Footer from '@/components/Footer';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { CustomSwitch } from '@/components/Switch/Switch';
-import { Prisma } from '@prisma/client';
 import { useState } from 'react';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 const dynamicStudentDataKeys = [
     'first_name',
     'middle_name',
     'last_name',
-    'school_id',
+    // 'school_id',
     // 'admission_no',
     'date_of_birth',
     // 'admission_status',
@@ -50,9 +50,10 @@ const dynamicStudentDataKeys = [
     'guardian_phone',
     'guardian_profession',
     // 'guardian_photo',
-    'relation_with_guardian',
+    // 'relation_with_guardian',
     'student_present_address',
-    'submission_time'
+    'submission_time',
+    'attendance_status'
     // 'created_at'
 ];
 
@@ -60,10 +61,12 @@ const StudentAutoSentSms = () => {
     const { t }: { t: any } = useTranslation();
     const [isLoading, setIsLoading] = useState(false)
     const { data, reFetchData } = useClientFetch('/api/automatic_attendances');
-
+    const { data: academicYears } = useClientDataFetch('/api/academic_years');
     const { showNotification } = useNotistick();
 
     const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
+
+        if (_values.is_active && !_values.academic_year_id) return showNotification('academic year field is required', 'error')
 
         const successResponse = () => {
             showNotification('autometic attendance sent sms settings updated!')
@@ -98,21 +101,23 @@ const StudentAutoSentSms = () => {
                         body: data?.body || undefined,
                         is_active: data?.is_active || false,
                         every_hit: data?.every_hit || false,
+                        academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
+                        academic_year_id: data?.academic_year_id || undefined,
                         submit: null
                     }}
                     validationSchema={Yup.object().shape({
-                        is_active: Yup.string().max(255).required(t('This is active field is required')),
-                        every_hit: Yup.string().max(255).required(t('This every field is required')),
-
+                        is_active: Yup.boolean().required(t('This is active field is required')),
+                        every_hit: Yup.boolean().required(t('This every field is required')),
+                        // academic_year:
                     })}
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-                        // console.log({ values, isSubmitting })
+                        console.log({ errors, values, isSubmitting })
                         return (
 
                             <Card sx={{
-                                maxWidth: '600px',
+                                maxWidth: '700px',
                                 boxShadow: 'black',
                                 overflowY: "auto",
                             }} >
@@ -166,6 +171,10 @@ const StudentAutoSentSms = () => {
                                                 </Grid>
                                             </Grid>
 
+
+                                            {/* <TextFieldWrapper
+                                             /> */}
+
                                             <Grid item>
                                                 <FormControlLabel
                                                     control={
@@ -186,23 +195,44 @@ const StudentAutoSentSms = () => {
 
                                             {
                                                 values.is_active &&
-                                                <Grid item>
-                                                    <Stack direction="row" spacing={1} alignItems="center">
-                                                        <Tooltip title="when student first time punch the attendance machine" placement="top">
-                                                            <Typography>Only Entry time</Typography>
-                                                        </Tooltip>
-                                                        <CustomSwitch
-                                                            name="every_hit"
-                                                            checked={values.every_hit || false}
-                                                            onChange={handleChange}
-                                                            inputProps={{ 'aria-label': 'controlled' }}
-                                                        // color="secondary" 
-                                                        />
-                                                        <Tooltip title="when student every time punch the attendance machine" placement="top">
-                                                            <Typography>Every Time</Typography>
-                                                        </Tooltip>
-                                                    </Stack>
-                                                </Grid>
+                                                <>
+                                                    <Grid item>
+                                                        <Stack direction="row" spacing={1} alignItems="center">
+                                                            <Tooltip title="when student first time punch the attendance machine" placement="top">
+                                                                <Typography>Only Entry time</Typography>
+                                                            </Tooltip>
+                                                            <CustomSwitch
+                                                                name="every_hit"
+                                                                checked={values.every_hit || false}
+                                                                onChange={handleChange}
+                                                                inputProps={{ 'aria-label': 'controlled' }}
+                                                            // color="secondary" 
+                                                            />
+                                                            <Tooltip title="when student every time punch the attendance machine" placement="top">
+                                                                <Typography>Every Time</Typography>
+                                                            </Tooltip>
+                                                        </Stack>
+                                                    </Grid>
+                                                    <AutoCompleteWrapper
+                                                        minWidth="100%"
+                                                        label={t('Academic Year')}
+                                                        placeholder={t('select a academic year')}
+                                                        limitTags={2}
+                                                        // getOptionLabel={(option) => option.id}
+                                                        options={
+                                                            academicYears.map(i => {
+                                                                return {
+                                                                    label: i.title,
+                                                                    id: i.id,
+                                                                }
+                                                            })}
+                                                        value={values.academic_year}
+                                                        handleChange={(e, v) => {
+                                                            setFieldValue('academic_year', v)
+                                                            setFieldValue('academic_year_id', v?.id)
+                                                        }}
+                                                    />
+                                                </>
                                             }
 
                                         </DialogContent>

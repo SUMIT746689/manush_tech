@@ -34,6 +34,8 @@ export const AutoCompleteWrapper = ({ minWidth = null, required = false, options
     </Grid>
   )
 }
+
+
 export const AutoCompleteWrapperWithoutRenderInput = ({ minWidth = null, required = false, options, value, handleChange, label, name, error, touched, placeholder, ...params }) => {
 
   return (

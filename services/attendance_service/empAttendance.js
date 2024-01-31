@@ -20,7 +20,7 @@ export const empAttendance = async ({ today, min_attend_datetime, max_attend_dat
 
             const { error: errorEmpAttendanceUpdate } = await updateEmployeeAttendance({ user_id, id: isEmpAlreadyEntryAttend.id, exit_time: tblAttendanceQ[0].exit_time })
             if (errorEmpAttendanceUpdate) return logFile.error(errorEmpAttendanceUpdate)
-            logFile.info(`user_id(${user_id}) employee attendance updated sucessfully`)
+            logFile.info(`user_id(${user_id}) employee attendance updated successfully`)
 
             const deleteIds = tblAttendanceQ.map((e) => e.id);
             const { error: errorDeleteTblAttendance } = await deleteTblAttendanceQueues({ ids: deleteIds })
@@ -39,9 +39,10 @@ export const empAttendance = async ({ today, min_attend_datetime, max_attend_dat
                 entry_time = tblAttendanceQ[0].entry_time;
                 exit_time = tblAttendanceQ.length > 1 ? tblAttendanceQ[0].exit_time : undefined;
             }
-            const status = "late";
+            const status = "present";
             const { error: errorCreateEmpAttendance } = await createEmployeeAttendance({ user_id, school_id, today, status, entry_time, exit_time });
             if (errorCreateEmpAttendance) return logFile.error(errorCreateEmpAttendance)
+            logFile.info(`user_id(${user_id}) employee attendance created successfully`)
 
             const deleteIds = tblAttendanceQ.map((e) => e.id);
             const { error: errorDeleteTblAttendance } = await deleteTblAttendanceQueues({ ids: deleteIds })

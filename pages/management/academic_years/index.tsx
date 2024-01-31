@@ -48,6 +48,7 @@ function Managementschools() {
           <Results
             sessions={datas}
             setEditData={setEditData}
+            reFetchData={reFetchData}
           />
         </Grid>
       </Grid>

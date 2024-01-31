@@ -51,3 +51,8 @@ export const verifyIsBangla = (str: string): boolean => {
   }
   return false;
 }
+
+export const verifyNumeric = (value: string): boolean => {
+  const pattern = /^\d+\.?\d*$/;
+  return pattern.test(value);
+}

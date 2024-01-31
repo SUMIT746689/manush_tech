@@ -23,6 +23,8 @@ export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id, s
         for (const element of allMatchesArray) {
             body = body.replaceAll(`#${element}#`, studentDatas[element] || studentDatas.student_info[element] || element === 'submission_time' && customizeDateWithTime(submission_time) || '')
         }
+        body = body.replace(/ +(?= )/g, '');
+
         // verify no of parts a sms
         const bodyLength = isUnicode ? body.length * 2 : body.length;
         const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);

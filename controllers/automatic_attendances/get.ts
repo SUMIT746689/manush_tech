@@ -11,7 +11,10 @@ async function get(req, res, refresh_token) {
         const { school_id } = refresh_token;
 
         const sss = await prisma.autoAttendanceSentSms.findFirst({
-            where: { school_id }
+            where: { school_id },
+            include: {
+                academicYear: true
+            }
         })
         res.status(200).json(sss);
     } catch (err) {

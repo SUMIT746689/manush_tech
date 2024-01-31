@@ -8,6 +8,7 @@ async function get(req: any, res: any, refresh_token: any) {
       where: { id: refresh_token.id, is_enabled: true },
       include: {
         permissions: true,
+
         role: {
           include: {
             permissions: true
@@ -18,6 +19,11 @@ async function get(req: any, res: any, refresh_token: any) {
             subscription: {
               where: { is_active: true },
               include: { package: true }
+            },
+            academic_years: {
+              where: {
+                curr_active: true
+              }
             }
           }
         }
@@ -34,14 +40,14 @@ async function get(req: any, res: any, refresh_token: any) {
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
       if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
 
-          isSubscriptionActive = true;
-        
+        isSubscriptionActive = true;
+
       }
-      else{
+      else {
         if (user?.role?.title === 'ADMIN') {
-        
+
           isSubscriptionActive = true;
-          console.log(isSubscriptionActive,"user?.role?.title__",user?.role?.title,);
+          console.log(isSubscriptionActive, "user?.role?.title__", user?.role?.title,);
           user['permissions'] = user['permissions'].filter(i => i.value === 'package_request')
         }
       }

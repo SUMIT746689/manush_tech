@@ -39,6 +39,9 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
+import ClearIcon from '@mui/icons-material/Clear';
+import CheckIcon from '@mui/icons-material/Check';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -76,6 +79,7 @@ const ButtonError = styled(Button)(
 interface ResultsProps {
   sessions: Project[];
   setEditData: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -138,7 +142,8 @@ const applyPagination = (
 
 const Results: FC<ResultsProps> = ({
   sessions,
-  setEditData
+  setEditData,
+  reFetchData
 }) => {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -164,7 +169,7 @@ const Results: FC<ResultsProps> = ({
 
   const filteredschools = applyFilters(sessions, query, filters);
   const paginatedschools = applyPagination(filteredschools, page, limit);
- 
+
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
@@ -176,11 +181,11 @@ const Results: FC<ResultsProps> = ({
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  
+
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/academic_years/${deleteSchoolId}`);
-     
+
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
 
@@ -188,10 +193,27 @@ const Results: FC<ResultsProps> = ({
 
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification('The academic year falied to delete ','error');
+      showNotification('The academic year falied to delete ', 'error');
 
     }
   };
+
+  const handleMakeActive = async (id) => {
+    await axios.patch(`/api/academic_years/${id}/current_active`)
+      .then((res) => {
+        console.log({ res });
+        const { data } = res;
+        const { success } = data || {};
+        if (success) {
+          showNotification(`successfully update current academic year ${id}`);
+          reFetchData();
+        }
+      })
+      .catch(err => {
+        console.log({ err });
+        showNotification(err.message, 'error')
+      })
+  }
 
   return (
     <>
@@ -226,110 +248,126 @@ const Results: FC<ResultsProps> = ({
         </Grid>
       </Card>
 
-        <Card sx={{minHeight:'calc(100vh - 428px) !important'}}>
-            <Box
-              p={2}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
+      <Card sx={{ minHeight: 'calc(100vh - 428px) !important' }}>
+        <Box
+          p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedschools.length}</b> <b>{t('academic years')}</b>
+          </Box>
+          <TablePagination
+            component="div"
+            count={filteredschools.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
+        <Divider />
+
+        {paginatedschools.length === 0 ? (
+          <>
+            <Typography
+              sx={{
+                py: 10
+              }}
+              variant="h3"
+              fontWeight="normal"
+              color="text.secondary"
+              align="center"
             >
-              <Box>
-                <Typography component="span" variant="subtitle1">
-                  {t('Showing')}:
-                </Typography>{' '}
-                <b>{paginatedschools.length}</b> <b>{t('academic years')}</b>
-              </Box>
-              <TablePagination
-                component="div"
-                count={filteredschools.length}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleLimitChange}
-                page={page}
-                rowsPerPage={limit}
-                rowsPerPageOptions={[5, 10, 15]}
-              />
-            </Box>
-          
-          <Divider />
+              {t(
+                "We couldn't find any academic year matching your search criteria"
+              )}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">{t('Academic year Id')}</TableCell>
+                    <TableCell align="center">{t('Title')}</TableCell>
+                    <TableCell align="center">{t('Current Active')}</TableCell>
+                    <TableCell align="center">{t('Actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedschools.map((project) => {
 
-          {paginatedschools.length === 0 ? (
-            <>
-              <Typography
-                sx={{
-                  py: 10
-                }}
-                variant="h3"
-                fontWeight="normal"
-                color="text.secondary"
-                align="center"
-              >
-                {t(
-                  "We couldn't find any academic year matching your search criteria"
-                )}
-              </Typography>
-            </>
-          ) : (
-            <>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align="center">{t('Academic year Id')}</TableCell>
-                      <TableCell align="center">{t('Title')}</TableCell>
-
-                      <TableCell align="center">{t('Actions')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {paginatedschools.map((project) => {
-                     
-                      return (
-                        <TableRow
-                          hover
-                          key={project.id}
-                          
-                        >
-                          <TableCell align="center">
+                    return (
+                      <TableRow
+                        hover
+                        key={project.id}
+                      >
+                        <TableCell align="center">
                           {project?.id}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography noWrap variant="h5">
-                              {project.title}
-                            </Typography>
-                          </TableCell>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography noWrap variant="h5">
+                            {project.title}
+                          </Typography>
+                        </TableCell>
 
-                          <TableCell align="center">
-                            <Typography noWrap>
-                              <Tooltip title={t('Edit')} arrow>
-                                <IconButton
-                                  onClick={() => setEditData(project)}
-                                  color="primary"
-                                >
-                                  <LaunchTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t('Delete')} arrow>
-                                <IconButton
-                                  onClick={() =>
-                                    handleConfirmDelete(project.id)
-                                  }
-                                  color="primary"
-                                >
-                                  <DeleteTwoToneIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          )}
-        </Card>
-      
+                        <TableCell align="center">
+                          <Typography noWrap variant="h5">
+                            {project.curr_active ? <CheckIcon /> : <ClearIcon />}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <Typography noWrap>
+
+                            <Tooltip title={t('Make Active')} arrow>
+                              <IconButton
+                                onClick={() => handleMakeActive(project.id)}
+                                color="primary"
+                                disabled={project.curr_active}
+                              >
+                                <PublishedWithChangesIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            <Tooltip title={t('Edit')} arrow>
+                              <IconButton
+                                onClick={() => setEditData(project)}
+                                color="primary"
+                              >
+                                <LaunchTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('Delete')} arrow>
+                              <IconButton
+                                onClick={() =>
+                                  handleConfirmDelete(project.id)
+                                }
+                                color="primary"
+                              >
+                                <DeleteTwoToneIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
+      </Card>
+
 
       <DialogWrapper
         open={openConfirmDelete}

@@ -37,9 +37,7 @@ export const handleResStdInfo = async ({ user_id }) => {
                         school: {
                             select: {
                                 name: true,
-                                AutoAttendanceSentSms: {
-                                    include: { academicYear: true }
-                                },
+                                AutoAttendanceSentSms: true,
                                 SmsGateway: true,
                                 masking_sms_count: true,
                                 non_masking_sms_count: true,

@@ -7,6 +7,7 @@ import { verifyIsUnicode } from "./utility/handleVerifyUnicode.js";
 import { findMatches } from "./utility/findMatches.js";
 import { customizeDateWithTime } from "./utility/dateTime.js";
 import { createAttendance, stdAlreadyAttendance } from "./utility/handleAttendance.js";
+import { handleNumberOfSmsParts } from "./utility/handleNoOfSmsParts.js";
 
 export const handleIndividualQueue = async ({ student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise }) => {
   try {
@@ -100,8 +101,7 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         logFile.info(JSON.stringify(sms_text))
 
         // calculate part of sms
-        const bodyLength = isUnicode ? sms_text.length * 2 : sms_text.length;
-        const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
+        const number_of_sms_parts = handleNumberOfSmsParts({ isUnicode, textLength: sms_text.length })
 
         // create sent sms queue, tbl sent sms and update school 
         const smsQueueHandlerParameters = {

@@ -19,7 +19,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
 
             const { id, guardian_phone, section, student_info, class_roll_no } = resStudent || {};
 
-            if (!id) return logFile.error(`user_id(${user_id}) student not found`);
+            if (!id) return logFile.error(`user_id(${user_id}) student not found, suggestion:check the academic year`);
             if (!section?.std_entry_time) return logFile.error(`user_id(${user_id}) section_id(${section?.id}) entry time not found`);
 
             const isAlreadyAttendanceEntry = await stdAlreadyAttendance({ student_id: id, min_attend_datetime, max_attend_datetime })

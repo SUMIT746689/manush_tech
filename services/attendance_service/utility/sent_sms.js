@@ -2,6 +2,7 @@ import { createSmsQueueTableHandler } from "./createSmsQueueTableHandler.js";
 import { customizeDateWithTime } from "./dateTime.js";
 import { findMatches } from "./findMatches.js";
 import { logFile } from "./handleLog.js";
+import { handleNumberOfSmsParts } from "./handleNoOfSmsParts.js";
 import { verifyIsUnicode } from "./handleVerifyUnicode.js";
 
 export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id, submission_time) => {
@@ -17,7 +18,6 @@ export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id, s
         if (!data.body) return logFile.error(`student sent sms, user_id(${user_id}) sms body not found`)
 
         let body = data.body;
-        const isUnicode = verifyIsUnicode(body);
 
         const allMatchesArray = findMatches(data.body);
         for (const element of allMatchesArray) {
@@ -25,10 +25,13 @@ export const sentSms = (data, isAlreadyAttendanceEntry, studentDatas, user_id, s
         }
         body = body.replace(/ +(?= )/g, '');
 
+        const isUnicode = verifyIsUnicode(body);
+        console.log({ bodyLength: body.length })
         // verify no of parts a sms
-        const bodyLength = isUnicode ? body.length * 2 : body.length;
-        const number_of_sms_parts = bodyLength <= 160 ? 1 : Math.ceil(bodyLength / 153);
-        if (masking_sms_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) masking sms count is ${masking_sms_count}`);
+        const sms_available_count = is_masking ? masking_sms_count : non_masking_sms_count;
+        const number_of_sms_parts = handleNumberOfSmsParts({ isUnicode, textLength: body.length });
+        console.log({ isUnicode, number_of_sms_parts })
+        if (sms_available_count < number_of_sms_parts) return logFile.error(`student sent sms, user_id(${user_id}) school_id(${studentDatas.student_info.school_id}) masking sms count is ${masking_sms_count}`);
 
         const smsQTableHandlerDatas = {
             user_id,

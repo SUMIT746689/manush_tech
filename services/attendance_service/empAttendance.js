@@ -8,7 +8,7 @@ export const empAttendance = async ({ today, min_attend_datetime, max_attend_dat
     if (resEmp.length === 0) return logFile.info("today's employee tbl_attendance_queue response array length is 0");
 
     resEmp.forEach(async (empAttend) => {
-        logFile.info(empAttend)
+        logFile.info(JSON.stringify(empAttend))
         const { user_id, school_id } = empAttend;
         const { error, data: isEmpAlreadyEntryAttend } = await resEmployeeAttendance({ user_id, min_attend_datetime, max_attend_datetime })
         if (error) return logFile.error(error)

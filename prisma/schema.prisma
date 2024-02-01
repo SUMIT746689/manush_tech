@@ -473,7 +473,6 @@ model AcademicYear {
   Syllabus                   Syllabus[]
   ExamTerm                   ExamTerm[]
   Homework                   Homework[]
-  AutoAttendanceSentSms      AutoAttendanceSentSms[]
   academicSchool             School[]
 
   @@map("academic_years")
@@ -1367,16 +1366,16 @@ enum payment_gateway_title {
 }
 
 model AutoAttendanceSentSms {
-  id               Int         @id @default(autoincrement())
-  body             String
-  body_format      body_format
-  is_active        Boolean     @default(false)
-  every_hit        Boolean     @default(false)
-  school_id        Int         @unique
-  academic_year_id Int?
+  id          Int         @id @default(autoincrement())
+  body        String
+  body_format body_format
+  is_active   Boolean     @default(false)
+  every_hit   Boolean     @default(false)
+  school_id   Int         @unique
+  // academic_year_id Int?
 
-  school       School        @relation(fields: [school_id], references: [id])
-  academicYear AcademicYear? @relation(fields: [academic_year_id], references: [id])
+  school School @relation(fields: [school_id], references: [id])
+  // academicYear AcademicYear? @relation(fields: [academic_year_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
 }

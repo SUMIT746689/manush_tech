@@ -61,12 +61,12 @@ const StudentAutoSentSms = () => {
     const { t }: { t: any } = useTranslation();
     const [isLoading, setIsLoading] = useState(false)
     const { data, reFetchData } = useClientFetch('/api/automatic_attendances');
-    const { data: academicYears } = useClientDataFetch('/api/academic_years');
+    // const { data: academicYears } = useClientDataFetch('/api/academic_years');
     const { showNotification } = useNotistick();
 
     const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
 
-        if (_values.is_active && !_values.academic_year_id) return showNotification('academic year field is required', 'error')
+        // if (_values.is_active && !_values.academic_year_id) return showNotification('academic year field is required', 'error')
 
         const successResponse = () => {
             showNotification('autometic attendance sent sms settings updated!')
@@ -194,7 +194,8 @@ const StudentAutoSentSms = () => {
                                             </Grid>
 
                                             {
-                                                values.is_active &&
+                                                values.is_active
+                                                &&
                                                 <>
                                                     <Grid item>
                                                         <Stack direction="row" spacing={1} alignItems="center">

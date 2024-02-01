@@ -269,8 +269,8 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
       setStudents(null)
       const date_ = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
       const date = new Date(date_);
-      console.log({date})
-    
+      console.log({ date })
+
       axios.get(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}`)
         .then(response => {
           const temp = targetsectionStudents?.map(i => {
@@ -294,7 +294,7 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
             }
           })
           setStudents(temp);
-
+          console.log({ temp })
 
         }).catch(err => {
           // showNotification(err.message, 'error')

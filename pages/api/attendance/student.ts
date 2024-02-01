@@ -8,7 +8,7 @@ const index = async (req, res) => {
 
         switch (method) {
             case 'GET':
-               let query = {};
+                let query = {};
                 if (req.query.date) {
 
                     const gte = new Date(req.query.date)
@@ -54,6 +54,12 @@ const index = async (req, res) => {
             case 'POST':
 
                 const { date, status, school_id, section_id, exam_id } = req.query;
+
+                const gte = new Date(req.query.date)
+                gte.setHours(0, 0, 0, 0);
+                const lte = new Date(req.query.date)
+                lte.setHours(23, 59, 59, 999);
+
                 const { sectionAttendence } = req.body;
 
                 const fullSectionStudents = await prisma.student.findMany({
@@ -73,7 +79,7 @@ const index = async (req, res) => {
                     where: {
                         school_id: parseInt(school_id),
                         section_id: parseInt(section_id),
-                        date: new Date(date),
+                        date: { gte, lte },
                         ...exam_id_query
                     },
                     select: {

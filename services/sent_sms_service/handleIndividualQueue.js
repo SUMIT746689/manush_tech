@@ -97,7 +97,6 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
         // remove extra spaces
         sms_text = sms_text.replace(/ +(?= )/g, '');
-        logFile.info("test sent sms")
         logFile.info(JSON.stringify(sms_text))
 
         // calculate part of sms

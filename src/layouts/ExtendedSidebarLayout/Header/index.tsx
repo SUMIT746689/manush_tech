@@ -224,10 +224,10 @@ function Header() {
         </Grid>
       )}
 
-      <Box display="flex" alignItems="center" justifyContent="right" width="100%">
+      <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid item pr={2} color="white">Current Active <br /> Academic Year: <b><i>{ current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></b> </Grid>
+          <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{borderStyle:'dashed'}}>Current Active <br /> Academic Year: <span style={{color:"white"}}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
         )}
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (

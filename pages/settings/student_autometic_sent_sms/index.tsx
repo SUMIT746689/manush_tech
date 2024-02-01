@@ -101,8 +101,8 @@ const StudentAutoSentSms = () => {
                         body: data?.body || undefined,
                         is_active: data?.is_active || false,
                         every_hit: data?.every_hit || false,
-                        academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
-                        academic_year_id: data?.academic_year_id || undefined,
+                        // academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
+                        // academic_year_id: data?.academic_year_id || undefined,
                         submit: null
                     }}
                     validationSchema={Yup.object().shape({
@@ -123,7 +123,7 @@ const StudentAutoSentSms = () => {
                             }} >
                                 <form onSubmit={handleSubmit}>
                                     <Grid container direction={'column'} alignItems={'center'} gap={1} marginTop={3}>
-                                        <DialogTitle sx={{ p: 3, borderBottom: 1, borderColor: "lightgray" }} >
+                                        <DialogTitle width='100%' sx={{ p: 3, borderBottom: 1, borderColor: "lightgray" }} >
                                             <Typography variant="h4" gutterBottom>
                                                 Sent Sms for Student Autometic Attendence
                                             </Typography>
@@ -199,7 +199,7 @@ const StudentAutoSentSms = () => {
                                                     <Grid item>
                                                         <Stack direction="row" spacing={1} alignItems="center">
                                                             <Tooltip title="when student first time punch the attendance machine" placement="top">
-                                                                <Typography>Only Entry time</Typography>
+                                                                <Typography>Only Entry Time</Typography>
                                                             </Tooltip>
                                                             <CustomSwitch
                                                                 name="every_hit"
@@ -213,7 +213,7 @@ const StudentAutoSentSms = () => {
                                                             </Tooltip>
                                                         </Stack>
                                                     </Grid>
-                                                    <AutoCompleteWrapper
+                                                    {/* <AutoCompleteWrapper
                                                         minWidth="100%"
                                                         label={t('Academic Year')}
                                                         placeholder={t('select a academic year')}
@@ -231,7 +231,7 @@ const StudentAutoSentSms = () => {
                                                             setFieldValue('academic_year', v)
                                                             setFieldValue('academic_year_id', v?.id)
                                                         }}
-                                                    />
+                                                    /> */}
                                                 </>
                                             }
 

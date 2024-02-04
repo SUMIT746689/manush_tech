@@ -19,6 +19,7 @@ import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import { getFile } from '@/utils/utilitY-functions';
+import { handleConvBanNum } from 'utilities_api/convertBanNumber';
 
 function RegistrationFirstPart({
   totalFormData,
@@ -65,6 +66,24 @@ function RegistrationFirstPart({
           { resetForm, setErrors, setStatus, setSubmitting }
         ) => {
           try {
+
+            // validate phone numbers
+            if (_values.father_phone) {
+              const { number, err } = handleConvBanNum(_values.father_phone);
+              if (err) return showNotification('father_phone field: ' + err, 'error');
+              _values.father_phone = number;
+            }
+            if (_values.mother_phone) {
+              const { number, err } = handleConvBanNum(_values.mother_phone);
+              if (err) return showNotification('mother_phone field: ' + err, 'error');
+              _values.mother_phone = number;
+            }
+            if (_values.guardian_phone) {
+              const { number, err } = handleConvBanNum(_values.guardian_phone);
+              if (err) return showNotification('father_phone field: ' + err, 'error');
+              _values.guardian_phone = number;
+            }
+
             _values = {
               ..._values,
               // @ts-ignore
@@ -93,7 +112,7 @@ function RegistrationFirstPart({
               if (res.data.success) {
                 handleSubmitSuccess();
                 showNotification('Student updated Successfully');
-                router.push('/management/students');
+                router.back()
               }
             }
             else {

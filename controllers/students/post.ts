@@ -8,6 +8,8 @@ import fs from 'fs';
 
 import { fileRename, fileUpload } from '@/utils/upload';
 import { logFile } from 'utilities_api/handleLogFile';
+import { verifyNumeric } from 'utilities_api/verify';
+import { handleConvBanNum } from 'utilities_api/convertBanNumber';
 
 const postHandle = async (req, res, refresh_token) => {
   try {
@@ -94,10 +96,61 @@ const postHandle = async (req, res, refresh_token) => {
       !fields.academic_year_id ||
       !fields.phone
     ) {
-      for (const i in files) {
-        fs.unlinkSync(files[i].filepath)
-      }
+      removeFiles(files);
       throw new Error('Required field value missing !!')
+    }
+
+    const isNumber = verifyNumeric(fields.phone);
+    if (!isNumber) {
+      removeFiles(files);
+      throw new Error('number filed only numbers allowed')
+    };
+    const { number, err } = handleConvBanNum(fields.phone);
+    if (err) {
+      removeFiles(files)
+      throw new Error(err)
+    }
+    fields.phone = number;
+
+    if (fields.father_phone) {
+      const isNumber = verifyNumeric(fields.father_phone);
+      if (!isNumber) {
+        removeFiles(files);
+        throw new Error('number field only numbers allowed')
+      };
+      const { number, err } = handleConvBanNum(fields.father_phone);
+      if (err) {
+        removeFiles(files)
+        throw new Error('father phone field: ' + err)
+      }
+      fields.father_phone = number;
+    }
+    if (fields.mother_phone) {
+      const isNumber = verifyNumeric(fields.mother_phone);
+      if (!isNumber) {
+        removeFiles(files);
+        throw new Error('number field only numbers allowed')
+      };
+      const { number, err } = handleConvBanNum(fields.mother_phone);
+      if (err) {
+        removeFiles(files)
+        throw new Error('mother phone field: ' + err)
+      }
+      fields.mother_phone = number;
+    }
+
+    if (fields.guardian_phone) {
+      const isNumber = verifyNumeric(fields.guardian_phone);
+      if (!isNumber) {
+        removeFiles(files);
+        throw new Error('number field only numbers allowed')
+      };
+      const { number, err } = handleConvBanNum(fields.guardian_phone);
+      if (err) {
+        removeFiles(files)
+        throw new Error('guardian phone field: ' + err)
+      }
+      fields.guardian_phone = number;
     }
 
     const hashPassword = await bcrypt.hash(
@@ -139,7 +192,7 @@ const postHandle = async (req, res, refresh_token) => {
           gender: fields?.gender,
           blood_group: fields?.blood_group,
           religion: fields?.religion,
-          phone: fields?.phone,
+          phone: fields.phone,
           email: fields?.email,
           national_id: fields?.national_id,
 
@@ -193,7 +246,7 @@ const postHandle = async (req, res, refresh_token) => {
           guardian_photo: filePathQuery?.guardian_photo_path,
           relation_with_guardian: fields?.relation_with_guardian,
           student_present_address: fields?.student_present_address,
-           ...group,
+          ...group,
           section: {
             connect: { id: parseInt(fields?.section_id) }
           },
@@ -238,5 +291,11 @@ const postHandle = async (req, res, refresh_token) => {
     res.status(404).json({ error: err.message });
   }
 };
+
+const removeFiles = (files) => {
+  for (const i in files) {
+    fs.unlinkSync(files[i].filepath)
+  }
+}
 
 export default authenticate(postHandle);

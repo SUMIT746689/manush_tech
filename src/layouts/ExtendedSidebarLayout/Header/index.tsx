@@ -58,13 +58,13 @@ function Header() {
   const { showNotification } = useNotistick();
   const { data } = useClientDataFetch(`/api/academic_years`)
   const { data: current_active_academic_year, reFetchData } = useClientFetch(`/api/academic_years/current_active`)
-  console.log({ current_active_academic_year })
+  // console.log({ current_active_academic_year })
   const auth: any = useAuth();
   const { user } = auth;
   const { school } = user || {};
   const { academic_years } = school || {}
 
-  console.log({ academic_years })
+  // console.log({ academic_years })
 
   const handleFetchAcademicYear = () => {
     axios

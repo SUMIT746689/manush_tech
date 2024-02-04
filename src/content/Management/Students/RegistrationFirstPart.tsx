@@ -21,6 +21,7 @@ import FormLabel from '@mui/material/FormLabel';
 import useNotistick from '@/hooks/useNotistick';
 import { MobileDatePicker, MobileDateTimePicker } from '@mui/lab';
 import { registration_no_generate } from '@/utils/utilitY-functions';
+import { handleConvBanNum } from 'utilities_api/convertBanNumber';
 
 function RegistrationFirstPart({
   setTotalFormData,
@@ -30,7 +31,7 @@ function RegistrationFirstPart({
 }) {
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
-  
+
   return (
     <>
       <Formik
@@ -38,14 +39,14 @@ function RegistrationFirstPart({
           first_name: student ? (student?.first_name || student?.student_info?.first_name || '') : undefined,
           middle_name: student ? (student?.middle_name || student?.student_info?.middle_name || '') : '',
           last_name: student ? (student?.middle_name || student?.student_info?.last_name || '') : '',
-          admission_no: student ? ( student?.admission_no|| student?.student_info?.admission_no) : '',
-          admission_date: student ? ( student?.admission_date || student?.student_info?.admission_date) : null,
-          date_of_birth: student ? ( student?.date_of_birth || student?.student_info?.date_of_birth) : null,
-          gender: student ? ( student?.gender || student?.student_info?.gender) : 'male',
-          blood_group: student ? ( student?.blood_group|| student?.student_info?.blood_group || '') : '',
+          admission_no: student ? (student?.admission_no || student?.student_info?.admission_no) : '',
+          admission_date: student ? (student?.admission_date || student?.student_info?.admission_date) : null,
+          date_of_birth: student ? (student?.date_of_birth || student?.student_info?.date_of_birth) : null,
+          gender: student ? (student?.gender || student?.student_info?.gender) : 'male',
+          blood_group: student ? (student?.blood_group || student?.student_info?.blood_group || '') : '',
           religion: student ? (student?.religion || student?.student_info?.religion) : '',
           phone: student ? (student?.phone || student?.student_info?.phone) : undefined,
-          email: student ? ( student?.email || student?.student_info?.email) : '',
+          email: student ? (student?.email || student?.student_info?.email) : '',
           national_id: student ? (student?.national_id || student?.student_info?.national_id) : '',
           student_photo: null
         }}
@@ -69,7 +70,10 @@ function RegistrationFirstPart({
           { resetForm, setErrors, setStatus, setSubmitting }
         ) => {
           try {
-            console.log('clicked');
+            const { number, err } = handleConvBanNum(_values.phone);
+            if (err) return showNotification(err, 'error');
+            _values.phone = number;
+            
             setTotalFormData((values: any) => ({ ...values, ..._values }));
             setActiveStep(1);
           } catch (err) {
@@ -93,7 +97,7 @@ function RegistrationFirstPart({
           setFieldValue
         }) => {
           // console.log("T__values__",values);
-          console.log({ errors });
+          // console.log({ errors });
           return (
             <form onSubmit={handleSubmit}>
               <DialogContent
@@ -273,7 +277,7 @@ function RegistrationFirstPart({
                     <Grid item xs={12}>
                       <FormControl required>
                         <FormLabel id="demo-row-radio-buttons-group-label">
-                          Select Gender 
+                          Select Gender
                         </FormLabel>
                         <RadioGroup
                           aria-labelledby="demo-controlled-radio-buttons-group"
@@ -283,7 +287,7 @@ function RegistrationFirstPart({
                           onChange={(event) => {
                             setFieldValue('gender', event.target.value);
                           }}
-                          
+
                         >
                           <FormControlLabel
                             value="male"

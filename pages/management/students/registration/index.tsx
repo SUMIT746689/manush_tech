@@ -36,7 +36,7 @@ function ManagementClasses() {
     try {
       axios.get(`/api/student`).then((res) => {
         if (isMountedRef()) {
-          console.log('ref__', res.data);
+          // console.log('ref__', res.data);
 
           setClasses(res.data);
         }
@@ -50,7 +50,7 @@ function ManagementClasses() {
     getClasses();
   }, [getClasses]);
 
-  console.log({ totalFormData });
+  // console.log({ totalFormData });
 
   const handleCreateClassClose = () => {
     router.push('/management/students');

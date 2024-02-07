@@ -15,7 +15,8 @@ import {
   Popover,
   Typography,
   styled,
-  useTheme
+  useTheme,
+  Grid
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
@@ -113,7 +114,7 @@ const UserBoxDescription = styled(Typography)(
 `
 );
 
-function HeaderUserbox() {
+function HeaderUserbox({current_active_academic_year}) {
   const { t }: { t: any } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -208,6 +209,7 @@ function HeaderUserbox() {
       data: [465, 546, 234, 576, 554, 338, 427, 348, 586, 254, 348]
     }
   ];
+  console.log({current_active_academic_year})
 
   return (
     <>
@@ -249,8 +251,24 @@ function HeaderUserbox() {
             mb: 0
           }}
         />
-        {/* <MenuListWrapperPrimary disablePadding>
-          <MenuItem>
+        <MenuListWrapperPrimary disablePadding>
+          <Grid>
+            {/* <ListItemText
+              primaryTypographyProps={{
+                variant: 'h5'
+              }}
+              primary={t('Current Active')}
+            />
+            <ListItemText
+              primaryTypographyProps={{
+                variant: 'h5'
+              }}
+              primary={t(' Academic Year: ' )}
+            /> */}
+            <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{color:"green"}}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
+          </Grid>
+
+          {/* <MenuItem>
             <ListItemText
               primaryTypographyProps={{
                 variant: 'h5'
@@ -299,8 +317,8 @@ function HeaderUserbox() {
                 opacity: 0.8
               }}
             />
-          </MenuItem>
-        </MenuListWrapperPrimary> */}
+          </MenuItem> */}
+        </MenuListWrapperPrimary>
         <Divider />
         {/* <Box m={1}>
           <Box px={2} pt={1} pb={0.5} display="flex" alignItems="flex-start">

@@ -261,7 +261,7 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none",mb:'auto' }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none", mb: 'auto' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
@@ -311,20 +311,24 @@ function PageHeader({ sms_gateway }) {
                 >
                   <Grid container rowGap={1}>
 
-                    <TextFieldWrapper
-                      label="Campaign Name"
-                      name="campaign_name"
-                      value={values.campaign_name}
-                      touched={touched.campaign_name}
-                      errors={errors.campaign_name}
-                      handleChange={handleChange}
-                      handleBlur={handleBlur}
-                      required={true}
-                    />
+                    <Grid container>
+                      <Grid pb={0.5}>Campaign Name: *</Grid>
+                      <TextFieldWrapper
+                        label=""
+                        name="campaign_name"
+                        value={values.campaign_name}
+                        touched={touched.campaign_name}
+                        errors={errors.campaign_name}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                      />
+                    </Grid>
 
                     <Grid container>
+                      <Grid pb={0.5}>Selected Sms Gateway: *</Grid>
                       <DisableTextWrapper
-                        label="Selected Sms Gateway"
+                        label=""
                         touched={values.sms_gateway}
                         errors={errors.sms_gateway}
                         value={values.sms_gateway}
@@ -399,22 +403,25 @@ function PageHeader({ sms_gateway }) {
                       : ''
                     }
 
-                    <AutoCompleteWrapper
-                      minWidth="100%"
-                      label='Select Mobile Number Column'
-                      placeholder='select mobile number column... '
-                      options={selectSheetHeaders?.map(i => {
-                        return {
-                          label: i,
-                          id: i
-                        }
-                      }) || []}
-                      value={values.contact_column}
-                      handleChange={(e, value) => {
-                        console.log("contact", value)
-                        setFieldValue("contact_column", value)
-                      }}
-                    />
+                    <Grid width="100%">
+                      <Grid pb={0.5}>Select Mobile Number: * (from upload file column) </Grid>
+                      <AutoCompleteWrapper
+                        minWidth="100%"
+                        label=''
+                        placeholder='select mobile number column... '
+                        options={selectSheetHeaders?.map(i => {
+                          return {
+                            label: i,
+                            id: i
+                          }
+                        }) || []}
+                        value={values.contact_column}
+                        handleChange={(e, value) => {
+                          console.log("contact", value)
+                          setFieldValue("contact_column", value)
+                        }}
+                      />
+                    </Grid>
 
                     <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
                       {/* {selectSheetHeaders.map((value)=><Card sx={{p:1,my:'auto', borderRadius:0.5}} elevation={3}> {`\#{${value}}`}</Card>)} */}
@@ -427,18 +434,22 @@ function PageHeader({ sms_gateway }) {
 
                     </Grid>
                     {/* <DynamicSelectTemplate /> */}
-                    <TextAreaWrapper
-                      sx={{ pb: 0 }}
-                      name="body"
-                      value={values.body}
-                      touched={touched.body}
-                      errors={errors.body}
-                      handleChange={(v) => {
-                        if (v.target.value.length > 1000) return;
-                        handleChange(v)
-                      }}
-                      handleBlur={handleBlur}
-                    />
+                    <Grid container>
+                      <Grid> Enter SMS Content: *</Grid>
+                      <TextAreaWrapper
+                        sx={{ pb: 0 }}
+                        label=""
+                        name="body"
+                        value={values.body}
+                        touched={touched.body}
+                        errors={errors.body}
+                        handleChange={(v) => {
+                          if (v.target.value.length > 1000) return;
+                          handleChange(v)
+                        }}
+                        handleBlur={handleBlur}
+                      />
+                    </Grid>
                     <Grid sx={{ pb: 1, ml: 'auto' }}>
                       {`
                       ${values.body?.length ?? 0} characters | 

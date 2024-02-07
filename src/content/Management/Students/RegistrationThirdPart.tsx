@@ -19,7 +19,7 @@ import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
 import { FileUploadFieldWrapper } from '@/components/TextFields';
 import { getFile } from '@/utils/utilitY-functions';
-import { handleConvBanNum } from 'utilities_api/convertBanNumber';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 
 function RegistrationFirstPart({
   totalFormData,

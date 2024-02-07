@@ -8,7 +8,7 @@ import { verifyIsMasking, verifyIsUnicode } from 'utilities_api/verify';
 
 async function post(req, res, refresh_token) {
   try {
-    const { sms_gateway_id, campaign_name, recipient_type, role_id, class_id, section_id, name: individual_user_id, body: custom_body, sms_template_id } = req.body;
+    const { sms_gateway_id, campaign_name, recipient_type, role_id, class_id, section_id, name_ids: individual_user_ids, body: custom_body, sms_template_id } = req.body;
     const { school_id, id } = refresh_token;
 
     if (!sms_gateway_id || !recipient_type) throw new Error("required valid datas")
@@ -136,7 +136,7 @@ async function post(req, res, refresh_token) {
       case "INDIVIDUAL":
 
         const role = await prisma.role.findFirstOrThrow({ where: { id: req.body.role_id } });
-        const resIndividualUsers = await getUsers({ where: { school_id: Number(refresh_token.school_id), NOT: { phone: null }, user: { id: { in: individual_user_id } } }, role })
+        const resIndividualUsers = await getUsers({ where: { school_id: Number(refresh_token.school_id), NOT: { phone: null }, user: { id: { in: individual_user_ids } } }, role })
 
         if (resIndividualUsers.length === 0) throw new Error("No contacts founds")
 
@@ -162,7 +162,7 @@ async function post(req, res, refresh_token) {
     await createCampaign({ recipient_type, campaign_name, sms_template_id, sms_gateway_id, school_id: refresh_token.school_id, custom_body });
 
     // users sending sms handle 
-    sentSms(sentSmsData);
+    sentSms(sentSmsData, is_masking);
 
     // throw new Error("invalid recipient type ")
     return res.json({ message: 'success' });

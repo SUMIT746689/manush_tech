@@ -1,5 +1,5 @@
 <h1 align="center">
-    <b>School Management System SasS</b>
+    <b>School Management System SaaS</b>
     <br>
     
 </h1>

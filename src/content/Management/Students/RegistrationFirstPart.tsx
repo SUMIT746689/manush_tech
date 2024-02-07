@@ -21,7 +21,7 @@ import FormLabel from '@mui/material/FormLabel';
 import useNotistick from '@/hooks/useNotistick';
 import { MobileDatePicker, MobileDateTimePicker } from '@mui/lab';
 import { registration_no_generate } from '@/utils/utilitY-functions';
-import { handleConvBanNum } from 'utilities_api/convertBanNumber';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 
 function RegistrationFirstPart({
   setTotalFormData,

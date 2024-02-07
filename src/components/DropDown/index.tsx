@@ -1,3 +1,4 @@
+import { customBorder } from '@/utils/mui_style';
 import { FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 
@@ -6,11 +7,7 @@ export function DropDownSelectWrapper({ value, name = '', label, handleChange, m
   return (
 
     <Grid container sx={{ pb: 1 }}>
-      <FormControl size='small' fullWidth sx={{
-        [`& fieldset`]: {
-          borderRadius: 0.5,
-        },
-      }}>
+      <FormControl size='small' fullWidth sx={customBorder}>
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select
           labelId="demo-simple-select-label"
@@ -35,11 +32,7 @@ export function DynamicDropDownSelectWrapper({ value, name, label, handleChange,
       <FormControl
         fullWidth
         size='small'
-        sx={{
-          [`& fieldset`]: {
-            borderRadius: 0.6,
-          }
-        }}
+        sx={customBorder}
       >
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select
@@ -76,11 +69,7 @@ export function DynamicDropDownMuilipleSelectWrapper({ value, name, label, handl
       <FormControl
         fullWidth
         size='small'
-        sx={{
-          [`& fieldset`]: {
-            borderRadius: 0.6,
-          }
-        }}
+        sx={customBorder}
       >
         <InputLabel id="demo-simple-select-label">{required ? label + ' *' : label}</InputLabel>
         <Select

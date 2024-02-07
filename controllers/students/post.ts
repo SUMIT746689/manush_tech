@@ -9,7 +9,7 @@ import fs from 'fs';
 import { fileRename, fileUpload } from '@/utils/upload';
 import { logFile } from 'utilities_api/handleLogFile';
 import { verifyNumeric } from 'utilities_api/verify';
-import { handleConvBanNum } from 'utilities_api/convertBanNumber';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 
 const postHandle = async (req, res, refresh_token) => {
   try {

@@ -5,6 +5,7 @@ import { Card, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import SmsPage from '@/content/BulkSmsAndEmail/SendSms/SmsPage';
+import SmsRecipient from '@/content/BulkSmsAndEmail/SendSms/SmsRecipient';
 import IndividualSmsPage from '@/content/BulkSmsAndEmail/SendSms/IndividualSmsPage';
 import FileUploadSentSmsPage from '@/content/BulkSmsAndEmail/SendSms/FileUploadSentSms';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,6 +33,18 @@ const Packages = () => {
             {
               sms_gateway && <BasicTabWrapper items={[
                 {
+                  label: "SMS RECIPIENT", value:
+                    <SendSmsWrapper>
+                      <SmsRecipient sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                      <Grid maxWidth={350} display="grid" rowGap={1} >
+                        <SmsQuantityCard />
+                        <SmsNoticeCard />
+                        <SmsRecipientCard />
+                        <SmsContentInfoCard />
+                      </Grid>
+                    </SendSmsWrapper>
+                },
+                {
                   label: "INDIVIDUAL SMS", value:
                     <SendSmsWrapper>
                       <IndividualSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
@@ -56,7 +69,7 @@ const Packages = () => {
                     </SendSmsWrapper>
                 },
                 {
-                  label: "FILE UPLOAD", value:
+                  label: "DYNAMIC SMS", value:
                     <SendSmsWrapper>
                       <FileUploadSentSmsPage sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
                       <Grid maxWidth={350} display="grid" rowGap={1} >

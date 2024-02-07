@@ -1,6 +1,6 @@
 
 export const customBorder = {
   [`& fieldset`]: {
-    borderRadius: 0.6,
+    borderRadius: 0.4,
   }
 }

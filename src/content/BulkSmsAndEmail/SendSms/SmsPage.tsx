@@ -17,7 +17,7 @@ const DynamicSelectTemplate = () => {
 
 
   const select_template_value = sms_datas?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-  select_template_value.unshift({ value: 0, title: 'Select' })
+  // select_template_value.unshift({ value: 0, title: 'Select' })
 
   const handleTemplateSelect = (e) => {
     if (e.target.value <= 0) return;
@@ -29,16 +29,17 @@ const DynamicSelectTemplate = () => {
   }
 
   return (
-    <>
-      <DynamicDropDownSelectWrapper label="Select Template" name="template_id" value={values.template_id} menuItems={select_template_value} handleChange={handleTemplateSelect} />
-    </>
+    <Grid container>
+      <Grid pb={0.5}>Select Template :*</Grid>
+      <DynamicDropDownSelectWrapper label="" name="template_id" value={values.template_id} menuItems={select_template_value} handleChange={handleTemplateSelect} />
+    </Grid>
   )
 }
 
 const TypeClass = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
   const { data: classes } = useClientFetch('/api/class');
-  const [selectClassList, setSelectClassList]: any = useState([{ value: 0, title: 'Select' }]);
+  const [selectClassList, setSelectClassList]: any = useState([]);
   const [selectSectionList, setSelecteSectionList]: any = useState([]);
 
   useEffect(() => {
@@ -68,9 +69,14 @@ const TypeClass = () => {
   };
 
   return <>
-    <DynamicDropDownSelectWrapper label="Select Class" name="class_id" value={values.class_id} menuItems={selectClassList} handleChange={handleClassSelect} />
-
-    <DynamicDropDownMuilipleSelectWrapper label="Select Section" name="section_id" value={values.section_id} menuItems={selectSectionList} handleChange={handleSectionSelect} />
+    <Grid container>
+      <Grid>Select Class: *</Grid>
+      <DynamicDropDownSelectWrapper label="" name="class_id" value={values.class_id} menuItems={selectClassList} handleChange={handleClassSelect} />
+    </Grid>
+    <Grid container>
+      <Grid>Select Section:</Grid>
+      <DynamicDropDownMuilipleSelectWrapper label="" name="section_id" value={values.section_id} menuItems={selectSectionList} handleChange={handleSectionSelect} />
+    </Grid>
 
   </>
 
@@ -80,7 +86,6 @@ const TypeGroup = () => {
   const { values, touched, errors, setFieldValue }: any = useFormikContext()
   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  console.log({ roles })
   useEffect(() => {
     const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
     customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
@@ -110,7 +115,7 @@ const DynamicTypeSelect = () => {
   const { values, setFieldValue }: any = useFormikContext()
 
   const types = [
-    { value: "SELECT", title: "SELECT" },
+    // { value: "SELECT", title: "SELECT" },
     { value: "CLASS", title: "CLASS" },
     { value: "GROUP", title: "GROUP" },
     // { value: 'INDIVIDUAL', title: "INDIVIDUAL" }
@@ -124,10 +129,10 @@ const DynamicTypeSelect = () => {
 
   // return <DropDownSelectWrapper   label="Type" handleChange={handleTypeChange} menuItems={types} />
   return (
-    <>
-      <DynamicDropDownSelectWrapper required={true} value={values.recipient_type} name="recipient_type" label="Type" menuItems={types} handleChange={handleTypeChange} />
-
-    </>
+    <Grid container>
+      <Grid pb={0.5}>Select Class/Group Wise: *</Grid>
+      <DynamicDropDownSelectWrapper value={values.recipient_type} name="recipient_type" label="" menuItems={types} handleChange={handleTypeChange} />
+    </Grid>
   )
 
 
@@ -163,7 +168,7 @@ function PageHeader({ sms_gateway }) {
 
   return (
     <>
-      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: 'none',mb:'auto' }}>
+      <Card sx={{ mt: 1, borderRadius: 0, boxShadow: 'none', mb: 'auto' }}>
         {/* dialog title */}
         {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
@@ -212,63 +217,72 @@ function PageHeader({ sms_gateway }) {
                 >
                   <Grid container rowGap={1}>
 
-                    <TextFieldWrapper
-                      label="Campaign Name"
-                      name="campaign_name"
-                      value={values.campaign_name}
-                      touched={touched.campaign_name}
-                      errors={errors.campaign_name}
-                      handleChange={handleChange}
-                      handleBlur={handleBlur}
-                      required={true}
-                    />
+                    <Grid container>
+                      <Grid pb={0.5}>Campaign Name :*</Grid>
+                      <TextFieldWrapper
+                        label=""
+                        name="campaign_name"
+                        value={values.campaign_name}
+                        touched={touched.campaign_name}
+                        errors={errors.campaign_name}
+                        handleChange={handleChange}
+                        handleBlur={handleBlur}
+                        required={true}
+                      />
+                    </Grid>
 
                     <Grid container>
-                      <DisableTextWrapper
-                        label="Selected Sms Gateway"
-                        touched={values.sms_gateway}
-                        errors={errors.sms_gateway}
-                        value={values.sms_gateway}
-                      />
-                      {
-                        Boolean(
-                          // touched.sms_gateway_id 
-                          // && 
-                          errors.sms_gateway_id
-                        ) &&
-                        <Grid display="flex" columnGap={2} justifyContent="space-between">
-                          <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
-                          <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
-                        </Grid>
-                      }
+                      <Grid container>
+                        <Grid pb={0.5}>Select Sms Gateway :*</Grid>
+                        <DisableTextWrapper
+                          label=""
+                          touched={values.sms_gateway}
+                          errors={errors.sms_gateway}
+                          value={values.sms_gateway}
+                        />
+                        {
+                          Boolean(
+                            // touched.sms_gateway_id 
+                            // && 
+                            errors.sms_gateway_id
+                          ) &&
+                          <Grid display="flex" columnGap={2} justifyContent="space-between">
+                            <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                            <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
+                          </Grid>
+                        }
+                      </Grid>
                     </Grid>
                     {/* <GateWaySelect /> */}
 
 
                     <DynamicSelectTemplate />
 
-                    <TextAreaWrapper
-                      sx={{ pb: 0 }}
-                      name="body"
-                      value={values.body}
-                      touched={touched.body}
-                      errors={errors.body}
-                      handleChange={(v) => {
-                        if (v.target.value.length > 1000) return;
-                        handleChange(v)
-                      }
-                      }
-                      handleBlur={handleBlur}
-                    />
-                    <Grid sx={{ pb: 1, ml: 'auto' }}>
-                      {`
+                    <Grid container>
+                      <Grid pb={0.5}>Enter SMS Content: *</Grid>
+                      <TextAreaWrapper
+                        sx={{ pb: 0 }}
+                        name="body"
+                        value={values.body}
+                        touched={touched.body}
+                        errors={errors.body}
+                        handleChange={(v) => {
+                          if (v.target.value.length > 1000) return;
+                          handleChange(v)
+                        }
+                        }
+                        handleBlur={handleBlur}
+                      />
+                      <Grid sx={{ pb: 1, ml: 'auto' }}>
+                        {`
                       ${values.body?.length ?? 0} characters | 
                       ${1000 - (values.body?.length ?? 0)} characters left |
                       ${!values.body?.length || values.body?.length === 0 ?
-                          0
-                          :
-                          values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
+                            0
+                            :
+                            values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
                       `}
+                      </Grid>
                     </Grid>
 
                     <DynamicTypeSelect />

@@ -8,7 +8,7 @@ export const TextFieldWrapper = ({ label, name, value, type = "text", touched, e
         size='small'
         sx={{
           [`& fieldset`]: {
-            borderRadius: 0.6,
+            borderRadius: 0.4,
           }
         }}
         id="outlined-basic"
@@ -38,7 +38,7 @@ export const UncontrolledTextFieldWrapper = ({ label, value, type = "string", di
         size='small'
         sx={{
           [`& fieldset`]: {
-            borderRadius: 0.6,
+            borderRadius: 0.4,
           }
         }}
         id="outlined-basic"
@@ -63,7 +63,7 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
         size='small'
         sx={{
           [`& fieldset`]: {
-            borderRadius: 0.6,
+            borderRadius: 0.4,
           }
         }}
         label={label}
@@ -79,13 +79,18 @@ export const DisableTextWrapper = ({ label, touched, errors, value }) => {
   )
 }
 
-export const TextAreaWrapper = ({ name, value, touched, errors, handleChange, handleBlur, minRows = 6, required = false, sx = {} }) => {
+export const TextAreaWrapper = ({ name, label = undefined, value, touched, errors, handleChange, handleBlur, minRows = 3, required = false, sx = {} }) => {
   return (
     <Grid item container pb={1}>
       <TextField
-        sx={{ maxlength: 10 }}
+        sx={{
+          maxlength: 10,
+          [`& fieldset`]: {
+            borderRadius: 0.4,
+          }
+        }}
         id="outlined-multiline-static"
-        label={name}
+        label={label ?? name}
         variant="outlined"
         error={Boolean(touched && errors)}
         fullWidth

@@ -4,15 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { DisableTextWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
-import { DynamicDropDownSelectWrapper } from '@/components/DropDown';
+import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
 import { useClientDataFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import Link from 'next/dist/client/link';
-import SmsHelpInfoWrapper from './SmsHelpInfoWrapper';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-
+import { verifyIsUnicode } from 'utilities_api/verify';
+import CustomizedHook from './CustomizeAutoCompleteWrapper';
+import { handleNumberOfSmsParts } from 'utilities_api/handleNoOfSmsParts';
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
   const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }: any = useFormikContext()
@@ -52,51 +52,57 @@ const DynamicSelectTemplate = () => {
 // }
 
 
-const TypeIndividual = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
-  const [selectRolesList, setSelectRolesList]: any = useState([]);
-  const [selectNameList, setSelecteNameList]: any = useState([]);
+// const TypeIndividual = () => {
+//   const { values, touched, errors, setFieldValue }: any = useFormikContext()
+//   const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
+//   const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
+//   const [selectNameList, setSelecteNameList]: any = useState([]);
 
-  useEffect(() => {
-    const customize_select_roleslist = roles?.map(role => ({ value: role.id, label: role.title }))
-    customize_select_roleslist && setSelectRolesList(value => [...value, ...customize_select_roleslist]);
-  }, [roles])
+//   useEffect(() => {
+//     const customize_select_roleslist = roles?.map(role => ({ value: role.id, title: role.title }))
+//     customize_select_roleslist && setSelectRolesList(value => [...value, ...customize_select_roleslist]);
+//   }, [roles])
 
-  const handleRoleSelect = async (e, value) => {
-    console.log({ value })
-    const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${value?.value}`, 'get', {});
+//   const handleRoleSelect = async (e) => {
+//     const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${e.target.value}`, 'get', {});
 
-    if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, label: user.username })));
-    setFieldValue("name", []);
-    const findSelectedTemplate = roles.find(data => data.id === value?.value)
-    if (!findSelectedTemplate) return;
-    setFieldValue("role", value);
-    setFieldValue("role_id", value.value);
+//     if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, title: user.username })));
+//     setFieldValue("name", []);
+//     const findSelectedTemplate = roles.find(data => data.id === e.target.value)
+//     if (!findSelectedTemplate) return;
+//     setFieldValue("role_id", e.target.value);
+//     if (!findSelectedTemplate.has_section) return;
+//     const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
+//     setSelecteNameList((value) => customize_select_sectionlist)
+//     // setFieldValue("body", findSelectedTemplate.body)
+//     // handleBlur("body")
 
-    if (!findSelectedTemplate.has_section) return;
-    const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    setSelecteNameList((value) => customize_select_sectionlist)
-  };
+//   };
 
-  const handleNameSelect = (e, value) => {
-    setFieldValue("name", value)
-    setFieldValue("name_ids", value.map((v) => v.value))
-  };
+//   const handleNameSelect = (e) => {
+//     // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
+//     // if (!findSelectedTemplate) return;
+//     setFieldValue("name", e.target.value)
+//     // setFieldValue("body", findSelectedTemplate.body)
+//     // handleBlur("body")
+//   };
 
-  return (
-    <>
-      <Grid container>
-        <Grid pb={0.5}>Select User Role: *</Grid>
-        <AutoCompleteWrapper minWidth="100%" label="" placeholder="select a user role..." value={values.role} options={selectRolesList} handleChange={handleRoleSelect} />
-      </Grid>
-      <Grid container>
-        <Grid pb={0.5}>Select Name: *</Grid>
-        <AutoCompleteWrapper multiple={true} minWidth="100%" label="" placeholder="select users..." value={values.name} options={selectNameList} handleChange={handleNameSelect} />
-      </Grid>
-    </>
-  )
-}
+//   return (
+//     <>
+//       <Grid container>
+//         <Grid pb={0.5}>Select Role: *</Grid>
+//         <DynamicDropDownSelectWrapper label="" name="role_id" value={values.role_id} menuItems={selectRolesList} handleChange={handleRoleSelect} />
+//       </Grid>
+//       <Grid container>
+//         <Grid pb={0.5}>Select Name: *</Grid>
+//         <DynamicDropDownMuilipleSelectWrapper label="" name="name" value={values.name} menuItems={selectNameList} handleChange={handleNameSelect} />
+//       </Grid>
+//       <Grid container>
+//         <CustomizedHook />
+//       </Grid>
+//     </>
+//   )
+// }
 
 
 function PageHeader({ sms_gateway }) {
@@ -118,7 +124,7 @@ function PageHeader({ sms_gateway }) {
 
       _values["recipient_type"] = "INDIVIDUAL"
 
-      const { data } = await axios.post(`/api/sent_sms`, _values);
+      const { data } = await axios.post(`/api/sent_sms/sms_recipients`, _values);
       successResponse('created');
 
     } catch (err) {
@@ -140,27 +146,29 @@ function PageHeader({ sms_gateway }) {
         <Formik
           enableReinitialize={true}
           initialValues={{
-            campaign_name: '',
+            // campaign_name: '',
             sms_gateway: sms_gateway?.details?.sender_id || '',
             sms_gateway_id: sms_gateway?.id || undefined,
             template_id: undefined,
             body: '',
+            msisdn:'',
             // recipient_type: undefined,
-            class_id: undefined,
-            section_id: [],
-            role_id: [],
-            role: undefined,
-            name: [],
-            name_ids: [],
+            // class_id: undefined,
+            // section_id: [],
+            // role_id: [],
+            // name: [],
             schedule_date: undefined,
             schedule_time: undefined,
             submit: null,
-            file_upload: undefined,
+            // file_upload: undefined,
           }}
           validationSchema={Yup.object().shape({
-            campaign_name: Yup.string()
-              .max(255)
-              .required(t('The campaign name field is required')),
+            // campaign_name: Yup.string()
+            //   .max(255)
+            //   .required(t('The campaign name field is required')),
+            msisdn: Yup.string()
+              // .max(255)
+              .required(t('The mobile number field is required')),
             body: Yup.string()
               .max(1000)
               .required(t('The body field is required')),
@@ -187,20 +195,6 @@ function PageHeader({ sms_gateway }) {
                 >
                   <Grid container rowGap={1}>
 
-                    <Grid container>
-                      <Grid pb={0.5} >Campaign Name: *</Grid>
-                      <TextFieldWrapper
-                        label=""
-                        name="campaign_name"
-                        value={values.campaign_name}
-                        touched={touched.campaign_name}
-                        errors={errors.campaign_name}
-                        handleChange={handleChange}
-                        handleBlur={handleBlur}
-                        required={true}
-                      />
-                    </Grid>
-
                     {
                       // sms_gateway &&
                       <Grid container>
@@ -226,12 +220,31 @@ function PageHeader({ sms_gateway }) {
                         }
                       </Grid>
                     }
+
+                    <Grid container>
+                      <Grid pb={0.5}>Enter Mobile Numbers: *</Grid>
+                      <TextAreaWrapper
+                        sx={{ pb: 0 }}
+                        label={''}
+                        name="msisdn"
+                        value={values.msisdn}
+                        touched={touched.msisdn}
+                        errors={errors.msisdn}
+                        handleChange={(v) => {
+                          if (v.target.value.length > 1000) return;
+                          handleChange(v)
+                        }
+                        }
+                        handleBlur={handleBlur}
+                      />
+                      <Grid>Exmp: <span style={{ fontSize: "12px", color: "teal" }}>8801776900000 8801910000000</span></Grid>
+                    </Grid>
                     {/* <GateWaySelect /> */}
 
                     <DynamicSelectTemplate />
 
                     <Grid container>
-                      <Grid pb={0.5}>Body: *</Grid>
+                      <Grid pb={0.5}>Enter SMS Content: *</Grid>
                       <TextAreaWrapper
                         sx={{ pb: 0 }}
                         label={''}
@@ -251,7 +264,19 @@ function PageHeader({ sms_gateway }) {
                       </Grid>
                     </Grid>
 
-                    <TypeIndividual />
+
+                    {/* <DynamicTypeSelect /> */}
+
+                    {/* {values.recipient_type === "CLASS" && <TypeClass />} */}
+                    {/* {values.recipient_type === "GROUP" && <TypeGroup />} */}
+                    {/* {values.recipient_type === "INDIVIDUAL" &&  */}
+                    {/* <TypeIndividual /> */}
+                    {/* } */}
+                    {/* <DropDownSelectWrapper required={true} label="Type" menuItems={[]} />
+                    <DropDownSelectWrapper required={true} label="Role" menuItems={[]} /> */}
+                    {/* <DropDownSelectWrapper menuItems={[]} /> */}
+                    {/* <MobileDatePicker />
+                    <MobileDatePicker /> */}
 
                   </Grid>
                 </DialogContent>
@@ -280,20 +305,16 @@ function PageHeader({ sms_gateway }) {
 
 export default PageHeader;
 
-// const SmsHelpInfoWrapper = ({ value }) => {
-//   const isUnicode = verifyIsUnicode(value);
-//   console.log({ isUnicode, value: value.length })
-//   const updatedValue = isUnicode ? value?.length * 2 : value.length;
-//   return (
-//     <Grid sx={{ ml: 'auto' }}>
-//       {`
-//         ${updatedValue ?? 0} characters | 
-//         ${1000 - (updatedValue ?? 0)} characters left |
-//         ${!updatedValue || updatedValue === 0 ?
-//           0
-//           :
-//           updatedValue <= 160 ? 1 : Math.ceil(updatedValue / 153)} SMS                
-//         `}
-//     </Grid>
-//   )
-// }
+const SmsHelpInfoWrapper = ({ value }) => {
+  const isUnicode = typeof value === 'string' ? verifyIsUnicode(value) : false;
+  const updatedValue = handleNumberOfSmsParts({ isUnicode, textLength: value?.length });
+
+  return (<Grid sx={{ ml: 'auto' }}>
+    {`
+        ${value?.length ?? 0} characters | 
+        ${1000 - (value?.length ?? 0)} characters left |
+        ${updatedValue} SMS (${isUnicode ? updatedValue > 1 ? 67 : 70 : updatedValue > 1 ? 153 : 160} Char./SMS)        
+        `}
+  </Grid>
+  )
+}

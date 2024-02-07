@@ -11,7 +11,9 @@ import * as XLSX from 'xlsx/xlsx.mjs';
 import { getSheetBodies, getSheetHeaders } from '@/utils/sheet';
 import { findMatches } from '@/utils/findMatches';
 import { logFile } from 'utilities_api/handleLogFile';
-import { verifyIsUnicode } from 'utilities_api/verify';
+import { verifyIsUnicode, verifyNumeric } from 'utilities_api/verify';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
+import { handleNumberOfSmsParts } from 'utilities_api/handleNoOfSmsParts';
 
 
 async function post(req, res, refresh_token) {
@@ -45,7 +47,7 @@ async function post(req, res, refresh_token) {
     // if(smsGatewayRes.)
     console.log({ smsGatewayRes })
     const { id: smsGatewayId, details } = smsGatewayRes;
-    const { sender_id } = <any>details ?? {};
+    const { sender_id, is_masking } = <any>details ?? {};
 
     const allMatchesArray = findMatches(fields.body);
 
@@ -70,28 +72,31 @@ async function post(req, res, refresh_token) {
       /* DO SOMETHING WITH workbook HERE */
       const firstSheetName = workbook.SheetNames[0]
       /* Get worksheet */
-      const worksheet = workbook.Sheets[firstSheetName]
+      const worksheet = workbook.Sheets[firstSheetName];
       const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
 
       if (excelArrayDatas.length > 30000) return res.status(404).json({ error: "large file, maximum support 30,000 row" })
 
-      let error = null;
 
-      const resSentSms = excelArrayDatas.map((value, index) => {
+      const resSentSms = [];
+      let total_sms_count = 0;
+      excelArrayDatas.forEach((value, index) => {
         let body = fields.body;
         let contacts = value[fields.contact_column];
 
-        if (!contacts) {
-          error = "selected contact field is missing";
-        }
+        const isNumeric = verifyNumeric(contacts);
+        if (!isNumeric) return;
+        const { number, err } = handleConvBanNum(String(contacts));
+        if (err) return;
 
         for (const element of allMatchesArray) {
           body = body.replaceAll(`#${element}#`, value[element])
         }
 
         const isUnicode = verifyIsUnicode(body || '');
-
-        return {
+        const number_of_sms_parts = handleNumberOfSmsParts({ isUnicode, textLength: body.length })
+        total_sms_count += number_of_sms_parts;
+        resSentSms.push({
           sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
           user_id: parseInt(id),
           school_id,
@@ -101,27 +106,30 @@ async function post(req, res, refresh_token) {
           sms_type: isUnicode ? 'unicode' : 'text',
           sms_text: body,
           submission_time: new Date(Date.now()),
-          contacts: String(contacts),
-          pushed_via: 'gui',
+          contacts: number,
+          pushed_via: 'gui-file-upload',
           total_count: 1,
-        }
+          number_of_sms_parts
+        });
       })
 
-      if (error) {
-        logFile.error(error);
-        return res.status(404).json({ error })
+      if (resSentSms.length === 0) {
+        logFile.error("contact numbers is not valid");
+        return res.status(404).json({ error: "contact numbers is not valid" })
       }
+
+      let error: string | null;
       // await prisma.$transaction([
       await prisma.tbl_queued_sms.createMany({
         data: resSentSms
       })
-      // ,
-      // prisma.tbl_sent_sms.createMany({
-      //   data: resSentSms
-      // })
-      // ])
-      // .then(res => { console.log("tbl_queue_sms", res) })
-      // .catch(err => { console.log("tbl_queue_sms", err) });
+        .then(async () => await prisma.school.update({ where: { id: school_id }, data: { masking_sms_count: { decrement: is_masking ? total_sms_count : 0 }, non_masking_sms_count: { decrement: is_masking ? 0 : total_sms_count } } }))
+        .catch(err => { error = err.message })
+
+      if (error) {
+        logFile.error(error);
+        return res.status(404).json({ error: error })
+      }
 
       res.status(200).end();
     });

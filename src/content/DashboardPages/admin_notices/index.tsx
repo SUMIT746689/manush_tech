@@ -35,6 +35,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { useSnackbar } from 'notistack';
 import { customizeDate } from '@/utils/customizeDate';
 import { getFile } from '@/utils/utilitY-functions';
+import Link from 'next/dist/client/link';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -280,9 +281,9 @@ const Notices: FC<NoticessProps> = ({ notices }) => {
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('view notice')} arrow>
-                              <a
+                              <Link
                                 style={{ width: '50px' }}
-                                target="_blank"
+                                // target="_blank"
                                 href={getFile(i?.file_url)}
                               ><IconButton
                                 sx={{
@@ -309,7 +310,7 @@ const Notices: FC<NoticessProps> = ({ notices }) => {
                                   {/* <LaunchTwoToneIcon fontSize="small" /> */}
                                 </IconButton>
 
-                              </a>
+                              </Link>
 
                             </Tooltip>
 

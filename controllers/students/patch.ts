@@ -5,7 +5,7 @@ import fs from 'fs';
 
 import { fileDelete, fileRename, fileUpload } from '@/utils/upload';
 import { logFile } from 'utilities_api/handleLogFile';
-import { handleConvBanNum } from 'utilities_api/convertBanNumber';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 import { verifyNumeric } from 'utilities_api/verify';
 
 const patchHandle = async (req, res, authenticate_user) => {

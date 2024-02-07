@@ -351,6 +351,7 @@ function PageHeader({ sms_gateway }) {
                       htmlFor="files"
                       label="File File"
                       name="file_upload"
+                      accept=".xlsx, .xls, .csv, text/csv"
                       value={values.logo?.name || ''}
                       handleChangeFile={(event) => {
                         if (!event.target.files[0]) return;

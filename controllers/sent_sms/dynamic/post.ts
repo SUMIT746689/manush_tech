@@ -75,8 +75,11 @@ async function post(req, res, refresh_token) {
       const worksheet = workbook.Sheets[firstSheetName];
       const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
 
-      if (excelArrayDatas.length > 30000) return res.status(404).json({ error: "large file, maximum support 30,000 row" })
-
+      if (excelArrayDatas.length > 30000) {
+        logFile.error("large file, maximum support 30,000 row");
+        removeFiles(files);
+        return res.status(404).json({ error: "large file, maximum support 30,000 row" });
+      }
 
       const resSentSms = [];
       let total_sms_count = 0;
@@ -96,6 +99,7 @@ async function post(req, res, refresh_token) {
         const isUnicode = verifyIsUnicode(body || '');
         const number_of_sms_parts = handleNumberOfSmsParts({ isUnicode, textLength: body.length })
         total_sms_count += number_of_sms_parts;
+
         resSentSms.push({
           sms_shoot_id: String(new Date().getTime()) + String(id) + String(index),
           user_id: parseInt(id),
@@ -115,6 +119,7 @@ async function post(req, res, refresh_token) {
 
       if (resSentSms.length === 0) {
         logFile.error("contact numbers is not valid");
+        removeFiles(files);
         return res.status(404).json({ error: "contact numbers is not valid" })
       }
 
@@ -128,21 +133,32 @@ async function post(req, res, refresh_token) {
 
       if (error) {
         logFile.error(error);
-        return res.status(404).json({ error: error })
+        removeFiles(files);
+        return res.status(404).json({ error: error });
       }
 
       res.status(200).end();
+      removeFiles(files);
     });
 
     datas.on("error", () => {
+      removeFiles(files);
       res.status(500).res.end();
-    })
+    });
 
   } catch (err) {
     logFile.error(err.message)
     console.log({ err: err.message })
     res.status(404).json({ error: err.message });
+
   }
 }
 
+const removeFiles = (files) => {
+  for (const i in files) {
+    fs.unlink(files[i].filepath, (err) => {
+      logFile.error(err)
+    })
+  }
+}
 export default authenticate(post)

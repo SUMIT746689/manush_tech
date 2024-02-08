@@ -55,6 +55,7 @@ const index = async (req, res, refresh_token) => {
                                 first_name: true,
                                 middle_name: true,
                                 last_name: true,
+                                phone:true,
                             }
                         },
                         guardian_name: true,

@@ -203,7 +203,7 @@ function Header() {
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.5, fontWeight: 600, fontSize: 12 }}>
+        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
         </Box>
@@ -211,7 +211,7 @@ function Header() {
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-        <Grid pt={1} minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
+        <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
           <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
           <CustomAutoCompleteWrapper
             // label="Academic Year"
@@ -227,18 +227,20 @@ function Header() {
       <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{ borderStyle: 'dashed' }}>
+          <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{ borderStyle: 'dashed', display: { xs: "none", md: "block" } }}>
             Current Active
             <br />
-            Academic Year:
-            <span style={{ color: "white" }}><i>
-              {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}
-            </i></span>
+            {`Academic Year: `}
+            <span style={{ color: "white" }}>
+              <i>
+                {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}
+              </i>
+            </span>
           </Grid>
         )}
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid pt={1} minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
+          <Grid minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
               // label="Academic Year"
@@ -292,10 +294,11 @@ export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, o
         {...params}
         size='small'
         sx={{
+          fontSize: '14px',
           color: "#002884",
           [`& fieldset`]: {
             color: "#002884",
-            borderRadius: 0.6,
+            borderRadius: 0.4,
             // backgroundColor: "#FFFFFF",
             // border:"2px solid #FFFFFF",
             // ":hover":  {border:"2px solid #FFFFFF"},
@@ -306,23 +309,11 @@ export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, o
         value={value}
         filterSelectedOptions
         renderInput={(rnParams) => (
-          <TextField
-            size="small"
-            fullWidth
-            required={required}
-            {...rnParams}
-            sx={{
-              fontWeight: 600,
-              color: "#002884",
-              backgroundColor: "white",
-              borderRadius: 0.6
-            }}
-            // sx={{border:"2px solid #FFFFFF"}}
-            label={label}
-            placeholder={placeholder}
-          />
-        )}
-        onChange={handleChange}
+          <div ref={rnParams.InputProps.ref} >
+            <input type="text" {...rnParams.inputProps} style={{borderRadius:'4px',padding:'4px',maxWidth:'200px'}} />
+          </div>
+          )}
+      onChange={handleChange}
       />
     </Grid>
   )

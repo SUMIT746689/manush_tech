@@ -112,7 +112,6 @@ const Results = ({
   setPrintFees,
   filteredFees,
   setFilteredFees,
-
   setSelectedFees,
   accounts,
   accountsOption
@@ -199,7 +198,7 @@ const Results = ({
         });
     }
   };
-  
+
   useEffect(() => {
     if (selectedStudent) {
       handleStudentPaymentCollect();
@@ -499,6 +498,7 @@ const Results = ({
                       </span>
                       <span>Id: {selectedStudent?.id}</span>
                       <span>Roll: {selectedStudent?.class_roll_no}</span>
+                      <span><a href={`tel:${selectedStudent?.student_info?.phone}`}>Number: {selectedStudent?.student_info?.phone}</a></span>
                     </Grid>
                   )
                 }
@@ -818,8 +818,6 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
   const [transID, setTransID] = useState(null)
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [gatewayOption, setGatewayOption] = useState([])
-
-  console.log({ fee });
 
   return (
     <Grid container

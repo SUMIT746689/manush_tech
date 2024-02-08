@@ -24,6 +24,7 @@ function Managementschools() {
   const [isSentSmsLoading, setIsSentSmsLoading] = useState(false);
   const { data: accounts } = useClientFetch(`/api/account`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
+  console.log({ classData });
 
   useEffect(() => {
 
@@ -66,15 +67,12 @@ function Managementschools() {
   console.log({ printFees, prinCollectedtFees })
 
   const handleSentSms = () => {
+    if (!selectedStudent?.student_info?.phone) return showNotification("phone number not founds", "error")
+
     setIsSentSmsLoading(true);
     const sms_text = `${prinCollectedtFees[0].title} fees, paid amount: ${printFees[0].paidAmount} TK(${printFees[0].status}), due: ${prinCollectedtFees[0].due} TK. Tracking number: ${printFees[0].tracking_number}`
-    console.log("print-fees--", { sms_text })
-    console.log({ selectedStudent })
-    if (!selectedStudent?.guardian_phone) {
-      showNotification("guardian phone number not founds", "error")
-      setIsSentSmsLoading(false);
-    }
-    axios.post("/api/sent_sms/student_fees", { sms_text, contacts: selectedStudent?.guardian_phone })
+
+    axios.post("/api/sent_sms/student_fees", { sms_text, contacts: selectedStudent?.student_info?.phone })
       .then(({ data }) => {
         if (data?.success) showNotification("sending sms successfully")
       })

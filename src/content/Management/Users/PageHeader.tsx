@@ -14,16 +14,17 @@ import {
   TextField,
   CircularProgress,
   Autocomplete,
-  Button
+  Button,
+  Card
 } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { FileUploadFieldWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { getFile } from '@/utils/utilitY-functions';
-import { DebounceInput } from '@/components/DebounceInput';
+import { DebounceInput, NewDebounceInput } from '@/components/DebounceInput';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
@@ -114,6 +115,44 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
   const temp = userPrermissionRoles.find(i => i.role == editUser?.user_role?.title);
 
+  const handleDebounce = (value) => {
+    if (editUser?.username?.toLowerCase() === value?.toLowerCase()) return setIsAvailableUsername(null);
+    if (value) {
+      axios.get(`/api/user/is_available?username=${value}`)
+        .then((res) => {
+          setIsAvailableUsername(null)
+        })
+        .catch(err => {
+          console.log("error", err?.response?.data?.message)
+          setIsAvailableUsername(err?.response?.data?.message)
+        })
+    }
+  }
+
+  const handleFileChange = (e, setFieldValue) => {
+    console.log({ e: e?.target?.files, setFieldValue })
+
+    if (e?.target?.files?.length === 0) {
+      setFieldValue("user_photo", '');
+      setFieldValue("preview_user_photo", []);
+      return;
+    }
+
+    setFieldValue("user_photo", e.target.files[0]);
+
+    const imgPrev = [];
+    Array.prototype.forEach.call(e.target.files, (file) => {
+      const objectUrl = URL.createObjectURL(file);
+      imgPrev.push({ name: file.name, src: objectUrl })
+    });
+    setFieldValue('preview_user_photo', imgPrev);
+  };
+
+  const handleRemove = (setFieldValue) => {
+    setFieldValue("user_photo", '');
+    setFieldValue("preview_user_photo", []);
+  }
+
   return (
     <>
       <PageHeaderTitleWrapper
@@ -146,9 +185,10 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
         <Formik
           initialValues={{
             username: editUser?.username || '',
-            password: '',
+            password: undefined,
             confirm_password: '',
             user_photo: editUser?.user_photo || '',
+            preview_user_photo: [],
             role: temp ? {
               role_title: temp?.role,
               permission: temp?.value
@@ -195,8 +235,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             setFieldValue,
             setErrors
           }) => {
-            console.log({ errors });
-
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -207,33 +245,19 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                 >
                   <Grid container spacing={1}>
 
-                    <DebounceInput
-                      sx={{
-                        pl: 1,
-                        pb:1,
-                      }}
-                      handleDebounce={(v) => {
-                        setFieldValue('username', v)
-                        if (v) {
-                          axios.get(`/api/user/is_available?username=${v}`)
-                            .then(() => setIsAvailableUsername(null))
-                            .catch(err => {
-                              setFieldValue('username', undefined)
-                              setIsAvailableUsername(err?.response?.data?.message)
-                            })
-                        }
-
-                      }}
-                      debounceTimeout={1000}
-                      label={t('Username')}
-                      name="username"
-                      value={values.username}
-                      required={true}
+                    <NewDebounceInput
                       touched={touched.username}
-                      errors={errors.username}
+                      errors={errors.username || isAvailableUsername}
+                      label={t('Username *')}
+                      name="username"
                       handleBlur={handleBlur}
+                      handleChange={handleChange}
+                      type="username"
+                      value={values.username || ''}
+                      debounceTimeout={500}
+                      handleDebounce={handleDebounce}
+                      autocomplete="false"
                     />
-                    {isAvailableUsername && <span style={{ color: 'red' }}>{isAvailableUsername}</span>}
 
                     <TextFieldWrapper
                       touched={touched.password}
@@ -244,6 +268,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       handleChange={handleChange}
                       type="password"
                       value={values.password}
+                      autocomplete="false"
                     />
 
                     <TextFieldWrapper
@@ -289,27 +314,31 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       </Grid>
                     }
 
-                    <Grid item xs={12} >
 
-                      <FileUploadFieldWrapper
-                        htmlFor="user photo"
-                        label="Select user photo"
-                        name="user_photo"
-                        value={values?.user_photo?.name || values?.user_photo || ''}
-                        handleChangeFile={(e) => {
-                          if (e.target.files?.length) {
-                            const photoUrl = URL.createObjectURL(e.target.files[0]);
-                            setUser_photo(photoUrl)
-                            setFieldValue('user_photo', e.target.files[0])
-                          }
-                        }}
-                        handleRemoveFile={(e) => {
-                          setUser_photo(null)
-                          setFieldValue('user_photo', undefined)
-                        }}
+                    <Grid item xs={12}>
+                      <NewFileUploadFieldWrapper
+                        htmlFor="user_photo"
+                        accept='image'
+                        handleChangeFile={(e) => handleFileChange(e, setFieldValue)}
+                        label='Upload User Photo'
                       />
+                    </Grid>
+                    <Grid item>
+                      {
+                        values?.preview_user_photo?.map((image, index) => (
+                          <>
+                            <PreviewImageCard
+                              data={image}
+                              index={index}
+                              key={index}
+                              handleRemove={() => handleRemove(setFieldValue)}
+                            />
+                          </>
+                        ))
+                      }
+                    </Grid>
 
-
+                    <Grid item>
                       {
                         (user_photo || editUser?.user_photo) &&
                         <Image src={user_photo ? user_photo : getFile(editUser?.user_photo)}
@@ -319,8 +348,8 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                           loading='lazy'
                         />
                       }
-
                     </Grid>
+
                   </Grid>
                 </DialogContent>
 
@@ -338,7 +367,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       isSubmitting ? <CircularProgress size="1rem" /> : null
                     }
                     // @ts-ignore
-                    disabled={Boolean(errors.submit) || isSubmitting}
+                    disabled={Boolean(isAvailableUsername) || Boolean(errors.submit) || isSubmitting}
                     variant="contained"
                   >
                     {t(editUser ? 'Edit user' : 'Add new user')}
@@ -354,5 +383,27 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     </>
   );
 }
+
+// const PreviewImageCard = ({ data, index, handleRemove }) => {
+//   const { src, name } = data;
+//   return (
+//     <Grid height={180} width={150} display="flex" flexDirection="column" justifyContent="end" gridTemplateColumns={"auto"}
+//       sx={{
+//         border: "1px solid skyblue", borderRadius: 0.6, borderStyle: "dashed", p: 0.5, ":hover": {
+//           scale: 1.5,
+//           cursor: "pointer"
+//         }
+//       }}
+//     >
+//       <Grid maxHeight={140} m={"auto"}>
+//         <img src={src} style={{ height: "100%", objectFit: "contain" }} />
+//       </Grid>
+//       <Grid sx={{ height: 20, fontSize: 11, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>
+//         File name: <span style={{ color: "darkcyan" }}>{name}</span>
+//       </Grid>
+//       <Button onClick={() => handleRemove()} size='small' color="error" sx={{ borderRadius: 0.5, height: 30 }}>Remove</Button>
+//     </Grid>
+//   )
+// }
 
 export default PageHeader;

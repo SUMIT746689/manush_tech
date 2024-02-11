@@ -156,7 +156,7 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
   )
 }
 
-export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple = false, handleChangeFile }) => {
+export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple = false, handleChangeFile, label="Upload" }) => {
 
   return (
     <Grid pb="1" mb={1} sx={{ position: "relative", height: 60 }} >
@@ -174,7 +174,7 @@ export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple 
           component="span"
           sx={{ width: "100%", height: "100%", borderStyle: "dashed", position: "absolute", borderRadius: 0.5 }}
         >
-          + Upload
+          + {label}
         </Button>
       </label>
     </Grid>

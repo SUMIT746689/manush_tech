@@ -10,6 +10,7 @@ import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import Link from 'next/dist/client/link';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
@@ -158,7 +159,7 @@ function PageHeader({ sms_gateway }) {
 
     } catch (err) {
       console.error(err);
-      showNotification(err?.response?.data?.message, 'error');
+      handleShowErrMsg(err, showNotification)
       setStatus({ success: false });
       //@ts-ignore
       setErrors({ submit: err.message });

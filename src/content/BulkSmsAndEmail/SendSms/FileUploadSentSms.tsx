@@ -1,194 +1,17 @@
 import * as Yup from 'yup';
-import { Formik, useFormikContext } from 'formik';
+import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Grid, DialogContent, Card, DialogActions, Button, CircularProgress, Chip } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { DisableTextWrapper, FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
-import { DynamicDropDownMuilipleSelectWrapper, DynamicDropDownSelectWrapper } from '@/components/DropDown';
-import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
-import { useEffect, useState } from 'react';
-import { fetchData } from '@/utils/post';
+import { DisableTextWrapper, NewFileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { useState } from 'react';
 import { read, utils } from "xlsx";
-import { getSheetHeaders } from '@/utils/sheet';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import Link from 'next/dist/client/link';
+import { handleCreateFileObj } from 'utilities_api/handleCreateFileObject';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
-const DynamicSelectTemplate = () => {
-  const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
-  const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }: any = useFormikContext()
-
-
-  const select_template_value = sms_datas?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-  select_template_value.unshift({ value: 0, title: 'Select' })
-
-  const handleTemplateSelect = (e) => {
-    if (e.target.value <= 0) return;
-    const findSelectedTemplate = sms_datas.find(data => data.id === e.target.value)
-    if (!findSelectedTemplate) return;
-    setFieldValue("template_id", e.target.value)
-    setFieldValue("body", findSelectedTemplate.body)
-    handleBlur("body")
-  }
-
-  return (
-    <>
-      <DynamicDropDownSelectWrapper label="Select Template" name="template_id" value={values.template_id} menuItems={select_template_value} handleChange={handleTemplateSelect} />
-    </>
-  )
-}
-
-const GateWaySelect = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
-  useEffect(() => {
-    sms_gateway[0]?.id && setFieldValue("sms_gateway_id", sms_gateway[0]?.id)
-  }, [sms_gateway])
-
-  return values.sms_gateway_id ?
-    <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={sms_gateway[0]?.title} />
-    :
-    <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={'No Gateway Selected'} />
-}
-
-const TypeClass = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: classes } = useClientFetch('/api/class');
-  const [selectClassList, setSelectClassList]: any = useState([{ value: 0, title: 'Select' }]);
-  const [selectSectionList, setSelecteSectionList]: any = useState([]);
-
-  useEffect(() => {
-    const customize_select_classlist = classes?.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    customize_select_classlist && setSelectClassList(value => [...value, ...customize_select_classlist]);
-  }, [classes])
-
-  const handleClassSelect = (e) => {
-    setSelecteSectionList(() => []);
-    setFieldValue("section_id", []);
-    const findSelectedTemplate = classes ? classes.find(data => data.id === e.target.value) : false;
-    if (!findSelectedTemplate) return;
-    setFieldValue("class_id", e.target.value);
-    if (!findSelectedTemplate.has_section) return;
-    const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    setSelecteSectionList((value) => customize_select_sectionlist)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  const handleSectionSelect = (e) => {
-    // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
-    // if (!findSelectedTemplate) return;
-    setFieldValue("section_id", e.target.value)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  return <>
-    <DynamicDropDownSelectWrapper label="Select Class" name="class_id" value={values.class_id} menuItems={selectClassList} handleChange={handleClassSelect} />
-
-    <DynamicDropDownMuilipleSelectWrapper label="Select Section" name="section_id" value={values.section_id} menuItems={selectSectionList} handleChange={handleSectionSelect} />
-
-  </>
-
-}
-
-const TypeGroup = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
-  const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  console.log({ roles })
-  useEffect(() => {
-    const customize_select_roleList = roles?.map(role => ({ value: role.id, title: role.title }))
-    customize_select_roleList && setSelectRolesList(() => customize_select_roleList);
-    return () => setFieldValue("role_id", [])
-  }, [roles])
-
-  const handleRoleSelect = (e) => {
-    console.log({ e })
-    // if (e.target.value <= 0) return;
-    // const findSelectedTemplate = roles.find(data => data.id === e.target.value)
-    // if (!findSelectedTemplate) return;
-    setFieldValue("role_id", e.target.value)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  return (
-    <>
-      <DynamicDropDownMuilipleSelectWrapper label="Select Role" name="role_id" value={Array.isArray(values.role_id) ? values.role_id : []} menuItems={selectRolesList} handleChange={handleRoleSelect} />
-    </>
-  )
-}
-
-
-const TypeIndividual = () => {
-  const { values, touched, errors, setFieldValue }: any = useFormikContext()
-  const { data: roles } = useClientDataFetch('/api/sent_sms/roles');
-  const [selectRolesList, setSelectRolesList]: any = useState([{ value: 0, title: 'SELECT' }]);
-  const [selectNameList, setSelecteNameList]: any = useState([]);
-
-  useEffect(() => {
-    const customize_select_roleslist = roles?.map(role => ({ value: role.id, title: role.title }))
-    customize_select_roleslist && setSelectRolesList(value => [...value, ...customize_select_roleslist]);
-  }, [roles])
-
-  const handleRoleSelect = async (e) => {
-    const [err, res] = await fetchData(`/api/user/role_wise_users?role_id=${e.target.value}`, 'get', {});
-
-    if (!err) setSelecteNameList(() => res.map(user => ({ value: user.id, title: user.username })));
-    setFieldValue("name", []);
-    const findSelectedTemplate = roles.find(data => data.id === e.target.value)
-    if (!findSelectedTemplate) return;
-    setFieldValue("role_id", e.target.value);
-    if (!findSelectedTemplate.has_section) return;
-    const customize_select_sectionlist = findSelectedTemplate.sections.map(sms_data => ({ value: sms_data.id, title: sms_data.name }))
-    setSelecteNameList((value) => customize_select_sectionlist)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-
-  };
-
-  const handleNameSelect = (e) => {
-    // const findSelectedTemplate = classes.find(data => data.id === e.target.value);
-    // if (!findSelectedTemplate) return;
-    setFieldValue("name", e.target.value)
-    // setFieldValue("body", findSelectedTemplate.body)
-    // handleBlur("body")
-  };
-
-  return (
-    <>
-      <DynamicDropDownSelectWrapper label="Select Role" name="role_id" value={values.role_id} menuItems={selectRolesList} handleChange={handleRoleSelect} />
-
-      <DynamicDropDownMuilipleSelectWrapper label="Select name" name="name" value={values.name} menuItems={selectNameList} handleChange={handleNameSelect} />
-    </>
-  )
-}
-
-
-const DynamicTypeSelect = () => {
-  // const { data: sms_datas } = useClientDataFetch("/api/")
-  // const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue } = useFormikContext()
-  const { values, setFieldValue }: any = useFormikContext()
-
-  const types = [{ value: "SELECT", title: "SELECT" }, { value: "CLASS", title: "CLASS" }, { value: "GROUP", title: "GROUP" }, { value: 'INDIVIDUAL', title: "INDIVIDUAL" }]
-
-  const handleTypeChange = (e) => {
-    setFieldValue("recipient_type", e.target.value)
-    setFieldValue("class_id", undefined)
-    setFieldValue("section_id", [])
-  }
-
-  // return <DropDownSelectWrapper   label="Type" handleChange={handleTypeChange} menuItems={types} />
-  return (
-    <>
-      <DynamicDropDownSelectWrapper required={true} value={values.recipient_type} name="recipient_type" label="Type" menuItems={types} handleChange={handleTypeChange} />
-
-    </>
-  )
-
-
-}
 
 function PageHeader({ sms_gateway }) {
   const { t }: { t: any } = useTranslation();
@@ -230,7 +53,7 @@ function PageHeader({ sms_gateway }) {
 
     } catch (err) {
       console.error(err);
-      showNotification(err?.response?.data?.message, 'error');
+      handleShowErrMsg(err, showNotification);
       setStatus({ success: false });
       //@ts-ignore
       setErrors({ submit: err.message });
@@ -238,6 +61,59 @@ function PageHeader({ sms_gateway }) {
     }
   };
 
+  const handleFileChange = async (event, setFieldValue) => {
+    if (!event.target.files[0]) return;
+    const reader = new FileReader();
+
+
+    reader.onload = async function (e) {
+      const data = e.target.result;
+      const workbook = read(data, { type: 'array' })
+      /* DO SOMETHING WITH workbook HERE */
+      const firstSheetName = workbook.SheetNames[0]
+      /* Get worksheet */
+      const worksheet = workbook.Sheets[firstSheetName]
+      const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
+      setFieldValue("body", '')
+      setFieldValue("contact_column", null)
+
+      if (excelArrayDatas.length > 30_000) {
+        showNotification("file is to large", "error")
+        setFieldValue("file_upload", null);
+        setSelectSheetHeaders(() => []);
+        return;
+      }
+      const fileHeads = Object.keys(excelArrayDatas[0]);
+      console.log({ fileHeads })
+      setSelectSheetHeaders(() => fileHeads);
+
+
+      // set upload file 
+      const { err, files, objFiles } = handleCreateFileObj(event)
+      if (err) showNotification(err, "error");
+      setFieldValue('file_upload', files[0]);
+      setFieldValue('preview_file_upload', objFiles[0]);
+
+      // setPreviewFile(() => imgPrev)
+
+      // const workbook = read(data, { type: "array" });
+
+      // console.log({ workbook })
+      // const { Sheets } = workbook;
+      // console.log({ Sheets })
+      // const { Sheet1 } = {} = Sheets || {};
+      // const { Sheet1: { A1 } } = {} = Sheets || {};
+      // console.log({ Sheet1 })
+      // // setFieldValue("file_upload", e );
+      // setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
+    }
+    reader.readAsArrayBuffer(event.target.files[0]);
+  }
+
+  const handleRemove = (setFile) => {
+    setFile('file_upload', '');
+    setFile('preview_file_upload', '');
+  }
 
   // function handleFile(file /*:File*/) {
   //   /* Boilerplate to set up FileReader */
@@ -303,7 +179,6 @@ function PageHeader({ sms_gateway }) {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
-            console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -347,61 +222,21 @@ function PageHeader({ sms_gateway }) {
                       }
                     </Grid>
 
-                    <FileUploadFieldWrapper
-                      htmlFor="files"
-                      label="File File"
-                      name="file_upload"
-                      accept=".xlsx, .xls, .csv, text/csv"
-                      value={values.logo?.name || ''}
-                      handleChangeFile={(event) => {
-                        if (!event.target.files[0]) return;
-                        const reader = new FileReader();
-                        console.log({ file___: event });
+                    <Grid >Upload File: *</Grid>
+                    <Grid item width="100%">
+                      <NewFileUploadFieldWrapper
+                        label='File Upload'
+                        htmlFor="file_upload"
+                        accept=".xlsx, .xls, .csv, text/csv"
+                        handleChangeFile={(event) => { handleFileChange(event, setFieldValue) }}
+                      />
+                    </Grid>
 
-
-                        reader.onload = async function (e) {
-                          const data = e.target.result;
-                          const workbook = read(data, { type: 'array' })
-                          /* DO SOMETHING WITH workbook HERE */
-                          const firstSheetName = workbook.SheetNames[0]
-                          /* Get worksheet */
-                          const worksheet = workbook.Sheets[firstSheetName]
-                          const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
-                          setFieldValue("body", '')
-                          setFieldValue("contact_column", null)
-
-                          if (excelArrayDatas.length > 30_000) {
-                            showNotification("file is to large", "error")
-                            setFieldValue("file_upload", null);
-                            setSelectSheetHeaders(() => []);
-                            return;
-                          }
-                          const fileHeads = Object.keys(excelArrayDatas[0]);
-                          console.log({ fileHeads })
-                          setSelectSheetHeaders(() => fileHeads);
-                          if (event.target?.files?.length) setFieldValue("file_upload", event.target.files[0]);
-
-                          // const workbook = read(data, { type: "array" });
-
-                          // console.log({ workbook })
-                          // const { Sheets } = workbook;
-                          // console.log({ Sheets })
-                          // const { Sheet1 } = {} = Sheets || {};
-                          // const { Sheet1: { A1 } } = {} = Sheets || {};
-                          // console.log({ Sheet1 })
-                          // // setFieldValue("file_upload", e );
-                          // setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
-                        }
-                        reader.readAsArrayBuffer(event.target.files[0]);
-
-
-                      }}
-                      handleRemoveFile={() => { setFieldValue("file_upload", undefined) }}
-                    />
-
-                    {values?.file_upload?.name ?
-                      <Grid ml={1} ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>
-                      : ''
+                    {values?.file_upload?.name &&
+                      <>
+                        <Grid color="#57ca22" width="100%" fontWeight={500}>Upload File Name:</Grid>
+                        <Grid ><Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} /><Chip color="success" variant="outlined" label={values.file_upload?.name} sx={{ borderRadius: 0, height: 40 }} /></Grid>
+                      </>
                     }
 
                     <Grid width="100%">
@@ -434,9 +269,10 @@ function PageHeader({ sms_gateway }) {
                       </Grid>
 
                     </Grid>
+
                     {/* <DynamicSelectTemplate /> */}
                     <Grid container>
-                      <Grid> Enter SMS Content: *</Grid>
+                      <Grid pb={0.5}> Enter SMS Content: *</Grid>
                       <TextAreaWrapper
                         sx={{ pb: 0 }}
                         label=""
@@ -446,11 +282,12 @@ function PageHeader({ sms_gateway }) {
                         errors={errors.body}
                         handleChange={(v) => {
                           if (v.target.value.length > 1000) return;
-                          handleChange(v)
+                          handleChange(v);
                         }}
                         handleBlur={handleBlur}
                       />
                     </Grid>
+
                     <Grid sx={{ pb: 1, ml: 'auto' }}>
                       {`
                       ${values.body?.length ?? 0} characters | 

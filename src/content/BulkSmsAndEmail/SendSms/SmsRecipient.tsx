@@ -11,8 +11,9 @@ import { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import Link from 'next/dist/client/link';
 import { verifyIsUnicode } from 'utilities_api/verify';
-import CustomizedHook from './CustomizeAutoCompleteWrapper';
 import { handleNumberOfSmsParts } from 'utilities_api/handleNoOfSmsParts';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+
 const DynamicSelectTemplate = () => {
   const { data: sms_datas } = useClientDataFetch("/api/sms_templates")
   const { values, handleSubmit, touched, setTouched, errors, handleBlur, setFieldValue }: any = useFormikContext()
@@ -129,7 +130,7 @@ function PageHeader({ sms_gateway }) {
 
     } catch (err) {
       console.error(err);
-      showNotification(err?.response?.data?.message, 'error');
+      handleShowErrMsg(err, showNotification)
       setStatus({ success: false });
       //@ts-ignore
       setErrors({ submit: err.message });
@@ -151,7 +152,7 @@ function PageHeader({ sms_gateway }) {
             sms_gateway_id: sms_gateway?.id || undefined,
             template_id: undefined,
             body: '',
-            msisdn:'',
+            msisdn: '',
             // recipient_type: undefined,
             // class_id: undefined,
             // section_id: [],
@@ -186,8 +187,6 @@ function PageHeader({ sms_gateway }) {
             isSubmitting, touched, values,
             setFieldValue
           }) => {
-            console.log({ errors, values });
-            console.log({ sms_gateway })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

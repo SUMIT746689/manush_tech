@@ -24,10 +24,9 @@ function Managementschools() {
   const [isSentSmsLoading, setIsSentSmsLoading] = useState(false);
   const { data: accounts } = useClientFetch(`/api/account`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
-  console.log({ classData });
+  const [showPrint, setShowPrint] = useState(false);
 
   useEffect(() => {
-
 
     const temp = datas.filter(i => {
 
@@ -40,7 +39,6 @@ function Managementschools() {
       }
 
       return false
-
 
     })
     console.log("printFees__", temp);
@@ -64,7 +62,6 @@ function Managementschools() {
   const handlePrintAll = useReactToPrint({
     content: () => printAllPageARef.current
   });
-  console.log({ printFees, prinCollectedtFees })
 
   const handleSentSms = () => {
     if (!selectedStudent?.student_info?.phone) return showNotification("phone number not founds", "error")
@@ -82,6 +79,12 @@ function Managementschools() {
       })
       .finally(() => { setIsSentSmsLoading(false); })
   }
+
+  useEffect(() => {
+    if (!showPrint || prinCollectedtFees.length === 0) return;
+    handlePrint();
+    setShowPrint(false);
+  }, [showPrint])
 
   return (
     <>
@@ -126,25 +129,6 @@ function Managementschools() {
             {'Reset'}
           </ButtonWrapper>
 
-          {/* <ButtonWrapper
-            disabled={selectedFees.length === 0}
-            handleClick={handlePrintSelected}
-          >
-            {'Selceted Invoice Print'}
-          </ButtonWrapper>
-
-          <ButtonWrapper
-            sx={{
-              ':disabled': {
-                backgroundColor: 'silver'
-              }
-            }}
-            disabled={filteredFees.length === 0}
-            handleClick={handlePrintAll}
-          >
-            {'Print All'}
-          </ButtonWrapper> */}
-
           <SearchingButtonWrapper
             isLoading={isSentSmsLoading}
             handleClick={handleSentSms}
@@ -168,8 +152,8 @@ function Managementschools() {
       </Grid>
       <Grid sx={{ display: 'none' }}>
         <Grid ref={printPageRef}>
-          <PaymentInvoice printFees={prinCollectedtFees} student={selectedStudent} />
-          <PaymentInvoice printFees={prinCollectedtFees} student={selectedStudent} />
+          <PaymentInvoice setShowPrint={setShowPrint} printFees={prinCollectedtFees} student={selectedStudent} />
+          <PaymentInvoice setShowPrint={setShowPrint} printFees={prinCollectedtFees} student={selectedStudent} />
         </Grid>
 
         {/* <Grid ref={printSelectedPageRef}>

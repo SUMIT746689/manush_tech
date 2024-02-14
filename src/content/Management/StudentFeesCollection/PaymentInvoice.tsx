@@ -17,7 +17,7 @@ import dayjs from 'dayjs';
 
 import { useState, useEffect } from 'react';
 
-function PaymentInvoice({ printFees, student }) {
+function PaymentInvoice({ setShowPrint, printFees, student }) {
 
 
   const { user } = useAuth();
@@ -60,7 +60,8 @@ function PaymentInvoice({ printFees, student }) {
     setWord(numberToWordConverter(totalPaidAmount_));
 
     console.log("selectedFees[0]", temp[0]);
-    setSelectedFees(temp)
+    setSelectedFees(temp);
+    if (printFees.length > 0) setShowPrint(true);
   }, [printFees])
 
   return (
@@ -110,7 +111,6 @@ function PaymentInvoice({ printFees, student }) {
           <Grid> Tracking number:  <b>{selectedFees[0]?.tracking_number}</b></Grid>
           <Grid> Invoice Created:  <b>{selectedFees[0]?.created_at ? dayjs(selectedFees[0]?.created_at).format('DD/MM/YYYY, h:mm a') : selectedFees[0]?.last_payment_date}</b></Grid>
           <Grid> Payment Collected by: <b>{selectedFees[0]?.collected_by_user}</b></Grid>
-
         </Grid>
       </Grid>
 
@@ -237,6 +237,6 @@ const numberToWordConverter = (s) => {
     for (var i = x + 1; i < y; i++)
       str += dg[n[i]] + ' ';
   }
-  
+
   return str.replace(/\s+/g, ' ');
 }

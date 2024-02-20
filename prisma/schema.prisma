@@ -1366,18 +1366,25 @@ enum payment_gateway_title {
 }
 
 model AutoAttendanceSentSms {
-  id          Int         @id @default(autoincrement())
-  body        String
-  body_format body_format
-  is_active   Boolean     @default(false)
-  every_hit   Boolean     @default(false)
-  school_id   Int         @unique
+  id                Int                  @id @default(autoincrement())
+  body              String?
+  body_format       body_format
+  use_system_type   use_system_type_enum @default(automatic)
+  is_active         Boolean              @default(false)
+  every_hit         Boolean              @default(false)
+  external_api_info Json?
+  school_id         Int                  @unique
   // academic_year_id Int?
 
   school School @relation(fields: [school_id], references: [id])
   // academicYear AcademicYear? @relation(fields: [academic_year_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
+}
+
+enum use_system_type_enum {
+  automatic
+  external_api
 }
 
 enum body_format {

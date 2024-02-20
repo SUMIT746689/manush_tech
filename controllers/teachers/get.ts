@@ -15,7 +15,7 @@ export const get = async (req, res) => {
       }
     }
     else {
-      console.log("req.cookies.refresh_token___", req.cookies.refresh_token);
+      // console.log("req.cookies.refresh_token___", req.cookies.refresh_token);
 
       const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 

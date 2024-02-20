@@ -817,26 +817,27 @@ export const PurpleFlowTheme = createTheme({
     },
     MuiTabs: {
       styleOverrides: {
-        root: {
-          height: 38,
-          minHeight: 38,
-          overflow: 'visible'
-        },
-        indicator: {
-          height: 38,
-          minHeight: 38,
-          borderRadius: 6,
-          border: '1px solid ' + colors.primary.dark,
-          boxShadow: '0px 2px 10px ' + colors.primary.light
-        },
-        scrollableX: {
-          overflow: 'visible !important'
-        }
+        // root: {
+        //   height: 38,
+        //   minHeight: 38,
+        //   overflow: 'visible'
+        // },
+        // indicator: {
+        //   height: 38,
+        //   minHeight: 38,
+        //   borderRadius: 6,
+        //   border: '1px solid ' + colors.primary.dark,
+        //   boxShadow: '0px 2px 10px ' + colors.primary.light
+        // },
+        // scrollableX: {
+        //   overflow: 'visible !important'
+        // }
       }
     },
     MuiTab: {
       styleOverrides: {
         root: {
+          color: colors.gradients.purple1,
           padding: 0,
           height: 38,
           minHeight: 38,
@@ -851,11 +852,11 @@ export const PurpleFlowTheme = createTheme({
             marginRight: 4
           },
           '&.Mui-selected, &.Mui-selected:hover': {
-            color: colors.alpha.white[100],
+            // color: colors.gradients.purple1,
             zIndex: 5
           },
           '&:hover': {
-            color: colors.alpha.black[100]
+            color: colors.gradients.purple1[100]
           }
         }
       }

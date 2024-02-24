@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import Link from 'src/components/Link';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import { getFile } from '@/utils/utilitY-functions';
 
 const LogoWrapper = styled(Link)(
   ({ theme }) => `
@@ -98,7 +100,12 @@ const TooltipWrapper = styled(({ className, ...props }: TooltipProps) => (
 function Logo() {
   const { t }: { t: any } = useTranslation();
   const theme = useTheme();
-
+  const auth = useAuth();
+  const { user } = auth;
+  // @ts-ignore
+  const { adminPanel } = user ?? {};
+  const { logo } = adminPanel ?? {};
+  // console.log({ adminPanel })
   return (
     <TooltipWrapper title={t('Home')} arrow>
       <LogoWrapper href="/dashboards/">
@@ -112,13 +119,13 @@ function Logo() {
           }}
           overlap="circular"
           color="success"
-          // badgeContent="3.1"
+        // badgeContent="3.1"
         >
           {/* <LogoSignWrapper> */}
-            {/* <LogoSign> */}
-              {/* <LogoSignInner /> */}
-            {/* </LogoSign> */}
-            <img style={{ filter: "drop-shadow(1px 1px 2px white)", objectFit:"contain", maxWidth:"130px", maxHeight:"60px" }} src='/mram.png'/>
+          {/* <LogoSign> */}
+          {/* <LogoSignInner /> */}
+          {/* </LogoSign> */}
+          <img style={{ filter: "drop-shadow(1px 1px 2px white)", objectFit: "contain", maxWidth: "130px", maxHeight: "60px" }} src={logo ? getFile(logo) : '/mram.png'} />
           {/* </LogoSignWrapper> */}
         </Badge>
       </LogoWrapper>

@@ -9,7 +9,7 @@ const patch = async (req: any, res: any, refresh_token) => {
 
     // if (!refresh_token.school_id) throw new Error('permission denied');
     const { user_id } = refresh_token;
-    const isEligibleUser = await verifyUser(user_id, ['SUPER_ADMIN']);
+    const isEligibleUser = await verifyUser(user_id, ['ASSIST_SUPER_ADMIN']);
     if (!isEligibleUser) throw new Error('permission denied');
 
     const { id, status } = req.query;

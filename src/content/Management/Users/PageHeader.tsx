@@ -36,6 +36,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   }, [editUser]);
 
   const permissons = [
+    { label: 'Assistant Super Admin', role: 'ASSIST_SUPER_ADMIN', value: 'create_assist_super_user' },
     { label: 'Admin', role: 'ADMIN', value: 'create_admin' },
     { label: 'Guardian', role: 'GURDIAN', value: 'create_gurdian' },
     { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
@@ -86,7 +87,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
       const formData = new FormData();
       for (const i in _values) {
-        if (i == 'role') {
+        if (i === 'role') {
           formData.append(`${i}`, JSON.stringify(_values[i]))
         }
         else {
@@ -129,28 +130,28 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     }
   }
 
-  const handleFileChange = (e, setFieldValue) => {
+  const handleFileChange = (e, setFieldValue, field, preview_field) => {
     console.log({ e: e?.target?.files, setFieldValue })
 
     if (e?.target?.files?.length === 0) {
-      setFieldValue("user_photo", '');
-      setFieldValue("preview_user_photo", []);
+      setFieldValue(field, '');
+      setFieldValue(preview_field, []);
       return;
     }
 
-    setFieldValue("user_photo", e.target.files[0]);
+    setFieldValue(field, e.target.files[0]);
 
     const imgPrev = [];
     Array.prototype.forEach.call(e.target.files, (file) => {
       const objectUrl = URL.createObjectURL(file);
       imgPrev.push({ name: file.name, src: objectUrl })
     });
-    setFieldValue('preview_user_photo', imgPrev);
+    setFieldValue(preview_field, imgPrev);
   };
 
-  const handleRemove = (setFieldValue) => {
-    setFieldValue("user_photo", '');
-    setFieldValue("preview_user_photo", []);
+  const handleRemove = (setFieldValue, field, preview_field) => {
+    setFieldValue(field, '');
+    setFieldValue(preview_field, []);
   }
 
   return (
@@ -158,7 +159,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       <PageHeaderTitleWrapper
         name={"User"}
         handleCreateClassOpen={handleCreateUserOpen}
-        actionButton={user?.role?.title !== 'SUPER_ADMIN' ? true : false}
+        actionButton={user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN' ? true : false}
       />
 
       <Dialog
@@ -192,7 +193,11 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             role: temp ? {
               role_title: temp?.role,
               permission: temp?.value
-            } : undefined
+            } : undefined,
+            domain: editUser?.adminPanel?.domain || '',
+            copy_right_txt: editUser?.adminPanel?.copy_right_txt,
+            logo: null,
+            preview_logo: []
           }}
           validationSchema={Yup.object().shape({
             username: Yup.string()
@@ -235,6 +240,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             setFieldValue,
             setErrors
           }) => {
+            // console.log({ values })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -314,12 +320,69 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       </Grid>
                     }
 
+                    {
+                      values.role?.role_title === "ASSIST_SUPER_ADMIN" &&
+                      <>
+                        <TextFieldWrapper
+                          errors={errors.domain}
+                          touched={touched.domain}
+                          label={t('Domain')}
+                          name="domain"
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values.domain}
+                        />
+                        <TextFieldWrapper
+                          errors={errors.copy_right_txt}
+                          touched={touched.copy_right_txt}
+                          label={t('Copy Right Text')}
+                          name="copy_right_txt"
+                          handleBlur={handleBlur}
+                          handleChange={handleChange}
+                          value={values.copy_right_txt}
+                        />
+                        <Grid item xs={12}>
+                          <NewFileUploadFieldWrapper
+                            htmlFor="logo"
+                            accept="image/*"
+                            handleChangeFile={(e) => handleFileChange(e, setFieldValue, "logo", "preview_logo")}
+                            label='Logo'
+                          />
+                        </Grid>
+                        <Grid item>
+                          {
+                            values?.preview_logo?.map((image, index) => (
+                              <>
+                                <PreviewImageCard
+                                  data={image}
+                                  index={index}
+                                  key={index}
+                                  handleRemove={() => handleRemove(setFieldValue, "logo", "preview_logo")}
+                                />
+                              </>
+                            ))
+                          }
+                        </Grid>
+                        <Grid item>
+                          {
+                            editUser?.adminPanel?.logo &&
+                            <Image src={getFile(editUser?.adminPanel?.logo)}
+                              height={150}
+                              width={150}
+                              alt='Logo'
+                              loading='lazy'
+                            />
+                          }
+                        </Grid>
+                      </>
+
+                    }
 
                     <Grid item xs={12}>
                       <NewFileUploadFieldWrapper
                         htmlFor="user_photo"
-                        accept='image'
-                        handleChangeFile={(e) => handleFileChange(e, setFieldValue)}
+                        accept="image/*"
+                        handleChangeFile={(e) => handleFileChange(e, setFieldValue, "user_photo", "preview_user_photo")}
                         label='Upload User Photo'
                       />
                     </Grid>
@@ -331,7 +394,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                               data={image}
                               index={index}
                               key={index}
-                              handleRemove={() => handleRemove(setFieldValue)}
+                              handleRemove={() => handleRemove(setFieldValue, "logo", "preview_logo")}
                             />
                           </>
                         ))

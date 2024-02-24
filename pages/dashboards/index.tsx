@@ -31,7 +31,7 @@ export async function getServerSideProps(context: any) {
     }
 
     switch (refresh_token.role.title) {
-      case 'SUPER_ADMIN':
+      case 'ASSIST_SUPER_ADMIN':
         blockCount['schools'] = { count: await prisma.school.count() };
         blockCount['admins'] = {
           count: await prisma.user.count({

@@ -22,7 +22,7 @@ const index = async (req, res) => {
     switch (method) {
       case 'GET':
         const totalCount = {};
-        if (userInfo.role.title === 'SUPER_ADMIN') {
+        if (userInfo.role.title === 'ASSIST_SUPER_ADMIN') {
           totalCount['schools'] = { count: await prisma.school.count() };
           totalCount['admins'] = {
             count: await prisma.user.count({

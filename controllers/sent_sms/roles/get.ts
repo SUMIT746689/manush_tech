@@ -8,7 +8,7 @@ async function get(req, res, refresh_token) {
     const response = await prisma.role.findMany({
       where: {
         title: { 
-          not: 'SUPER_ADMIN'
+          not: 'ASSIST_SUPER_ADMIN'
         } 
       },
       // select: { title: true }

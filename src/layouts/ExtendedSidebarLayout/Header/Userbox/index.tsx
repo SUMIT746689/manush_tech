@@ -114,7 +114,7 @@ const UserBoxDescription = styled(Typography)(
 `
 );
 
-function HeaderUserbox({current_active_academic_year}) {
+function HeaderUserbox({ current_active_academic_year }) {
   const { t }: { t: any } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -209,7 +209,7 @@ function HeaderUserbox({current_active_academic_year}) {
       data: [465, 546, 234, 576, 554, 338, 427, 348, 586, 254, 348]
     }
   ];
-  console.log({current_active_academic_year})
+  console.log({ current_active_academic_year })
 
   return (
     <>
@@ -265,7 +265,11 @@ function HeaderUserbox({current_active_academic_year}) {
               }}
               primary={t(' Academic Year: ' )}
             /> */}
-            <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{color:"green"}}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
+            {
+              // @ts-ignore
+              user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+              <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{ color: "green" }}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
+            }
           </Grid>
 
           {/* <MenuItem>

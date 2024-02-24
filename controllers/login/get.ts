@@ -4,11 +4,14 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 async function get(req: any, res: any, refresh_token: any) {
   try {
+    console.log({ req: req.headers.host });
+    const { admin_panel_id } = refresh_token
+
     const user = await prisma.user.findFirst({
       where: { id: refresh_token.id, is_enabled: true },
       include: {
         permissions: true,
-
+        adminPanel: true,
         role: {
           include: {
             permissions: true
@@ -29,13 +32,19 @@ async function get(req: any, res: any, refresh_token: any) {
         }
       }
     });
+
+    // verify adminpanel domain 
+    const { adminPanel } = user;
+    const host = req.headers.host;
+    if (host !== adminPanel?.domain) throw new Error("Login using correct domain address")
+    if (admin_panel_id !== adminPanel.id) throw new Error("malicious info, login again")
     if (!user.permissions.length) {
       user['permissions'] = user.role.permissions;
       delete user['role']['permissions'];
     }
     delete user['password'];
 
-    if (user?.role?.title !== 'SUPER_ADMIN') {
+    if (user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
       if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {

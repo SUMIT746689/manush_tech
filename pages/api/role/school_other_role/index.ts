@@ -12,7 +12,7 @@ const index = async (req, res) => {
             AND: [
               {
                 title: {
-                  not: 'SUPER_ADMIN',
+                  not: 'ASSIST_SUPER_ADMIN',
                 }
               },
               {

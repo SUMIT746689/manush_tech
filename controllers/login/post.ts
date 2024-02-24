@@ -20,11 +20,14 @@ export default async function post(req, res) {
 
     if (request_refresh_token) {
       //for super admin and admin login there available users 
-      // if (request_refresh_token && (request_refresh_token.role?.title === 'ADMIN' || request_refresh_token.role?.title === 'SUPER_ADMIN')) {
+      // if (request_refresh_token && (request_refresh_token.role?.title === 'ADMIN' || request_refresh_token.role?.title === 'ASSIST_SUPER_ADMIN')) {
       console.log(request_refresh_token);
       //superadmin login as admin
-      if (request_refresh_token && (request_refresh_token.role?.title === 'SUPER_ADMIN' || request_refresh_token.role?.title === 'ADMIN')) query = { id: user_id };
-
+      if (
+        request_refresh_token
+        &&
+        (request_refresh_token.role?.title === 'SUPER_ADMIN' || request_refresh_token.role?.title === 'ASSIST_SUPER_ADMIN' || request_refresh_token.role?.title === 'ADMIN')
+      ) query = { id: user_id };
       else throw new Error('invalid user');
 
     }
@@ -37,6 +40,7 @@ export default async function post(req, res) {
       where: { ...query },
       include: {
         permissions: true,
+        adminPanel: true,
         role: {
           include: {
             permissions: true
@@ -62,12 +66,17 @@ export default async function post(req, res) {
     console.log({ user: user?.school?.academic_years })
     if (!user) throw new Error(`Invalid Authorization`);
 
+    // admin_panel domain verification
+    const {adminPanel} = user ;
+    const host = req.headers.host;
+    if(host !== adminPanel?.domain) throw new Error("Login using correct domain address") 
+
     if (user_id) {
       if (user.role_id) {
-        if (user.role.title === 'SUPER_ADMIN' && request_refresh_token.role?.title === 'ADMIN') {
+        if (user.role.title === 'ASSIST_SUPER_ADMIN' && request_refresh_token.role?.title === 'ADMIN') {
           throw new Error('Bad request !');
         }
-        else if ((user.role.title == 'ADMIN' && request_refresh_token.role?.title !== 'SUPER_ADMIN')) {
+        else if ((user.role.title == 'ADMIN' && request_refresh_token.role?.title !== 'ASSIST_SUPER_ADMIN')) {
           throw new Error('Bad request !');
         }
       }
@@ -82,20 +91,20 @@ export default async function post(req, res) {
       user['permissions'] = user.role?.permissions;
       delete user['role']['permissions'];
     }
-    
-    if (user?.role?.title !== 'SUPER_ADMIN') {
+
+    if (user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
       if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
 
-          isSubscriptionActive = true;
-        
+        isSubscriptionActive = true;
+
       }
-      else{
+      else {
         if (user?.role?.title === 'ADMIN') {
-        
+
           isSubscriptionActive = true;
-          console.log(isSubscriptionActive,"user?.role?.title__",user?.role?.title,);
+          console.log(isSubscriptionActive, "user?.role?.title__", user?.role?.title,);
           user['permissions'] = user['permissions'].filter(i => i.value === 'package_request')
         }
       }
@@ -116,14 +125,14 @@ export default async function post(req, res) {
     }
 
     const access_token = jwt.sign(
-      { name: user.username, id: user.id, school_id: user.school_id, role: user.role },
+      { name: user.username, id: user.id, school_id: user.school_id, role: user.role, admin_panel_id: user.admin_panel_id },
       process.env.JWT_ACCESS_TOKEN_SECRET,
       {
         expiresIn: '5000ms'
       }
     );
     const refresh_token = jwt.sign(
-      { name: user.username, id: user.id, school_id: user.school_id, role: user.role },
+      { name: user.username, id: user.id, school_id: user.school_id, role: user.role, admin_panel_id: user.admin_panel_id },
       process.env.JWT_REFRESH_TOKEN_SECRET,
       {
         expiresIn: '1d'

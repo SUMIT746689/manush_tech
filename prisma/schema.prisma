@@ -8,24 +8,29 @@ datasource db {
 }
 
 model User {
-  id           Int                 @id @default(autoincrement())
-  username     String              @unique
-  password     String
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
   /// 1=superadmin, 2=admin, 3=teacher, 4=student, 5=gurdian, 6=staff, 7=accountant, 8=librarian, 9=receptionist
-  user_role_id Int
-  role_id      Int?
-  deleted_at   DateTime?
-  is_enabled   Boolean             @default(true)
-  created_at   DateTime            @default(now())
-  updated_at   DateTime            @updatedAt
-  user_photo   String?
-  school_id    Int?
-  teacher      Teacher?
-  school       School?             @relation("AdminUserSchool", fields: [school_id], references: [id])
-  user_role    Role                @relation("userRoleWithRole", fields: [user_role_id], references: [id])
-  role         Role?               @relation(fields: [role_id], references: [id])
-  permissions  Permission[]        @relation("PermissionToUser")
-  student      StudentInformation?
+  user_role_id   Int
+  role_id        Int?
+  deleted_at     DateTime?
+  is_enabled     Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  user_photo     String?
+  // domain         String?
+  // copy_right_txt String?
+  // logo           String?
+  school_id      Int?
+  admin_panel_id Int?
+
+  teacher     Teacher?
+  school      School?             @relation("AdminUserSchool", fields: [school_id], references: [id])
+  user_role   Role                @relation("userRoleWithRole", fields: [user_role_id], references: [id])
+  role        Role?               @relation(fields: [role_id], references: [id])
+  permissions Permission[]        @relation("PermissionToUser")
+  student     StudentInformation?
 
   // admin_school School? @relation(name: "AdminUserSchool")
   EmployeeAttendance   EmployeeAttendance[]
@@ -37,8 +42,20 @@ model User {
   banners              Banners[]
   Subscription_history Subscription_history[]
   OtherUsersInfo       OtherUsersInfo?
+  adminPanel           AdminPanel?            @relation("admin_panel_to_users", fields: [admin_panel_id], references: [id])
 
   @@map("users")
+}
+
+model AdminPanel {
+  id             Int     @id @default(autoincrement())
+  domain         String  @unique
+  logo           String?
+  copy_right_txt String?
+
+  users User[] @relation("admin_panel_to_users")
+
+  @@map("admin_panels")
 }
 
 model School {

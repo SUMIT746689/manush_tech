@@ -12,7 +12,32 @@ interface AuthenticatedProps {
   requiredPermissions?: string[];
 }
 
+export async function getServerSideProps(context: any) {
+  // console.log({ context: context })
+  const { req, query, res, asPath, pathname } = context;
+  if (req) {
+    let host = req.headers.host // will give you localhost:3000
+    console.log({ host })
+  } 
+  // console.log({ req })
+  //   console.log({ host })
+  let blockCount: any = { holidays: [] };
+  try {
+    // const headersList = headers();
+    // const domain = headersList.get('host')
+  }
+  catch (err) {
+    console.log({ err })
+  }
+
+  const parseJson = JSON.parse(JSON.stringify(blockCount));
+
+  return { props: { blockCount: parseJson } }
+}
+
+
 export const Authenticated: FC<AuthenticatedProps> = (props) => {
+  console.log({props})
   const { children, name = undefined, requiredPermissions = [] } = props;
   const auth = useAuth();
   // console.log("auth", auth);

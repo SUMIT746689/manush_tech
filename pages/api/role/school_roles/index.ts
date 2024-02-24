@@ -10,7 +10,7 @@ const index = async (req, res) => {
         const data = await prisma.role.findMany({
           where: {
             title: {
-              not: 'SUPER_ADMIN',
+              not: 'ASSIST_SUPER_ADMIN',
             }
           }
         })

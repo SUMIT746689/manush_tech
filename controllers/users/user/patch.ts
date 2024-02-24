@@ -9,13 +9,22 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 
 
-export const patch = async (req, res) => {
+export const patch = async (req, res, refresh_token) => {
   try {
+    console.log({ refresh_token })
+    const { role: fetch_req_user_role } = refresh_token;
+    // if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
+
+    // const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
+
+    // if (!refresh_token) throw new Error('invalid user');
+
     const uploadFolderName = "userPhoto";
 
-    const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
+    const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg', 'image/JPG']
     const filterFiles = {
       user_photo: fileType,
+      logo: fileType
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
@@ -23,17 +32,11 @@ export const patch = async (req, res) => {
     if (error) {
       throw new Error('Server error !')
     }
-    const { username, password, role } = fields;
+    const { username, password, role, domain, logo, copy_right_txt } = fields;
     const parseRole = JSON.parse(role)
 
     if (!parseRole.permission)
       throw new Error('provide all required informations');
-
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
 
     const hashPassword = await bcrypt.hash(
       password,
@@ -68,14 +71,32 @@ export const patch = async (req, res) => {
         id: parseInt(req.query.id)
       }
     })
-    const data = {};
-    if (username) {
-      data['username'] = username
+    const data = { adminPanel: {} };
+    if (username) data['username'] = username
+    if (password) data['password'] = hashPassword
+
+    // if (fetch_req_user_role?.title !== "SUPER_ADMIN" && domain && logo && copy_right_txt) throw new Error("permission denied for doamin/logo/copy_right fields")
+    if (fetch_req_user_role?.title === "SUPER_ADMIN") {
+      const create_admin_panel = {
+        upsert: {
+          create: {
+            domain: domain ?? undefined,
+            copy_right_txt: copy_right_txt ?? undefined
+          },
+          update: {
+            domain: domain ?? undefined,
+            copy_right_txt: copy_right_txt ?? undefined
+          },
+        }
+      }
+
+      if (files?.logo?.newFilename) {
+        create_admin_panel.upsert.create["logo"] = path.join(uploadFolderName, files.logo.newFilename);
+        create_admin_panel.upsert.update["logo"] = path.join(uploadFolderName, files.logo.newFilename);
+      }
+      data["adminPanel"] = create_admin_panel;
     }
-    if (password) {
-      data['password'] = hashPassword
-    }
-    
+
     if (files?.user_photo?.newFilename) {
       const user_imageNewName = Date.now().toString() + '_' + files.user_photo.originalFilename;
       await fspromises.rename(files.user_photo.filepath, path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, user_imageNewName))

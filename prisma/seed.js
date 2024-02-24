@@ -52,7 +52,7 @@ async function seed() {
 
   const createSuperAdminRole = await prisma.role.create({
     data: {
-      title: "SUPER_ADMIN",
+      title: "ASSIST_SUPER_ADMIN",
       permissions: {
         connect: [
           { id: createAdminPermission.id },
@@ -70,7 +70,7 @@ async function seed() {
   })
 
 
-  //create a super_admin user 
+  //create a ASSIST_SUPER_ADMIN user 
   await prisma.user.create({
     data: {
       username: 'a',

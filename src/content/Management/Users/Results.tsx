@@ -277,7 +277,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
     console.log({ err, response });
   }
   //@ts-ignore
-  const isNotSuperAdmin = user?.role?.title !== 'SUPER_ADMIN'
+  const isNotSuperAdmin = user?.role?.title !== 'ASSIST_SUPER_ADMIN'
   return (
     <>
       <Dialog
@@ -291,12 +291,12 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
       >
         <Grid item container flexDirection={'column'} sx={{ p: 4 }}>
           <Grid display="flex" alignItems="center" gap={2} sx={{ mb: { xs: 2, md: 4 } }} >
-            <Avatar 
+            <Avatar
               src={selectedUser?.avatar}
             />
-            
-              <Typography fontSize={20} fontWeight={'bold'}>{selectedUser?.username}</Typography>
-          
+
+            <Typography fontSize={20} fontWeight={'bold'}>{selectedUser?.username}</Typography>
+
           </Grid>
 
           <Grid item container display={'grid'} sx={{ gridTemplateColumns: { sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' }, gap: { xs: 1, sm: 1 } }}>
@@ -423,15 +423,19 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     <TableCell><Typography noWrap>{t('Username')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Role')}</Typography></TableCell>
                     <TableCell><Typography noWrap>{t('Created at')}</Typography></TableCell>
-                    <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
-
+                    {
+                      // @ts-ignore
+                      user?.role?.title === "SUPER_ADMIN" ?
+                        <TableCell><Typography noWrap>{t('Domain')}</Typography></TableCell>
+                        :
+                        <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
+                    }
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {paginatedUsers.map((i) => {
-
 
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
@@ -454,12 +458,24 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                             {customizeDate(i?.created_at)}
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          {/* @ts-ignore */}
-                          <Typography variant="h5" noWrap >
-                            {i?.school?.name}
-                          </Typography>
-                        </TableCell>
+
+                        {
+                          // @ts-ignore
+                          user?.role?.title === "SUPER_ADMIN" ?
+                            <TableCell>
+                              {/* @ts-ignore */}
+                              <Typography variant="h5" noWrap >
+                                {i?.domain}
+                              </Typography>
+                            </TableCell>
+                            :
+                            <TableCell>
+                              {/* @ts-ignore */}
+                              <Typography variant="h5" noWrap >
+                                {i?.school?.name}
+                              </Typography>
+                            </TableCell>
+                        }
 
 
                         <TableCell align='center'>

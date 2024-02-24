@@ -11,7 +11,7 @@ async function getHandler(req, res, authenticate_user) {
       }
     });
 
-    if (authenticate_user_Info.role.title !== 'SUPER_ADMIN')
+    if (authenticate_user_Info.role.title !== 'ASSIST_SUPER_ADMIN')
       throw new Error('Your role have no permissions');
 
     const schools = await prisma.school.findMany({

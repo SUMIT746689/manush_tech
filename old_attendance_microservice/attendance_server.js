@@ -81,7 +81,7 @@ const attendenceDistributeByType = async (attend_queue, role_type, index) => {
         student?.id && studentAttendence(attend_queue, student.id, index);
       })
       break;
-    case 'SUPER_ADMIN', 'ADMIN':
+    case 'ASSIST_SUPER_ADMIN', 'ADMIN':
       break;
     default:
     // employeeAttendence(attend_queue);

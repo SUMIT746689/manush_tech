@@ -25,6 +25,8 @@ import { AcademicYearContext, Students } from '@/contexts/UtilsContextUse';
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
 import '@fullcalendar/timegrid/main.css'
+import prisma from '@/lib/prisma_client';
+// import { headers } from 'next/headers';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -37,7 +39,31 @@ interface TokyoAppProps extends AppProps {
   Component: NextPageWithLayout;
 }
 
+export async function getServerSideProps(context: any) {
+  // console.log({ context: context })
+  const { req, query, res, asPath, pathname } = context;
+  if (req) {
+    let host = req.headers.host // will give you localhost:3000
+    console.log({ host })
+  } 
+  // console.log({ req })
+  //   console.log({ host })
+  let blockCount: any = { holidays: [] };
+  try {
+    // const headersList = headers();
+    // const domain = headersList.get('host')
+  }
+  catch (err) {
+    console.log({ err })
+  }
+
+  const parseJson = JSON.parse(JSON.stringify(blockCount));
+
+  return { props: { blockCount: parseJson } }
+}
+
 function TokyoApp(props: TokyoAppProps) {
+  // console.log({ props })
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const getLayout = Component.getLayout ?? ((page) => page);
   useScrollTop();

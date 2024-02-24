@@ -14,7 +14,7 @@ export const verifyPermissions = async (requiredPermissions: string[], refresh_t
                 username: refresh_token?.name,
                 role: {
                     id: refresh_token?.role?.id,
-                    // title: 'SUPER_ADMIN',
+                    // title: 'ASSIST_SUPER_ADMIN',
                 },
                 // permissions: {
                 //     some:requiredPermissions

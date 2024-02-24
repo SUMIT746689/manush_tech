@@ -6,29 +6,36 @@ import path from 'path';
 import prisma from '@/lib/prisma_client';
 import { logFile } from 'utilities_api/handleLogFile';
 
-export const post = async (req, res) => {
+export const post = async (req, res, refresh_token) => {
   try {
+
+    const { role: fetch_req_user_role, admin_panel_id } = refresh_token;
+
+    // if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
+
+    // const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
+
+    // if (!refresh_token) throw new Error('invalid user');
+
+
     const uploadFolderName = "userPhoto";
 
-    const fileType = ['image/jpeg', 'image/jpg', 'image/png'];
+    const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/svg']
+    // const fileType = ['image/*'];
+
     const filterFiles = {
       user_photo: fileType,
+      logo: fileType
     }
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
 
-
-    const { username, password, role } = fields;
+    console.log({ error })
+    const { username, password, role, domain, logo, copy_right_txt } = fields;
     const parseRole = JSON.parse(role)
 
     if (!username || !password || !parseRole.permission)
       throw new Error('provide all required informations');
-
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
-
-    if (!refresh_token) throw new Error('invalid user');
 
     const hashPassword = await bcrypt.hash(
       password,
@@ -63,11 +70,22 @@ export const post = async (req, res) => {
       }
     })
 
-    if(isExist) throw Error('This username is taken, try another !')
+    if (isExist) throw Error('This username is taken, try another !')
     const data = {
       username: username,
-      password: hashPassword
+      password: hashPassword,
+      adminPanel: {}
     };
+
+    if (fetch_req_user_role?.title !== "SUPER_ADMIN" && domain && logo && copy_right_txt) throw new Error("permission denied for doamin/logo/copy_right fields")
+    if (fetch_req_user_role?.title === "SUPER_ADMIN") {
+      const create_admin_panel = { create: {} }
+      if (files?.logo?.newFilename) create_admin_panel.create["logo"] = path.join(uploadFolderName, files.logo.newFilename);
+      if (copy_right_txt) create_admin_panel.create["copy_right_txt"] = copy_right_txt;
+      data["adminPanel"] = create_admin_panel;
+    }
+    else data.adminPanel = { connect: { id: admin_panel_id } }
+
 
     if (refresh_token.school_id) data['school'] = {
       connect: { id: parseInt(refresh_token.school_id) }
@@ -104,7 +122,7 @@ export const post = async (req, res) => {
 
     await prisma.user.create({
       // @ts-ignore
-      data
+      data,
     });
 
     res.status(200).json({ message: `${parseRole.role_title} Created Successfully` });

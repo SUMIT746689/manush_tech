@@ -26,7 +26,7 @@ function DashboardReportsContent({ blockCount = null }) {
   //     .get('/api/holidays')
   //     .then((res) => {
   //       // @ts-ignore
-  //       if (user?.role?.title === "SUPER_ADMIN") {
+  //       if (user?.role?.title === "ASSIST_SUPER_ADMIN") {
   //         setHolidays(
   //           res?.data?.data.map((i) => {
   //             return {
@@ -84,7 +84,7 @@ function DashboardReportsContent({ blockCount = null }) {
               }
               {
                 // @ts-ignore
-                user?.role?.title === "SUPER_ADMIN" && <Link href='/api/db_backup' target='_blank' style={{
+                user?.role?.title === "ASSIST_SUPER_ADMIN" && <Link href='/api/db_backup' target='_blank' style={{
                   color: 'blue'
                 }} rel="noopener noreferrer">
                   <Button color='primary' variant='contained'>

@@ -14,7 +14,7 @@ import { logFile } from 'utilities_api/handleLogFile';
                     username: refresh_token?.name,
                     role: {
                         id: refresh_token?.role?.id,
-                        title: 'SUPER_ADMIN',
+                        title: 'ASSIST_SUPER_ADMIN',
                     }
                 }
             })

@@ -112,7 +112,7 @@ function Header() {
 
   useEffect(() => {
     // @ts-ignore
-    if (auth?.user?.role?.title !== 'SUPER_ADMIN') {
+    if (auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN') {
       const tempMenu = []
       for (const i of menuItems[0]?.items) {
         if (i.items) {
@@ -202,7 +202,7 @@ function Header() {
 
 
       {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
         <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
@@ -210,37 +210,9 @@ function Header() {
       }
 
       {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-        <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
-          <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
-          <CustomAutoCompleteWrapper
-            // label="Academic Year"
-            label=""
-            placeholder="select a academic year..."
-            value={selectedAcademicYear}
-            options={academicYearList}
-            handleChange={handleAcademicYearChange}
-          />
-        </Grid>
-      )}
-
-      <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
-        {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{ borderStyle: 'dashed', display: { xs: "none", md: "block" } }}>
-            Current Active
-            <br />
-            {`Academic Year: `}
-            <span style={{ color: "white" }}>
-              <i>
-                {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}
-              </i>
-            </span>
-          </Grid>
-        )}
-        {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' && (
-          <Grid minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+        (
+          <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
               // label="Academic Year"
@@ -252,6 +224,37 @@ function Header() {
             />
           </Grid>
         )}
+
+      <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
+        {/* @ts-ignore */}
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+          (
+            <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{ borderStyle: 'dashed', display: { xs: "none", md: "block" } }}>
+              Current Active
+              <br />
+              {`Academic Year: `}
+              <span style={{ color: "white" }}>
+                <i>
+                  {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}
+                </i>
+              </span>
+            </Grid>
+          )}
+        {/* @ts-ignore */}
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+          (
+            <Grid minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
+              <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
+              <CustomAutoCompleteWrapper
+                // label="Academic Year"
+                label=""
+                placeholder="select a academic year..."
+                value={selectedAcademicYear}
+                options={academicYearList}
+                handleChange={handleAcademicYearChange}
+              />
+            </Grid>
+          )}
         {/* <HeaderButtons /> */}
         <HeaderUserbox current_active_academic_year={current_active_academic_year} />
 
@@ -310,10 +313,10 @@ export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, o
         filterSelectedOptions
         renderInput={(rnParams) => (
           <div ref={rnParams.InputProps.ref} >
-            <input type="text" {...rnParams.inputProps} style={{borderRadius:'4px',padding:'4px',maxWidth:'200px'}} />
+            <input type="text" {...rnParams.inputProps} style={{ borderRadius: '4px', padding: '4px', maxWidth: '200px' }} />
           </div>
-          )}
-      onChange={handleChange}
+        )}
+        onChange={handleChange}
       />
     </Grid>
   )

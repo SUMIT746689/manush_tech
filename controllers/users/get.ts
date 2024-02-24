@@ -1,19 +1,19 @@
 import prisma from '@/lib/prisma_client';
 import { logFile } from 'utilities_api/handleLogFile';
 import { refresh_token_varify } from 'utilities_api/jwtVerify';
+import { ref } from 'yup';
 
-export const get = async (req, res) => {
+export const get = async (req, res, refresh_token) => {
   try {
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
+    // if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
 
-    const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
+    // const refresh_token: any = refresh_token_varify(req.cookies.refresh_token);
 
-    if (!refresh_token) throw new Error('invalid user');
-
+    // if (!refresh_token) throw new Error('invalid user');
+    const { admin_panel_id } = refresh_token;
     const user = await prisma.user.findFirst({
       where: {
         id: refresh_token.id,
-
         deleted_at: null
 
       },
@@ -27,13 +27,23 @@ export const get = async (req, res) => {
     AND.push({
       deleted_at: null
     })
+
     if (user.role.title === 'SUPER_ADMIN') AND.push({
       role: {
-        title: 'ADMIN'
+        title: 'ASSIST_SUPER_ADMIN'
       }
     });
+    else if (user.role.title === 'ASSIST_SUPER_ADMIN') AND.push(
+      { admin_panel_id: admin_panel_id || { not: null } },
+      {
+        role: {
+          title: 'ADMIN'
+        }
+      }
+    );
     else if (user.role.title === 'ADMIN') {
       AND.push(
+        { admin_panel_id: admin_panel_id || { not: null } },
         { school_id: user.school_id },
         {
           NOT: {
@@ -43,7 +53,7 @@ export const get = async (req, res) => {
           }
         }
       );
-      if (role && role !== 'SUPER_ADMIN' && role !== 'ADMIN') {
+      if (role && role !== 'SUPER_ADMIN' && role !== 'ASSIST_SUPER_ADMIN' && role !== 'ADMIN') {
         AND.push({
           role: {
             title: role
@@ -63,6 +73,13 @@ export const get = async (req, res) => {
       select: {
         id: true,
         username: true,
+        adminPanel: {
+          select: {
+            domain: true,
+            logo: true,
+            copy_right_txt: true
+          }
+        },
         user_role: {
           select: {
             id: true,

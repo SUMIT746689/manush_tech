@@ -15,6 +15,13 @@ import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
   try {
+    // const { req, query, res, asPath, pathname } = context;
+    // if (req) {
+    //   let host = req.headers.host // will give you localhost:3000
+    //   const findAdminPanel = await prisma.user.findFirst({ where: { domain: host }, select: { id: true } })
+    //   blockCount["findAdminPanel"] = findAdminPanel ? true : false;
+    //   if(!findAdminPanel) throw new Error("domain is not founds")
+    // }
 
     const refresh_token: any = serverSideAuthentication(context);
     if (!refresh_token) return { redirect: { destination: '/login' } };
@@ -31,7 +38,7 @@ export async function getServerSideProps(context: any) {
     }
 
     switch (refresh_token.role.title) {
-      case 'SUPER_ADMIN':
+      case 'ASSIST_SUPER_ADMIN':
         blockCount['schools'] = { count: await prisma.school.count() };
         blockCount['admins'] = {
           count: await prisma.user.count({
@@ -88,7 +95,7 @@ export async function getServerSideProps(context: any) {
         blockCount['domain'] = school?.domain || '';
         blockCount['teachers'] = {
           count: await prisma.teacher.count({
-            where: { school_id: refresh_token?.school_id,deleted_at: null }
+            where: { school_id: refresh_token?.school_id, deleted_at: null }
           })
         };
         blockCount["school"] = school;
@@ -152,7 +159,7 @@ export async function getServerSideProps(context: any) {
     }
 
   } catch (err) {
-    console.log(err)
+    console.log({err})
   }
   const parseJson = JSON.parse(JSON.stringify(blockCount));
 

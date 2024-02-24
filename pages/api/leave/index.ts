@@ -64,7 +64,7 @@ const index = async (req, res, refresh_token) => {
                         role: {
                             OR: [
                                 {
-                                    title: 'SUPER_ADMIN'
+                                    title: 'ASSIST_SUPER_ADMIN'
                                 },
                                 {
                                     title: 'ADMIN'

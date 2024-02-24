@@ -13,7 +13,7 @@ const index = async (req, res, refresh_token) => {
 
         switch (method) {
             case 'GET':
-                if (refresh_token?.role?.title !== 'SUPER_ADMIN') {
+                if (refresh_token?.role?.title !== 'ASSIST_SUPER_ADMIN') {
                     throw new Error('Permission denied !')
                 }
                 try {

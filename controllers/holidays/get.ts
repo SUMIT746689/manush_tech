@@ -18,7 +18,7 @@ export default async function get(req, res) {
       if (response) return res.json({ data: response, success: true });
       else throw new Error('Invalid to find school');
     }
-    else if (refresh_token.role.title == 'SUPER_ADMIN') {
+    else if (refresh_token.role.title == 'ASSIST_SUPER_ADMIN') {
       const response = await prisma.subscription.findMany({
         where: {
           is_active: true

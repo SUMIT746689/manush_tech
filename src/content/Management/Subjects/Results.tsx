@@ -22,7 +22,8 @@ import {
   Button,
   Typography,
   Dialog,
-  styled
+  styled,
+  Grid
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import { DebounceInput } from '@/components/DebounceInput';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -124,6 +126,7 @@ const Results = ({ setEditSubject, users, classList }) => {
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -183,10 +186,12 @@ const Results = ({ setEditSubject, users, classList }) => {
     <>
       <Card sx={{ minHeight: '64.8vh' }}>
         <Box p={2}>
-          <TextField
-            sx={{
-              m: 0
-            }}
+          <DebounceInput
+            debounceTimeout={500}
+            handleDebounce={(v) => setQuery(v)}
+            value={searchValue}
+            handleChange={(v) => setSearchValue(v.target?.value)}
+            label={t('Search by subject name...')}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -194,13 +199,6 @@ const Results = ({ setEditSubject, users, classList }) => {
                 </InputAdornment>
               )
             }}
-            onChange={handleQueryChange}
-            placeholder={t('Search by subject name...')}
-            value={query}
-            size="small"
-            fullWidth
-            margin="normal"
-            variant="outlined"
           />
         </Box>
 

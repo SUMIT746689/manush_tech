@@ -129,6 +129,7 @@ const Results = ({ setEditSubject, users, classList }) => {
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -192,8 +193,10 @@ const Results = ({ setEditSubject, users, classList }) => {
         <Box p={2}>
 
           <DebounceInput
-            debounceTimeout={1000}
+            debounceTimeout={500}
             handleDebounce={(v) => setQuery(v)}
+            value={searchValue}
+            handleChange={(v) => setSearchValue(v.target?.value)}
             label={'Search by subject name...'}
             InputProps={{
               startAdornment: (

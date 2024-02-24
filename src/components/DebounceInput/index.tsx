@@ -21,7 +21,7 @@ export function DebounceInput({ handleDebounce, debounceTimeout, label, type = '
             size='small'
             sx={{
                 [`& fieldset`]: {
-                    borderRadius: 0.6,
+                    borderRadius: 0.4,
                 },
                 ...sx
             }}
@@ -30,6 +30,7 @@ export function DebounceInput({ handleDebounce, debounceTimeout, label, type = '
             required={required}
             disabled={disabled}
             fullWidth
+            value={value}
             onChange={handleChange}
 
         />
@@ -41,8 +42,8 @@ export function NewDebounceInput({ label, debounceTimeout, handleDebounce, name,
 
     useEffect(() => {
         const getData = setTimeout(() => {
-            console.log({handleDebounce})
-            console.log({debounce_:handleDebounce(value)})
+            console.log({ handleDebounce })
+            console.log({ debounce_: handleDebounce(value) })
             handleDebounce(value);
         }, debounceTimeout);
 

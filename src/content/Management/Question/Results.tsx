@@ -124,6 +124,7 @@ const Results = ({
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     status: null
@@ -203,7 +204,7 @@ const Results = ({
     setDeleteSchoolId(null);
   };
 
-  const handleDeleteCompleted =  () => {
+  const handleDeleteCompleted = () => {
 
     axios.delete(`/api/question/${deleteSchoolId}`).then(res => {
       closeConfirmDelete()
@@ -226,18 +227,20 @@ const Results = ({
       >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-              <DebounceInput
-                debounceTimeout={1000}
-                handleDebounce={(v) => setQuery(v)}
-                label={'Search exam name or subject...'}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-              />
+            <DebounceInput
+              debounceTimeout={500}
+              handleDebounce={(v) => setQuery(v)}
+              value={searchValue}
+              handleChange={(v) => setSearchValue(v.target?.value)}
+              label={'Search exam name or subject...'}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchTwoToneIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
           </Grid>
         </Grid>
       </Card>

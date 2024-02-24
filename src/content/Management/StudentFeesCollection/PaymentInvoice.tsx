@@ -15,9 +15,15 @@ import {
 import { Box } from '@mui/system';
 import dayjs from 'dayjs';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC } from 'react';
 
-function PaymentInvoice({ setShowPrint, printFees, student }) {
+type PaymentInvoiceType = {
+  setShowPrint?: (arg: boolean) => void,
+  printFees: any[],
+  student: any
+}
+
+const PaymentInvoice: FC<PaymentInvoiceType> = ({ setShowPrint, printFees, student }) => {
 
 
   const { user } = useAuth();
@@ -30,8 +36,9 @@ function PaymentInvoice({ setShowPrint, printFees, student }) {
   useEffect(() => {
     // console.log({ printFees });
 
-    const temp = printFees.map(payment => {
+    const temp = printFees.map((payment:any) => {
       const last_date = new Date(payment.last_date)
+      // @ts-ignore
       const today = printFees?.last_payment_date ? new Date(printFees?.last_payment_date) : new Date()
       let payableAmount = payment.amount
 

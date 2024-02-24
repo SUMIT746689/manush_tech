@@ -116,6 +116,7 @@ const Results = ({
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     status: null
@@ -199,22 +200,24 @@ const Results = ({
         }}
       >
         {/* <Grid container spacing={2}> */}
-          {/* <Grid item xs={12}> */}
-            {/* <Box p={0.5}> */}
-              <DebounceInput
-                debounceTimeout={1000}
-                handleDebounce={(v) => setQuery(v)}
-                label={'Search by exam name...'}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchTwoToneIcon />
-                    </InputAdornment>
-                  )
-                }}
-              />
-            {/* </Box> */}
-          {/* </Grid> */}
+        {/* <Grid item xs={12}> */}
+        {/* <Box p={0.5}> */}
+        <DebounceInput
+          debounceTimeout={500}
+          handleDebounce={(v) => setQuery(v)}
+          value={searchValue}
+          handleChange={(v) => setSearchValue(v.target?.value)}
+          label={'Search by exam name...'}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchTwoToneIcon />
+              </InputAdornment>
+            )
+          }}
+        />
+        {/* </Box> */}
+        {/* </Grid> */}
         {/* </Grid> */}
       </Card>
 

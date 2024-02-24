@@ -159,6 +159,7 @@ const Results = ({ periods, setEditPeriod, reFetchData }) => {
 
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(10);
+    const [searchValue, setSearchValue] = useState<string | null>(null)
     const [query, setQuery] = useState<string>('');
     const [filters, setFilters] = useState({
         role: null
@@ -211,8 +212,10 @@ const Results = ({ periods, setEditPeriod, reFetchData }) => {
             <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
                 <Box p={2}>
                     <DebounceInput
-                        debounceTimeout={1200}
+                        debounceTimeout={500}
                         handleDebounce={(v) => setQuery(v)}
+                        value={searchValue}
+                        handleChange={(v) => setSearchValue(v.target?.value)}
                         label={'Search by name or class code...'}
                         InputProps={{
                             startAdornment: (

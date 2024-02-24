@@ -113,7 +113,8 @@
     "export": "next export",
     "lint": "next lint",
     "lint-fix": "next lint --fix",
-    "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json}\" --config ./.prettierrc"
+    "format": "prettier --write \"./**/*.{ts,tsx,js,jsx,json}\" --config ./.prettierrc",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.13",

@@ -153,6 +153,7 @@ const Results: FC<ResultsProps> = ({
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     status: null
@@ -168,7 +169,7 @@ const Results: FC<ResultsProps> = ({
 
   const filteredschools = applyFilters(datas, query, filters);
   const paginatedDepartments = applyPagination(filteredschools, page, limit);
-  
+
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
 
@@ -206,8 +207,10 @@ const Results: FC<ResultsProps> = ({
           <Grid item xs={12}>
             <Box p={0.5}>
               <DebounceInput
-                debounceTimeout={1000}
+                debounceTimeout={500}
                 handleDebounce={(v) => setQuery(v)}
+                value={searchValue}
+                handleChange={(v) => setSearchValue(v.target?.value)}
                 label={'Search by title...'}
                 InputProps={{
                   startAdornment: (
@@ -223,31 +226,31 @@ const Results: FC<ResultsProps> = ({
       </Card>
 
       <Card sx={{ minHeight: 'calc(100vh - 450px) !important', borderRadius: 0.6 }}>
-       
-      
-          <Box
-            p={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Box>
-              <Typography component="span" variant="subtitle1">
-                {t('Showing')}:
-              </Typography>{' '}
-              <b>{paginatedDepartments.length}</b> <b>{t('departments')}</b>
-            </Box>
-            <TablePagination
-              component="div"
-              count={filteredschools.length}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleLimitChange}
-              page={page}
-              rowsPerPage={limit}
-              rowsPerPageOptions={[5, 10, 15]}
-            />
+
+
+        <Box
+          p={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedDepartments.length}</b> <b>{t('departments')}</b>
           </Box>
-      
+          <TablePagination
+            component="div"
+            count={filteredschools.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
         <Divider />
 
         {paginatedDepartments.length === 0 ? (
@@ -265,7 +268,7 @@ const Results: FC<ResultsProps> = ({
                 </TableHead>
                 <TableBody>
                   {paginatedDepartments.map((i) => {
-                    
+
                     return (
                       <TableRow
                         hover
@@ -278,7 +281,7 @@ const Results: FC<ResultsProps> = ({
                         </TableCell>
 
                         <TableCell align="center">
-                          <Typography noWrap sx={{display:'flex',justifyContent:'center',gap:3}}>
+                          <Typography noWrap sx={{ display: 'flex', justifyContent: 'center', gap: 3 }}>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
                                 onClick={() => setEditData(i)}

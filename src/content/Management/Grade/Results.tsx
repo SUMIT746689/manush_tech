@@ -150,6 +150,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     status: null
@@ -207,8 +208,10 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
           <Grid item xs={12}>
             <Box>
               <DebounceInput
-                debounceTimeout={1000}
-                handleDebounce={(v) => setQuery(v)}
+              debounceTimeout={500}
+              handleDebounce={(v) => setQuery(v)}
+              value={searchValue}
+              handleChange={(v) => setSearchValue(v.target?.value)}
                 label={'Search by grade name...'}
                 InputProps={{
                   startAdornment: (

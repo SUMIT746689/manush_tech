@@ -174,6 +174,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
+  const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -340,8 +341,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
               variant="outlined"
             /> */}
             <DebounceInput
-              debounceTimeout={1000}
-              handleDebounce={(v) => setQuery(v)}
+              debounceTimeout={500}
+              handleDebounce={(v)=>setQuery(v)}
+              value={searchValue}
+              handleChange={(v) => setSearchValue(v.target?.value)}
               label={t('Search by Username or School...')}
               InputProps={{
                 startAdornment: (

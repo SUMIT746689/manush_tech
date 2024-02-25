@@ -224,10 +224,10 @@ export const PureLightTheme = createTheme({
   },
   general: {
     reactFrameworkColor: '#00D8FF',
-    borderRadiusSm: '6px',
-    borderRadius: '10px',
-    borderRadiusLg: '12px',
-    borderRadiusXl: '16px'
+    borderRadiusSm: '4px',
+    borderRadius: '6px',
+    borderRadiusLg: '10px',
+    borderRadiusXl: '18px'
   },
   sidebar: {
     background: colors.layout.sidebar.background,
@@ -670,11 +670,11 @@ export const PureLightTheme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 6,
           padding: 8,
 
           '& .MuiTouchRipple-root': {
-            borderRadius: 8
+            borderRadius: 6
           }
         },
         sizeSmall: {
@@ -819,21 +819,21 @@ export const PureLightTheme = createTheme({
     },
     MuiTabs: {
       styleOverrides: {
-        root: {
-          height: 38,
-          minHeight: 38,
-          overflow: 'visible'
-        },
-        indicator: {
-          height: 38,
-          minHeight: 38,
-          borderRadius: 6,
-          border: '1px solid ' + colors.primary.dark,
-          boxShadow: '0px 2px 10px ' + colors.primary.light
-        },
-        scrollableX: {
-          overflow: 'visible !important'
-        }
+        // root: {
+        //   height: 38,
+        //   minHeight: 38,
+        //   overflow: 'visible'
+        // },
+        // indicator: {
+        //   height: 38,
+        //   minHeight: 38,
+        //   borderRadius: 6,
+        //   border: '1px solid ' + colors.primary.dark,
+        //   boxShadow: '0px 2px 10px ' + colors.primary.light
+        // },
+        // scrollableX: {
+        //   overflow: 'visible !important'
+        // }
       }
     },
     MuiTab: {
@@ -842,6 +842,7 @@ export const PureLightTheme = createTheme({
           padding: 0,
           height: 38,
           minHeight: 38,
+          color: colors.primary.light,
           borderRadius: 6,
           transition: 'color .2s',
           textTransform: 'capitalize',
@@ -853,11 +854,11 @@ export const PureLightTheme = createTheme({
             marginRight: 4
           },
           '&.Mui-selected, &.Mui-selected:hover': {
-            color: colors.alpha.white[100],
+            color: colors.primary.dark,
             zIndex: 5
           },
           '&:hover': {
-            color: colors.alpha.black[100]
+            color: colors.primary.main
           }
         }
       }

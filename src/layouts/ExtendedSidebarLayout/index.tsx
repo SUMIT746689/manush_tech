@@ -55,11 +55,12 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({
             pt: `${theme.header.height}`,
             [theme.breakpoints.up('lg')]: {
               ml: `${theme.sidebar.width}`
-            }
+            },
+            background: theme.colors.primary.lighter
           }}
         >
-          <Box display="block">{children}</Box>
-          {/* <ThemeSettings /> */}
+          <Box display="block" >{children}</Box>
+          <ThemeSettings />
         </Box>
       </Box>
     </>

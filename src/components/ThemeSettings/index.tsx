@@ -135,7 +135,7 @@ const ColorSchemeWrapper = styled(Box)(
         }
     
         .secondary {
-            background: #00b795;
+            background: #F8F8F8;
         }
     }
   `
@@ -205,7 +205,7 @@ const ThemeSettings: FC = () => {
 
   return (
     <>
-      {/* <ThemeSettingsButton>
+      <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
           <Fab ref={ref} onClick={handleOpen} color="primary" aria-label="add">
             <SettingsTwoToneIcon />
@@ -225,7 +225,7 @@ const ThemeSettings: FC = () => {
             horizontal: 'right'
           }}
         >
-          <Box p={2}>
+          {/* <Box p={2}>
             <Typography
               sx={{
                 mb: 2,
@@ -313,8 +313,8 @@ const ThemeSettings: FC = () => {
                 Top Navigation
               </MenuItem>
             </Menu>
-          </Box>
-          <Divider />
+          </Box> */}
+          {/* <Divider /> */}
           <ThemeToggleWrapper>
             <Typography
               sx={{
@@ -386,7 +386,7 @@ const ThemeSettings: FC = () => {
             </Stack>
           </ThemeToggleWrapper>
         </Popover>
-      </ThemeSettingsButton> */}
+      </ThemeSettingsButton>
     </>
   );
 };

@@ -224,10 +224,10 @@ export const GreyGooseTheme = createTheme({
   },
   general: {
     reactFrameworkColor: '#00D8FF',
-    borderRadiusSm: '6px',
-    borderRadius: '10px',
-    borderRadiusLg: '12px',
-    borderRadiusXl: '16px'
+    borderRadiusSm: '4px',
+    borderRadius: '6px',
+    borderRadiusLg: '10px',
+    borderRadiusXl: '18px'
   },
   sidebar: {
     background: colors.layout.sidebar.background,
@@ -670,11 +670,11 @@ export const GreyGooseTheme = createTheme({
     MuiIconButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 6,
           padding: 8,
 
           '& .MuiTouchRipple-root': {
-            borderRadius: 8
+            borderRadius: 6
           }
         },
         sizeSmall: {
@@ -818,23 +818,23 @@ export const GreyGooseTheme = createTheme({
       }
     },
     MuiTabs: {
-      styleOverrides: {
-        root: {
-          height: 38,
-          minHeight: 38,
-          overflow: 'visible'
-        },
-        indicator: {
-          height: 38,
-          minHeight: 38,
-          borderRadius: 6,
-          border: '1px solid ' + colors.primary.dark,
-          boxShadow: '0px 2px 10px ' + colors.primary.light
-        },
-        scrollableX: {
-          overflow: 'visible !important'
-        }
-      }
+      // styleOverrides: {
+      //   root: {
+      //     height: 38,
+      //     minHeight: 38,
+      //     overflow: 'visible'
+      //   },
+      //   indicator: {
+      //     height: 38,
+      //     minHeight: 38,
+      //     borderRadius: 6,
+      //     border: '1px solid ' + colors.primary.dark,
+      //     boxShadow: '0px 2px 10px ' + colors.primary.light
+      //   },
+      //   scrollableX: {
+      //     overflow: 'visible !important'
+      //   }
+      // }
     },
     MuiTab: {
       styleOverrides: {
@@ -843,21 +843,22 @@ export const GreyGooseTheme = createTheme({
           height: 38,
           minHeight: 38,
           borderRadius: 6,
+          color: colors.primary.lighter,
           transition: 'color .2s',
           textTransform: 'capitalize',
-
           '&.MuiButtonBase-root': {
+            color: colors.primary.dark,
             minWidth: 'auto',
             paddingLeft: 20,
             paddingRight: 20,
             marginRight: 4
           },
           '&.Mui-selected, &.Mui-selected:hover': {
-            color: colors.alpha.white[100],
+            color: colors.primary.dark,
             zIndex: 5
           },
           '&:hover': {
-            color: colors.alpha.black[100]
+            color: colors.primary.main
           }
         }
       }

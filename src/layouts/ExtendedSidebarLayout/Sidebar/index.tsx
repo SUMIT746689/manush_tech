@@ -37,10 +37,12 @@ function Sidebar() {
           position: 'fixed',
           left: 0,
           top: 0,
-          background: "#002884",
+          background: theme.colors.primary.dark,
           // background:"#212c6f",
           boxShadow:
-            theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
+            // theme.palette.mode === 'dark' ? 
+            theme.sidebar.boxShadow
+            //  : 'none'
         }}
       >
         <Scrollbar>
@@ -54,14 +56,14 @@ function Sidebar() {
               <Logo />
             </Box>
           </Grid>
-          {/* <Divider
+          <Divider
             sx={{
               my: theme.spacing(3),
               mx: theme.spacing(2),
               background: theme.colors.alpha.trueWhite[10]
             }}
           />
-          <SidebarTopSection />
+          {/* <SidebarTopSection />
           <Divider
             sx={{
               my: theme.spacing(3),
@@ -93,7 +95,7 @@ function Sidebar() {
       >
         <SidebarWrapper
           sx={{
-            background: "#002884",
+            background: theme.colors.primary.dark,
           }}
         >
           <Scrollbar>

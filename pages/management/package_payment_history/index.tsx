@@ -24,6 +24,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { logFile } from 'utilities_api/handleLogFile';
 const tableStyle: object = {
     border: '1px solid black',
     borderCollapse: 'collapse',
@@ -52,14 +53,14 @@ export async function getServerSideProps(context: any) {
         }))
 
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        logFile.error(err);
     }
     const parseJson = JSON.parse(JSON.stringify(schoolList));
 
     return { props: { schoolList: parseJson } }
 }
 function FeesPaymentReport({ schoolList }) {
-    console.log({ schoolList });
 
     const { t }: { t: any } = useTranslation();
     const [datas, setDatas] = useState<any>([]);
@@ -98,8 +99,6 @@ function FeesPaymentReport({ schoolList }) {
         // @ts-ignore
 
         const paginatedTransaction = applyPagination(datas?.data || [], page, limit);
-
-        console.log(paginatedTransaction, page, limit);
 
         setPaginatedTransection(paginatedTransaction);
     }, [datas, filter, page])
@@ -276,9 +275,9 @@ function FeesPaymentReport({ schoolList }) {
             </Dialog>
 
 
-            <form onSubmit={handlePaymentHistoryFind}>
+            <form onSubmit={handlePaymentHistoryFind} style={{margin:"0 10px"}}>
                 <Card sx={{
-                    display: 'grid', mx: 'auto', p: 1, px: 4, gridTemplateColumns: { sm: 'auto', md: '1fr 2fr 0.5fr' }, gap: 1
+                    display: 'grid', mx: 'auto', pt: 1, px: 1, gridTemplateColumns: { sm: 'auto', md: '1fr 2fr 0.5fr' }, gap: 1
                 }}>
                     <Grid item >
                         <AutoCompleteWrapper
@@ -390,7 +389,6 @@ function FeesPaymentReport({ schoolList }) {
                                         <TableBody >
                                             {
                                                 paginatedTransection?.map((i) => {
-                                                    console.log({ i });
 
                                                     return (
                                                         <TableRow

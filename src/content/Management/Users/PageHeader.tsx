@@ -153,7 +153,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     setFieldValue(field, '');
     setFieldValue(preview_field, []);
   }
-
+  console.log({ temp })
   return (
     <>
       <PageHeaderTitleWrapper
@@ -240,7 +240,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             setFieldValue,
             setErrors
           }) => {
-            // console.log({ values })
+            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -394,7 +394,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                               data={image}
                               index={index}
                               key={index}
-                              handleRemove={() => handleRemove(setFieldValue, "logo", "preview_logo")}
+                              handleRemove={() => handleRemove(setFieldValue, "user_photo", "preview_user_photo")}
                             />
                           </>
                         ))

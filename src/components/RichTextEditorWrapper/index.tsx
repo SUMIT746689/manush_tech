@@ -1,34 +1,46 @@
+import { Grid } from "@mui/material";
 import { Editor } from "@tinymce/tinymce-react";
 import React from "react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
-export function RichTextEditorWrapper({value,handleChange}) {
-  
+// export function RichTextEditorWrapper({value,handleChange}) {
+
+//   return (
+//     <>
+//       <Editor
+//         // apiKey="y7gnmtbsaxnjbgh3405ioqbdm24eit5f0ovek49w8yvq5r9q"
+//         initialValue=""
+//         init={{
+//           init_instance_callback:(e)=>{e.setContent(value)},
+//           branding: false,
+//           height: 400,
+//           width: '100%',
+//           menubar: true,
+//           plugins:
+//             "print preview paste searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
+//           toolbar:
+//             "formatselect | bold italic underline strikethrough | forecolor backcolor blockquote | link image media | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | removeformat",
+//           image_advtab: true
+//         }}
+//         value={ value}
+//         onEditorChange={handleChange}
+//       />
+
+//       {
+//         // parse(data)
+//         // ReactDOMServer.renderToString(React.createElement(data))
+//       }
+//     </>
+//   )
+// }
+
+export function RichTextEditorWrapper({ value, handleChange }) {
+
   return (
-    <>
-      <Editor
-        // apiKey="y7gnmtbsaxnjbgh3405ioqbdm24eit5f0ovek49w8yvq5r9q"
-        initialValue=""
-        init={{
-          init_instance_callback:(e)=>{e.setContent(value)},
-          branding: false,
-          height: 400,
-          width: '100%',
-          menubar: true,
-          plugins:
-            "print preview paste searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern",
-          toolbar:
-            "formatselect | bold italic underline strikethrough | forecolor backcolor blockquote | link image media | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | removeformat",
-          image_advtab: true
-        }}
-        value={ value}
-        onEditorChange={handleChange}
-      />
-
-      {
-        // parse(data)
-        // ReactDOMServer.renderToString(React.createElement(data))
-      }
-    </>
+    <Grid item width={"100%"} >
+      <ReactQuill theme="snow" value={value} onChange={handleChange} />
+    </Grid>
   )
 }
 

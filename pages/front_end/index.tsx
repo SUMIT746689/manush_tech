@@ -27,7 +27,7 @@ const Packages = () => {
 
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: { xs: 1, sm: 2, md: 3 } }}
         container
         direction="row"
         justifyContent="center"

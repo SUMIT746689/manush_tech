@@ -361,12 +361,16 @@ function PageHeader({ editData, setEditData, reFetchData }) {
                       required={true}
                     /> */}
 
+                    <Grid>
+                      Content:
+                    </Grid>
                     <RichTextEditorWrapper
                       value={values.content}
-                      handleChange={(newValue, editor) => {
+                      handleChange={(newValue: any) => {
+                        console.log({ newValue });
                         setFieldValue('content', newValue);
                         // setText(editor.getContent({ format: 'text' }));
-                        editor.getContent({ format: 'text' });
+                        // editor.getContent({ format: 'text' });
                       }}
                     />
                     <Grid display="flex" flexWrap="wrap" gap={1} mt={1} >

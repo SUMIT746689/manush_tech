@@ -55,6 +55,8 @@ import NotesIcon from '@mui/icons-material/Notes';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import PostAddIcon from '@mui/icons-material/PostAdd';
+import SettingsVoiceIcon from '@mui/icons-material/SettingsVoice';
+
 export interface MenuItem {
   link?: string;
   icon?: ReactNode;
@@ -614,6 +616,17 @@ export const menuItems: MenuItems[] = [
         name: 'All SMS Gateways',
         icon: WifiTetheringErrorIcon,
         link: '/sms_gateways',
+      },
+      {
+        name: 'Voice Msg',
+        icon: SettingsVoiceIcon,
+        items: [
+          {
+            name: 'Send Voice',
+            link: '/voice_msg/send_voice_msg',
+            icon: RecordVoiceOverIcon
+          },
+        ]
       },
       {
         name: 'System',

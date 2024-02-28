@@ -30,7 +30,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
       <Grid p={2} display={{ sm: "flex" }} gap={2}>
 
         <Grid sx={{ display: "grid", width: "100%", gap: 2 }}>
-          <Card sx={{ display: 'flex', width: "100%", p: 2, gap: 4, backgroundColor: colorBlue, color: "whitesmoke", borderRadius: 1 }}>
+          <Card sx={{ display: 'flex', width: "100%", p: 2, gap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
             {/* <Image alt='sss' /> */}
             <Avatar sx={{ my: 'auto', width: { xs: 60, sm: 80, md: 120 }, height: { xs: 60, sm: 80, md: 120 } }} />
             <Grid sx={{

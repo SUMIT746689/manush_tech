@@ -9,6 +9,7 @@ export const ButtonWrapper = ({ startIcon = undefined, handleClick, disabled = f
         startIcon={startIcon}
         sx={{
           ...sx,
+          color:theme=>theme.colors.warning,
           borderRadius: 0.5,
           minHeight: 36,
           width: '100%',

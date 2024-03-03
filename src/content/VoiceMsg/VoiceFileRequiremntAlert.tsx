@@ -17,6 +17,7 @@ export const VoiceFileRequiremntAlert = ({ voiceFileRequiremntShow, setVoiceFile
     const handleClose = () => {
         setVoiceFileRequiremntShow(false)
     }
+
     return (
         <Dialog
             fullWidth
@@ -30,7 +31,7 @@ export const VoiceFileRequiremntAlert = ({ voiceFileRequiremntShow, setVoiceFile
             <Card sx={{ borderRadius: '1px' }} >
                 <Grid px={2} py={1} fontSize={18} display="flex" justifyContent="space-between" >
                     <Grid my="auto">Voice File Requirements</Grid>
-                    <Grid><Button size="small" variant="outlined" sx={{borderSize:2}} onClick={handleClose}><b><CloseIcon sx={{fontWeight:600}}/></b></Button></Grid>
+                    <Grid><Button size="small" variant="outlined" sx={{ borderSize: 2 }} onClick={handleClose}><b><CloseIcon sx={{ fontWeight: 600 }} /></b></Button></Grid>
                 </Grid>
                 <Divider />
                 <Grid display="grid" px={2} py={4} rowGap={2} justifyContent="start">

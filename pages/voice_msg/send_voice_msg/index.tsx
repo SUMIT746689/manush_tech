@@ -4,14 +4,12 @@ import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Card, Grid } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
-import SmsPage from '@/content/BulkSmsAndEmail/SendSms/SmsPage';
-import IndividualSmsPage from '@/content/BulkSmsAndEmail/SendSms/IndividualSmsPage';
 import { useAuth } from '@/hooks/useAuth';
 import { BasicTabWrapper } from '@/components/Tab/Tab';
 import { useClientDataFetch } from '@/hooks/useClientFetch';
-import VoiceRecipient from '@/content/SendVoiceMsg/VoiceRecipient';
-import FileUpload from '@/content/SendVoiceMsg/FileUpload';
-import GroupContact from '@/content/SendVoiceMsg/GroupContact';
+import VoiceRecipient from '@/content/VoiceMsg/SendVoiceMsg/VoiceRecipient';
+import GroupContact from '@/content/VoiceMsg/SendVoiceMsg/GroupContact';
+import FileUpload from '@/content/VoiceMsg/SendVoiceMsg/FileUpload';
 
 const colorBlue = "#0052B4"
 

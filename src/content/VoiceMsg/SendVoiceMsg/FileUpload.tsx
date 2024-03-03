@@ -11,7 +11,7 @@ import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import Link from 'next/dist/client/link';
 import { handleCreateFileObj } from 'utilities_api/handleCreateFileObject';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
-import { VoiceFileRequiremntAlert } from './VoiceFileRequiremntAlert';
+import { VoiceFileRequiremntAlert } from '../VoiceFileRequiremntAlert';
 import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUpload';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 

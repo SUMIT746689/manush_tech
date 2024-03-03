@@ -122,8 +122,8 @@ model School {
   Payment_gateway_credential Payment_gateway_credential[]
   AutoAttendanceSentSms      AutoAttendanceSentSms[]
   OtherUsersInfo             OtherUsersInfo[]
-  VoiceTemplate              VoiceTemplate[]
   VoiceGateway               VoiceGateway?
+  VoiceTemplate              VoiceTemplate[]
 
   // routines Routine[]
   @@map("schools")

@@ -56,6 +56,8 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import SettingsVoiceIcon from '@mui/icons-material/SettingsVoice';
+import FenceIcon from '@mui/icons-material/Fence';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 export interface MenuItem {
   link?: string;
@@ -625,6 +627,16 @@ export const menuItems: MenuItems[] = [
             name: 'Send Voice',
             link: '/voice_msg/send_voice_msg',
             icon: RecordVoiceOverIcon
+          },
+          {
+            name: 'Gateway',
+            link: '/voice_msg/gateways',
+            icon: FenceIcon
+          },
+          {
+            name: 'Template',
+            link: '/voice_msg/templates',
+            icon: ContentPasteIcon
           },
         ]
       },

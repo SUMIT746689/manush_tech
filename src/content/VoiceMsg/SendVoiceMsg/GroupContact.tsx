@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchData } from '@/utils/post';
 import Link from 'next/dist/client/link';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
-import { VoiceFileRequiremntAlert } from './VoiceFileRequiremntAlert';
+import { VoiceFileRequiremntAlert } from '../VoiceFileRequiremntAlert';
 import { handleFileChange } from 'utilities_api/handleFileUpload';
 
 const DynamicSelectTemplate = () => {

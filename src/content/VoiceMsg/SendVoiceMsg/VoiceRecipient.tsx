@@ -11,7 +11,7 @@ import { handleFileChange } from 'utilities_api/handleFileUpload';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import React, { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { VoiceFileRequiremntAlert } from './VoiceFileRequiremntAlert';
+import { VoiceFileRequiremntAlert } from '../VoiceFileRequiremntAlert';
 // const GateWaySelect = () => {
 //   const { values, touched, errors, setFieldValue }: any = useFormikContext()
 //   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');

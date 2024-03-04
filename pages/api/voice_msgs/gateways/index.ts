@@ -1,5 +1,5 @@
-import get from 'controllers/voice_gateways/get';
-import post from 'controllers/voice_gateways/post';
+import get from 'controllers/voice_msgs/voice_gateways/get';
+import post from 'controllers/voice_msgs/voice_gateways/post';
 import { logFile } from 'utilities_api/handleLogFile';
 
 

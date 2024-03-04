@@ -14,7 +14,8 @@ import FileUpload from '@/content/VoiceMsg/SendVoiceMsg/FileUpload';
 const colorBlue = "#0052B4"
 
 const VoiceMsg = () => {
-  const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
+  const { data: gateways } = useClientDataFetch('/api/voice_msgs/gateways');
+  const { data: templates } = useClientDataFetch('/api/voice_msgs/templates');
   return (
     <>
       <Head>
@@ -29,13 +30,13 @@ const VoiceMsg = () => {
             width="100%"
           >
             {
-              sms_gateway && <BasicTabWrapper items={[
+              gateways && <BasicTabWrapper items={[
                 {
                   label: "VOICE RECIPIENT", value:
                     <SendSmsWrapper>
-                      <VoiceRecipient sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null}/>
+                      <VoiceRecipient gateways={(gateways && Array.isArray(gateways)) ? gateways[0] : null} templates={(gateways && Array.isArray(gateways)) ? templates : []} />
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
-                        <AvailableBalance/>
+                        <AvailableBalance />
                         <VoicePrice />
                       </Grid>
                     </SendSmsWrapper>
@@ -43,7 +44,7 @@ const VoiceMsg = () => {
                 {
                   label: "GROUP CONTACT", value:
                     <SendSmsWrapper>
-                      <GroupContact sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                      <GroupContact sms_gateway={(gateways && Array.isArray(gateways)) ? gateways[0] : null} />
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />
@@ -53,14 +54,14 @@ const VoiceMsg = () => {
                 {
                   label: "FILE UPLOAD", value:
                     <SendSmsWrapper>
-                      <FileUpload sms_gateway={(sms_gateway && Array.isArray(sms_gateway)) ? sms_gateway[0] : null} />
+                      <FileUpload sms_gateway={(gateways && Array.isArray(gateways)) ? gateways[0] : null} />
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />
                       </Grid>
                     </SendSmsWrapper>
                 },
-    
+
               ]} />
             }
           </Grid>
@@ -101,7 +102,7 @@ const VoicePrice = () => {
     <Card sx={{ boxShadow: 3, color: colorBlue, p: 3, minWidth: { xs: 'fit-content', md: 350 }, mb: 'auto', borderRadius: 0.5 }}>
       <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>VOICE PRICE</Grid>
       <Grid sx={{ fontSize: 14, pt: 2, textAlign: 'justify' }}>
-        Disabled
+        {/* Disabled */}
       </Grid>
     </Card>
   )

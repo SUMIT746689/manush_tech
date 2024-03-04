@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma_client";
 
 export const sentSms = (dataObj, is_masking) => {
-  const { school_id, total_count } = dataObj;
+  const { school_id, total_count, number_of_sms_parts } = dataObj;
   prisma.$transaction([
     prisma.tbl_queued_sms.create({
       data: {
@@ -11,8 +11,8 @@ export const sentSms = (dataObj, is_masking) => {
     prisma.school.update({
       where: { id: school_id },
       data: {
-        masking_sms_count: { decrement: is_masking ? total_count : 0 },
-        non_masking_sms_count: { decrement: is_masking ? 0 : total_count }
+        masking_sms_count: { decrement: is_masking ? total_count * number_of_sms_parts : 0 },
+        non_masking_sms_count: { decrement: is_masking ? 0 : total_count * number_of_sms_parts }
       }
     })
     // prisma.tbl_sent_sms.create({

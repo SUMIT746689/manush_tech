@@ -1,7 +1,6 @@
-import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
+import axios from 'axios';
 import { authenticate } from 'middleware/authenticate';
-import path from 'path';
 import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
@@ -10,7 +9,7 @@ async function post(req, res, refresh_token) {
 
     await certificateTemplateFolder(uploadFolderName);
 
-    const fileType = ['audio/wav', 'audio/x-wav'];
+    const fileType = ['audio/wav','audio/x-wav'];
 
     const filterFiles = {
       voice_file: fileType,
@@ -24,24 +23,28 @@ async function post(req, res, refresh_token) {
 
     if (error) throw new Error(error);
 
-    const { name } = fields;
+    const { gateway_id, msisdn } = fields;
     const { voice_file } = files;
 
-    if (!name || !voice_file) throw new Error("provide all required datas");
+    if (!gateway_id || !msisdn || !voice_file) throw new Error("provide all required datas");
 
-    const response = await prisma.voiceTemplate.create({
-      data: {
-        // @ts-ignore
-        name: name,
-        voice_url: voice_file && path.join(uploadFolderName, voice_file?.newFilename),
-        school_id: Number(refresh_token.school_id)
-      }
-    });
+    const resp = await axios.get("");
+    const response = {};
+    
+    // const response = await prisma.voiceTemplate.create({
+    //   data: {
+    //     // @ts-ignore
+    //     name: name,
+    //     voice_url: voice_file && path.join(uploadFolderName, voice_file?.newFilename),
+    //     school_id: Number(refresh_token.school_id)
+    //   }
+    // });
 
     return res.json({ data: response, success: true });
     // else throw new Error('Invalid to find school');
 
   } catch (err) {
+    console.log({err})
     logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }

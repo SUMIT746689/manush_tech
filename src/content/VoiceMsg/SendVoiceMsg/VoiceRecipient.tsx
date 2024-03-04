@@ -9,20 +9,20 @@ import Link from 'next/dist/client/link';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { handleFileChange } from 'utilities_api/handleFileUpload';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { VoiceFileRequiremntAlert } from '../VoiceFileRequiremntAlert';
 // const GateWaySelect = () => {
 //   const { values, touched, errors, setFieldValue }: any = useFormikContext()
-//   const { data: sms_gateway } = useClientDataFetch('/api/sms_gateways?is_active=true');
+//   const { data: gateways } = useClientDataFetch('/api/gatewayss?is_active=true');
 //   useEffect(() => {
-//     sms_gateway[0]?.id && setFieldValue("sms_gateway_id", sms_gateway[0]?.id)
-//   }, [sms_gateway])
+//     gateways[0]?.id && setFieldValue("gateways_id", gateways[0]?.id)
+//   }, [gateways])
 
-//   return values.sms_gateway_id ?
-//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={sms_gateway[0]?.title} />
+//   return values.gateways_id ?
+//     <DisableTextWrapper label="Sms Gateway" touched={touched.gateways_id} errors={errors.gateways_id} value={gateways[0]?.title} />
 //     :
-//     <DisableTextWrapper label="Sms Gateway" touched={touched.sms_gateway_id} errors={errors.sms_gateway_id} value={'No Gateway Selected'} />
+//     <DisableTextWrapper label="Sms Gateway" touched={touched.gateways_id} errors={errors.gateways_id} value={'No Gateway Selected'} />
 // }
 
 
@@ -78,8 +78,12 @@ import { VoiceFileRequiremntAlert } from '../VoiceFileRequiremntAlert';
 //   )
 // }
 
+type VoiceRecipientType = {
+    gateways: null | any;
+    templates: any[];
+}
 
-function VoiceRecipient({ sms_gateway }) {
+const VoiceRecipient: FC<VoiceRecipientType> = ({ gateways, templates }) => {
 
     const { t }: { t: any } = useTranslation();
     const { showNotification } = useNotistick();
@@ -97,9 +101,12 @@ function VoiceRecipient({ sms_gateway }) {
                 // reFetchData();
             };
 
-            _values["recipient_type"] = "INDIVIDUAL"
+            const formData = new FormData();
+            formData.append("gateway_id", _values.gateway_id);
+            formData.append("msisdn", _values.msisdn);
+            formData.append("voice_file", _values?.voice_file[0]);
 
-            const { data } = await axios.post(`/api/sent_sms/sms_recipients`, _values);
+            const { data } = await axios.post(`/api/voice_msgs/voice_recipients`, formData);
             successResponse('created');
 
         } catch (err) {
@@ -119,8 +126,8 @@ function VoiceRecipient({ sms_gateway }) {
                 <Formik
                     enableReinitialize={true}
                     initialValues={{
-                        sms_gateway: sms_gateway?.details?.sender_id || '',
-                        sms_gateway_id: sms_gateway?.id || undefined,
+                        gateways: gateways?.details?.sender_id || '',
+                        gateway_id: gateways?.id || undefined,
                         msisdn: '',
                         schedule_date: undefined,
                         voice_file: undefined,
@@ -131,9 +138,11 @@ function VoiceRecipient({ sms_gateway }) {
                         msisdn: Yup.string()
                             // .max(255)
                             .required(t('The mobile number field is required')),
-                        sms_gateway_id: Yup.number()
+                        gateway_id: Yup.number()
                             .min(0)
                             .required(t('The sms gateway field is required')),
+                        voice_file: Yup.mixed()
+                            .required(t('The audio file field is required')),
                     })}
                     onSubmit={handleFormSubmit}
                 >
@@ -142,7 +151,7 @@ function VoiceRecipient({ sms_gateway }) {
                         isSubmitting, touched, values,
                         setFieldValue
                     }) => {
-                        console.log({ values });
+                        console.log({ values, errors });
                         return (
                             <form onSubmit={handleSubmit}>
                                 <DialogContent
@@ -151,24 +160,24 @@ function VoiceRecipient({ sms_gateway }) {
                                     <Grid container rowGap={1}>
 
                                         {
-                                            // sms_gateway &&
+                                            // gateways &&
                                             <Grid container>
                                                 <Grid pb={0.5}>Selected Sms Gateway: *</Grid>
                                                 <DisableTextWrapper
                                                     // label="Selected Sms Gateway"
                                                     label=""
-                                                    touched={values.sms_gateway}
-                                                    errors={errors.sms_gateway}
-                                                    value={values.sms_gateway}
+                                                    touched={values.gateways}
+                                                    errors={errors.gateways}
+                                                    value={values.gateways}
                                                 />
                                                 {
                                                     Boolean(
-                                                        // touched.sms_gateway_id 
+                                                        // touched.gateways_id 
                                                         // && 
-                                                        errors.sms_gateway_id
+                                                        errors.gateway_id
                                                     ) &&
                                                     <Grid display="flex" columnGap={2} justifyContent="space-between">
-                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.gateways_id} </Grid>
                                                         <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
                                                     </Grid>
 

@@ -1,4 +1,4 @@
-import patch from 'controllers/voice_gateways/voice_gateway/patch';
+import patch from 'controllers/voice_msgs/voice_gateways/voice_gateway/patch';
 import { logFile } from 'utilities_api/handleLogFile';
 
 

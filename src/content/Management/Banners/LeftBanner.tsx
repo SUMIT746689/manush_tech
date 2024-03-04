@@ -100,7 +100,7 @@ function LeftBanner({ banners, refetchBanner }: { banners: { url: string }[], re
     return (
         <>
             <Card sx={{ borderRadius: 0.5 }}>
-                <Grid sx={{ borderRadious: 0, background: "blue", py: 1, color: "white", fontWeight: 700, textAlign: "center" }}>
+                <Grid sx={{ borderRadious: 0, background:(themes)=>themes.colors.primary.dark, py: 1, color: "white", fontWeight: 700, textAlign: "center" }}>
                     Left Banner Images
                 </Grid>
                 <Grid m={1} mt={2}>

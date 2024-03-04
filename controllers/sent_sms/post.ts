@@ -4,6 +4,7 @@ import { authenticate } from 'middleware/authenticate';
 import { createCampaign, getUsers, sentSms } from './postContent/postContent';
 import { logFile } from 'utilities_api/handleLogFile';
 import { verifyIsMasking, verifyIsUnicode } from 'utilities_api/verify';
+import { handleNumberOfSmsParts } from 'utilities_api/handleNoOfSmsParts';
 
 
 async function post(req, res, refresh_token) {
@@ -11,7 +12,7 @@ async function post(req, res, refresh_token) {
     const { sms_gateway_id, campaign_name, recipient_type, role_id, class_id, section_id, name_ids: individual_user_ids, body: custom_body, sms_template_id } = req.body;
     const { school_id, id } = refresh_token;
 
-    if (!sms_gateway_id || !recipient_type) throw new Error("required valid datas")
+    if (!sms_gateway_id || !recipient_type || !custom_body) throw new Error("required valid datas")
 
     const data = {
       sms_gateway_id,
@@ -40,6 +41,8 @@ async function post(req, res, refresh_token) {
 
     const isUnicode = verifyIsUnicode(custom_body || '');
 
+    const number_of_sms_parts = handleNumberOfSmsParts({ isUnicode, textLength: custom_body.length })
+
     const sentSmsData = {
       sms_shoot_id,
       school_id,
@@ -53,6 +56,7 @@ async function post(req, res, refresh_token) {
       sms_text: custom_body,
       submission_time: new Date(),
       sms_gateway_status: "pending",
+      number_of_sms_parts
       // campaign_id,
       // campaign_name,
     }

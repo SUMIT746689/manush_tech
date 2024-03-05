@@ -1,8 +1,9 @@
 import { Grid } from "@mui/material";
 // import { Editor } from "@tinymce/tinymce-react";
-import React from "react";
-import ReactQuill from 'react-quill';
+import React, { useMemo } from "react";
+// import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import dynamic from "next/dynamic";
 
 // export function RichTextEditorWrapper({value,handleChange}) {
 
@@ -36,6 +37,7 @@ import 'react-quill/dist/quill.snow.css';
 // }
 
 export function RichTextEditorWrapper({ value, handleChange }) {
+  const ReactQuill = useMemo(() => dynamic(() => import('react-quill'), { ssr: false }),[]);
 
   return (
     <Grid item width={"100%"} >

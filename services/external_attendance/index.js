@@ -54,7 +54,7 @@ const main = async () => {
             //     start_time: "12:00:00",
             //     end_time: "23:59:59"
             // };
-
+            console.log({ today, start_time })
             const smsBody = {
                 operation: "fetch_log",
                 auth_user: auth_user,
@@ -123,6 +123,6 @@ const main = async () => {
     }
 }
 
-// setInterval(() => {
-main();
-// }, 60000*3)
+setInterval(() => {
+    main();
+}, 60000 * 3)

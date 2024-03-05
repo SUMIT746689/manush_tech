@@ -83,8 +83,6 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
                 sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id, stdAttendanceQ[0].exit_time);
 
             }
-
-
         })
     }
     catch (err) {

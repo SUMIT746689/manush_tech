@@ -74,7 +74,7 @@ const StudentAutoSentSms = () => {
 
     const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
 
-        if(_values.use_system_type) _values.use_system_type = _values.use_system_type.id
+        if (_values.use_system_type) _values.use_system_type = _values.use_system_type.id
         // if (_values.is_active && !_values.academic_year_id) return showNotification('academic year field is required', 'error')
 
         const successResponse = () => {
@@ -120,7 +120,7 @@ const StudentAutoSentSms = () => {
                         auth_user: data?.auth_user || undefined,
                         auth_code: data?.auth_code || undefined,
                         url: data?.external_api_info?.url || undefined,
-                        url_params: data?.external_api_info?.url_params || [],
+                        url_params: data?.external_api_info?.url_params || [{ auth_user: "", auth_code: "" }],
                         // academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
                         // academic_year_id: data?.academic_year_id || undefined,
                         submit: null
@@ -271,16 +271,16 @@ const StudentAutoSentSms = () => {
                                                                         value={value.value}
                                                                     />
                                                                 </Grid>
-                                                                <Grid item xs={1} >
+                                                                {/* <Grid item xs={1} >
                                                                     <Button onClick={() => handleDeleteApiKeyValues(index, values.url_params, setFieldValue)} variant="outlined" size='small' sx={{ borderRadius: 0.5 }}>
                                                                         <DeleteIcon sx={{ color: "red" }} />
                                                                     </Button>
-                                                                </Grid>
+                                                                </Grid> */}
                                                             </React.Fragment>
                                                         ))
                                                     }
                                                     <Grid item mx="auto">
-                                                        <ButtonWrapper handleClick={() => setFieldValue("url_params", [...values?.url_params, { key: "", value: "" }])}> + Add Key Values </ButtonWrapper>
+                                                        {/* <ButtonWrapper handleClick={() => setFieldValue("url_params", [...values?.url_params, { key: "", value: "" }])}> + Add Key Values </ButtonWrapper> */}
                                                     </Grid>
                                                     {/* <Grid item sm={6}>
                                                         <TextFieldWrapper

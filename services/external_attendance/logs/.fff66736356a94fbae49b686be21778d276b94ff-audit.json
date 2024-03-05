@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 5
+    },
+    "auditLog": "/home/mehedi-hasan/elitbuzz_projects/School-SAAS/services/external_attendance/logs/.fff66736356a94fbae49b686be21778d276b94ff-audit.json",
+    "files": [
+        {
+            "date": 1709552490374,
+            "name": "/home/mehedi-hasan/elitbuzz_projects/School-SAAS/services/external_attendance/logs/external_attendance-2024-03-04.log",
+            "hash": "172600281653dda0ee37d4f199680a10d1423dc1984695db983a293426f82587"
+        },
+        {
+            "date": 1709612477685,
+            "name": "/home/mehedi-hasan/elitbuzz_projects/School-SAAS/services/external_attendance/logs/external_attendance-2024-03-05.log",
+            "hash": "246e0015c88af0b8ba17fd6ef5f5e6407affffbe007972783e326d2f37c35d1b"
+        }
+    ],
+    "hashType": "sha256"
+}

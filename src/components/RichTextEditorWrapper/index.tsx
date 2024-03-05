@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
 import React from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';

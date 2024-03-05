@@ -120,7 +120,7 @@ const StudentAutoSentSms = () => {
                         auth_user: data?.auth_user || undefined,
                         auth_code: data?.auth_code || undefined,
                         url: data?.external_api_info?.url || undefined,
-                        url_params: data?.external_api_info?.url_params || [{ auth_user: "", auth_code: "" }],
+                        url_params: data?.external_api_info?.url_params || [{ key: "auth_user", value: "" }, { key: "auth_code", value: "" }],
                         // academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
                         // academic_year_id: data?.academic_year_id || undefined,
                         submit: null
@@ -135,7 +135,7 @@ const StudentAutoSentSms = () => {
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-                        // console.log({ errors, values, isSubmitting })
+                        console.log({ errors, values, isSubmitting })
                         return (
                             <Card sx={{
                                 maxWidth: '700px',
@@ -241,7 +241,7 @@ const StudentAutoSentSms = () => {
                                                     {
                                                         values?.url_params?.map((value, index) => (
                                                             <React.Fragment key={value.index + 1}>
-                                                                <Grid item sm={5.5}>
+                                                                <Grid item width="100%" sm={6}>
                                                                     <TextFieldWrapper
                                                                         name="key"
                                                                         label={t('Key')}
@@ -254,9 +254,10 @@ const StudentAutoSentSms = () => {
                                                                             setFieldValue("url_params", values_)
                                                                         }}
                                                                         value={value?.key}
+                                                                        disabled={true}
                                                                     />
                                                                 </Grid>
-                                                                <Grid item sm={5.5}>
+                                                                <Grid item width="100%" sm={6}>
                                                                     <TextFieldWrapper
                                                                         name="value"
                                                                         label={t('Value')}

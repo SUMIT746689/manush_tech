@@ -20,7 +20,6 @@ const main = async () => {
                 }
             }
         });
-        console.log({ resAutoAttdnceSentSms })
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
             const { external_api_info, school } = singleResp;

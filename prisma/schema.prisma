@@ -121,6 +121,8 @@ model School {
   Payment_gateway_credential Payment_gateway_credential[]
   AutoAttendanceSentSms      AutoAttendanceSentSms[]
   OtherUsersInfo             OtherUsersInfo[]
+  VoiceTemplate              VoiceTemplate[]
+  VoiceGateway               VoiceGateway?
 
   // routines Routine[]
   @@map("schools")
@@ -774,6 +776,18 @@ model SmsTemplate {
   smsCampaigns SmsCampaigns[]
 
   @@map("sms_templates")
+}
+
+model VoiceTemplate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  voice_url  String
+  school_id  Int
+  created_at DateTime @default(now())
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("voice_templates")
 }
 
 model SmsGateway {
@@ -1439,4 +1453,16 @@ model OtherUsersInfo {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("other_users_info")
+}
+
+model VoiceGateway {
+  id        Int    @id @default(autoincrement())
+  title     String
+  details   Json
+  // is_active Boolean
+  school_id Int    @unique
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("voice_gateways")
 }

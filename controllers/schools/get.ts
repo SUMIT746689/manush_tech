@@ -6,7 +6,7 @@ async function getHandler(req, res, authenticate_user) {
   try {
 
     const { role, admin_panel_id } = authenticate_user
-    if (role.title !== 'ASSIST_SUPER_ADMIN' || admin_panel_id) throw new Error('Your role have no permissions');
+    if (role.title !== 'ASSIST_SUPER_ADMIN' || !admin_panel_id) throw new Error('Your role have no permissions');
     const schools = await prisma.school.findMany({
       where: {
         admin_panel_id

@@ -1,5 +1,5 @@
-import post from 'controllers/school/post-school';
-import get from 'controllers/school/get';
+import post from 'controllers/schools/post-school';
+import get from 'controllers/schools/get';
 import { logFile } from 'utilities_api/handleLogFile';
 
 const index = async (req, res) => {

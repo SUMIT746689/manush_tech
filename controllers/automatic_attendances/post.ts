@@ -12,8 +12,6 @@ async function post(req, res, refresh_token) {
         const { body, is_active, every_hit, use_system_type, url, url_params } = req.body;
         const { school_id } = refresh_token;
 
-        console.log({ use_system_type, url, url_params });
-
         const resAlreadyCreated = await prisma.autoAttendanceSentSms.findFirst({
             where: { school_id }
         });
@@ -61,7 +59,6 @@ async function post(req, res, refresh_token) {
         res.status(200).json({ success: true });
     } catch (err) {
         logFile.error(err.message)
-        console.log(err.message);
         res.status(404).json({ error: err.message });
     }
 }

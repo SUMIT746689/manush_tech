@@ -1,6 +1,6 @@
-import deleteSchool from 'controllers/school/single-school/delete-school';
-import getSchool from 'controllers/school/single-school/get-school';
-import patchSchool from 'controllers/school/single-school/patch-school';
+import deleteSchool from 'controllers/schools/single-school/delete-school';
+import getSchool from 'controllers/schools/single-school/get-school';
+import patchSchool from 'controllers/schools/single-school/patch-school';
 import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
 

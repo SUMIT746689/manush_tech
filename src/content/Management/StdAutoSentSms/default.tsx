@@ -204,29 +204,11 @@ const StudentAutoSentSms = () => {
                                                 handleChange={(e, v) => handleChangeSystemType(v, setFieldValue)}
                                             />
 
-                                            <Grid item>
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            name="is_active"
-                                                            checked={values.is_active || false}
-                                                            onChange={handleChange}
-                                                            inputProps={{ 'aria-label': 'controlled' }}
-                                                            size="medium"
-                                                        // color="secondary" 
-                                                        />
-                                                    }
-                                                    label="Is Active"
-                                                    labelPlacement="start"
-                                                    sx={{ pl: 0, ml: 0 }}
-                                                />
-                                            </Grid>
-
                                             {
                                                 values.use_system_type?.id === "external_api"
-                                                && values.is_active
+                                                // && values.is_active
                                                 && <Grid container columnSpacing={0.5} rowSpacing={1}>
-                                                    <Grid item xs={12}>
+                                                    {/* <Grid item xs={12}>
                                                         <TextFieldWrapper
                                                             name="url"
                                                             label={<b>URL:</b>}
@@ -237,7 +219,7 @@ const StudentAutoSentSms = () => {
                                                             value={values.url}
                                                         />
                                                         <Grid >example: <span style={{ color: "darkgoldenrod" }}>www.dummy.com</span></Grid>
-                                                    </Grid>
+                                                    </Grid> */}
                                                     {
                                                         values?.url_params?.map((value, index) => (
                                                             <React.Fragment key={value.index + 1}>
@@ -326,6 +308,24 @@ const StudentAutoSentSms = () => {
                                                     /> */}
                                                 </Grid>
                                             }
+
+                                            <Grid item>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            name="is_active"
+                                                            checked={values.is_active || false}
+                                                            onChange={handleChange}
+                                                            inputProps={{ 'aria-label': 'controlled' }}
+                                                            size="medium"
+                                                        // color="secondary" 
+                                                        />
+                                                    }
+                                                    label="Is Active"
+                                                    labelPlacement="start"
+                                                    sx={{ pl: 0, ml: 0 }}
+                                                />
+                                            </Grid>
 
                                             {
                                                 values.is_active

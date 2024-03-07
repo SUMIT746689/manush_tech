@@ -1,4 +1,4 @@
-import get from 'controllers/school/get';
+import get from 'controllers/schools/search_schools/get';
 import { logFile } from 'utilities_api/handleLogFile';
 
 const index = async (req, res) => {

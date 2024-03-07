@@ -14,9 +14,11 @@ import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { useEffect, useState } from 'react';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { DebounceInput } from '@/components/DebounceInput';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 
 
-const SMSSettings = ({ editData, seteditData, reFetchData }) => {
+const SMSSettings = ({ schools, editData, seteditData, reFetchData }) => {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
@@ -38,6 +40,8 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
     seteditData(null);
     setOpen(false);
   };
+  const [searchValue, setSearchValue] = useState();
+  const [query, setQuery] = useState();
   return (
     <>
       <PageHeaderTitleWrapper
@@ -58,10 +62,12 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
             sms_api_key: editData?.details?.sms_api_key || '',
             sender_id: editData?.details?.sender_id || '',
             // title: data?.data[0]?.title || 'mram',
+            school: schools.find((school) => school?.id === editData?.school_id) || null,
+            school_id: editData?.school_id || null,
             submit: null
           }}
           validationSchema={Yup.object().shape({
-            // title: Yup.string().max(255).required(t('The title field is required')),
+            school_id: Yup.number().required(t('The school id field is required')),
             // sms_gateway: Yup.string().max(255).required(t('The sms_gateway field is required')),
             // sms_api_key: Yup.string().max(255).required(t('The sms_api_key field is required')),
             sender_id: Yup.string().max(255).required(t('The sender_id field is required')),
@@ -76,6 +82,7 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
 
               const v = {
                 id: _values.id,
+                school_id: _values.school_id,
                 // title: _values.title,
                 details: {
                   // sms_gateway: _values.sms_gateway,
@@ -98,7 +105,7 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
               } else {
                 axios.post('/api/sms_gateways', v)
                   .then(res => {
-                    showNotification('sms information updated!');
+                    showNotification('sms information created successfully');
                     seteditData(() => { })
                     reFetchData();
                     handleCreateClassClose()
@@ -121,7 +128,7 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
           }}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-
+            console.log({ values })
             return (
               <>
 
@@ -149,6 +156,20 @@ const SMSSettings = ({ editData, seteditData, reFetchData }) => {
                           handleChange={handleChange}
                           value={values?.sms_gateway}
                         /> */}
+
+                      <AutoCompleteWrapper
+                        minWidth="100%"
+                        label={t('Select School')}
+                        placeholder={t('select a school...')}
+                        limitTags={2}
+                        // getOptionLabel={(option) => option.id}
+                        options={schools}
+                        value={values.school}
+                        handleChange={(e, v) => {
+                          setFieldValue("school", v ? v : null);
+                          setFieldValue("school_id", v ? v.id : null);
+                        }}
+                      />
 
                       {/* sms_api_key */}
                       <TextFieldWrapper

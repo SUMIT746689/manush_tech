@@ -13,7 +13,7 @@ const SmsGateways = () => {
 
     const [editData, setEditData] = useState<any>(null);
     const { data, reFetchData } = useClientFetch('/api/sms_gateways?is_active=true');
-    const { data: schools } = useClientFetch('/api/school');
+    const { data: schools } = useClientFetch('/api/school/search_schools');
     console.log({ schools })
     // console.log({ data })
     return (
@@ -25,6 +25,7 @@ const SmsGateways = () => {
                 {/* @ts-ignore */}
                 <PageHeader
                     // name="All Sms Gateways"
+                    schools={schools ? schools.map(school => ({ id: school.id, label: school.name })) : []}
                     editData={editData}
                     seteditData={setEditData}
                     reFetchData={reFetchData}

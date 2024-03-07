@@ -19,7 +19,6 @@ async function get(req, res, refresh_token) {
         res.status(200).json(sss);
     } catch (err) {
         logFile.error(err.message)
-        console.log(err.message);
         res.status(404).json({ err: err.message });
     }
 }

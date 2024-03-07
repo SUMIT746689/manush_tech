@@ -5,26 +5,16 @@ import { logFile } from 'utilities_api/handleLogFile';
 async function getHandler(req, res, authenticate_user) {
   try {
     const { role, admin_panel_id } = authenticate_user
-    // const authenticate_user_Info = await prisma.user.findFirst({
-    //   where: { id: authenticate_user.id },
-    //   select: {
-    //     role: true
-    //   }
-    // });
 
     if (role?.title !== 'ASSIST_SUPER_ADMIN') throw new Error('Your role have no permissions');
 
-    const schools = await prisma.user.findMany({
+    const schools = await prisma.school.findMany({
       where: {
         admin_panel_id,
       },
       select: {
-        school: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
+        id: true,
+        name: true
       }
     });
     res.status(200).json(schools);

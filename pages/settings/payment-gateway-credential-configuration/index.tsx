@@ -328,7 +328,7 @@ const PaymentGatewayConfiguration = ({ data }) => {
 
 PaymentGatewayConfiguration.getLayout = (page) => {
   return (
-    <Authenticated name='sms_gateway'>
+    <Authenticated requiredPermissions={['add_payment_gateway_credentials']}>
       <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
   );

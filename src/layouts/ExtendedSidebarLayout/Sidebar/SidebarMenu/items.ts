@@ -611,6 +611,11 @@ export const menuItems: MenuItems[] = [
         ]
       },
       {
+        name: 'All SMS Gateways',
+        icon: WifiTetheringErrorIcon,
+        link: '/sms_gateways',
+      },
+      {
         name: 'System',
         icon: SettingsSuggestIcon,
         items: [

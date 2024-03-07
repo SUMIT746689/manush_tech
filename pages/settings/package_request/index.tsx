@@ -92,7 +92,7 @@ const Packages = ({ school }) => {
 };
 
 Packages.getLayout = (page) => (
-  <Authenticated name="teacher">
+  <Authenticated  requiredPermissions={['package_request']}>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

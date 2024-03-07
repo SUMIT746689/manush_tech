@@ -27,4 +27,5 @@ mynewfile.txt
 /public/frontendPhoto
 /services/attendance_service/logs
 /services/sent_sms_service/logs
+/services/external_attendance/logs
 /logs

@@ -79,7 +79,7 @@ function BasicTabs() {
 }
 
 BasicTabs.getLayout = (page) => (
-    <Authenticated requiredPermissions={['request_buy_sms']}>
+    <Authenticated requiredPermissions={['modify_student_auto_sent_sms']}>
       <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
   );

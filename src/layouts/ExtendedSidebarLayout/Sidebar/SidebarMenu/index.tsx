@@ -402,7 +402,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       );
     }
     else if (item.name === 'System') {
-      if (permissions.findIndex(i => i.group == 'package_request') > -1) ev.push(
+      if (permissionVerify(permissions, ['package_request', 'add_payment_gateway_credentials', 'create_sms_gateway', 'request_buy_sms', 'modify_student_auto_sent_sms'])) ev.push(
         <SidebarMenuItem
           key={key}
           active={partialMatch}
@@ -596,7 +596,10 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Banners' ||
       item.name === 'Package payment history' ||
 
+      item.name === 'Package Request' ||
+      item.name === 'Payment Gateway' ||
       item.name === 'Sms Request' ||
+      item.name === 'SMS' ||
       item.name === 'Student Auto Sent Sms'
 
 
@@ -687,8 +690,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       //package
       if (item.name === 'Package payment history' && permissionVerify(permissions, ['package_payment_history'])) sub_menu();
 
-      //settings
+      //settings 
+      if (item.name === 'Package Request' && permissionVerify(permissions, ['package_request'])) sub_menu();
+      if (item.name === 'Payment Gateway' && permissionVerify(permissions, ['add_payment_gateway_credentials'])) sub_menu();
       if (item.name === 'Sms Request' && permissionVerify(permissions, ['request_buy_sms'])) sub_menu();
+      if (item.name === 'SMS' && permissionVerify(permissions, ['create_sms_gateway'])) sub_menu();
       if (item.name === 'Student Auto Sent Sms' && permissionVerify(permissions, ['modify_student_auto_sent_sms'])) sub_menu();
 
     }

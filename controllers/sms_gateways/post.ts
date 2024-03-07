@@ -6,6 +6,8 @@ import { verifyIsMasking } from 'utilities_api/verify';
 async function post(req, res, refresh_token) {
   try {
     const { details, id } = req.body;
+    const { role } = refresh_token;
+    console.log({ role })
 
     if (
       // !title || 
@@ -13,6 +15,7 @@ async function post(req, res, refresh_token) {
     ) throw new Error("provide valid data")
 
     const { sender_id, sms_api_key } = details;
+    if (role?.title !== "ASSIST_SUPER_ADMIN" && sms_api_key) throw new Error("permission denied");
 
     const query = {
       title: 'mram',
@@ -24,7 +27,7 @@ async function post(req, res, refresh_token) {
 
     query.details['is_masking'] = smsType ? true : false;
     query.details['sender_id'] = update_sender_id || undefined;
-    query.details['sms_api_key'] = sms_api_key || '';
+    if (sms_api_key) query.details['sms_api_key'] = sms_api_key;
 
 
     const response = await prisma.smsGateway.upsert({

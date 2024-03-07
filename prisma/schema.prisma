@@ -53,7 +53,8 @@ model AdminPanel {
   logo           String?
   copy_right_txt String?
 
-  users User[] @relation("admin_panel_to_users")
+  users  User[]   @relation("admin_panel_to_users")
+  School School[]
 
   @@map("admin_panels")
 }
@@ -72,12 +73,14 @@ model School {
   masking_sms_price        Float?  @default(0)
   non_masking_sms_price    Float?  @default(0)
   current_academic_year_id Int?
+  admin_panel_id           Int?
   // school should not be created without an existing user
   // admin_id Int     @unique
   // sms_balance           Int? //no_of_sms
   // sms      Json?
 
   // admin          User                 @relation(fields: [admin_id], references: [id], name: "AdminUserSchool")
+  admin_panel                AdminPanel?                  @relation(fields: [admin_panel_id], references: [id])
   currentAcademicYear        AcademicYear?                @relation(fields: [current_academic_year_id], references: [id])
   admins                     User[]                       @relation("AdminUserSchool")
   teachers                   Teacher[]

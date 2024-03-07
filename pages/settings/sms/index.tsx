@@ -11,14 +11,17 @@ import { TextFieldWrapper } from '@/components/TextFields';
 import Footer from '@/components/Footer';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { verifyIsMasking } from 'utilities_api/verify';
+import { useAuth } from '@/hooks/useAuth';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 
 const SMSSettings = () => {
   const { t }: { t: any } = useTranslation();
   const { data, reFetchData } = useClientFetch('/api/sms_gateways?is_active=true');
-
   const { showNotification } = useNotistick();
-
+  const { user } = useAuth();
+  const { role } = user || {};
+  console.log({ user, role })
   return (
     <>
       <Formik
@@ -26,7 +29,7 @@ const SMSSettings = () => {
         initialValues={{
           id: data?.data[0]?.id || 0,
           sms_gateway: data?.data[0]?.details?.sms_gateway || '',
-          // sms_api_key: data?.data[0]?.details?.sms_api_key || '',
+          sms_api_key: data?.data[0]?.details?.sms_api_key || '',
           sender_id: data?.data[0]?.details?.sender_id || '',
           // title: data?.data[0]?.title || 'mram',
           submit: null
@@ -50,17 +53,20 @@ const SMSSettings = () => {
               // title: _values.title,
               details: {
                 // sms_gateway: _values.sms_gateway,
-                // sms_api_key: _values.sms_api_key,
+                sms_api_key: null,
                 sender_id: _values.sender_id
               }
             }
+            // @ts-ignore
+            if (role?.title === "ASSIST_SUPER_ADMIN") v.details.sms_api_key = _values.sms_api_key
             axios.post('/api/sms_gateways', v)
               .then(res => {
                 showNotification('sms information updated!')
                 reFetchData();
               })
               .catch(err => {
-                showNotification('sms information update failed!', 'error')
+                // showNotification("sms information update failed!", error')
+                handleShowErrMsg(err, showNotification)
                 console.log(err);
 
               })
@@ -117,16 +123,21 @@ const SMSSettings = () => {
                         /> */}
 
                         {/* sms_api_key */}
-                        {/* <TextFieldWrapper
-                          label="Sms Api Key"
-                          errors={errors?.sms_api_key}
-                          touched={touched?.sms_api_key}
-                          name="sms_api_key"
-                          // placeholder={t(`sms_api_key here...`)}
-                          handleBlur={handleBlur}
-                          handleChange={handleChange}
-                          value={values?.sms_api_key}
-                        /> */}
+                        {
+                          // @ts-ignore
+                          role?.title === "ASSIST_SUPER_ADMIN" &&
+                          <TextFieldWrapper
+                            label="Sms Api Key"
+                            errors={errors?.sms_api_key}
+                            touched={touched?.sms_api_key}
+                            name="sms_api_key"
+                            // placeholder={t(`sms_api_key here...`)}
+                            handleBlur={handleBlur}
+                            handleChange={handleChange}
+                            value={values?.sms_api_key}
+                          />
+                        }
+
                         <Grid>
                           {/* sender_id */}
                           <TextFieldWrapper
@@ -181,7 +192,7 @@ const SMSSettings = () => {
 
 SMSSettings.getLayout = (page) => {
   return (
-    <Authenticated name='sms_gateway'>
+    <Authenticated requiredPermissions={['create_sms_gateway']}>
       <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
   );

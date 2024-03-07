@@ -4,13 +4,15 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 async function get(req, res, refresh_token) {
   try {
-   
-    const { is_active } = req.query;
 
-    const where = { school_id: Number(refresh_token.school_id) };
+    const { is_active } = req.query;
+    const { role, school_id } = refresh_token;
+
+    const where = {};
+    if (role?.title !== 'ASSIST_SUPER_ADMIN') where["school_id"] = Number(school_id);
 
     if (is_active) where["is_active"] = is_active === "true" ? true : false;
-    
+
     const response = await prisma.smsGateway.findMany({ where })
 
     return res.json({ data: response, success: true });

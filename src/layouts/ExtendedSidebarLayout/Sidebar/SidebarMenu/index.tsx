@@ -600,8 +600,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'Payment Gateway' ||
       item.name === 'Sms Request' ||
       item.name === 'SMS' ||
-      item.name === 'Student Auto Sent Sms'
+      item.name === 'Student Auto Sent Sms' ||
 
+      item.name === 'All SMS Gateways'
 
     ) {
       // switch(item.name){
@@ -696,6 +697,9 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       if (item.name === 'Sms Request' && permissionVerify(permissions, ['request_buy_sms'])) sub_menu();
       if (item.name === 'SMS' && permissionVerify(permissions, ['create_sms_gateway'])) sub_menu();
       if (item.name === 'Student Auto Sent Sms' && permissionVerify(permissions, ['modify_student_auto_sent_sms'])) sub_menu();
+
+      // all sms gateways
+      if (item.name === 'All SMS Gateways' && permissionVerify(permissions, ['add_all_sms_gateways'])) sub_menu();
 
     }
     else sub_menu();

@@ -199,6 +199,7 @@ const postHandle = async (req, res, refresh_token) => {
           father_name: fields?.father_name,
           father_phone: fields?.father_phone,
           father_profession: fields?.father_profession,
+          father_nid: fields?.father_nid,
           // @ts-ignore
           father_photo: filePathQuery?.father_photo_path,
           mother_name: fields?.mother_name,
@@ -206,6 +207,7 @@ const postHandle = async (req, res, refresh_token) => {
           mother_profession: fields?.mother_profession,
           // @ts-ignore
           mother_photo: filePathQuery?.mother_photo_path,
+          mother_nid: fields?.mother_nid,
 
           student_permanent_address: fields?.student_permanent_address,
           previous_school: fields?.previous_school,
@@ -244,6 +246,8 @@ const postHandle = async (req, res, refresh_token) => {
           guardian_profession: fields?.guardian_profession,
           // @ts-ignore
           guardian_photo: filePathQuery?.guardian_photo_path,
+          guardian_nid: filePathQuery?.guardian_nid,
+
           relation_with_guardian: fields?.relation_with_guardian,
           student_present_address: fields?.student_present_address,
           ...group,

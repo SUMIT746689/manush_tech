@@ -188,6 +188,8 @@ const patchHandle = async (req, res, authenticate_user) => {
                     guardian_profession: fields?.guardian_profession,
                     //@ts-ignore
                     guardian_photo: filePathQuery?.guardian_photo_path,
+                    guardian_nid: fields?.guardian_nid,
+
                     relation_with_guardian: fields?.relation_with_guardian,
                     student_present_address: fields?.student_present_address,
                     section: {
@@ -219,11 +221,15 @@ const patchHandle = async (req, res, authenticate_user) => {
                             father_profession: fields?.father_profession,
                             //@ts-ignore
                             father_photo: filePathQuery?.father_photo_path,
+                            //@ts-ignore
+                            father_nid: fields?.father_nid,
+
                             mother_name: fields?.mother_name,
                             mother_phone: fields?.mother_phone,
                             mother_profession: fields?.mother_profession,
                             //@ts-ignore
                             mother_photo: filePathQuery?.mother_photo_path,
+                            mother_nid: fields?.mother_nid,
 
                             student_permanent_address: fields?.student_permanent_address,
                             previous_school: fields?.previous_school,

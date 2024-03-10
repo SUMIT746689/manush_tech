@@ -253,10 +253,12 @@ model StudentInformation {
   father_phone              String?
   father_profession         String?
   father_photo              String?
+  father_nid                String?
   mother_name               String?
   mother_phone              String?
   mother_profession         String?
   mother_photo              String?
+  mother_nid                String?
   student_permanent_address String?
   previous_school           String?
 
@@ -281,6 +283,7 @@ model Student {
   guardian_phone          String?
   guardian_profession     String?
   guardian_photo          String?
+  guardian_nid            String?
   relation_with_guardian  String?
   student_present_address String?
   created_at              DateTime?          @default(now())

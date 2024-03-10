@@ -43,7 +43,7 @@ export default function StudentForm({ student = null, handleClose = null, online
     if (handleClose) handleClose();
     else router.push('/management/students');
   };
-  console.log("totalFormData___", totalFormData);
+
   return (
     <>
       <Grid>

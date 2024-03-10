@@ -25,7 +25,6 @@ import { AcademicYearContext, Students } from '@/contexts/UtilsContextUse';
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
 import '@fullcalendar/timegrid/main.css'
-import prisma from '@/lib/prisma_client';
 // import { headers } from 'next/headers';
 
 const clientSideEmotionCache = createEmotionCache();

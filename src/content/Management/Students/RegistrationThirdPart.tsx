@@ -17,9 +17,10 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
-import { FileUploadFieldWrapper } from '@/components/TextFields';
+import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 import { getFile } from '@/utils/utilitY-functions';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
+import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUpload';
 
 function RegistrationFirstPart({
   totalFormData,
@@ -39,6 +40,7 @@ function RegistrationFirstPart({
   const [mother_photo, setMother_photo] = useState(null);
   const [guardian_photo, setGuardian_photo] = useState(null);
 
+  console.log({ student })
   return (
     <>
       <Formik
@@ -46,15 +48,24 @@ function RegistrationFirstPart({
           father_name: student ? (student?.student_info?.father_name || student?.father_name || '') : '',
           father_phone: student ? (student?.student_info?.father_phone || student?.father_phone || '') : '',
           father_profession: student ? (student?.student_info?.father_profession || student?.father_profession || '') : '',
+          father_nid: student ? (student?.student_info?.father_nid || student?.father_nid || '') : '',
           father_photo: null,
+          preview_father_photo: [],
+
           mother_name: student ? (student?.student_info?.mother_name || student?.mother_name || '') : '',
           mother_phone: student ? (student?.student_info?.mother_phone || student?.mother_phone || '') : '',
           mother_profession: student ? (student?.student_info?.mother_profession || student?.mother_profession || '') : '',
+          mother_nid: student ? (student?.student_info?.mother_nid || student?.mother_nid || '') : '',
           mother_photo: null,
+          preview_mother_photo: [],
+
           guardian_name: student ? student?.guardian_name : '',
           guardian_phone: student ? student?.guardian_phone : '',
           guardian_profession: student ? student?.guardian_profession : '',
+          guardian_nid: student ? student?.guardian_nid : '',
           guardian_photo: null,
+          preview_guardian_photo: [],
+
           relation_with_guardian: student ? student?.relation_with_guardian : '',
           filePathQuery: student ? student?.filePathQuery : {}
         }}
@@ -95,7 +106,9 @@ function RegistrationFirstPart({
             const formData = new FormData();
 
             for (let i in _values) {
-              if (i == 'filePathQuery') formData.append(`${i}`, JSON.stringify(_values[i]));
+              if (["preview_mother_photo", "preview_father_photo", "preview_guardian_photo"].includes(i)){}
+              else if (["mother_photo", "father_photo", "guardian_photo"].includes(i)) _values[i] && formData.append(`${i}`, _values[i][0])
+              else if (i == 'filePathQuery') formData.append(`${i}`, JSON.stringify(_values[i]));
               else if (_values[i]) formData.append(`${i}`, _values[i]);
             }
             const handleSubmitSuccess = () => {
@@ -150,7 +163,7 @@ function RegistrationFirstPart({
           values,
           setFieldValue
         }) => {
-          // console.log("T__values__",values);
+          console.log("T__values__", errors);
 
           return (
             <form onSubmit={handleSubmit}>
@@ -163,353 +176,283 @@ function RegistrationFirstPart({
                 <Grid container>
                   <Grid container item spacing={1}>
                     {/* father_name */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.father_name && errors.father_name
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.father_name && errors.father_name}
-                        label={t('Father name')}
-                        name="father_name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.father_name}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"father_name"}
+                        errors={errors?.father_name}
+                        touched={touched?.father_name}
+                        label={t(`Father Name:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.father_name}
                       />
                     </Grid>
                     {/* father_phone */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.father_phone && errors.father_phone
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.father_phone && errors.father_phone}
-                        label={t('father phone number')}
-                        name="father_phone"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.father_phone}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"father_phone"}
+                        errors={errors?.father_phone}
+                        touched={touched?.father_phone}
+                        label={t(`Father Phone Number:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.father_phone}
                       />
                     </Grid>
                     {/* father_profession */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.father_profession && errors.father_profession
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.father_profession && errors.father_profession
-                        }
-                        label={t('father Profession')}
-                        name="father_profession"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.father_profession}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"father_profession"}
+                        errors={errors?.father_profession}
+                        touched={touched?.father_profession}
+                        label={t(`Father Profession:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.father_profession}
                       />
                     </Grid>
-                    {/* father_photo */}
-                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
-                      <Grid item>
-                        <Image src={father_photo ? father_photo : getFile(student?.student_info?.father_photo || student?.filePathQuery?.father_photo_path)}
-                          height={100}
-                          width={100}
-                          alt="Father's photo:"
-                          loading='lazy'
-                        />
+                    {/* father_nid */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"father_nid"}
+                        errors={errors?.father_nid}
+                        touched={touched?.father_nid}
+                        label={t(`Father NID:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.father_nid}
+                      />
+                    </Grid>
 
-                      </Grid>
-                      <br />
-                      <FileUploadFieldWrapper
-                        htmlFor="father_photo"
-                        label="Select Father's photo::"
-                        name="father_photo"
-                        value={values?.father_photo?.name || student?.student_info?.father_photo || ''}
-                        handleChangeFile={(e) => {
-                          if (e.target?.files?.length) {
-                            const photoUrl = URL.createObjectURL(e.target.files[0]);
-                            setFather_photo(photoUrl)
-                            setFieldValue('father_photo', e.target.files[0])
-                          }
-                        }}
-                        handleRemoveFile={(e) => {
-                          setFather_photo(null);
-                          setFieldValue('father_photo', undefined)
-                        }}
+                    {/* mother_name */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"mother_name"}
+                        errors={errors?.mother_name}
+                        touched={touched?.mother_name}
+                        label={t(`Mother Name:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.mother_name}
                       />
                     </Grid>
-                    {/* mather_name */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.mother_name && errors.mother_name
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.father_name && errors.mother_name}
-                        label={t('Mother name')}
-                        name="mother_name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.mother_name}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    {/* mather_phone */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.mother_phone && errors.mother_phone
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={touched.mother_phone && errors.mother_phone}
-                        label={t('Mother phone number')}
-                        name="mother_phone"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.mother_phone}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    {/* mather_profession */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.mother_profession && errors.mother_profession
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.mother_profession && errors.mother_profession
-                        }
-                        label={t('Mother profession')}
-                        name="mother_profession"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.mother_profession}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    {/* mather_photo */}
-                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
 
-                      <Grid item>
-                        <Image src={mother_photo ? mother_photo : getFile(student?.student_info?.mother_photo || student?.filePathQuery?.mother_photo_path)}
-                          height={100}
-                          width={100}
-                          alt="Mother's photo:"
-                          loading='lazy'
-                        />
-
-                      </Grid>
-                      <br />
-                      <FileUploadFieldWrapper
-                        htmlFor="mother_photo"
-                        label="Select Mother's photo::"
-                        name="mother_photo"
-                        value={values?.mother_photo?.name || student?.student_info?.mother_photo || ''}
-                        handleChangeFile={(e) => {
-                          if (e.target?.files?.length) {
-                            const photoUrl = URL.createObjectURL(e.target.files[0]);
-                            setMother_photo(photoUrl)
-                            setFieldValue('mother_photo', e.target.files[0])
-                          }
-                        }}
-                        handleRemoveFile={(e) => {
-                          setMother_photo(null);
-                          setFieldValue('mother_photo', undefined)
-                        }}
+                    {/* mother_phone */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"mother_phone"}
+                        errors={errors?.mother_phone}
+                        touched={touched?.mother_phone}
+                        label={t(`Mother Phone Number:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.mother_phone}
                       />
                     </Grid>
+
+                    {/* mother_profession */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"mother_profession"}
+                        errors={errors?.mother_profession}
+                        touched={touched?.mother_profession}
+                        label={t(`Mother Profession:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.mother_profession}
+                      />
+                    </Grid>
+
+                    {/* mother_nid */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"mother_nid"}
+                        errors={errors?.mother_nid}
+                        touched={touched?.mother_nid}
+                        label={t(`Mother NID:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.mother_nid}
+                      />
+                    </Grid>
+
                     {/* guardian_name */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.guardian_name && errors.guardian_name
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.guardian_name && errors.guardian_name
-                        }
-                        label={t('Guardian name')}
-                        name="guardian_name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.guardian_name}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"guardian_name"}
+                        errors={errors?.guardian_name}
+                        touched={touched?.guardian_name}
+                        label={t(`Guardian Name:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.guardian_name}
                       />
                     </Grid>
+
                     {/* guardian_phone */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.guardian_phone && errors.guardian_phone
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.guardian_phone && errors.guardian_phone
-                        }
-                        label={t('Guardian phone')}
-                        name="guardian_phone"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.guardian_phone}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"guardian_phone"}
+                        errors={errors?.guardian_phone}
+                        touched={touched?.mother_phone}
+                        label={t(`Guardian Phone Number:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.guardian_phone}
                       />
                     </Grid>
+
                     {/* guardian_profession */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.guardian_profession &&
-                          errors.guardian_profession
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.guardian_profession &&
-                          errors.guardian_profession
-                        }
-                        label={t('Guardian profession')}
-                        name="guardian_profession"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.guardian_profession}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"guardian_profession"}
+                        errors={errors?.guardian_profession}
+                        touched={touched?.guardian_profession}
+                        label={t(`Guardian Profession:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.guardian_profession}
                       />
                     </Grid>
-                    {/* guardian_photo */}
-                    <Grid container p={1} gap={1} item xs={12} sm={6} md={6}>
 
-                      <Grid item>
-                        <Image src={guardian_photo ? guardian_photo : getFile(student?.guardian_photo || student?.filePathQuery?.guardian_photo_path)}
-                          height={100}
-                          width={100}
-                          alt="Guardian's photo:"
-                          loading='lazy'
-                        />
-
-                      </Grid>
-                      <br />
-                      <FileUploadFieldWrapper
-                        htmlFor="guardian_photo"
-                        label="Select Guardian's photo:"
-                        name="guardian_photo"
-                        value={values?.guardian_photo?.name || student?.guardian_photo || ''}
-                        handleChangeFile={(e) => {
-                          if (e.target?.files?.length) {
-                            const photoUrl = URL.createObjectURL(e.target.files[0]);
-                            setGuardian_photo(photoUrl)
-                            setFieldValue('guardian_photo', e.target.files[0])
-                          }
-                        }}
-                        handleRemoveFile={(e) => {
-                          setGuardian_photo(null);
-                          setFieldValue('guardian_photo', undefined)
-                        }}
+                    {/* guardian nid */}
+                    <Grid item xs={12} sm={6}>
+                      <TextFieldWrapper
+                        name={"guardian_nid"}
+                        errors={errors?.guardian_nid}
+                        touched={touched?.guardian_nid}
+                        label={t(`Guardian NID:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.guardian_nid}
                       />
                     </Grid>
+
                     {/* relation_with_guardian */}
-                    <Grid item xs={12} sm={6} md={6}>
-                      <TextField
-                        size="small"
-                        sx={{
-                          '& fieldset': {
-                            borderRadius: '3px'
-                          }
-                        }}
-                        error={Boolean(
-                          touched.relation_with_guardian &&
-                          errors.relation_with_guardian
-                        )}
-                        fullWidth
-                        margin="normal"
-                        helperText={
-                          touched.relation_with_guardian &&
-                          errors.relation_with_guardian
-                        }
-                        label={t('Relation with guardian')}
-                        name="relation_with_guardian"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="text"
-                        value={values.relation_with_guardian}
-                        variant="outlined"
+                    <Grid item xs={12} sm={6} >
+                      <TextFieldWrapper
+                        name={"relation_with_guardian"}
+                        errors={errors?.relation_with_guardian}
+                        touched={touched?.relation_with_guardian}
+                        label={t(`Relation With Guardian:`)}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values?.relation_with_guardian}
                       />
                     </Grid>
+
+                    {/*father photo*/}
+                    <Grid item xs={12} sm={6}>
+                      <Grid item >
+                        <NewFileUploadFieldWrapper
+                          htmlFor="father_photo"
+                          accept="image/*"
+                          handleChangeFile={(e) => handleFileChange(e, setFieldValue, "father_photo", "preview_father_photo")}
+                          label='Father Photo'
+                        />
+                      </Grid>
+                      <Grid item>
+                        {
+                          values?.preview_father_photo?.map((image, index) => (
+                            <>
+                              <PreviewImageCard
+                                data={image}
+                                index={index}
+                                key={index}
+                                handleRemove={() => handleFileRemove(setFieldValue, "father_photo", "preview_father_photo")}
+                              />
+                            </>
+                          ))
+                        }
+                      </Grid>
+                      <Grid item>
+                        {
+                          student?.student_info?.father_photo &&
+                          <Image src={getFile(student?.student_info?.father_photo)}
+                            height={150}
+                            width={150}
+                            alt='Logo'
+                            loading='lazy'
+                          />
+                        }
+                      </Grid>
+                    </Grid>
+
+                    {/*mother photo*/}
+                    <Grid item xs={12} sm={6}>
+                      <Grid item xs={12}>
+                        <NewFileUploadFieldWrapper
+                          htmlFor="mother_photo"
+                          accept="image/*"
+                          handleChangeFile={(e) => handleFileChange(e, setFieldValue, "mother_photo", "preview_mother_photo")}
+                          label='Mother Photo'
+                        />
+                      </Grid>
+                      <Grid item>
+                        {
+                          values?.preview_mother_photo?.map((image, index) => (
+                            <>
+                              <PreviewImageCard
+                                data={image}
+                                index={index}
+                                key={index}
+                                handleRemove={() => handleFileRemove(setFieldValue, "mother_photo", "preview_mother_photo")}
+                              />
+                            </>
+                          ))
+                        }
+                      </Grid>
+                      <Grid item>
+                        {
+                          student?.student_info?.mother_photo &&
+                          <Image src={getFile(student?.student_info?.mother_photo)}
+                            height={150}
+                            width={150}
+                            alt='Logo'
+                            loading='lazy'
+                          />
+                        }
+                      </Grid>
+                    </Grid>
+
+                    {/* guardian_photo */}
+                    <Grid item xs={12} sm={6}>
+                      <Grid item xs={12}>
+                        <NewFileUploadFieldWrapper
+                          htmlFor="guardian_photo"
+                          accept="image/*"
+                          handleChangeFile={(e) => handleFileChange(e, setFieldValue, "guardian_photo", "preview_guardian_photo")}
+                          label='Guardian Photo'
+                        />
+                      </Grid>
+                      <Grid item>
+                        {
+                          values?.preview_guardian_photo?.map((image, index) => (
+                            <>
+                              <PreviewImageCard
+                                data={image}
+                                index={index}
+                                key={index}
+                                handleRemove={() => handleFileRemove(setFieldValue, "guardian_photo", "preview_guardian_photo")}
+                              />
+                            </>
+                          ))
+                        }
+                      </Grid>
+                      <Grid item>
+                        {
+                          student?.guardian_photo &&
+                          <Image src={getFile(student?.guardian_photo)}
+                            height={150}
+                            width={150}
+                            alt='guardian photo'
+                            loading='lazy'
+                            style={{width:150,height:150,objectFit:"contain"}}
+                          />
+                        }
+                      </Grid>
+                    </Grid>
+
                   </Grid>
                 </Grid>
               </DialogContent>

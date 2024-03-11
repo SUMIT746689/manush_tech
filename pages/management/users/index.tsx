@@ -13,7 +13,6 @@ function ManagementUsers() {
   const { data: allUsers, reFetchData } = useClientFetch('/api/user')
   const { data: roles } = useClientFetch('/api/role/school_other_role')
   const [editUser, setEditUser] = useState(null);
-  console.log({ roles });
 
   return (
     <>

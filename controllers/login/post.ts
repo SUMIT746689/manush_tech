@@ -69,7 +69,7 @@ export default async function post(req, res) {
     // admin_panel domain verification
     const {adminPanel} = user ;
     const host = req.headers.host;
-    if(host !== adminPanel?.domain) throw new Error("Login using correct domain address") 
+    if(user.role.title !== "SUPER_ADMIN" && host !== adminPanel?.domain) throw new Error("Login using correct domain address") 
 
     if (user_id) {
       if (user.role_id) {

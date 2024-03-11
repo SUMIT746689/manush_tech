@@ -51,13 +51,11 @@ export async function getServerSideProps(context: any) {
   } catch (err) {
     console.log(err)
   }
-  const parseJson = JSON.parse(JSON.stringify(school));
-
+  const parseJson = JSON.parse(JSON.stringify(school || {}));
   return { props: { school: parseJson } }
 }
 const Packages = ({ school }) => {
   const { showNotification } = useNotistick()
-  console.log({ school });
   const router = useRouter()
 
   useEffect(() => {

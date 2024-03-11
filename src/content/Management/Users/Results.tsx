@@ -468,7 +468,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                             <TableCell>
                               {/* @ts-ignore */}
                               <Typography variant="h5" noWrap >
-                                {i?.domain}
+                                <a href={`http://${i?.adminPanel?.domain || "#"}`} >{i?.adminPanel?.domain}</a>
                               </Typography>
                             </TableCell>
                             :

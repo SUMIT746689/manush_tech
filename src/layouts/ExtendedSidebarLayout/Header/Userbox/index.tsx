@@ -209,7 +209,6 @@ function HeaderUserbox({ current_active_academic_year }) {
       data: [465, 546, 234, 576, 554, 338, 427, 348, 586, 254, 348]
     }
   ];
-  console.log({ current_active_academic_year })
 
   return (
     <>

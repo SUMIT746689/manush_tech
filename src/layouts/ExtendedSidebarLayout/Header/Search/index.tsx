@@ -4,7 +4,8 @@ import {
   Ref,
   useState,
   ReactElement,
-  ChangeEvent
+  ChangeEvent,
+  useEffect
 } from 'react';
 import {
   Box,
@@ -22,7 +23,8 @@ import {
   alpha,
   Slide,
   styled,
-  useTheme
+  useTheme,
+  Alert
 } from '@mui/material';
 import Link from 'src/components/Link';
 
@@ -37,6 +39,9 @@ import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
 import DashboardTwoToneIcon from '@mui/icons-material/DashboardTwoTone';
 import AppSettingsAltTwoToneIcon from '@mui/icons-material/AppSettingsAltTwoTone';
 import KeyboardArrowRightTwoToneIcon from '@mui/icons-material/KeyboardArrowRightTwoTone';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const wait = (time: number): Promise<void> =>
   new Promise((res) => setTimeout(res, time));
@@ -107,41 +112,6 @@ const ListButton = styled(Box)(
 `
 );
 
-const searchTerms = {
-  Dashboards: [
-    {
-      title: 'Automation UI'
-    },
-    {
-      title: 'Banking Performance'
-    },
-    {
-      title: 'Fitness Statistics'
-    }
-  ],
-  Applications: [
-    {
-      title: 'Events Manager'
-    },
-    {
-      title: 'Messenging Platform'
-    }
-  ],
-  Management: [
-    {
-      title: 'Products Admin'
-    },
-    {
-      title: 'Customers Database'
-    },
-    {
-      title: 'Learning Center'
-    },
-    {
-      title: 'Invoices Archive'
-    }
-  ]
-};
 
 function HeaderSearch() {
   const { t }: { t: any } = useTranslation();
@@ -149,32 +119,13 @@ function HeaderSearch() {
 
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
-  const submitSearch = async (event): Promise<void> => {
-    event.preventDefault();
-    setSearchResults(false);
-    setSearchLoading(true);
-    await wait(1500);
-    setSearchLoading(false);
-    setSearchResults(true);
-  };
+  const { showNotification } = useNotistick();
 
-  const handleSearchChange = async (event: ChangeEvent<{ value: unknown }>) => {
-    event.preventDefault();
-
-    if (event.target.value) {
-      setSearchResults(false);
-      setSearchValue(event.target.value as string);
-      setSearchLoading(true);
-      await wait(1500);
-      setSearchLoading(false);
-      setSearchResults(true);
-    } else {
-      setSearchValue('');
-      setSearchResults(false);
-    }
-  };
+  const handleSearchChange = (event: ChangeEvent<{ value: unknown }>) => {
+    setSearchValue(event.target.value as string);
+  }
 
   const [open, setOpen] = useState(false);
 
@@ -186,11 +137,38 @@ function HeaderSearch() {
     setOpen(false);
   };
 
+  const handleFetch = async () => {
+    try {
+      if (!searchValue || searchValue.length < 3) return setSearchResults([]);
+      setSearchLoading(true)
+      const { data } = await axios.get(`/api/student/search-students?search_value=${searchValue}`);
+      setSearchResults(data)
+    } catch (err) {
+      setSearchResults([])
+      handleShowErrMsg(err, showNotification)
+      console.log({ err })
+    } finally {
+      // setTimeout(() => 
+      setSearchLoading(false)
+      // , 5000)
+    }
+  }
+
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      handleFetch()
+      // handleDebounce(value);
+      // handleSearchChange(searchValue)
+    }, 500);
+
+    return () => clearTimeout(getData);
+  }, [searchValue]);
+
   return (
     <>
-      <Tooltip arrow title={t('Search')}>
-        <IconButtonWrapper color="primary" onClick={handleClickOpen}>
-          <SearchTwoToneIcon fontSize="small" />
+      <Tooltip arrow title={t('Search Student')}>
+        <IconButtonWrapper sx={{ borderColor: "red" }} onClick={handleClickOpen}>
+          <SearchTwoToneIcon sx={{ fontSize: 40, color: "white", p: 0.5, ":hover": { border: "1px solid white", borderRadius: 0.5 } }} fontSize="small" />
         </IconButtonWrapper>
       </Tooltip>
 
@@ -204,7 +182,9 @@ function HeaderSearch() {
         onClose={handleClose}
       >
         <Box>
-          <form onSubmit={submitSearch}>
+          <form
+          // onSubmit={submitSearch}
+          >
             <Box display="flex" alignItems="center">
               <Box flexGrow={1} display="flex" alignItems="center">
                 <SearchTwoToneIcon
@@ -242,9 +222,9 @@ function HeaderSearch() {
           </form>
         </Box>
         <Divider />
-        {!searchLoading && (
+        {/* {!searchLoading && (
           <>
-            {!searchResults && (
+            {searchResults.length === 0 && (
               <Typography
                 variant="subtitle1"
                 component="div"
@@ -270,307 +250,43 @@ function HeaderSearch() {
               </Typography>
             )}
           </>
-        )}
+        )} */}
+        {
+          searchValue.length < 3 &&
+          <Alert severity="warning" sx={{ mx: 2, mt: 1 }}>Minimum 3 character required...</Alert>
+        }
         {searchLoading ? (
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              my: 5
+              py: 5,
+              height: 450,
             }}
           >
             <CircularProgress />
           </Box>
         ) : (
           <>
-            {searchResults ? (
-              <Box
-                sx={{
-                  height: 450
-                }}
-              >
-                <Scrollbar>
-                  {Object.keys(searchTerms).map((type, index) => (
-                    <Box px={2} py={1} key={index}>
-                      <Typography
-                        sx={{
-                          py: 1
-                        }}
-                        variant="h5"
-                      >
-                        {type}
-                      </Typography>
-                      {searchTerms[type].map((result) => (
-                        <Fragment key={result.title}>
-                          <ListButton>
-                            <Box display="flex" alignItems="flex-start">
-                              <RestoreTwoToneIcon
-                                sx={{
-                                  mr: 1
-                                }}
-                                fontSize="small"
-                              />
-                              <Typography>{result.title}</Typography>
-                            </Box>
-                            <KeyboardArrowRightTwoToneIcon fontSize="small" />
-                          </ListButton>
-                        </Fragment>
-                      ))}
-                    </Box>
-                  ))}
-                </Scrollbar>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  height: 450
-                }}
-              >
-                <Scrollbar>
-                  <Box pb={2} px={2}>
-                    <Typography
-                      sx={{
-                        pb: 0.5
-                      }}
-                      variant="h5"
-                    >
-                      {t('Recent searches')}
-                    </Typography>
+            <Box
+              sx={{
+                height: 450,
+                px: 1
+              }}
+            >
+              <Scrollbar>
+                {searchResults?.map((result) => (
+                  <Link href={`/students/${result?.id}`} key={result.id} style={{ textDecoration: "none" }} onClick={handleClose}>
                     <ListButton>
-                      <Box display="flex" alignItems="center">
-                        <RestoreTwoToneIcon
-                          sx={{
-                            mr: 1
-                          }}
-                          fontSize="small"
-                        />
-                        <Typography>Analytics dashboard</Typography>
+                      <Box display="flex" alignItems="flex-start">
+                        <Typography>{result.first_name} {result?.middle_name || ''} {result?.last_name} | class: {result?.class_name} | section: {result?.section_name} | roll: {result?.class_roll_no}</Typography>
                       </Box>
-                      <Box>
-                        <Tooltip
-                          placement="top"
-                          arrow
-                          title={t('Save this search')}
-                        >
-                          <IconButton size="small" color="primary">
-                            <StarTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          placement="top"
-                          arrow
-                          title={t('Remove this search from history')}
-                        >
-                          <IconButton size="small" color="error">
-                            <CloseTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
+                      <KeyboardArrowRightTwoToneIcon fontSize="small" />
                     </ListButton>
-                    <ListButton>
-                      <Box display="flex" alignItems="center">
-                        <RestoreTwoToneIcon
-                          sx={{
-                            mr: 1
-                          }}
-                          fontSize="small"
-                        />
-                        <Typography>Top navigation layout</Typography>
-                      </Box>
-                      <Box>
-                        <Tooltip
-                          placement="top"
-                          arrow
-                          title={t('Save this search')}
-                        >
-                          <IconButton size="small" color="primary">
-                            <StarTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          placement="top"
-                          arrow
-                          title={t('Remove this search from history')}
-                        >
-                          <IconButton size="small" color="error">
-                            <CloseTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </ListButton>
-                    <Typography
-                      sx={{
-                        pt: 2,
-                        pb: 0.5
-                      }}
-                      variant="h5"
-                    >
-                      {t('Saved searches')}
-                    </Typography>
-                    <ListButton>
-                      <Box display="flex" alignItems="center">
-                        <StarTwoToneIcon
-                          sx={{
-                            mr: 1
-                          }}
-                          fontSize="small"
-                        />
-                        <Typography>Hospital overview page</Typography>
-                      </Box>
-                      <Box>
-                        <Tooltip
-                          placement="top"
-                          arrow
-                          title={t('Remove this search from favourites')}
-                        >
-                          <IconButton size="small" color="error">
-                            <CloseTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </ListButton>
-                    <Divider
-                      sx={{
-                        my: 4
-                      }}
-                    />
-                    <Typography variant="h5">
-                      {t('Popular searches')}
-                    </Typography>
-                    <Box p={4}>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            display="flex"
-                            mb={1}
-                            fontSize={13}
-                            alignItems="center"
-                          >
-                            <DashboardTwoToneIcon
-                              sx={{
-                                color: theme.colors.primary.main,
-                                fontSize: theme.typography.pxToRem(18),
-                                mr: 1
-                              }}
-                            />
-                            <b>{t('Dashboards')}</b>
-                          </Box>
-                          <List disablePadding>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Tasks for today')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Statistics dashboard')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Monitoring admin')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Banking interface')}
-                              </Link>
-                            </ListItem>
-                          </List>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            display="flex"
-                            mb={1}
-                            fontSize={13}
-                            alignItems="center"
-                          >
-                            <AppSettingsAltTwoToneIcon
-                              sx={{
-                                color: theme.colors.primary.main,
-                                fontSize: theme.typography.pxToRem(18),
-                                mr: 1
-                              }}
-                            />
-                            <b>{t('Management')}</b>
-                          </Box>
-                          <List disablePadding>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Calendar')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('File manager')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Products list')}
-                              </Link>
-                            </ListItem>
-                            <ListItem
-                              sx={{
-                                pl: 3,
-                                py: 0.4
-                              }}
-                              disableGutters
-                            >
-                              <Link href="#" color="primary" fontSize={13}>
-                                {t('Recent orders')}
-                              </Link>
-                            </ListItem>
-                          </List>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Scrollbar>
-              </Box>
-            )}
+                  </Link>
+                ))}
+              </Scrollbar>
+            </Box>
           </>
         )}
       </DialogWrapper>

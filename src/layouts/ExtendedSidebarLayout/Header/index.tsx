@@ -28,6 +28,7 @@ import menuItems from '../Sidebar/SidebarMenu/items';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
+import SearchInputWrapper from '@/components/SearchInput';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -99,7 +100,6 @@ function Header() {
 
         axios.get('/api/academic_years/current_user')
           .then(({ data }) => {
-            console.log({ data })
             if (data?.success) setSelectedAcademicYear(() => ({ id: data.data.id, label: data.data.title }))
           })
 
@@ -155,9 +155,14 @@ function Header() {
       })
       .catch((error) => { showNotification("failed to change academic year", "error") })
   }
-  const permissionsArray = auth?.user?.permissions?.length > 0
-    ? auth?.user?.permissions?.map((permission: any) => permission.group)
-    : [];
+  // const permissionsArray = auth?.user?.permissions?.length > 0
+  //   ? auth?.user?.permissions?.map((permission: any) => permission.group)
+  //   : [];
+
+  const permissionsArray_ =
+    auth?.user?.permissions?.length > 0
+      ? auth?.user?.permissions?.map((permission: any) => permission.value)
+      : [];
 
   return (
     <HeaderWrapper
@@ -215,7 +220,7 @@ function Header() {
           <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
-              // label="Academic Year"
+              // label="Academic Year"  
               label=""
               placeholder="select a academic year..."
               value={selectedAcademicYear}
@@ -240,6 +245,7 @@ function Header() {
               </span>
             </Grid>
           )}
+
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
           (
@@ -254,7 +260,13 @@ function Header() {
                 handleChange={handleAcademicYearChange}
               />
             </Grid>
-          )}
+          )
+        }
+
+        {
+          permissionsArray_.includes("show_students") &&
+          <HeaderSearch />
+        }
         {/* <HeaderButtons /> */}
         <HeaderUserbox current_active_academic_year={current_active_academic_year} />
 

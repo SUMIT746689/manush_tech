@@ -58,7 +58,7 @@ const StudentProfile = ({ student }) => {
     return (
         <>
             <PageTitleWrapper>
-                <Grid display={{sm:"flex"}} justifyContent="space-between">
+                <Grid display={{ sm: "flex" }} justifyContent="space-between">
                     <Grid item>
                         <Typography variant="h3" component="h3" gutterBottom>
                             {t('Student Profile')}
@@ -67,7 +67,7 @@ const StudentProfile = ({ student }) => {
                             {t(`Student Name: ${student?.student_info?.first_name} ${student?.student_info?.middle_name || ''} ${student?.student_info?.last_name || ''}`)}
                         </Typography>
                     </Grid>
-                    <Grid item display="flex" my="auto" pt={{xs:1,sm:0}} columnGap={1} columnSpacing={1}>
+                    <Grid item display="flex" my="auto" pt={{ xs: 1, sm: 0 }} columnGap={1} columnSpacing={1}>
                         <Link href={"/management/attendence/normalAttendence"}><ButtonWrapper handleClick={() => { }}>attendance page  <KeyboardArrowRightTwoToneIcon fontSize="small" /></ButtonWrapper></Link>
                         <Link href={"/management/student_fees_collection"}><ButtonWrapper handleClick={() => { }}>fees page <KeyboardArrowRightTwoToneIcon fontSize="small" /> </ButtonWrapper></Link>
                     </Grid>
@@ -82,7 +82,7 @@ const StudentProfile = ({ student }) => {
 
 
 StudentProfile.getLayout = (page) => (
-    <Authenticated name="student">
+    <Authenticated requiredPermissions={["show_students"]}>
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

@@ -67,6 +67,7 @@ import { customizeDate } from '@/utils/customizeDate';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -272,10 +273,9 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
   //change user active or disable 
   const handleUserEnabled = async (user) => {
-    // console.log({user})
-    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !user.is_enabled, role: user.user_role });
-    if (response.message) reFetchData(true)
-    console.log({ err, response });
+    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled, role: user?.user_role });
+    if (response?.message) reFetchData(true);
+    if (err) showNotification(err, "error")
   }
   //@ts-ignore
   const isNotSuperAdmin = user?.role?.title !== 'ASSIST_SUPER_ADMIN'
@@ -342,7 +342,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
             /> */}
             <DebounceInput
               debounceTimeout={500}
-              handleDebounce={(v)=>setQuery(v)}
+              handleDebounce={(v) => setQuery(v)}
               value={searchValue}
               handleChange={(v) => setSearchValue(v.target?.value)}
               label={t('Search by Username or School...')}

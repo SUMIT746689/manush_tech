@@ -25,7 +25,7 @@ const main = async () => {
             const { external_api_info, school } = singleResp;
             const { url_params } = external_api_info || {};
 
-            const date = new Date(Date.now() - 60000 * 4);
+            const date = new Date(Date.now() - 60000 * 3);
             const today = date.toLocaleDateString('en-CA');
             const start_time = date.toLocaleTimeString('en-US', { hour12: false });
 
@@ -141,6 +141,6 @@ const main = async () => {
     }
 }
 
-// setInterval(() => {
+setInterval(() => {
 main();
-// }, 60000 * 3)
+}, 60000 * 2)

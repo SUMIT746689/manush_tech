@@ -23,7 +23,6 @@ const main = async () => {
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
             const { external_api_info, school } = singleResp;
-            console.log({ school })
             const { url_params } = external_api_info || {};
 
             const date = new Date(Date.now() - 60000 * 4);
@@ -44,7 +43,7 @@ const main = async () => {
                 }
             });
 
-            if (!auth_user || !auth_code) return logFile.error("auth_user or auth_code field not founds")
+            if (!auth_user || !auth_code) return logFile.error(`school(${school?.name})auth_user or auth_code field not founds`)
 
             // const smsBody = {
             //     operation: "fetch_log",
@@ -67,35 +66,40 @@ const main = async () => {
             }
             const { data } = await axios.post("https://rumytechnologies.com/rams/json_api", smsBody);
 
-            const datas = await prisma.user.findFirst({
-                where: {
-                    AND: [
-                        { username: "mehedi" },
-                        { school: { name: { equals: school?.name } } }
-                    ],
-                },
-                select: {
-                    id: true,
-                    school_id: true,
-                    student: {
-                        select: {
-                            variance: {
-                                where: { academic_year: { curr_active: true } },
-                                select: {
-                                    id: true
+            if (!Array.isArray(data?.log)) return logFile.error(`auth_user(${auth_user}) response(${data})`);
+
+            // const tbl_attendance_queue_datas = [];
+
+            // for (let attendance_stat of data?.log) {
+            data?.log.forEach(async attendance_stat => {
+                const { registration_id, user_name, access_id, unit_id, card, access_time, access_date } = attendance_stat;
+
+                const datas = await prisma.user.findFirst({
+                    where: {
+                        AND: [
+                            { username: user_name },
+                            { school: { name: { equals: school?.name } } }
+                        ],
+                    },
+                    select: {
+                        id: true,
+                        school_id: true,
+                        student: {
+                            select: {
+                                variance: {
+                                    where: { academic_year: { curr_active: true } },
+                                    select: {
+                                        id: true
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-
-            if (!Array.isArray(data?.log)) return logFile.error(`auth_user(${auth_user}) response(${data})`);
-
-            const tbl_attendance_queue_datas = [];
-
-            data?.log.forEach(attendance_stat => {
-                const { registration_id, access_id, unit_id, card, access_time, access_date } = attendance_stat;
+                });
+                if (!datas) {
+                    return logFile.error(`auth_user(${auth_user}), user not founds username(${user_name}) `);
+                    // continue;
+                };
 
                 const time = new Date(access_date);
                 const access_time_ = access_time.split(':');
@@ -103,27 +107,40 @@ const main = async () => {
                 time.setUTCMinutes(access_time_[1])
                 time.setUTCSeconds(access_time_[2])
 
-                tbl_attendance_queue_datas.push({
-                    school_id: datas.school_id,
-                    machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
-                    user_id: datas.id,
-                    status: 1,
-                    submission_time: time
-                });
-            });
+                // tbl_attendance_queue_datas.push({
+                //     school_id: datas.school_id,
+                //     machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
+                //     user_id: datas.id,
+                //     status: 1,
+                //     submission_time: time
+                // });
 
-            await prisma.tbl_attendance_queue.createMany({
-                data: tbl_attendance_queue_datas
-            });
+                await prisma.tbl_attendance_queue.create({
+                    data: {
+                        school_id: datas.school_id,
+                        machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
+                        user_id: datas.id,
+                        status: 1,
+                        submission_time: time
+                    }
+                }).catch((err) => {
+                    logFile.error(`user_id(${datas?.id})` + err.message)
+                });
+            }
+            );
+
+            // await prisma.tbl_attendance_queue.createMany({
+            //     data: tbl_attendance_queue_datas
+            // });
 
         });
     }
     catch (err) {
         logFile.error(err.message)
-        console.log({ err: err.message })
+        // console.log({ err: err.message })
     }
 }
 
-setInterval(() => {
+// setInterval(() => {
 main();
-}, 60000 * 3)
+// }, 60000 * 3)

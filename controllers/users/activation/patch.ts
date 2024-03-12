@@ -4,11 +4,11 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 const patch = async (req, res, refresh_token) => {
   try {
-    const { role, is_enabled } = req.body;
+    const { is_enabled } = req.body;
     const { id } = req.query;
     const { admin_panel_id } = refresh_token;
     
-    if (!role || typeof is_enabled !== 'boolean') throw new Error('provide role informations');
+    if (typeof is_enabled !== 'boolean') throw new Error('provide role informations');
 
     const deactive_user = await prisma.user.findFirst({
       where: { id: parseInt(id), admin_panel_id },

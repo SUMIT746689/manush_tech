@@ -273,10 +273,17 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
   //change user active or disable 
   const handleUserEnabled = async (user) => {
-    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled, role: user?.user_role });
+    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled});
     if (response?.message) reFetchData(true);
     if (err) showNotification(err, "error")
   }
+
+  const handleCngAdminPanelActiveStatus = async (user)=>{
+    const [err, response]: any = await fetchData(`/api/admin_panels/activations/${user.id}`, 'patch', { is_active: !!!user?.adminPanel?.is_active});
+    if (response?.message) reFetchData(true);
+    if (err) showNotification(err, "error")
+  }
+
   //@ts-ignore
   const isNotSuperAdmin = user?.role?.title !== 'ASSIST_SUPER_ADMIN'
   return (
@@ -434,6 +441,12 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                         <TableCell><Typography noWrap>{t('School name')}</Typography></TableCell>
                     }
                     <TableCell><Typography noWrap align='center'>{t('Active Status')}</Typography></TableCell>
+                    {
+                      // @ts-ignore
+                      user?.role?.title === "SUPER_ADMIN" &&
+                      <TableCell><Typography noWrap>{t('Admin Panel (Active Status)')}</Typography></TableCell>
+
+                    }
                     <TableCell><Typography noWrap align='center'>{t('Actions')}</Typography></TableCell>
                   </TableRow>
                 </TableHead>
@@ -488,6 +501,18 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                             <Switch checked={i?.is_enabled} onClick={() => handleUserEnabled(i)} />
                           </Typography>
                         </TableCell>
+
+                        {
+                          // @ts-ignore
+                          user?.role?.title === "SUPER_ADMIN" &&
+                          <TableCell align="center">
+                            <Typography variant="h5" color={i?.adminPanel?.is_active ? 'green' : 'red'}>
+                              {/* {user?.is_enabled ? 'Enable' : 'Disable'} */}
+                              <Switch checked={i?.adminPanel?.is_active} onClick={() => handleCngAdminPanelActiveStatus(i)} />
+                            </Typography>
+                          </TableCell>
+
+                        }
 
                         <TableCell align="center">
                           <Typography noWrap align='center' sx={{ display: 'flex', flexWrap: "nowrap", justifyContent: 'space-around', }}>

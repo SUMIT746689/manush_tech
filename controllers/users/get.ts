@@ -77,7 +77,8 @@ export const get = async (req, res, refresh_token) => {
           select: {
             domain: true,
             logo: true,
-            copy_right_txt: true
+            copy_right_txt: true,
+            is_active: true
           }
         },
         user_role: {

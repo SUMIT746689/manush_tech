@@ -23,6 +23,7 @@ const main = async () => {
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
             const { external_api_info, school } = singleResp;
+            console.log({ school })
             const { url_params } = external_api_info || {};
 
             const date = new Date(Date.now() - 60000 * 4);
@@ -54,7 +55,7 @@ const main = async () => {
             //     start_time: "12:00:00",
             //     end_time: "23:59:59"
             // };
-            console.log({ today, start_time })
+            // console.log({ today, start_time })
             const smsBody = {
                 operation: "fetch_log",
                 auth_user: auth_user,
@@ -70,7 +71,7 @@ const main = async () => {
                 where: {
                     AND: [
                         { username: "mehedi" },
-                        { school: { name: { equals: "my school and college" } } }
+                        { school: { name: { equals: school?.name } } }
                     ],
                 },
                 select: {
@@ -124,5 +125,5 @@ const main = async () => {
 }
 
 setInterval(() => {
-    main();
+main();
 }, 60000 * 3)

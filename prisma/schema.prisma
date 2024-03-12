@@ -52,6 +52,7 @@ model AdminPanel {
   domain         String  @unique
   logo           String?
   copy_right_txt String?
+  is_active      Boolean @default(true)
 
   users  User[]   @relation("admin_panel_to_users")
   School School[]

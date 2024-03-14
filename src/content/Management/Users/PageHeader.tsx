@@ -25,6 +25,7 @@ import Image from 'next/image';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { getFile } from '@/utils/utilitY-functions';
 import { DebounceInput, NewDebounceInput } from '@/components/DebounceInput';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
@@ -36,7 +37,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   }, [editUser]);
 
   const permissons = [
-    { label: 'Assistant Super Admin', role: 'ASSIST_SUPER_ADMIN', value: 'create_assist_super_user' },
+    { label: 'Assistant Super Admin', role: 'ASSIST_SUPER_ADMIN', value: 'create_assist_super_admin' },
     { label: 'Admin', role: 'ADMIN', value: 'create_admin' },
     { label: 'Guardian', role: 'GURDIAN', value: 'create_gurdian' },
     { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
@@ -76,7 +77,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   const handleFormSubmit = async (_values, formValue) => {
     const { resetForm, setErrors, setStatus, setSubmitting } = formValue
     try {
-      const hansleResponseSuccess = (msg) => {
+      const handleResponseSuccess = (msg) => {
         resetForm();
         setStatus({ success: true });
         setSubmitting(false);
@@ -96,17 +97,18 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       }
       if (editUser) {
         await axios.patch(`/api/user/${editUser.id}`, formData)
-        hansleResponseSuccess('The user account was edited successfully')
+        handleResponseSuccess('The user account was edited successfully')
       }
       else {
         await axios.post(`/api/user`, formData)
-        hansleResponseSuccess('The user account was created successfully')
+        handleResponseSuccess('The user account was created successfully')
       }
 
       // await wait(1000);
     } catch (err) {
       console.log(err);
-      showNotification(err?.response?.data?.error, 'error')
+      // showNotification(err?.response?.data?.error, 'error');
+      handleShowErrMsg(err, showNotification)
       setStatus({ success: false });
       // @ts-ignore
       setErrors({ submit: err.message });

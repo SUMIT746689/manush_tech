@@ -79,9 +79,15 @@ export const post = async (req, res, refresh_token) => {
 
     if (fetch_req_user_role?.title !== "SUPER_ADMIN" && domain && logo && copy_right_txt) throw new Error("permission denied for doamin/logo/copy_right fields")
     if (fetch_req_user_role?.title === "SUPER_ADMIN") {
-      const create_admin_panel = { create: {} }
+      if (!domain) throw new Error("domain field is required");
+      const create_admin_panel = {
+        create: {
+          domain
+        }
+      }
       if (files?.logo?.newFilename) create_admin_panel.create["logo"] = path.join(uploadFolderName, files.logo.newFilename);
       if (copy_right_txt) create_admin_panel.create["copy_right_txt"] = copy_right_txt;
+
       data["adminPanel"] = create_admin_panel;
     }
     else data.adminPanel = { connect: { id: admin_panel_id } }

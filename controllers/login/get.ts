@@ -4,7 +4,6 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 async function get(req: any, res: any, refresh_token: any) {
   try {
-    console.log({ req: req.headers.host });
     const { admin_panel_id } = refresh_token
 
     const user = await prisma.user.findFirst({

@@ -106,8 +106,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
 
       // await wait(1000);
     } catch (err) {
-      console.log(err);
-      // showNotification(err?.response?.data?.error, 'error');
       handleShowErrMsg(err, showNotification)
       setStatus({ success: false });
       // @ts-ignore
@@ -126,15 +124,13 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           setIsAvailableUsername(null)
         })
         .catch(err => {
-          console.log("error", err?.response?.data?.message)
           setIsAvailableUsername(err?.response?.data?.message)
         })
     }
   }
 
   const handleFileChange = (e, setFieldValue, field, preview_field) => {
-    console.log({ e: e?.target?.files, setFieldValue })
-
+   
     if (e?.target?.files?.length === 0) {
       setFieldValue(field, '');
       setFieldValue(preview_field, []);
@@ -155,7 +151,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     setFieldValue(field, '');
     setFieldValue(preview_field, []);
   }
-  console.log({ temp })
   return (
     <>
       <PageHeaderTitleWrapper
@@ -242,7 +237,6 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             setFieldValue,
             setErrors
           }) => {
-            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

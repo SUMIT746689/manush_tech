@@ -273,13 +273,13 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
   //change user active or disable 
   const handleUserEnabled = async (user) => {
-    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled});
+    const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled });
     if (response?.message) reFetchData(true);
     if (err) showNotification(err, "error")
   }
 
-  const handleCngAdminPanelActiveStatus = async (user)=>{
-    const [err, response]: any = await fetchData(`/api/admin_panels/activations/${user.id}`, 'patch', { is_active: !!!user?.adminPanel?.is_active});
+  const handleCngAdminPanelActiveStatus = async (user) => {
+    const [err, response]: any = await fetchData(`/api/admin_panels/activations/${user.id}`, 'patch', { is_active: !!!user?.adminPanel?.is_active });
     if (response?.message) reFetchData(true);
     if (err) showNotification(err, "error")
   }
@@ -654,12 +654,24 @@ const MenuList = ({ targetUser, setEditUser, reFetchData, setSelectedUser, setPe
   const { t }: { t: any } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const { showNotification } = useNotistick();
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleAutoLogin = async (id) => {
+    if(!id || typeof id !== "number") return showNotification("user id not founds or not number");
+    const [err, data] = await fetchData(`/api/login/automatics/${id}`, 'post', {});
+    if (err) return showNotification(err,"error");
+    window.location.href= "/";
+    // @ts-ignore
+    // await superAdminLogInAsAdmin(targetUser.id);
+  };
+
   return (
     <div>
       <ButtonWrapper
@@ -686,14 +698,7 @@ const MenuList = ({ targetUser, setEditUser, reFetchData, setSelectedUser, setPe
           <ButtonWrapper
             startIcon={<LoginIcon fontSize="small" />}
             variant="outlined"
-            handleClick={async () => {
-              try {
-                // @ts-ignore
-                await superAdminLogInAsAdmin(targetUser.id);
-              } catch (err) {
-                console.error(err);
-              }
-            }}
+            handleClick={() => handleAutoLogin(targetUser?.id)}
           >
             {t('Log in')}
           </ButtonWrapper>

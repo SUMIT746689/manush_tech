@@ -30,7 +30,6 @@ export const post = async (req, res, refresh_token) => {
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName, uniqueFileName: false });
 
-    console.log({ error })
     const { username, password, role, domain, logo, copy_right_txt } = fields;
     const parseRole = JSON.parse(role)
 
@@ -135,7 +134,6 @@ export const post = async (req, res, refresh_token) => {
     // res.status(200).json({ data });
   } catch (err) {
     logFile.error(err.message)
-    console.log(err.message);
     res.status(404).json({ error: err.message });
   }
 };

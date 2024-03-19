@@ -37,7 +37,7 @@ export default async function post(req, res) {
     }
 
     const user = await prisma.user.findFirst({
-      where: { ...query },
+      where: { ...query, adminPanel: { is_active: true } },
       include: {
         permissions: true,
         adminPanel: true,

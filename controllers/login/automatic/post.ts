@@ -67,7 +67,6 @@ const automaticLogin = async (req, res, refresh_token) => {
                 throw new Error("permission denied")
         };
 
-        console.log(resLoginUser)
         const academic_year_max_age = (!Array.isArray(resLoginUser.school?.academic_years) || resLoginUser.school?.academic_years.length === 0) ? 0 : 15456432416531;
 
         const cookies = [

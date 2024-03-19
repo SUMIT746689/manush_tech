@@ -21,7 +21,8 @@ export default async function post(req, res) {
     if (request_refresh_token) {
       //for super admin and admin login there available users 
       // if (request_refresh_token && (request_refresh_token.role?.title === 'ADMIN' || request_refresh_token.role?.title === 'ASSIST_SUPER_ADMIN')) {
-      console.log(request_refresh_token);
+      // console.log(request_refresh_token);
+
       //superadmin login as admin
       if (
         request_refresh_token
@@ -37,7 +38,7 @@ export default async function post(req, res) {
     }
 
     const user = await prisma.user.findFirst({
-      where: { ...query, adminPanel: { is_active: true } },
+      where: { ...query },
       include: {
         permissions: true,
         adminPanel: true,
@@ -67,10 +68,14 @@ export default async function post(req, res) {
     if (!user) throw new Error(`Invalid Authorization`);
 
     // admin_panel domain verification
-    const {adminPanel} = user ;
+    const { adminPanel } = user;
     const host = req.headers.host;
-    if(user.role.title !== "SUPER_ADMIN" && host !== adminPanel?.domain) throw new Error("Login using correct domain address") 
 
+    if (user.role.title !== "SUPER_ADMIN") {
+      if (host !== adminPanel?.is_active) throw new Error("Admin Panel is desabled");
+      if (host !== adminPanel?.domain) throw new Error("Login using correct domain address");
+    }
+    
     if (user_id) {
       if (user.role_id) {
         if (user.role.title === 'ASSIST_SUPER_ADMIN' && request_refresh_token.role?.title === 'ADMIN') {

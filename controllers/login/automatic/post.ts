@@ -67,8 +67,8 @@ const automaticLogin = async (req, res, refresh_token) => {
                 throw new Error("permission denied")
         };
 
-
-        const academic_year_max_age = (!Array.isArray(resLoginUser.school.academic_years) || resLoginUser.school.academic_years.length === 0) ? 0 : 15456432416531;
+        console.log(resLoginUser)
+        const academic_year_max_age = (!Array.isArray(resLoginUser.school?.academic_years) || resLoginUser.school?.academic_years.length === 0) ? 0 : 15456432416531;
 
         const cookies = [
             makeCookie(serialize, 'access_token', handleCreateToken({ user: resLoginUser, secret: process.env.JWT_REFRESH_TOKEN_SECRET, expiresIn: '5000ms' }), 5),
@@ -106,7 +106,7 @@ const handleGetAcademicYearFromCookie = (request) => {
     return dcrypt_cookie;
 }
 const handleCreateAcademicYearToken = (user) => {
-    if (!Array.isArray(user.school.academic_years) || user.school.academic_years.length === 0) return ''
+    if (!Array.isArray(user.school?.academic_years) || user.school?.academic_years?.length === 0) return ''
     const academic_year_cookie_datas = { id: user.school.academic_years[0].id, title: user.school.academic_years[0].title, school_id: user.school.academic_years[0].school_id }
 
     const encryptData = encrypt(academic_year_cookie_datas);

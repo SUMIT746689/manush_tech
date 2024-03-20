@@ -64,7 +64,6 @@ export default async function post(req, res) {
       }
     });
 
-    console.log({ user: user?.school?.academic_years })
     if (!user) throw new Error(`Invalid Authorization`);
 
     // admin_panel domain verification
@@ -72,7 +71,7 @@ export default async function post(req, res) {
     const host = req.headers.host;
 
     if (user.role.title !== "SUPER_ADMIN") {
-      if (host !== adminPanel?.is_active) throw new Error("Admin Panel is disabled");
+      if (!adminPanel?.is_active) throw new Error("Admin Panel is disabled");
       if (host !== adminPanel?.domain) throw new Error("Login using correct domain address");
     }
 

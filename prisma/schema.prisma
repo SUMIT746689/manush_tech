@@ -1470,3 +1470,28 @@ model VoiceGateway {
 
   @@map("voice_gateways")
 }
+
+model tbl_sent_voice_sms {
+  id                Int             @id @default(autoincrement())
+  message_id        String          @unique
+  send_by_user_id   Int
+  send_by_user_name String
+  status            Int             @default(0) // 0-> new, 1-> paush, 2-> processing, 3-> fails
+  voice_url         String
+  contacts          String          @db.LongText
+  sender_id         String
+  // is_masking        Boolean
+  pushed_via        pushed_via_enum
+  school_id         Int
+  logs              String?
+  created_at        DateTime        @default(now())
+  updated_at        DateTime?
+
+  @@map("tbl_sent_voice_sms")
+}
+
+enum pushed_via_enum {
+  voice_recipient
+  group_contact
+  file_upload
+}

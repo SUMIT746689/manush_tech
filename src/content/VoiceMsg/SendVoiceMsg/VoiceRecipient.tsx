@@ -201,7 +201,7 @@ const VoiceRecipient: FC<VoiceRecipientType> = ({ gateways, templates }) => {
                                                 }
                                                 handleBlur={handleBlur}
                                             />
-                                            <Grid>Exmp: <span style={{ fontSize: "12px", color: "teal" }}>8801776900000 8801910000000</span></Grid>
+                                            <Grid>Exmp: <span style={{ fontSize: "12px", color: "teal" }}>8801776900000,8801910000000</span></Grid>
                                         </Grid>
                                         {/* <GateWaySelect /> */}
 

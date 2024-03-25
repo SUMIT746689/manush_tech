@@ -62,6 +62,7 @@
     "formik": "^2.2.9",
     "formik-mui": "4.0.0-alpha.3",
     "formik-mui-lab": "1.0.0-alpha.3",
+    "get-audio-duration": "^4.0.1",
     "html-react-parser": "^4.0.0",
     "i18next-browser-languagedetector": "6.1.4",
     "jsonwebtoken": "^8.5.1",

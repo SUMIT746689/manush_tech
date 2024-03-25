@@ -14,7 +14,7 @@ import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 const postHandle = async (req, res, refresh_token) => {
   try {
     if (!refresh_token?.school_id) throw new Error('permission denied');
-
+    const { admin_panel_id } = refresh_token;
     const subscription = await prisma.subscription.findFirstOrThrow({
       where: {
         AND: [
@@ -223,7 +223,8 @@ const postHandle = async (req, res, refresh_token) => {
               user_photo: filePathQuery?.student_photo_path,
               user_role: { connect: { id: student_role.id } },
               role: { connect: { id: student_role.id } },
-              school: { connect: { id: parseInt(fields.school_id) } }
+              school: { connect: { id: parseInt(fields.school_id) } },
+              adminPanel: { connect: { id: admin_panel_id } }
             }
           }
         }

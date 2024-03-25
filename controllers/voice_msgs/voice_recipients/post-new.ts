@@ -1,12 +1,15 @@
 import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
 import { readFileSync } from 'fs';
+import getAudioDurationInSeconds from 'get-audio-duration';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
+import { handleGetFileDuration } from 'utilities_api/fileDuration';
 import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
+    let voice_file_path ;
     try {
 
         const { id: auth_user_id, name: auth_user_name, school_id } = refresh_token;
@@ -32,19 +35,28 @@ async function post(req, res, refresh_token) {
 
         const { gateway_id, msisdn } = fields;
         const { voice_file } = files;
+        voice_file_path = voice_file.filepath;
 
         if (!gateway_id || !msisdn || !voice_file) throw new Error("provide all required datas");
 
-        const findGateway = await prisma.voiceGateway.findFirst({ where: { id: parseInt(gateway_id), school_id } });
-        console.log({ findGateway });
+        const findGateway = await prisma.voiceGateway.findFirst({ where: { id: parseInt(gateway_id), school_id }, select: { details: true } });
 
         //@ts-ignore
-        if (!findGateway || !findGateway?.details?.sender_id || typeof findGateway?.details?.is_masking !== "boolean") throw new Error("sms gateway/serder_id/is_masking not founds")
+        if (!findGateway || !findGateway?.details?.sender_id) throw new Error("sms gateway/serder_id not founds")
 
-        const { details: { sender_id, is_masking } }: any = findGateway
+        const { details: { sender_id } }: any = findGateway
 
         const formData = new FormData();
         const blob = new Blob([readFileSync(voice_file.filepath)]);
+        let duration;
+        await getAudioDurationInSeconds(voice_file.filepath)
+            .then((duration_) => {
+                duration = duration_;
+            })
+            .catch(err => {
+                console.log({ err_____: err });
+                logFile.error(err);
+            })
 
         const dateNow = new Date()
         const createUniqueMagId = String(auth_user_id) + String(dateNow.getTime());
@@ -87,12 +99,11 @@ async function post(req, res, refresh_token) {
         formData.set("type", total_contact_count > 1 ? "single" : "group")
 
         formData.set("audio_file", blob, voice_file.newFilename)
-        formData.set("duration", "3")
+        formData.set("duration", String(duration))
         // formData.set("sender_id", "8809677602858")
         formData.set("sender_id", sender_id)
         formData.set("base_url", "http://msg.elitbuzz-bd.com")
 
-        // console.log(formData)
         const resp = await fetch(process.env.voice_sms_api,
             {
                 headers: { 'Authorization': 'Bearer PktcjYCSqYgM6zR1uhozUmd0unVr5LnB' },
@@ -101,10 +112,9 @@ async function post(req, res, refresh_token) {
             }
         );
         const respJson = await resp.json();
-        // console.log(respJson);
-        // if (respJson.code !== 200) throw new Error(respJson.data);
 
-        const respUpdateVoiceSms = await prisma.tbl_sent_voice_sms.update({
+        // update voice sms data
+        await prisma.tbl_sent_voice_sms.update({
             where: { id: respCreateVoiceSms.id },
             data: {
                 status: respJson?.code === 200 ? 0 : 3,
@@ -112,7 +122,10 @@ async function post(req, res, refresh_token) {
             }
         });
 
-        if (respJson.code !== 200) throw new Error(respJson.data);
+        if (respJson.code !== 200) {
+            voice_file_path = null;
+            throw new Error(respJson.data);
+        }
 
         return res.json({ data: respJson.data, success: true });
 

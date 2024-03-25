@@ -151,7 +151,7 @@ const VoiceRecipient: FC<VoiceRecipientType> = ({ gateways, templates }) => {
                         isSubmitting, touched, values,
                         setFieldValue
                     }) => {
-                        console.log({ values, errors });
+                        // console.log({ values, errors });
                         return (
                             <form onSubmit={handleSubmit}>
                                 <DialogContent

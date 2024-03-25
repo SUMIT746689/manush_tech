@@ -8,6 +8,8 @@ import adminCheck from 'middleware/adminCheck';
 import { logFile } from 'utilities_api/handleLogFile';
 
 const post = async (req, res, refresh_token) => {
+
+  const { admin_panel_id } = refresh_token;
   const uploadFolderName = 'teacher';
 
   const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
@@ -135,7 +137,8 @@ const post = async (req, res, refresh_token) => {
             user_photo: optionalQuery.photo,
             role: { connect: { id: teacher_role.id } },
             user_role: { connect: { id: teacher_role.id } },
-            school: { connect: { id: refresh_token.school_id } }
+            school: { connect: { id: refresh_token.school_id } },
+            adminPanel: { connect: { id: admin_panel_id } }
           }
         }
       }

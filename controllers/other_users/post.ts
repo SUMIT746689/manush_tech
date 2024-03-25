@@ -7,10 +7,12 @@ import prisma from '@/lib/prisma_client';
 import adminCheck from 'middleware/adminCheck';
 import { logFile } from 'utilities_api/handleLogFile';
 import { verifyPermissions } from 'utilities_api/verifyPermissions';
-import { TextRotationAngledownRounded } from '@mui/icons-material';
 
 const post = async (req, res, refresh_token) => {
   try {
+
+    const { admin_panel_id } = refresh_token;
+
     const uploadFolderName = 'other_users';
 
     const resumeFileType = ['application/pdf', 'application/vnd.ms-excel'];
@@ -109,7 +111,7 @@ const post = async (req, res, refresh_token) => {
           console.log('Successfully moved file!')
         })
       }
-      console.log({employee_id})
+      console.log({ employee_id })
       const resOtherUsersInfo = await prisma.otherUsersInfo.create({
         // @ts-ignore
         data: {
@@ -132,7 +134,8 @@ const post = async (req, res, refresh_token) => {
               user_photo: optionalQuery.photo,
               role: { connect: { id: teacher_role.id } },
               user_role: { connect: { id: teacher_role.id } },
-              school: { connect: { id: refresh_token.school_id } }
+              school: { connect: { id: refresh_token.school_id } },
+              adminPanel: { connect: { id: admin_panel_id } }
             }
           }
         }

@@ -1,4 +1,4 @@
-import post from 'controllers/voice_msgs/voice_recipients/post-new';
+import post from 'controllers/voice_msgs/voice_recipients/post';
 import { logFile } from 'utilities_api/handleLogFile';
 
 export const config = {

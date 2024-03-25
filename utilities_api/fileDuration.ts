@@ -1,20 +1,15 @@
 import { getAudioDurationInSeconds } from 'get-audio-duration';
-import { logFile } from './handleLogFile';
 
-export const handleGetFileDuration = async (path):Promise<any> => {
-    console.log({path})
-    try{
+export const handleGetFileDuration = async (path): Promise<any> => {
+    console.log({ path });
+    let duration = null;
+    let err = null;
     await getAudioDurationInSeconds(path)
-        .then((duration) => {
-            return [duration, null];
+        .then((duration_) => {
+            duration = duration_
         })
-        .catch(err => {
-            console.log({err_____:err})
-            logFile.error(err);
-            return [null, err];
+        .catch(err_ => {
+            err = err_
         })
-    }
-    catch(err){
-        console.log({err})
-    }
+    return [duration, err];
 }

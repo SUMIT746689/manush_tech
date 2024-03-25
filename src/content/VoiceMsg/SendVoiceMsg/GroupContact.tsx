@@ -174,13 +174,13 @@ function GroupContact({ sms_gateway }) {
     return (
         <>
             <VoiceFileRequiremntAlert voiceFileRequiremntShow={voiceFileRequiremntShow} setVoiceFileRequiremntShow={setVoiceFileRequiremntShow} />
-            <Card sx={{ mt: 1, borderRadius: 0, boxShadow: 'none', mb: 'auto' }}>
+            <Card sx={{ width: "100%", mt: 1, borderRadius: 0, boxShadow: 'none', mb: 'auto' }}>
                 {/* dialog title */}
                 {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
                 <Formik
                     initialValues={{
-                        campaign_name: '',
+                        // campaign_name: '',
                         sms_gateway: sms_gateway?.details?.sender_id || '',
                         sms_gateway_id: sms_gateway?.id || undefined,
                         voice_file: undefined,
@@ -221,7 +221,7 @@ function GroupContact({ sms_gateway }) {
                                 >
                                     <Grid container rowGap={1}>
 
-                                        <Grid container>
+                                        {/* <Grid container>
                                             <Grid pb={0.5}>Campaign Name :*</Grid>
                                             <TextFieldWrapper
                                                 label=""
@@ -233,7 +233,7 @@ function GroupContact({ sms_gateway }) {
                                                 handleBlur={handleBlur}
                                                 required={true}
                                             />
-                                        </Grid>
+                                        </Grid> */}
 
                                         <Grid container>
                                             <Grid container>

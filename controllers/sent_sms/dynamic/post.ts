@@ -45,7 +45,7 @@ async function post(req, res, refresh_token) {
       }
     })
     // if(smsGatewayRes.)
-    console.log({ smsGatewayRes })
+    // console.log({ smsGatewayRes })
     const { id: smsGatewayId, details } = smsGatewayRes;
     const { sender_id, is_masking } = <any>details ?? {};
 

@@ -783,11 +783,12 @@ model SmsTemplate {
 }
 
 model VoiceTemplate {
-  id         Int      @id @default(autoincrement())
-  name       String
-  voice_url  String
-  school_id  Int
-  created_at DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  name           String
+  voice_url      String
+  voice_duration Int
+  school_id      Int
+  created_at     DateTime @default(now())
 
   school School @relation(fields: [school_id], references: [id])
 

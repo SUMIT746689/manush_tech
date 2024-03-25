@@ -35,24 +35,13 @@ function FileUpload({ sms_gateway }) {
             };
 
             const datas = new FormData()
-            // datas.set('file', "asss")
 
             for (const [key, value] of Object.entries(_values)) {
-                console.log(`${key}: ${value}`);
-                // @ts-ignore
-                if (key === "contact_column") datas.set(key, value.id)
-                else if (value) datas.set(key, _values[key]);
+                if (["gateway_id", "contact_file"].includes(key)) datas.set(key, _values[key]);
+                else if (key === "voice_file") datas.set(key, _values[key][0])
             }
-            console.log({ datas })
-            // const {file_upload} = _values;
-            // const fileToBlob = new Blob([new Uint8Array(await file_upload.arrayBuffer())], {type: file_upload.type });
-            // _values.file_upload.arrayBuffer().then((arrayBuffer) => {
-            //   const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file_upload.type });
-            //   console.log({blob});
-            // }); 
-            // _values.file_upload = fileToBlob;
-            console.log({ _values })
-            const { data } = await axios.post(`/api/sent_sms/dynamic`, datas);
+
+            const { data } = await axios.post(`/api/voice_msgs/file_uploads`, datas);
             successResponse('created');
 
         } catch (err) {
@@ -96,19 +85,6 @@ function FileUpload({ sms_gateway }) {
             if (err) showNotification(err, "error");
             setFieldValue('contact_file', files[0]);
             setFieldValue('preview_contact_file', objFiles[0]);
-
-            // setPreviewFile(() => imgPrev)
-
-            // const workbook = read(data, { type: "array" });
-
-            // console.log({ workbook })
-            // const { Sheets } = workbook;
-            // console.log({ Sheets })
-            // const { Sheet1 } = {} = Sheets || {};
-            // const { Sheet1: { A1 } } = {} = Sheets || {};
-            // console.log({ Sheet1 })
-            // // setFieldValue("file_upload", e );
-            // setSelectSheetHeaders(() => getSheetHeaders(Sheet1))
         }
         reader.readAsArrayBuffer(event.target.files[0]);
     }
@@ -118,58 +94,36 @@ function FileUpload({ sms_gateway }) {
         setFile('preview_file_upload', '');
     }
 
-    // function handleFile(file /*:File*/) {
-    //   /* Boilerplate to set up FileReader */
-    //   const reader = new FileReader();
-    //   const rABS = !!reader.readAsBinaryString;
-    //   reader.onload = e => {
-    //     /* Parse data */
-    //     const bstr = e.target.result;
-    //     const wb = XLSX.read(bstr, { type: rABS ? "binary" : "array" });
-    //     /* Get first worksheet */
-    //     const wsname = wb.SheetNames[0];
-    //     const ws = wb.Sheets[wsname];
-    //     console.log(rABS, wb);
-    //     /* Convert array of arrays */
-    //     const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-    //     /* Update state */
-    //     console.log({ data: data, cols: make_cols(ws["!ref"]) });
-    //   };
-    //   reader.readAsBinaryString(file)
-    // };
-
     return (
         <>
             <VoiceFileRequiremntAlert voiceFileRequiremntShow={voiceFileRequiremntShow} setVoiceFileRequiremntShow={setVoiceFileRequiremntShow} />
-            <Card sx={{ mt: 1, borderRadius: 0, boxShadow: "none", mb: 'auto' }}>
+            <Card sx={{ width:"100%", mt: 1, borderRadius: 0, boxShadow: "none", mb: 'auto' }}>
                 {/* dialog title */}
                 {/* <DialogTitleWrapper name={"Sms Templates"} /> */}
 
                 <Formik
                     initialValues={{
-                        campaign_name: '',
-                        sms_gateway: sms_gateway?.details?.sender_id || '',
-                        sms_gateway_id: sms_gateway?.id || undefined,
-                        contact_column: null,
-                        file_upload: undefined,
-                        preview_file_upload: [],
+                        // campaign_name: '',
+                        gateway: sms_gateway?.details?.sender_id || '',
+                        gateway_id: sms_gateway?.id || undefined,
+                        contact_file: undefined,
+                        preview_contact_file: [],
+                        voice_file: undefined,
+                        preview_voice_file: [],
                         schedule_date: undefined,
                         schedule_time: undefined,
                         submit: null
                     }}
                     validationSchema={Yup.object().shape({
-                        campaign_name: Yup.string()
-                            .max(255)
-                            .required(t('The campaign name field is required')),
-                        body: Yup.string()
-                            .max(255)
-                            .required(t('The body field is required')),
-                        // sms_gateway_id: Yup.number()
-                        //   .min(0)
-                        //   .required(t('The sms gateway field is required')),
-                        // recipient_type: Yup.string()
-                        //   .min(4)
-                        //   .required(t('The type field is required')),
+                        gateway_id: Yup.number()
+                        .required(t('')),
+                        contact_file: Yup.mixed()
+                            .required(t('The audio file field is required')),
+                        voice_file: Yup.mixed()
+                            .required(t('The audio file field is required')),
+                        // campaign_name: Yup.string()
+                        //     .max(255)
+                        //     .required(t('The campaign name field is required')),
                     })}
                     onSubmit={handleFormSubmit}
                 >
@@ -178,6 +132,7 @@ function FileUpload({ sms_gateway }) {
                         isSubmitting, touched, values,
                         setFieldValue
                     }) => {
+                        console.log({ values })
                         return (
                             <form onSubmit={handleSubmit}>
                                 <DialogContent
@@ -185,7 +140,7 @@ function FileUpload({ sms_gateway }) {
                                 >
                                     <Grid container rowGap={1}>
 
-                                        <Grid container>
+                                        {/* <Grid container>
                                             <Grid pb={0.5}>Campaign Name: *</Grid>
                                             <TextFieldWrapper
                                                 label=""
@@ -197,24 +152,24 @@ function FileUpload({ sms_gateway }) {
                                                 handleBlur={handleBlur}
                                                 required={true}
                                             />
-                                        </Grid>
+                                        </Grid> */}
 
                                         <Grid container>
                                             <Grid pb={0.5}>Selected Sms Gateway: *</Grid>
                                             <DisableTextWrapper
                                                 label=""
-                                                touched={values.sms_gateway}
-                                                errors={errors.sms_gateway}
-                                                value={values.sms_gateway}
+                                                touched={values.gateway}
+                                                errors={errors.gateway}
+                                                value={values.gateway}
                                             />
                                             {
                                                 Boolean(
                                                     // touched.sms_gateway_id 
                                                     // && 
-                                                    errors.sms_gateway_id
+                                                    errors.gateway_id
                                                 ) &&
                                                 <Grid display="flex" columnGap={2} justifyContent="space-between">
-                                                    <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                                                    <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.gateway_id} </Grid>
                                                     <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
                                                 </Grid>
 
@@ -272,34 +227,6 @@ function FileUpload({ sms_gateway }) {
                                                 }
                                             </>
                                         }
-                                        {/* <Grid width="100%">
-                                            <Grid pb={0.5}>Select Mobile Number: * (from upload file column) </Grid>
-                                            <AutoCompleteWrapper
-                                                minWidth="100%"
-                                                label=''
-                                                placeholder='select mobile number column... '
-                                                options={selectSheetHeaders?.map(i => {
-                                                    return {
-                                                        label: i,
-                                                        id: i
-                                                    }
-                                                }) || []}
-                                                value={values.contact_column}
-                                                handleChange={(e, value) => {
-                                                    console.log("contact", value)
-                                                    setFieldValue("contact_column", value)
-                                                }}
-                                            />
-                                        </Grid> */}
-
-                                        {/* <Grid display="flex" width={'100%'} gap={1} mt={1} mb={0.5} justifyContent={'right'} >
-                                            <Grid display={"flex"} justifyContent={"right"} flexWrap={"wrap"} gap={0.5}>
-                                                {selectSheetHeaders.map((value, index) => <Chip key={index} color="primary" onClick={(e) => {
-                                                    setFieldValue("body", (values.body || '') + ` #${value}#`)
-                                                }} sx={{ borderRadius: 0.5, fontSize: 13, fontWeight: 700 }} label={`#${value}#`} clickable />)}
-                                            </Grid>
-                                        </Grid> */}
-
 
                                     </Grid>
                                 </DialogContent>

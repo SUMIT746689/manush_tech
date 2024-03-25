@@ -7,3 +7,11 @@ export const handleDeleteFile = (path) => {
         console.log({ err });
     });
 };
+
+export const handleDeleteMuiltiFiles = (files) => {
+    for (const i in files) {
+      fs.unlink(files[i].filepath, (err) => {
+        logFile.error(err)
+      })
+    }
+  }

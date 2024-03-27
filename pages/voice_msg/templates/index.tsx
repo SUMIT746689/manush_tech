@@ -45,7 +45,7 @@ const VoiceSmsTemplates = () => {
 };
 
 VoiceSmsTemplates.getLayout = (page) => (
-    <Authenticated>
+    <Authenticated requiredPermissions={["show_voice_sms_templates,create_voice_sms_template"]}>
         <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
     </Authenticated>
 );

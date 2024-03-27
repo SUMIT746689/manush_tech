@@ -1,9 +1,9 @@
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CircularProgress, DialogActions, Grid, TextField } from '@mui/material';
+import { Button, Card, CircularProgress, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
+import { NewFileUploadFieldWrapper, PreviewImageCard, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
@@ -14,8 +14,6 @@ import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUplo
 
 
 const Results = ({ data, reFetchData }) => {
-
-  console.log({ data });
 
   const { t }: { t: any } = useTranslation();
   // const [notice, setNotice] = useState([{ title: '', headLine: '', body: undefined, link: undefined }]);
@@ -92,8 +90,6 @@ const Results = ({ data, reFetchData }) => {
             showNotification(message)
           };
 
-          console.log("_values", _values);
-
           const formData = new FormData();
 
           for (let i in _values) {
@@ -113,6 +109,7 @@ const Results = ({ data, reFetchData }) => {
                 }
               }
             }
+            else if (["header_image", "history_photo"].includes(i)) formData.append(`${i}`, _values[i][0]);
             else {
               formData.append(`${i}`, _values[i]);
             }
@@ -120,7 +117,6 @@ const Results = ({ data, reFetchData }) => {
 
           axios.put('/api/front_end', formData)
             .then(res => {
-              console.log(res);
               reFetchData();
               successResponse('Front end information updated !');
             }).catch(err => {
@@ -148,12 +144,10 @@ const Results = ({ data, reFetchData }) => {
         values,
         setFieldValue
       }) => {
-        console.log("isSubmitting__", isSubmitting, errors);
-
         return (
           <>
             <form onSubmit={handleSubmit}>
-              <Card sx={{maxWidth:1400}}>
+              <Card sx={{ maxWidth: 1400 }}>
                 <DialogTitleWrapper name={"Certificate Templates"} editData={undefined} />
                 <Grid container columnSpacing={1} paddingTop={2} borderTop='1px solid lightGray' borderBottom='1px solid lightGray' p={2}>
                   <Grid container item borderRadius='10px' marginBottom='10px'>
@@ -256,7 +250,7 @@ const Results = ({ data, reFetchData }) => {
                       }
                     </Grid>
                     {
-                      Array.isArray(data?.carousel_image) && <Grid item display="flex" columnSpacing={0.5}>
+                      Array.isArray(data?.carousel_image) && <Grid item display="flex" gap={1} sx={{overflowX:"auto"}} columnSpacing={0.5}>
                         {
                           data?.carousel_image?.map((image) => (
                             <Image src={getFile(image?.path)}
@@ -297,7 +291,7 @@ const Results = ({ data, reFetchData }) => {
                     </Grid>
 
                     {
-                      Array.isArray(data?.gallery) && <Grid item display="flex" flexWrap="nowrap" columnSpacing={0.5}>
+                      Array.isArray(data?.gallery) && <Grid item display="flex" flexWrap="nowrap" gap={1} sx={{ overflowX: "auto" }} columnSpacing={0.5}>
                         {
                           data?.gallery?.map((image) => (
                             <Image src={getFile(image?.path)}

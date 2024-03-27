@@ -162,7 +162,7 @@ const VoiceGateway = () => {
 
 VoiceGateway.getLayout = (page) => {
     return (
-        <Authenticated name='sms_gateway'>
+        <Authenticated requiredPermissions={['create_voice_sms_gateway','show_voice_sms_gateway']}>
             <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
         </Authenticated>
     );

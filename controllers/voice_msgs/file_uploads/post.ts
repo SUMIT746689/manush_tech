@@ -56,8 +56,6 @@ async function post(req, res, refresh_token) {
       })
       .catch(err => { console.log({ getFileErr: err }) })
 
-    console.log({ finalContacts });
-
     const findGateway = await prisma.voiceGateway.findFirst({ where: { id: parseInt(gateway_id), school_id }, select: { details: true } });
 
     //@ts-ignore

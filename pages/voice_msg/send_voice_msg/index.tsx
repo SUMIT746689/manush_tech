@@ -75,7 +75,7 @@ const VoiceMsg = () => {
 };
 
 VoiceMsg.getLayout = (page) => (
-  <Authenticated >
+  <Authenticated requiredPermissions={["send_voice_sms"]} >
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

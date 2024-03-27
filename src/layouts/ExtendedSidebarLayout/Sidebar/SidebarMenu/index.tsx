@@ -507,6 +507,27 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
         </SidebarMenuItem>
       );
     }
+    else if (item.name === 'Voice Msg') {
+      if (permissionVerify(permissions, ['create_voice_sms_gateway', 'show_voice_sms_gateway', 'send_voice_sms', 'show_voice_sms_templates', 'create_voice_sms_template'])) ev.push(
+        <SidebarMenuItem
+          key={key}
+          active={partialMatch}
+          open={partialMatch}
+          name={item.name}
+          icon={item.icon}
+          link={item.link}
+          badge={item.badge}
+          badgeTooltip={item.badgeTooltip}
+        >
+          {/* @ts-ignore */}
+          {renderSidebarMenuItems({
+            permissions,
+            path,
+            items: item.items
+          })}
+        </SidebarMenuItem>
+      );
+    }
     else {
       ev.push(
         <SidebarMenuItem
@@ -602,7 +623,11 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
       item.name === 'SMS' ||
       item.name === 'Student Auto Sent Sms' ||
 
-      item.name === 'All SMS Gateways'
+      item.name === 'All SMS Gateways' ||
+
+      item.name === 'Send Voice' ||
+      item.name === 'Gateway' ||
+      item.name === 'Template'
 
     ) {
       // switch(item.name){
@@ -700,6 +725,13 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 
       // all sms gateways
       if (item.name === 'All SMS Gateways' && permissionVerify(permissions, ['add_all_sms_gateways'])) sub_menu();
+
+      // voice sms
+      if (item.name === 'Send Voice' && permissionVerify(permissions, ['send_voice_sms'])) sub_menu();
+      if (item.name === 'Gateway' && permissionVerify(permissions, ['create_voice_sms_gateway', 'show_voice_sms_gateway'])) sub_menu();
+      if (item.name === 'Template' && permissionVerify(permissions, ['show_voice_sms_templates', 'create_voice_sms_template'])) sub_menu();
+
+
 
     }
     else sub_menu();

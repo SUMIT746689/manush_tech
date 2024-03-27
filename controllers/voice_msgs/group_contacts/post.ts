@@ -1,5 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
+import { Prisma } from '@prisma/client';
+import { getUsers } from 'controllers/sent_sms/postContent/postContent';
 import { readFileSync } from 'fs';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
@@ -29,17 +31,15 @@ async function post(req, res, refresh_token) {
 
         if (files && error) {
             // @ts-ignore
-            for (const [key, value] of Object.entries(files)) fs.unlink(value.filepath, (err) => { if (err) console.log({ err }) })
+            for (const [key, value] of Object.entries(files)) fs.unlink(value.filepath, (err) => { if (err) logFile.error(err) })
         }
         if (error) throw new Error(error);
 
-        const { gateway_id, type } = fields;
+        const { gateway_id, recipient_type, role_id, section_id, class_id } = fields;
         const { voice_file } = files;
 
-        if (!gateway_id || !type || !voice_file) throw new Error("provide all required datas");
+        if (!gateway_id || !recipient_type || !voice_file) throw new Error("provide all required datas");
         voice_file_path = voice_file.filepath;
-
-
 
 
         const findGateway = await prisma.voiceGateway.findFirst({ where: { id: parseInt(gateway_id), school_id }, select: { details: true } });
@@ -60,17 +60,11 @@ async function post(req, res, refresh_token) {
         const dateNow = new Date()
         const createUniqueMagId = String(auth_user_id) + String(dateNow.getTime());
 
-        const arrContacts = msisdn.split(',');
-        const finalContacts = [];
-        arrContacts.forEach(element => {
-            const element_ = element.trim();
-            const { number, err } = handleConvBanNum(element_);
-            if (err) return;
-            finalContacts.push(number);
-        });
+        const role_ids = role_id.split(',').map(str => Number(str))
+
+        const finalContacts = await handleGetContact({ recipient_type, role_id: role_ids, school_id, section_id, class_id });
 
         if (finalContacts.length === 0) throw new Error("no valid contact founds");
-
 
         // create tbl_sent_vocie_sms
         const respCreateVoiceSms = await prisma.tbl_sent_voice_sms.create({
@@ -131,7 +125,6 @@ async function post(req, res, refresh_token) {
 
     } catch (err) {
         if (voice_file_path) handleDeleteFile(voice_file_path)
-        console.log({ err: err.message })
         logFile.error(err.message)
         res.status(404).json({ error: err.message });
     }
@@ -140,7 +133,8 @@ async function post(req, res, refresh_token) {
 export default authenticate(post);
 
 
-const handleGetContact = async ({ recipient_type, role_id, school_id }) => {
+const handleGetContact = async ({ recipient_type, role_id, school_id, section_id, class_id }) => {
+    const contactsArr = [];
     try {
         switch (recipient_type) {
             case "GROUP":
@@ -150,7 +144,6 @@ const handleGetContact = async ({ recipient_type, role_id, school_id }) => {
 
                 if (!Array.isArray(roles) || roles.length <= 0) throw new Error("Invalid role");
 
-                const contactsArr = [];
                 for (const role of roles) {
 
                     let singleGroupUsers = null;
@@ -160,56 +153,45 @@ const handleGetContact = async ({ recipient_type, role_id, school_id }) => {
                     if (!singleGroupUsers || singleGroupUsers.length === 0) continue;
 
                     const contacts_ = [];
-                    singleGroupUsers.array.forEach(user => {
-                        const isMasking = verifyIsMasking(user.phone);
-                        if (typeof verifyIsMasking(user.phone) === 'boolean' && !isMasking) {
-                            const updatePhoneNumber = user.phone.length === 11 ? 88 + user.phone : user.phone;
-                            contacts_.push(updatePhoneNumber);
-                        }
+                    singleGroupUsers.forEach(user => {
+                        const { number, err } = handleConvBanNum(user.phone);
+                        if (err) return;
+                        contacts_.push(number);
                     });
 
                     contactsArr.push(...contacts_);
                 };
-
-                const contacts = contactsArr.join(',');
-
-                sentSmsData["contacts"] = contacts;
-                sentSmsData["total_count"] = contactsArr.length;
-
+                return contactsArr;
                 break;
 
             case "CLASS":
 
-                const sections = section_id.join(", ");
-
                 const resUsers: [{ phone: string }] | [] = await prisma.$queryRaw`
-            SELECT student_informations.phone as phone FROM students
-            JOIN student_informations ON student_informations.id = students.student_information_id
-            JOIN sections ON students.section_id = sections.id
-            WHERE class_id = ${class_id} AND school_id = ${refresh_token.school_id} AND phone IS NOT null
-            ${(Array.isArray(section_id) && section_id.length > 0) ? Prisma.sql`AND section_id IN (${sections})` : Prisma.empty}
-          `
+                    SELECT student_informations.phone as phone FROM students
+                    JOIN student_informations ON student_informations.id = students.student_information_id
+                    JOIN sections ON students.section_id = sections.id
+                    WHERE class_id = ${class_id} AND school_id = ${school_id} AND phone IS NOT null
+                    ${section_id ? Prisma.sql`AND section_id IN (${section_id})` : Prisma.empty}
+                  `
+                // ${(Array.isArray(section_id) && section_id.length > 0) ? Prisma.sql`AND section_id IN (${sections})` : Prisma.empty}
                 if (resUsers.length === 0) throw new Error("No user founds");
 
                 const classContacts_ = [];
                 resUsers.forEach(user => {
-                    const isMasking = verifyIsMasking(user.phone);
-                    if (typeof verifyIsMasking(user.phone) === 'boolean' && !isMasking) {
-                        const updatePhoneNumber = user.phone.length === 11 ? 88 + user.phone : user.phone;
-                        classContacts_.push(updatePhoneNumber);
-                    }
+                    const { number, err } = handleConvBanNum(user.phone);
+                    if (err) return;
+                    classContacts_.push(number);
                 });
 
-                // contactsArr.push(...contacts_);
-
-                sentSmsData["contacts"] = classContacts_.join(',');
-                sentSmsData["total_count"] = resUsers.length;
-
+                contactsArr.push(...classContacts_);
+                return contactsArr;
                 break;
             default:
                 throw new Error("invalid recipient type ");
         }
     } catch (err) {
+        logFile.error(err.message)
         console.log({ err: err.message })
+        return contactsArr
     }
 }

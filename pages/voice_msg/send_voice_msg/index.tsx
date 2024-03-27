@@ -44,7 +44,7 @@ const VoiceMsg = () => {
                 {
                   label: "GROUP CONTACT", value:
                     <SendSmsWrapper>
-                      <GroupContact sms_gateway={(gateways && Array.isArray(gateways)) ? gateways[0] : null} />
+                      <GroupContact gateways={(gateways && Array.isArray(gateways)) ? gateways[0] : null} />
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />

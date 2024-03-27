@@ -141,7 +141,7 @@ const DynamicTypeSelect = () => {
 
 }
 
-function GroupContact({ sms_gateway }) {
+function GroupContact({ gateways }) {
     const { t }: { t: any } = useTranslation();
     const { showNotification } = useNotistick();
     const [voiceFileRequiremntShow, setVoiceFileRequiremntShow] = useState(false);
@@ -157,8 +157,14 @@ function GroupContact({ sms_gateway }) {
                 setSubmitting(false);
                 // reFetchData();
             };
+            const formData = new FormData();
 
-            const { data } = await axios.post(`/api/sent_sms`, _values);
+            for (const [key, value] of Object.entries(_values)) {
+                if (["gateway_id", "recipient_type", "class_id", "section_id", "role_id"].includes(key)) formData.set(key, _values[key]);
+                else if (key === "voice_file") formData.set(key, _values[key][0])
+            }
+
+            const { data } = await axios.post(`/api/voice_msgs/group_contacts`, formData);
             successResponse('created');
 
         } catch (err) {
@@ -181,8 +187,8 @@ function GroupContact({ sms_gateway }) {
                 <Formik
                     initialValues={{
                         // campaign_name: '',
-                        sms_gateway: sms_gateway?.details?.sender_id || '',
-                        sms_gateway_id: sms_gateway?.id || undefined,
+                        gateway: gateways?.details?.sender_id || '',
+                        gateway_id: gateways?.id || undefined,
                         voice_file: undefined,
                         preview_voice_file: [],
 
@@ -197,10 +203,10 @@ function GroupContact({ sms_gateway }) {
                         // file_upload: undefined,
                     }}
                     validationSchema={Yup.object().shape({
-                        campaign_name: Yup.string()
-                            .max(255)
-                            .required(t('The campaign name field is required')),
-                        sms_gateway_id: Yup.number()
+                        // campaign_name: Yup.string()
+                        //     .max(255)
+                        //     .required(t('The campaign name field is required')),
+                        gateway_id: Yup.number()
                             .min(0)
                             .required(t('The sms gateway field is required')),
                         recipient_type: Yup.string()
@@ -214,6 +220,7 @@ function GroupContact({ sms_gateway }) {
                         isSubmitting, touched, values,
                         setFieldValue
                     }) => {
+                        console.log({ errors })
                         return (
                             <form onSubmit={handleSubmit}>
                                 <DialogContent
@@ -237,21 +244,21 @@ function GroupContact({ sms_gateway }) {
 
                                         <Grid container>
                                             <Grid container>
-                                                <Grid pb={0.5}>Select Sms Gateway :*</Grid>
+                                                <Grid pb={0.5}>Select Gateway :*</Grid>
                                                 <DisableTextWrapper
                                                     label=""
-                                                    touched={values.sms_gateway}
-                                                    errors={errors.sms_gateway}
-                                                    value={values.sms_gateway}
+                                                    touched={values.gateway}
+                                                    errors={errors.gateway}
+                                                    value={values.gateway}
                                                 />
                                                 {
                                                     Boolean(
                                                         // touched.sms_gateway_id 
                                                         // && 
-                                                        errors.sms_gateway_id
+                                                        errors.gateway_id
                                                     ) &&
                                                     <Grid display="flex" columnGap={2} justifyContent="space-between">
-                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.sms_gateway_id} </Grid>
+                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.gateway_id} </Grid>
                                                         <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
                                                     </Grid>
                                                 }

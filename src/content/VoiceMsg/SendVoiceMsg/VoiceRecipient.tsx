@@ -177,7 +177,7 @@ const VoiceRecipient: FC<VoiceRecipientType> = ({ gateways, templates }) => {
                                                         errors.gateway_id
                                                     ) &&
                                                     <Grid display="flex" columnGap={2} justifyContent="space-between">
-                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.gateways_id} </Grid>
+                                                        <Grid pb={2} color="red" fontSize={13} fontWeight={600}> {errors.gateway_id} </Grid>
                                                         <Link href="/settings/sms" ><Grid textTransform="uppercase" color="violet" px={1} mb="auto" sx={{ ':hover': { cursor: "pointer", color: "blue" } }}> create sms gateway {'->'}</Grid></Link>
                                                     </Grid>
 

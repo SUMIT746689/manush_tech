@@ -109,7 +109,7 @@ const Results = ({ data, reFetchData }) => {
                 }
               }
             }
-            else if (["header_image", "history_photo"].includes(i)) formData.append(`${i}`, _values[i][0]);
+            else if (["header_image", "history_photo", "chairman_photo", "principal_photo"].includes(i)) formData.append(`${i}`, _values[i][0]);
             else {
               formData.append(`${i}`, _values[i]);
             }
@@ -250,7 +250,7 @@ const Results = ({ data, reFetchData }) => {
                       }
                     </Grid>
                     {
-                      Array.isArray(data?.carousel_image) && <Grid item display="flex" gap={1} sx={{overflowX:"auto"}} columnSpacing={0.5}>
+                      Array.isArray(data?.carousel_image) && <Grid item display="flex" gap={1} sx={{ overflowX: "auto" }} columnSpacing={0.5}>
                         {
                           data?.carousel_image?.map((image) => (
                             <Image src={getFile(image?.path)}

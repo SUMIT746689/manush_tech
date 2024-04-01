@@ -1,6 +1,5 @@
 import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
-import getAudioDurationInSeconds from 'get-audio-duration';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { handleGetFileDuration } from 'utilities_api/fileDuration';

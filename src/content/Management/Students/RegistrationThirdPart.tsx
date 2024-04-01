@@ -17,7 +17,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import Image from 'next/image';
-import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
+import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 import { getFile } from '@/utils/utilitY-functions';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUpload';
@@ -106,7 +106,7 @@ function RegistrationFirstPart({
             const formData = new FormData();
 
             for (let i in _values) {
-              if (["preview_mother_photo", "preview_father_photo", "preview_guardian_photo"].includes(i)){}
+              if (["preview_mother_photo", "preview_father_photo", "preview_guardian_photo"].includes(i)) { }
               else if (["mother_photo", "father_photo", "guardian_photo"].includes(i)) _values[i] && formData.append(`${i}`, _values[i][0])
               else if (i == 'filePathQuery') formData.append(`${i}`, JSON.stringify(_values[i]));
               else if (_values[i]) formData.append(`${i}`, _values[i]);
@@ -447,7 +447,7 @@ function RegistrationFirstPart({
                             width={150}
                             alt='guardian photo'
                             loading='lazy'
-                            style={{width:150,height:150,objectFit:"contain"}}
+                            style={{ width: 150, height: 150, objectFit: "contain" }}
                           />
                         }
                       </Grid>

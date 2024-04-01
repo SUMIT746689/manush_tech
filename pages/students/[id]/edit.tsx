@@ -31,12 +31,13 @@ export const getServerSideProps = async ({ params }) => {
                 // "updated_at": "2024-03-10T06:32:41.608Z",
                 user_photo: true,
                 school_id: true,
-                admin_panel_id: true
+                admin_panel_id: true,
               }
             }
           }
         },
         section: true,
+        extra_section: true
       }
     })
 

@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Autocomplete,
   Button,
+  Checkbox,
 } from '@mui/material';
 import useNotistick from '@/hooks/useNotistick';
 import { generateUsername, getFile, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
@@ -37,14 +38,29 @@ function RegistrationSecondPart({
   const [classesOptions, setClassesOptions] = useState(null)
   const [group, setGroup] = useState([])
 
+  const [isExtraClass, setIsExtraClass] = useState(false);
+  const [extraClassesOptions, setExtraClassesOptions] = useState([]);
+  const [selectedXtraCls, setSelectedXtraCls] = useState(null);
+  const [sectionsForSelectedXtraCls, setSectionsForSelectedXtraCls] = useState([]);
+  const [selectedXtraClsSection, setSelectedXtraClsSection] = useState(null);
+
+
   useEffect(() => {
-    setClassesOptions(classes?.map((i) => {
-      return {
-        label: i.name,
-        id: i.id,
-        has_section: i.has_section
+    const classes_ = [];
+    const extraClasses = [];
+
+    classes?.forEach(class_ => {
+      const customCls = {
+        label: class_.name,
+        id: class_.id,
+        has_section: class_.has_section
       };
-    }))
+
+      if (class_.is_extra) return extraClasses.push(customCls);
+      classes_.push(customCls);
+    });
+    setClassesOptions(() => classes_);
+    setExtraClassesOptions(() => extraClasses);
   }, [classes])
 
   useEffect(() => {
@@ -123,7 +139,32 @@ function RegistrationSecondPart({
 
   }
 
-  const password = unique_password_generate()
+  const handleExtraClassSelect = (event, value, setFieldValue) => {
+    setFieldValue("extra_class_id", value?.id)
+    setSelectedXtraCls(value);
+
+    const targetClassSections = classes?.find(i => i.id == value?.id)
+    console.log(targetClassSections);
+
+    setSectionsForSelectedXtraCls(targetClassSections?.sections?.map(i => {
+      return {
+        label: i.name,
+        id: i.id
+      }
+    }))
+    if (!value?.has_section) {
+      selectedXtraClsSection({
+        label: targetClassSections?.sections[0]?.name,
+        id: targetClassSections?.sections[0]?.id
+      })
+      setFieldValue('extra_section_id', targetClassSections?.sections[0]?.id);
+    } else {
+      setSelectedXtraClsSection(null)
+    }
+  }
+
+  const password = unique_password_generate();
+  console.log({ classes })
   return (
     <>
       <Formik
@@ -134,6 +175,10 @@ function RegistrationSecondPart({
           class_id: student ? (student?.class_id ? Number(student?.class_id) : student?.section?.class_id) : undefined,
           section_id: student ? (student?.section_id ? Number(student?.section_id) : student?.section?.id) : undefined,
           group_id: student ? (student?.group_id ? Number(student?.group_id) : student?.group?.id) : undefined,
+
+          extra_class_id: student?.extra_section_id ? student?.extra_section?.class_id : undefined,
+          extra_section_id: student?.extra_section_id ? student?.extra_section?.id : undefined,
+
           academic_year_id: student ? Number(student?.academic_year_id) : undefined,
           roll_no: student ? student?.class_roll_no : undefined,
           registration_no: student?.class_registration_no || registration_no_generate(),
@@ -206,7 +251,7 @@ function RegistrationSecondPart({
           setFieldValue
         }) => {
           //  console.log("T__values__", errors, values);
-
+          console.log({ values });
           return (
             <form onSubmit={handleSubmit}>
               <DialogContent
@@ -359,6 +404,7 @@ function RegistrationSecondPart({
                         />
                       )}
                     </Grid>
+
                     {/* Group  */}
                     <Grid item xs={12} md={6}>
                       {selectedClass && selectedClass.has_section && (
@@ -563,8 +609,92 @@ function RegistrationSecondPart({
                       />
                     </Grid>
 
+                    {/* extra info */}
+                    <Grid item xs={12} display="flex" justifyItems="center"
+                    // bgcolor={"red"}
+                    >
+                      <Grid item> <Checkbox name='is_extra' checked={isExtraClass} onChange={() => setIsExtraClass(value => !value)} /> Add Extra Class ? </Grid>
+                    </Grid>
+
+                    {
+                      isExtraClass &&
+                      <>
+                        {/* extra classes */}
+                        <Grid item xs={12} md={6}>
+                          <Autocomplete
+                            disablePortal
+                            options={extraClassesOptions}
+                            value={selectedXtraCls}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                required
+                                size="small"
+                                sx={{
+                                  '& fieldset': {
+                                    borderRadius: '3px'
+                                  }
+                                }}
+                                fullWidth
+                                error={Boolean(touched.extra_class_id && errors.extra_class_id)}
+                                helperText={touched.extra_class_id && errors.extra_class_id}
+                                onBlur={handleBlur}
+                                label={t('Select Extra class')}
+                              />
+                            )}
+                            onChange={(event, value) => handleExtraClassSelect(event, value, setFieldValue)}
+                          />
+                        </Grid>
+
+                        {/* extra section */}
+                        <Grid item xs={12} md={6}>
+                          {selectedXtraCls && selectedXtraCls.has_section && (
+                            <Autocomplete
+                              size="small"
+                              disablePortal
+                              options={sectionsForSelectedXtraCls}
+                              value={selectedXtraClsSection}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  required
+                                  size="small"
+                                  sx={{
+                                    '& fieldset': {
+                                      borderRadius: '3px'
+                                    }
+                                  }}
+                                  fullWidth
+                                  error={Boolean(
+                                    touched.password && errors.password
+                                  )}
+                                  helperText={touched.password && errors.password}
+                                  onBlur={handleBlur}
+                                  label={t('Select Extra section')}
+                                />
+                              )}
+                              onChange={(event, value) => {
+                                console.log('selected sections__', {
+                                  event,
+                                  value
+                                });
+                                setSelectedXtraClsSection(value)
+                                // @ts-ignore
+
+                                setFieldValue('extra_section_id', value?.id);
+
+
+                              }}
+                            />
+                          )}
+                        </Grid>
+                      </>
+                    }
+
+
                     {/* student photo */}
-                    <Grid container p={1} gap={1} xs={12} sm={6} md={6}>
+                    {/* <Grid container p={1} gap={1} xs={12} sm={6} md={6}></Grid> */}
+                    <Grid container p={1} gap={1} xs={12}>
                       <Grid item>
                         <Image src={student_photo ? student_photo : getFile(student?.student_photo || student?.filePathQuery?.student_photo_path)}
                           height={150}
@@ -572,7 +702,6 @@ function RegistrationSecondPart({
                           alt='Student photo'
                           loading='lazy'
                         />
-
                       </Grid>
                       <br />
                       <FileUploadFieldWrapper
@@ -593,6 +722,7 @@ function RegistrationSecondPart({
                         }}
                       />
                     </Grid>
+
                   </Grid>
                 </Grid>
               </DialogContent>
@@ -626,7 +756,7 @@ function RegistrationSecondPart({
             </form>
           );
         }}
-      </Formik>
+      </Formik >
     </>
   );
 }

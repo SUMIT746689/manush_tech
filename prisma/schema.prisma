@@ -200,6 +200,7 @@ model Class {
   code        String
   has_section Boolean @default(false)
   school_id   Int
+  is_extra    Boolean @default(false)
 
   sections                   Section[]
   subjects                   Subject[]
@@ -229,6 +230,7 @@ model Section {
   exams                      Exam[]
   groups                     Group[]
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
+  extraStudents              Student[]                    @relation("extra_section")
 
   @@map("sections")
 }
@@ -272,13 +274,13 @@ model StudentInformation {
 }
 
 model Student {
-  id                      Int                @id @default(autoincrement())
+  id                      Int       @id @default(autoincrement())
   student_information_id  Int
   section_id              Int
   group_id                Int?
   academic_year_id        Int
   class_roll_no           String
-  class_registration_no   String             @unique
+  class_registration_no   String    @unique
   student_photo           String?
   guardian_name           String?
   guardian_phone          String?
@@ -287,13 +289,16 @@ model Student {
   guardian_nid            String?
   relation_with_guardian  String?
   student_present_address String?
-  created_at              DateTime?          @default(now())
-  academic_year           AcademicYear       @relation(fields: [academic_year_id], references: [id])
-  student_info            StudentInformation @relation(fields: [student_information_id], references: [id])
-  section                 Section            @relation(fields: [section_id], references: [id])
-  group                   Group?             @relation(fields: [group_id], references: [id])
-  discount                Discount[]         @relation("DiscountToStudent")
-  waiver_fees             Fee[]              @relation("WaiverFeesToStudent")
+  extra_section_id        Int?
+  created_at              DateTime? @default(now())
+
+  academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
+  student_info  StudentInformation @relation(fields: [student_information_id], references: [id])
+  section       Section            @relation(fields: [section_id], references: [id])
+  group         Group?             @relation(fields: [group_id], references: [id])
+  discount      Discount[]         @relation("DiscountToStudent")
+  waiver_fees   Fee[]              @relation("WaiverFeesToStudent")
+  extra_section Section?           @relation("extra_section", fields: [extra_section_id], references: [id])
 
   fees        StudentFee[]
   attendances Attendance[]

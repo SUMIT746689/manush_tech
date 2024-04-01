@@ -125,14 +125,15 @@ function PageHeader({ editClass, setEditClass, reFetchData }) {
             std_entry_time: (!editClass?.has_section && editClass?.sections && editClass.sections[0].std_entry_time) ? editClass?.sections[0]?.std_entry_time : '',
             std_exit_time: (!editClass?.has_section && editClass?.sections && editClass.sections[0].std_exit_time) ? editClass?.sections[0]?.std_exit_time : '',
             will_have_section: true,
+            is_extra: editClass?.is_extra || false,
           }}
           validationSchema={Yup.object().shape({
             name: Yup.string()
               .max(255)
               .required(t('The class name field is required')),
-            code: Yup.string()
-              .max(255)
-              .required(t('The class code field is required'))
+            // code: Yup.string()
+            //   .max(255)
+            //   .required(t('The class code field is required'))
           })}
           onSubmit={handleFormSubmit}
         >
@@ -177,7 +178,8 @@ function PageHeader({ editClass, setEditClass, reFetchData }) {
                       value={values.code}
                     />
 
-
+                    <Checkbox name='is_extra' checked={values.is_extra} onChange={handleChange} /> <Grid py={1}> As Extra Class ? </Grid>
+                    
                     {
                       !editClass && <>
                         <Checkbox name='will_have_section' checked={values.will_have_section} onChange={handleChange} /> <Grid py={1}>Will include sections ? </Grid>

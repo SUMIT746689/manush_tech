@@ -109,7 +109,10 @@ const Results = ({ data, reFetchData }) => {
                 }
               }
             }
-            else if (["header_image", "history_photo", "chairman_photo", "principal_photo"].includes(i)) formData.append(`${i}`, _values[i][0]);
+            else if (["header_image", "history_photo", "chairman_photo", "principal_photo"].includes(i) && _values[i]) {
+              formData.append(`${i}`, _values[i][0]);
+            }
+
             else {
               formData.append(`${i}`, _values[i]);
             }

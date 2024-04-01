@@ -28,7 +28,7 @@ const index = async (req, res, refresh_token) => {
         res.status(200).json(classes);
         break;
       case 'POST':
-        const { name: name_, code, section_name, std_entry_time, std_exit_time } = req.body;
+        const { name: name_, code, section_name, is_extra, std_entry_time, std_exit_time } = req.body;
         const { school_id } = refresh_token;
         const name = name_.trim();
 
@@ -43,8 +43,9 @@ const index = async (req, res, refresh_token) => {
         const newClass = await prisma.class.create({
           data: {
             name,
-            code,
-            school_id
+            code: code && '',
+            school_id,
+            is_extra: typeof is_extra === "boolean" ? is_extra : undefined,
             // has_section: true,
           }
         });

@@ -24,7 +24,7 @@ const index = async (req, res, refresh_token) => {
             }
           };
         }
-         else {
+        else {
           query['include'] = {
             sections: true
           };
@@ -36,7 +36,7 @@ const index = async (req, res, refresh_token) => {
         break;
 
       case 'PATCH':
-        const { name, code, std_entry_time, std_exit_time } = req.body;
+        const { name, code, is_extra, std_entry_time, std_exit_time } = req.body;
         const class_ = await prisma.class.findFirst({
           where: { id: parseInt(id) },
           select: { has_section: true }
@@ -50,6 +50,7 @@ const index = async (req, res, refresh_token) => {
 
         if (name) quries.data['name'] = name;
         if (code) quries.data['code'] = code;
+        if (typeof is_extra === "boolean") quries.data['is_extra'] = is_extra;
 
         await prisma.class.update({
           ...quries
@@ -60,7 +61,7 @@ const index = async (req, res, refresh_token) => {
 
           if (std_entry_time) sectionQuery['std_entry_time'] = new Date(std_entry_time);
           if (std_exit_time) sectionQuery['std_exit_time'] = new Date(std_exit_time);
-          
+
           await prisma.section.updateMany({
             where: { class_id: parseInt(id) },
             data: sectionQuery

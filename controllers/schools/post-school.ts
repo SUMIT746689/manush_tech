@@ -4,6 +4,7 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 const postSchool = async (req, res, authenticate_user) => {
   try {
+    const { admin_panel_id } = authenticate_user;
     const authenticate_user_Info = await prisma.user.findFirst({
       where: { id: authenticate_user.id },
       select: {
@@ -62,15 +63,18 @@ const postSchool = async (req, res, authenticate_user) => {
             non_masking_sms_count: non_masking_sms_count ?? undefined,
             admins: { connect: admins },
             AutoAttendanceSentSms: {
-              create : {
-               body:'dear parents, your child #first_name# #middle_name# #last_name# is punch time #submission_time#',
-               is_active:false,
-               every_hit:false ,
-               body_format:'text'
+              create: {
+                body: 'dear parents, your child #first_name# #middle_name# #last_name# is punch time #submission_time#',
+                is_active: false,
+                every_hit: false,
+                body_format: 'text'
               }
+            },
+            admin_panel: {
+              connect: admin_panel_id
             }
           }
-          
+
         },
         package: {
           create: {
@@ -87,7 +91,7 @@ const postSchool = async (req, res, authenticate_user) => {
     })
     if (!response) throw new Error('Failed to create school');
     res.status(200).json({ success: true, message: 'Successfully created school' });
-    
+
   } catch (err) {
     logFile.error(err.message)
     console.log(err.message);

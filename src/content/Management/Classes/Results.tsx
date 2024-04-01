@@ -51,6 +51,8 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { useSnackbar } from 'notistack';
 import { DebounceInput } from '@/components/DebounceInput';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -283,6 +285,7 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
                     <TableCell align='center'>{t('class Id')}</TableCell>
                     <TableCell align='center'>{t('class name')}</TableCell>
                     <TableCell align='center'>{t('Class code')}</TableCell>
+                    <TableCell align='center'>{t('Is Extra Class')}</TableCell>
                     <TableCell align="center">{t('Actions')}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -305,6 +308,20 @@ const Results: FC<ResultsProps> = ({ users, setEditClass }) => {
                         <TableCell align='center'>
                           <Typography variant="h5">
                             {i.code}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align='center'>
+                          <Typography variant="h5">
+                            {i.is_extra ?
+                              <CheckIcon sx={{
+                                color: theme => theme.colors.primary.dark
+                              }} />
+                              :
+                              <ClearIcon sx={{
+                                color: theme => theme.colors.primary.lighter
+                              }} />
+                            }
                           </Typography>
                         </TableCell>
 

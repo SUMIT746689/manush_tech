@@ -1,7 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
-import {readFileSync, unlink } from 'fs';
-import getAudioDurationInSeconds from 'get-audio-duration';
+import {readFileSync } from 'fs';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
@@ -16,7 +15,7 @@ async function post(req, res, refresh_token) {
         const { id: auth_user_id, name: auth_user_name, school_id } = refresh_token;
         if (!school_id) throw new Error("Invalid User");
 
-        const uploadFolderName = "voice_templates";
+        const uploadFolderName = "voice_sms";
 
         await certificateTemplateFolder(uploadFolderName);
 

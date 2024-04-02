@@ -11,8 +11,9 @@ const index = async (req, res, refresh_token, academic_year) => {
 
                 const { id: academic_year_id, school_id } = academic_year;
                 const { search_value } = req.query;
-                console.log({ search_value, academic_year })
+                const search_value_ = search_value.trim();
                 const query = {};
+                
                 if (!search_value) throw new Error("search value field is empty ")
                 const students = await prisma.$queryRaw`SELECT 
                         student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
@@ -23,7 +24,7 @@ const index = async (req, res, refresh_token, academic_year) => {
                     JOIN students on  students.student_information_id = student_informations.id
                     JOIN sections on students.section_id = sections.id
                     JOIN classes  on classes.id = sections.class_id
-                    WHERE CONCAT(student_informations.first_name,student_informations.middle_name,student_informations.last_name) REGEXP ${search_value} AND students.academic_year_id=${academic_year_id}
+                    WHERE CONCAT(student_informations.first_name, IFNULL(student_informations.middle_name , ' '),IFNULL(student_informations.last_name, '')) REGEXP ${search_value_} AND students.academic_year_id=${academic_year_id}
                 `;
 
                 // const students = await prisma.student.findMany({

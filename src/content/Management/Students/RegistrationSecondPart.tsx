@@ -44,7 +44,6 @@ function RegistrationSecondPart({
   const [sectionsForSelectedXtraCls, setSectionsForSelectedXtraCls] = useState([]);
   const [selectedXtraClsSection, setSelectedXtraClsSection] = useState(null);
 
-
   useEffect(() => {
     const classes_ = [];
     const extraClasses = [];
@@ -80,27 +79,36 @@ function RegistrationSecondPart({
 
   useEffect(() => {
     if (student) {
-      console.log("student__", student);
-
       const targetClassSections = classes?.find(i => i.id == (Number(student?.class_id) || student?.section?.class_id))
-      console.log("targetClassSections__", targetClassSections);
 
       setSectionsForSelectedClass(targetClassSections?.sections?.map(i => {
         return {
           label: i.name,
           id: i.id
         }
-      }))
+      }));
+
+
+      const targetExtraClassSections = classes?.find(i => i.id == (Number(student?.extra_section?.class_id)))
+      if (targetExtraClassSections) {
+        setIsExtraClass(true);
+        setSelectedXtraCls({ label: targetExtraClassSections.name, id: targetExtraClassSections.id, ...targetExtraClassSections })
+      }
+      setSectionsForSelectedXtraCls(targetExtraClassSections?.sections?.map(i => {
+        return {
+          label: i.name,
+          id: i.id
+        }
+      }));
+      if (student?.extra_section) setSelectedXtraClsSection({ label: student.extra_section.name, id: student.extra_section?.id })
     }
 
   }, [student])
 
   useEffect(() => {
     if (student && sectionsForSelectedClass?.length > 0) {
-      console.log("sectionsForSelectedClass__", sectionsForSelectedClass);
       setSelecetedSection(sectionsForSelectedClass.find(i => i.id == (Number(student?.section_id) || student?.section?.id)))
     }
-    // setSelecetedSection(sectionsForSelectedClass)
   }, [sectionsForSelectedClass, student])
 
   const handleClassSelect = (event, value, setFieldValue) => {
@@ -153,7 +161,7 @@ function RegistrationSecondPart({
       }
     }))
     if (!value?.has_section) {
-      selectedXtraClsSection({
+      setSelectedXtraClsSection({
         label: targetClassSections?.sections[0]?.name,
         id: targetClassSections?.sections[0]?.id
       })
@@ -164,7 +172,7 @@ function RegistrationSecondPart({
   }
 
   const password = unique_password_generate();
-  console.log({ classes })
+  // console.log({ classes })
   return (
     <>
       <Formik
@@ -250,8 +258,6 @@ function RegistrationSecondPart({
           values,
           setFieldValue
         }) => {
-          //  console.log("T__values__", errors, values);
-          console.log({ values });
           return (
             <form onSubmit={handleSubmit}>
               <DialogContent

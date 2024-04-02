@@ -199,6 +199,9 @@ const patchHandle = async (req, res, authenticate_user) => {
                     academic_year: {
                         connect: { id: parseInt(fields?.academic_year_id) }
                     },
+                    extra_section: {
+                        connect: { id: parseInt(fields.extra_section_id) || undefined },
+                    },
                     student_info: {
                         // connect: { id: studentInformation.id }
                         update: {

@@ -10,6 +10,8 @@ import Results from 'src/content/Management/Result/Results';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import useNotistick from '@/hooks/useNotistick';
 
 function Managementschools() {
   const [editExam, setEditExam] = useState(null);
@@ -30,7 +32,9 @@ function Managementschools() {
   const [selectClasses, setSelectClasses] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedExamSubject, setSelectedExamSubject] = useState(null);
-  const [academicYearList, setAcademicYearList] = useState([])
+  const [academicYearList, setAcademicYearList] = useState([]);
+  const { showNotification } = useNotistick();
+
   useEffect(() => {
     axios
       .get(`/api/academic_years`)
@@ -59,7 +63,8 @@ function Managementschools() {
             res.data?.map((i) => {
               return {
                 label: `${i.class_registration_no} (${i?.student_info?.first_name})`,
-                id: i.id
+                id: i.id,
+                extra_section_id: i.extra_section_id
               };
             })
           )
@@ -85,6 +90,7 @@ function Managementschools() {
   }, [selectedSection, academicYear]);
 
   const handleSearchResult = () => {
+    if (!selectedSection?.id || !selectedExam.id) return handleShowErrMsg("section id or exam is not selected ", showNotification);
     axios
       .get(
         `/api/result/?section_id=${selectedSection.id}&exam_id=${selectedExam.id}`
@@ -108,7 +114,26 @@ function Managementschools() {
     setSelectedStudent(null);
     setSelectedExam(null);
   }, [selectedSection]);
-  console.log({result})
+
+  useEffect(() => {
+    if (!selectedStudent?.extra_section_id) return;
+
+    axios
+      .get(
+        `/api/exam/exam-list?academic_year=${academicYear?.id}&section_id=${selectedStudent?.extra_section_id}`
+      )
+      .then((res) => {
+        const customRes_ = res.data?.map((i) => {
+          return {
+            label: i.title,
+            id: i.id
+          };
+        });
+        setExams((exams_) => [...exams_, ...customRes_])
+      })
+      .catch((err) => console.log(err));
+  }, [selectedStudent])
+
   return (
     <>
       <Head>

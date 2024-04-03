@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
+import util from "util"
 const index = async (req, res, refresh_token) => {
     try {
         const { method } = req;
@@ -54,6 +55,35 @@ const index = async (req, res, refresh_token) => {
                                         title: true
                                     }
                                 },
+                                extra_section: {
+                                    select: {
+                                        exams: {
+                                            select: {
+                                                title: true,
+                                                student_results: {
+                                                    select: {
+                                                        student_id: true,
+                                                        total_marks_obtained: true,
+                                                        calculated_grade: true,
+                                                        calculated_point: true,
+                                                        result_details: {
+                                                            select: {
+                                                                mark_obtained: true,
+                                                                exam_details: {
+                                                                    select: {
+                                                                        subject_total: true,
+                                                                        subject: { select: { name: true } },
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+
+                                                    }
+                                                },
+                                            }
+                                        },
+                                    }
+                                }
                             }
                         },
 

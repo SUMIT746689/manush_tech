@@ -452,6 +452,7 @@ const Results = ({ result, classes, selectClasses, setSelectClasses, setSections
                   <TableBody>
                     {paginatedExams?.map((row) => {
                       const isUserSelected = selectedItems.includes(row.id);
+                      console.log({ isUserSelected })
                       return (
                         <>
 
@@ -619,7 +620,15 @@ function Row(props) {
       setSubmitting(false);
     }
   }
-
+  let extraSectionObtainMark = 0 ;
+  let selectStdXtraResult;
+  if (Array.isArray(row?.student.extra_section?.exams) && Array.isArray(row.student.extra_section?.exams[0]?.student_results)) {
+    selectStdXtraResult = row.student.extra_section?.exams[0]?.student_results.find(xtraResult => xtraResult.student_id === row.student_id)
+    if(selectStdXtraResult && typeof selectStdXtraResult.total_marks_obtained === "number" ) extraSectionObtainMark = selectStdXtraResult.total_marks_obtained
+  }
+const {student_id} = row
+  console.log({student_id,selectStdXtraResult})
+  
   return (
     <>
       <Dialog
@@ -797,7 +806,7 @@ function Row(props) {
         <TableCell component="th" scope="row">
           {row?.student?.class_roll_no}
         </TableCell>
-        <TableCell >{row?.total_marks_obtained?.toFixed(2)}</TableCell>
+        <TableCell >{(row?.total_marks_obtained + extraSectionObtainMark)?.toFixed(2)}</TableCell>
         <TableCell >{row?.grade}</TableCell>
         {
           !selectedBulkActions && !pdf && <TableCell >
@@ -818,7 +827,7 @@ function Row(props) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Subject Nama</TableCell>
+                    <TableCell>Subject Name</TableCell>
                     <TableCell>Subject Obtain marks</TableCell>
                     <TableCell >Subject Total marks</TableCell>
                   </TableRow>
@@ -845,6 +854,32 @@ function Row(props) {
 
                     )
                   }
+                  {
+                    selectStdXtraResult &&
+                    <>
+                      <TableRow> <TableCell colSpan={3}>Extra Subjects {`(Exam Title: ${row?.student.extra_section?.exams[0].title})`} </TableCell> </TableRow>
+                      {
+                       selectStdXtraResult.result_details.map((markRow, index) =>
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Typography noWrap variant="h5">
+                                {markRow?.exam_details?.subject?.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography noWrap variant="h5">
+                                {markRow?.mark_obtained?.toFixed(2)}
+                              </Typography>
+                            </TableCell>
+                            <TableCell ><Typography noWrap variant="h5">
+                              {markRow?.exam_details?.subject_total?.toFixed(2)}
+                            </Typography></TableCell>
+                          </TableRow>
+                        )
+                      }
+                    </>
+                  }
+
                 </TableBody>
               </Table>
             </Box>

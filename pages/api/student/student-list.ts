@@ -55,11 +55,12 @@ const index = async (req, res, refresh_token) => {
                                 first_name: true,
                                 middle_name: true,
                                 last_name: true,
-                                phone:true,
+                                phone: true,
                             }
                         },
                         guardian_name: true,
-                        guardian_phone: true
+                        guardian_phone: true,
+                        extra_section_id: true
                     }
                 })
                 res.status(200).json(students)

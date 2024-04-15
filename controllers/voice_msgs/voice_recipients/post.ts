@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma_client';
 import { certificateTemplateFolder, fileUpload } from '@/utils/upload';
-import {readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
@@ -9,7 +9,7 @@ import { handleDeleteFile } from 'utilities_api/handleDeleteFiles';
 import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
-    let voice_file_path ;
+    let voice_file_path;
     try {
 
         const { id: auth_user_id, name: auth_user_name, school_id } = refresh_token;
@@ -35,7 +35,7 @@ async function post(req, res, refresh_token) {
 
         const { gateway_id, msisdn } = fields;
         const { voice_file } = files;
-        
+
         if (!gateway_id || !msisdn || !voice_file) throw new Error("provide all required datas");
         voice_file_path = voice_file.filepath;
 
@@ -48,7 +48,7 @@ async function post(req, res, refresh_token) {
 
         const formData = new FormData();
         const blob = new Blob([readFileSync(voice_file.filepath)]);
-        
+
         // voice file duration 
         const [duration, durationErr] = await handleGetFileDuration(voice_file_path);
 
@@ -68,8 +68,18 @@ async function post(req, res, refresh_token) {
 
         if (finalContacts.length === 0) throw new Error("no valid contact founds");
 
+        const total_contact_count = finalContacts.length;
 
-        // create tbl_sent_vocie_sms
+        // get school voice transactions datas
+        const respVoiceSmsPrices = await prisma.school.findFirst({ where: { id: school_id }, select: { voice_sms_balance: true, voice_sms_price: true, voice_pulse_size: true } });
+
+        const number_of_sms_pulses = respVoiceSmsPrices.voice_pulse_size >= duration ? 1 : Math.ceil(duration / respVoiceSmsPrices.voice_pulse_size);
+
+        const calculateTotalVoiceSmsPrice = number_of_sms_pulses * respVoiceSmsPrices.voice_sms_price * finalContacts.length;
+
+        // check balance availability  
+        if (respVoiceSmsPrices.voice_sms_balance < calculateTotalVoiceSmsPrice) throw new Error(" balance insufficient")
+
         const respCreateVoiceSms = await prisma.tbl_sent_voice_sms.create({
             data: {
                 message_id: createUniqueMagId,
@@ -77,17 +87,18 @@ async function post(req, res, refresh_token) {
                 send_by_user_name: auth_user_name,
                 voice_url: path.join(uploadFolderName, voice_file?.newFilename),
                 contacts: finalContacts.join(','),
-                // duration:,
                 sender_id,
                 pushed_via: "voice_recipient",
                 // is_masking,
+                voice_duration: duration,
                 status: 2,
-                school_id
+                school_id,
+                pulse_size: respVoiceSmsPrices.voice_pulse_size,
+                charges_per_pulses: respVoiceSmsPrices.voice_sms_price,
+                number_of_sms_pulses,
+                total_count: finalContacts.length
             }
         });
-
-
-        const total_contact_count = finalContacts.length;
 
         formData.set("message_id", createUniqueMagId)
         formData.set("receivers", finalContacts.join(','))
@@ -115,7 +126,7 @@ async function post(req, res, refresh_token) {
             data: {
                 status: respJson?.code === 200 ? 0 : 3,
                 logs: respJson.data,
-                updated_at:new Date(),
+                updated_at: new Date(),
             }
         });
 
@@ -124,10 +135,31 @@ async function post(req, res, refresh_token) {
             throw new Error(respJson.data);
         }
 
+        // school cut voice price and add transaction table for tracking
+        const resUpdateSchool = await prisma.school.update({
+            where: { id: school_id },
+            data: {
+                voice_sms_balance: { decrement: calculateTotalVoiceSmsPrice },
+            }
+        });
+
+        await prisma.smsTransaction.create({
+            data: {
+                user_id: auth_user_id,
+                user_name: auth_user_name,
+                voice_sms_balance: resUpdateSchool.voice_sms_balance,
+                prev_voice_sms_balance: respVoiceSmsPrices.voice_sms_balance,
+                is_voice: true,
+                pushed_via: "gui voice reciepent",
+                school_id
+            }
+        });
+
+
         return res.json({ data: respJson.data, success: true });
 
     } catch (err) {
-        if(voice_file_path) handleDeleteFile(voice_file_path)
+        if (voice_file_path) handleDeleteFile(voice_file_path)
         console.log({ err: err.message })
         logFile.error(err.message)
         res.status(404).json({ error: err.message });

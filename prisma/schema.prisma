@@ -74,7 +74,12 @@ model School {
   masking_sms_price        Float?  @default(0)
   non_masking_sms_price    Float?  @default(0)
   current_academic_year_id Int?
-  admin_panel_id           Int?
+
+  voice_sms_balance Float @default(0)
+  voice_sms_price   Float @default(0)
+  voice_pulse_size  Int   @default(0)
+
+  admin_panel_id Int?
   // school should not be created without an existing user
   // admin_id Int     @unique
   // sms_balance           Int? //no_of_sms
@@ -1237,11 +1242,17 @@ model RequestBuySms {
 }
 
 model SmsTransaction {
-  id                     Int  @id @default(autoincrement())
+  id                     Int     @id @default(autoincrement())
+  user_id                Int?
+  user_name              String?
   masking_count          Int?
   non_masking_count      Int?
-  prev_masking_count     Int
-  prev_non_masking_count Int
+  prev_masking_count     Int?
+  prev_non_masking_count Int?
+  voice_sms_balance      Float?
+  prev_voice_sms_balance Float?
+  pushed_via             String?
+  is_voice               Boolean @default(false)
   school_id              Int
 
   school School @relation(fields: [school_id], references: [id])
@@ -1490,9 +1501,16 @@ model tbl_sent_voice_sms {
   // is_masking        Boolean
   pushed_via        pushed_via_enum
   school_id         Int
-  logs              String?
-  created_at        DateTime        @default(now())
-  updated_at        DateTime?
+
+  voice_duration       Int   @default(0) // seconds
+  pulse_size           Int   @default(0)
+  charges_per_pulses   Float @default(0)
+  number_of_sms_pulses Int   @default(1)
+  total_count          Int   @default(0)
+
+  logs       String?
+  created_at DateTime  @default(now())
+  updated_at DateTime?
 
   @@map("tbl_sent_voice_sms")
 }
@@ -1501,4 +1519,40 @@ enum pushed_via_enum {
   voice_recipient
   group_contact
   file_upload
+}
+
+model tbl_schools_transactions {
+  id                    Int    @id @default(autoincrement())
+  school_id             Int
+  school_name           String
+  updated_by_user_id   Int?
+  updated_by_user_name String?
+
+  main_balance      Float?
+  prev_main_balance Float?
+
+  masking_sms_count      Int?
+  prev_masking_sms_count Int?
+
+  non_masking_sms_count      Int?
+  prev_non_masking_sms_count Int?
+
+  masking_sms_price      Float?
+  prev_masking_sms_price Float?
+
+  non_masking_sms_price      Float?
+  prev_non_masking_sms_price Float?
+
+  voice_sms_balance      Float?
+  prev_voice_sms_balance Float?
+
+  voice_sms_price      Float?
+  prev_voice_sms_price Float?
+
+  voice_pulse_size      Int?
+  prev_voice_pulse_size Int?
+
+  created_at DateTime @default(now())
+
+  @@map("tbl_schools_transactions")
 }

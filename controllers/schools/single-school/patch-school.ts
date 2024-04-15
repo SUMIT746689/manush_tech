@@ -3,12 +3,16 @@ import { logFile } from "utilities_api/handleLogFile";
 
 export default async function patchSchool(req, res, refresh_token) {
   try {
+    const { id: user_id, name: user_name, } = refresh_token;
     const { id } = req.query;
     const { name, subscription_id, phone, email, address,
       admin_ids, currency, domain, main_balance,
       masking_sms_count, non_masking_sms_count,
       masking_sms_price, non_masking_sms_price,
-      package_price, package_duration, package_student_count, is_std_cnt_wise
+      package_price, package_duration, package_student_count, is_std_cnt_wise,
+      voice_sms_balance,
+      voice_sms_price,
+      voice_pulse_size,
     } = req.body;
 
     let data = {};
@@ -25,6 +29,11 @@ export default async function patchSchool(req, res, refresh_token) {
     if (masking_sms_price) data['masking_sms_price'] = masking_sms_price;
     if (non_masking_sms_price) data['non_masking_sms_price'] = non_masking_sms_price;
 
+    if (voice_sms_balance) data['voice_sms_balance'] = voice_sms_balance;
+    if (voice_sms_price) data['voice_sms_price'] = voice_sms_price;
+    if (voice_pulse_size) data['voice_pulse_size'] = voice_pulse_size;
+
+
     const existingSchoolIdList = await prisma.user.findMany({
       where: {
         school_id: Number(id),
@@ -35,7 +44,8 @@ export default async function patchSchool(req, res, refresh_token) {
       select: {
         id: true
       }
-    })
+    });
+    const resSchoolInfo = await prisma.school.findFirst({ where: { id: Number(id) } })
 
     const connectIdList = []
     const disconnectIdList = []
@@ -81,13 +91,6 @@ export default async function patchSchool(req, res, refresh_token) {
     if (package_student_count) package_data['student_count'] = Number(package_student_count)
     if (is_std_cnt_wise === true || is_std_cnt_wise === false) package_data['is_std_cnt_wise'] = is_std_cnt_wise
 
-    // console.log({package_data,subscription_query,data});
-
-
-    // const response = await prisma.school.update({
-    //   where: { id: Number(id) },
-    //   data
-    // });
     const response = await prisma.subscription.update({
       where: {
         id: Number(subscription_id),
@@ -113,18 +116,48 @@ export default async function patchSchool(req, res, refresh_token) {
         },
       }
     });
+
     if (!response) throw new Error('Failed to update school');
-    // const userSddSchool = await prisma.user.update({
-    //   where: { id: admin_id },
-    //   data: { school_id: response.id }
-    // });
-    // if (userSddSchool)
+
+    // create transaction fot track the changes
+    await prisma.tbl_schools_transactions.create({
+      data: {
+        school_id: resSchoolInfo.id,
+        school_name: resSchoolInfo.name,
+        updated_by_user_id: user_id,
+        updated_by_user_name: user_name,
+
+        main_balance: main_balance || undefined,
+        prev_main_balance: main_balance ? resSchoolInfo.main_balance : undefined,
+
+        masking_sms_count: masking_sms_count || undefined,
+        prev_masking_sms_count: masking_sms_count ? resSchoolInfo.masking_sms_count : undefined,
+
+        non_masking_sms_count: resSchoolInfo.non_masking_sms_count || undefined,
+        prev_non_masking_sms_count: non_masking_sms_count ? resSchoolInfo.non_masking_sms_count : undefined,
+
+        masking_sms_price: masking_sms_price || undefined,
+        prev_masking_sms_price: masking_sms_price ? resSchoolInfo.masking_sms_price : undefined,
+
+        non_masking_sms_price: non_masking_sms_price || undefined,
+        prev_non_masking_sms_price: non_masking_sms_price ? resSchoolInfo.non_masking_sms_price : undefined,
+
+        voice_sms_balance: voice_sms_balance || undefined,
+        prev_voice_sms_balance: voice_sms_balance ? resSchoolInfo.voice_sms_balance : undefined,
+
+        voice_sms_price: voice_sms_price || undefined,
+        prev_voice_sms_price: voice_sms_balance ? resSchoolInfo.voice_sms_price : undefined,
+
+        voice_pulse_size: voice_pulse_size || undefined,
+        prev_voice_pulse_size: voice_pulse_size ? resSchoolInfo.voice_pulse_size : undefined,
+
+      }
+    })
+
     res.json({ school: response, success: true });
-    // else throw new Error('Invalid to create school');
 
   } catch (err) {
     logFile.error(err.message)
-    console.log(err);
     res.status(404).json({ error: err.message });
   }
 }

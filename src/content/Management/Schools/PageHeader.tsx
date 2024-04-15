@@ -126,6 +126,10 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             package_duration: editSchool?.subscription[0]?.package?.duration,
             package_student_count: editSchool?.subscription[0]?.package?.student_count,
 
+            voice_sms_balance: editSchool?.voice_sms_balance || undefined,
+            voice_sms_price: editSchool?.voice_sms_price || undefined, 
+            voice_pulse_size: editSchool?.voice_pulse_size || undefined,
+
             submit: null
           }}
           validationSchema={Yup.object().shape({
@@ -152,6 +156,7 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             package_price: Yup.number().min(1).required(t('The price field is required')),
             package_duration: Yup.number().min(1).required(t('The duration field is required')),
 
+            voice_pulse_size: Yup.number().integer().min(0).required(t('The voice pusle size field is required'))
 
           })}
           onSubmit={async (
@@ -425,6 +430,39 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
                         handleBlur={handleBlur}
                         handleChange={handleChange}
                         value={values.non_masking_sms_count}
+                      />
+
+                      {/* voice sms */}
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.voice_sms_balance}
+                        touched={touched.voice_sms_balance}
+                        name="voice_sms_balance"
+                        label={t('Voice Sms Balance')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.voice_sms_balance}
+                      />
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.voice_sms_price}
+                        touched={touched.voice_sms_price}
+                        name="voice_sms_price"
+                        label={t('Voice Sms Price')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.voice_sms_price}
+                      />
+                      <TextFieldWrapper
+                        type="number"
+                        errors={errors.voice_pulse_size}
+                        touched={touched.voice_pulse_size}
+                        name="voice_pulse_size"
+                        label={t('Voice Sms Pulse Size (Second)')}
+                        handleBlur={handleBlur}
+                        handleChange={handleChange}
+                        value={values.voice_pulse_size}
+                        pattern="[0-9]{10}"
                       />
                     </Grid>
   

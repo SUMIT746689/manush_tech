@@ -66,7 +66,18 @@ async function post(req, res, refresh_token) {
 
         if (finalContacts.length === 0) throw new Error("no valid contact founds");
 
-        // create tbl_sent_vocie_sms
+        const total_contact_count = finalContacts.length;
+
+        // get school voice transactions datas
+        const respVoiceSmsPrices = await prisma.school.findFirst({ where: { id: school_id }, select: { voice_sms_balance: true, voice_sms_price: true, voice_pulse_size: true } });
+
+        const number_of_sms_pulses = respVoiceSmsPrices.voice_pulse_size >= duration ? 1 : Math.ceil(duration / respVoiceSmsPrices.voice_pulse_size);
+
+        const calculateTotalVoiceSmsPrice = number_of_sms_pulses * respVoiceSmsPrices.voice_sms_price * finalContacts.length;
+
+        // check balance availability  
+        if(respVoiceSmsPrices.voice_sms_balance < calculateTotalVoiceSmsPrice) throw new Error(" balance insufficient")
+
         const respCreateVoiceSms = await prisma.tbl_sent_voice_sms.create({
             data: {
                 message_id: createUniqueMagId,
@@ -74,17 +85,18 @@ async function post(req, res, refresh_token) {
                 send_by_user_name: auth_user_name,
                 voice_url: path.join(uploadFolderName, voice_file?.newFilename),
                 contacts: finalContacts.join(','),
-                // duration:,
                 sender_id,
-                pushed_via: "voice_recipient",
+                pushed_via: "group_contact",
                 // is_masking,
+                voice_duration: duration,
                 status: 2,
-                school_id
+                school_id,
+                pulse_size: respVoiceSmsPrices.voice_pulse_size,
+                charges_per_pulses: respVoiceSmsPrices.voice_sms_price,
+                number_of_sms_pulses,
+                total_count: finalContacts.length
             }
         });
-
-
-        const total_contact_count = finalContacts.length;
 
         formData.set("message_id", createUniqueMagId)
         formData.set("receivers", finalContacts.join(','))
@@ -95,7 +107,7 @@ async function post(req, res, refresh_token) {
         formData.set("duration", String(duration))
         // formData.set("sender_id", "8809677602858")
         formData.set("sender_id", sender_id)
-        formData.set("base_url", "http://msg.elitbuzz-bd.com")
+        formData.set("base_url", process.env.base_url)
 
         const resp = await fetch(process.env.voice_sms_api,
             {
@@ -120,6 +132,27 @@ async function post(req, res, refresh_token) {
             voice_file_path = null;
             throw new Error(respJson.data);
         }
+
+        // school cut voice price and add transaction table for tracking
+        const resUpdateSchool = await prisma.school.update({
+            where: { id: school_id },
+            data: {
+                voice_sms_balance: { decrement: calculateTotalVoiceSmsPrice },
+            }
+        });
+
+        await prisma.smsTransaction.create({
+            data: {
+              user_id: auth_user_id,
+              user_name: auth_user_name,
+              voice_sms_balance: resUpdateSchool.voice_sms_balance,
+              prev_voice_sms_balance: respVoiceSmsPrices.voice_sms_balance,
+              is_voice: true,
+              pushed_via: "gui voice group contact",
+              school_id
+            }
+          })
+      
 
         return res.json({ data: respJson.data, success: true });
 

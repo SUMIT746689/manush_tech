@@ -1,7 +1,7 @@
 import { Authenticated } from '@/components/Authenticated';
 import Footer from '@/components/Footer';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
-import { Card, Grid } from '@mui/material';
+import { Card, Divider, Grid, Typography } from '@mui/material';
 import Head from 'next/head';
 import PageBodyWrapper from '@/components/PageBodyWrapper';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,6 +10,7 @@ import { useClientDataFetch } from '@/hooks/useClientFetch';
 import VoiceRecipient from '@/content/VoiceMsg/SendVoiceMsg/VoiceRecipient';
 import GroupContact from '@/content/VoiceMsg/SendVoiceMsg/GroupContact';
 import FileUpload from '@/content/VoiceMsg/SendVoiceMsg/FileUpload';
+import { formatNumber } from '@/utils/numberFormat';
 
 const colorBlue = "#0052B4"
 
@@ -19,7 +20,7 @@ const VoiceMsg = () => {
   return (
     <>
       <Head>
-        <title>Send Sms</title>
+        <title>Send Voice SMS</title>
       </Head>
       <PageBodyWrapper>
         <Grid display="flex" gap={2} py={{ xs: 2, sm: 3 }} px={0.5}>
@@ -38,6 +39,7 @@ const VoiceMsg = () => {
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />
+                        <NoOfVoiceSms />
                       </Grid>
                     </SendSmsWrapper>
                 },
@@ -48,6 +50,7 @@ const VoiceMsg = () => {
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />
+                        <NoOfVoiceSms />
                       </Grid>
                     </SendSmsWrapper>
                 },
@@ -58,6 +61,7 @@ const VoiceMsg = () => {
                       <Grid maxWidth={350} display="grid" alignContent="flex-start" rowGap={1} >
                         <AvailableBalance />
                         <VoicePrice />
+                        <NoOfVoiceSms />
                       </Grid>
                     </SendSmsWrapper>
                 },
@@ -80,35 +84,55 @@ VoiceMsg.getLayout = (page) => (
   </Authenticated>
 );
 
-export default VoiceMsg;
-
 const AvailableBalance = () => {
   const { user } = useAuth();
   const { school } = user || {};
+  console.log({ school });
+  const { voice_sms_balance }: any = school || {};
   return (
     <Card sx={{ boxShadow: 3, color: colorBlue, p: 3, minWidth: { xs: 'fit-content', md: 350 }, mt: 1, mb: 'auto', borderRadius: 0.5 }}>
       <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>Available Balance</Grid>
-      <Grid sx={{ fontSize: 14, display: 'flex', justifyContent: 'space-between' }}>
+      <Divider />
+      <Grid sx={{ pt: 1, fontSize: 14, display: 'flex', justifyContent: 'space-between' }}>
         <span>BDT:</span>
-        {/* <span>{school?.non_masking_sms_count ? formatNumber(school?.non_masking_sms_count) : 0}</span> */}
-        <span></span>
+        <span>{voice_sms_balance ? formatNumber(voice_sms_balance) : 0}</span>
       </Grid>
     </Card>
   )
 }
 
 const VoicePrice = () => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  const { voice_pulse_size, voice_sms_balance, voice_sms_price }: any = school || {};
+
   return (
     <Card sx={{ boxShadow: 3, color: colorBlue, p: 3, minWidth: { xs: 'fit-content', md: 350 }, mb: 'auto', borderRadius: 0.5 }}>
-      <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>VOICE PRICE</Grid>
-      <Grid sx={{ fontSize: 14, pt: 2, textAlign: 'justify' }}>
-        {/* Disabled */}
+      <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>Voice Price</Grid>
+      <Divider />
+      <Grid sx={{ pt: 1, fontSize: 14, display: "flex", justifyContent: "space-between", textAlign: 'justify' }}>
+        <span>BDT:</span>
+        <Typography>{voice_sms_price}</Typography>
       </Grid>
     </Card>
   )
 }
 
+const NoOfVoiceSms = () => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  const { voice_pulse_size, voice_sms_balance, voice_sms_price }: any = school || {};
 
+  return (
+    <>
+      {/* <Card sx={{ boxShadow: 3, color: colorBlue, p: 3, minWidth: { xs: 'fit-content', md: 350 }, mb: 'auto', borderRadius: 0.5 }}>
+      <Grid sx={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}>Available No Of Voice Sms</Grid>
+      <Divider />
+      <Typography justifyContent="center">{voice_sms_price}</Typography>
+    </Card> */}
+    </>
+  )
+}
 
 const SendSmsWrapper = ({ children }) => {
   return (
@@ -117,3 +141,5 @@ const SendSmsWrapper = ({ children }) => {
     </Grid>
   )
 } 
+
+export default VoiceMsg;

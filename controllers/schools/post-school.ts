@@ -18,7 +18,10 @@ const postSchool = async (req, res, authenticate_user) => {
     const { name, phone, email, address, admin_ids, currency, domain,
       main_balance, masking_sms_price, non_masking_sms_price,
       masking_sms_count, non_masking_sms_count,
-      package_price, package_duration, package_student_count, is_std_cnt_wise
+      package_price, package_duration, package_student_count, is_std_cnt_wise,
+      voice_sms_balance,
+      voice_sms_price,
+      voice_pulse_size,
     } = req.body;
 
     if (!name || !phone || !email || !address) throw new Error('provide valid data');
@@ -61,6 +64,9 @@ const postSchool = async (req, res, authenticate_user) => {
             non_masking_sms_price: non_masking_sms_price ?? undefined,
             masking_sms_count: masking_sms_count ?? undefined,
             non_masking_sms_count: non_masking_sms_count ?? undefined,
+            voice_sms_balance,
+            voice_sms_price,
+            voice_pulse_size,
             admins: { connect: admins },
             AutoAttendanceSentSms: {
               create: {
@@ -71,7 +77,7 @@ const postSchool = async (req, res, authenticate_user) => {
               }
             },
             admin_panel: {
-              connect: admin_panel_id
+              connect: { id: admin_panel_id }
             }
           }
 

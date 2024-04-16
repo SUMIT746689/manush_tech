@@ -72,6 +72,7 @@ async function post(req, res, refresh_token) {
 
         // get school voice transactions datas
         const respVoiceSmsPrices = await prisma.school.findFirst({ where: { id: school_id }, select: { voice_sms_balance: true, voice_sms_price: true, voice_pulse_size: true } });
+        if (!respVoiceSmsPrices.voice_sms_price || !respVoiceSmsPrices.voice_pulse_size) throw new Error(' voice sms price / voice pulse size not founds ');
 
         const number_of_sms_pulses = respVoiceSmsPrices.voice_pulse_size >= duration ? 1 : Math.ceil(duration / respVoiceSmsPrices.voice_pulse_size);
 
@@ -111,28 +112,34 @@ async function post(req, res, refresh_token) {
         formData.set("sender_id", sender_id)
         formData.set("base_url", "http://msg.elitbuzz-bd.com")
 
-        const resp = await fetch(process.env.voice_sms_api,
+        let respJson;
+        let errResp;
+        await fetch(process.env.voice_sms_api,
             {
                 headers: { 'Authorization': 'Bearer PktcjYCSqYgM6zR1uhozUmd0unVr5LnB' },
                 method: "POST",
                 body: formData,
             }
-        );
-        const respJson = await resp.json();
+        ).then(async res => {
+            respJson = await res.json()
+        }).catch(err => {
+            errResp = err.message
+        })
+
 
         // update voice sms data
         await prisma.tbl_sent_voice_sms.update({
             where: { id: respCreateVoiceSms.id },
             data: {
                 status: respJson?.code === 200 ? 0 : 3,
-                logs: respJson.data,
+                logs: respJson?.data || errResp,
                 updated_at: new Date(),
             }
         });
 
-        if (respJson.code !== 200) {
+        if (respJson?.code !== 200) {
             voice_file_path = null;
-            throw new Error(respJson.data);
+            throw new Error(respJson?.data || errResp);
         }
 
         // school cut voice price and add transaction table for tracking
@@ -160,7 +167,6 @@ async function post(req, res, refresh_token) {
 
     } catch (err) {
         if (voice_file_path) handleDeleteFile(voice_file_path)
-        console.log({ err: err.message })
         logFile.error(err.message)
         res.status(404).json({ error: err.message });
     }

@@ -70,13 +70,14 @@ async function post(req, res, refresh_token) {
 
         // get school voice transactions datas
         const respVoiceSmsPrices = await prisma.school.findFirst({ where: { id: school_id }, select: { voice_sms_balance: true, voice_sms_price: true, voice_pulse_size: true } });
+        if (!respVoiceSmsPrices.voice_sms_price || !respVoiceSmsPrices.voice_pulse_size) throw new Error(' voice sms price / voice pulse size not founds ');
 
         const number_of_sms_pulses = respVoiceSmsPrices.voice_pulse_size >= duration ? 1 : Math.ceil(duration / respVoiceSmsPrices.voice_pulse_size);
 
         const calculateTotalVoiceSmsPrice = number_of_sms_pulses * respVoiceSmsPrices.voice_sms_price * finalContacts.length;
 
         // check balance availability  
-        if(respVoiceSmsPrices.voice_sms_balance < calculateTotalVoiceSmsPrice) throw new Error(" balance insufficient")
+        if (respVoiceSmsPrices.voice_sms_balance < calculateTotalVoiceSmsPrice) throw new Error(" balance insufficient")
 
         const respCreateVoiceSms = await prisma.tbl_sent_voice_sms.create({
             data: {
@@ -109,28 +110,33 @@ async function post(req, res, refresh_token) {
         formData.set("sender_id", sender_id)
         formData.set("base_url", process.env.base_url)
 
+        let respJson;
+        let errResp;
         const resp = await fetch(process.env.voice_sms_api,
             {
                 headers: { 'Authorization': 'Bearer PktcjYCSqYgM6zR1uhozUmd0unVr5LnB' },
                 method: "POST",
                 body: formData,
             }
-        );
-        const respJson = await resp.json();
+        ).then(async res => {
+            respJson = await res.json()
+        }).catch(err => {
+            errResp = err.message
+        })
 
         // update voice sms data
         await prisma.tbl_sent_voice_sms.update({
             where: { id: respCreateVoiceSms.id },
             data: {
                 status: respJson?.code === 200 ? 0 : 3,
-                logs: respJson.data,
+                logs: respJson?.data || errResp,
                 updated_at: new Date(),
             }
         });
 
-        if (respJson.code !== 200) {
+        if (respJson?.code !== 200) {
             voice_file_path = null;
-            throw new Error(respJson.data);
+            throw new Error(respJson?.data || errResp);
         }
 
         // school cut voice price and add transaction table for tracking
@@ -143,16 +149,16 @@ async function post(req, res, refresh_token) {
 
         await prisma.smsTransaction.create({
             data: {
-              user_id: auth_user_id,
-              user_name: auth_user_name,
-              voice_sms_balance: resUpdateSchool.voice_sms_balance,
-              prev_voice_sms_balance: respVoiceSmsPrices.voice_sms_balance,
-              is_voice: true,
-              pushed_via: "gui voice group contact",
-              school_id
+                user_id: auth_user_id,
+                user_name: auth_user_name,
+                voice_sms_balance: resUpdateSchool.voice_sms_balance,
+                prev_voice_sms_balance: respVoiceSmsPrices.voice_sms_balance,
+                is_voice: true,
+                pushed_via: "gui voice group contact",
+                school_id
             }
-          })
-      
+        })
+
 
         return res.json({ data: respJson.data, success: true });
 

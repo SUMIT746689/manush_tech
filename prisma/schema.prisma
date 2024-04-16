@@ -1551,7 +1551,9 @@ model tbl_schools_transactions {
 
   voice_pulse_size      Int?
   prev_voice_pulse_size Int?
-
+  
+  total_answered Int?
+  
   created_at DateTime @default(now())
 
   @@map("tbl_schools_transactions")

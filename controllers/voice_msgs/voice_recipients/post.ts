@@ -110,7 +110,7 @@ async function post(req, res, refresh_token) {
         formData.set("duration", String(duration))
         // formData.set("sender_id", "8809677602858")
         formData.set("sender_id", sender_id)
-        formData.set("base_url", "http://msg.elitbuzz-bd.com")
+        formData.set("base_url", process.env.base_url)
 
         let respJson;
         let errResp;

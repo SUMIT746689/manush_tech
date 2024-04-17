@@ -31,6 +31,7 @@ import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import TimePicker from '@mui/lab/TimePicker';
 import { TimePickerWrapper } from '@/components/DatePickerWrapper';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -43,11 +44,13 @@ const MenuProps = {
   }
 };
 
-function PageHeader({ editSection, setEditSection, reFetchData }) {
+function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const [teachers, setTeachers] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState([])
+
   const [selectedClassGroup, setSelectedClassGroup] = useState(null);
   const { showNotification } = useNotistick();
 
@@ -90,6 +93,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
     setEditSection(null);
     setPersonName([]);
     setSelectedClassGroup(null);
+    setSelectedClass([])
   };
 
   const handleCreateUserSuccess = (message) => {
@@ -98,22 +102,23 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
     setEditSection(null);
     setPersonName([]);
     setSelectedClassGroup(null);
+    setSelectedClass([])
   };
 
   useEffect(() => {
-    axios
-      .get('/api/class')
-      .then((res) =>
-        setClasses(
-          res.data?.map((i) => {
-            return {
-              label: i.name,
-              value: i.id
-            };
-          })
-        )
-      )
-      .catch((err) => console.log(err));
+    // axios
+    //   .get('/api/class')
+    //   .then((res) =>
+    //     setClasses(
+    //       res.data?.map((i) => {
+    //         return {
+    //           label: i.name,
+    //           value: i.id
+    //         };
+    //       })
+    //     )
+    //   )
+    //   .catch((err) => console.log(err));
 
     axios
       .get('/api/teacher')
@@ -152,7 +157,12 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
               reFetchData();
             } else throw new Error(' Updated Unsuccessfull');
           });
-      else
+      else {
+        if (!_values?.class_id?.length) throw new Error('please select class');
+        _values.class_ids = _values?.class_id?.map(i => ({
+          id: i.value,
+          // name: i?.label,
+        }))
         axios
           .post(`/api/section`, {
             ..._values,
@@ -165,9 +175,11 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             handleCreateUserSuccess(t('The section was created successfully'));
             reFetchData();
           });
+      }
     } catch (err) {
       console.error(err);
-      showNotification(t('There was an error, try again later'), 'error');
+      handleShowErrMsg(err, showNotification)
+      // showNotification(err.message || t('There was an error, try again later'), 'error');
       setStatus({ success: false });
       // @ts-ignore
       setErrors({ submit: err.message });
@@ -228,7 +240,11 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             name: Yup.string()
               .max(255)
               .required(t('The Section name field is required')),
-            class_id: Yup.number().positive().integer()
+            class_id: editSection ? Yup.number()
+              .positive()
+              .integer()
+              .required(t('The class field is required')) : Yup.array().required(t('The class field is required'))
+
           })}
           onSubmit={handleFormSubmit}
         >
@@ -242,6 +258,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             values,
             setFieldValue
           }) => {
+            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -262,8 +279,28 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                       handleChange={handleChange}
                     />
 
-
                     <AutoCompleteWrapper
+                      multiple={editSection ? false : true}
+                      minWidth="100%"
+                      label="Class"
+                      placeholder="select a class..."
+                      value={editSection ? classList.find((cls) => cls.value === values.class_id) : selectedClass}
+                      options={classList}
+                      // @ts-ignore
+                      handleChange={(event, value) => {
+                        if (editSection) setFieldValue('class_id', value?.value || null)
+                        else {
+                          setSelectedClass(value)
+                          setFieldValue('class_id', value)
+                        }
+                        // setFieldValue('class_id', value?.value || null);
+                        // setFieldValue('group_id', null);
+                        // if (value) getSelectedClassGroup(value.value);
+                        // else setSelectedClassGroup(null);
+                      }}
+                    />
+
+                    {/* <AutoCompleteWrapper
                       minWidth="100%"
                       label="Class"
                       placeholder="select a class..."
@@ -276,7 +313,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
                         if (value) getSelectedClassGroup(value.value);
                         else setSelectedClassGroup(null);
                       }}
-                    />
+                    /> */}
 
 
                     {selectedClassGroup && (
@@ -372,7 +409,7 @@ function PageHeader({ editSection, setEditSection, reFetchData }) {
             );
           }}
         </Formik>
-      </Dialog>
+      </Dialog >
     </>
   );
 }

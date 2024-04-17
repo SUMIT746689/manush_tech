@@ -12,6 +12,7 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 function ManagementClasses() {
   const [editSection, setEditSection] = useState(null);
   const { data: sections, reFetchData } = useClientFetch(`/api/section`);
+  const { data: classes } = useClientFetch(`/api/class`);
 
   return (
     <>
@@ -23,6 +24,14 @@ function ManagementClasses() {
           editSection={editSection}
           setEditSection={setEditSection}
           reFetchData={reFetchData}
+          classList={
+            classes?.map((i) => {
+              return {
+                label: i.name,
+                value: i.id
+              };
+            }) || []
+          }
         />
       </PageTitleWrapper>
 

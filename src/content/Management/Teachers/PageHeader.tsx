@@ -232,9 +232,9 @@ function PageHeader({
             permanent_address: Yup.string().required(
               t('The parmanent_address field is required')
             ),
-            department_id: Yup.number().required(
-              t('The depardment field is required')
-            ),
+            // department_id: Yup.number().required(
+            //   t('The depardment field is required')
+            // ),
             national_id: Yup.number().required(
               t('The national id field is required')
             ),

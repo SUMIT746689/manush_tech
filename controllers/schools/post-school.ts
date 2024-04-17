@@ -94,7 +94,33 @@ const postSchool = async (req, res, authenticate_user) => {
         end_date: end_date_provided,
         is_active: true
       }
-    })
+    });
+
+    await prisma.academicYear.create({ data: { title: String((new Date()).getFullYear()), school_id: response.school_id } });
+    await createClassesWithSections(response.school_id);
+    // await prisma.section.create({
+    //   data: {
+    //     name: "default-One",
+    //     class: {
+    //       create:
+    //         { name: "One", code: "001", has_section: false, school_id: response.school_id, }
+    //     }
+    //   },
+    //   // [
+    //   //   { name: "Two", code: "002", has_section: false, school_id: response.school_id },
+    //   //   { name: "Three", code: "003", has_section: false, school_id: response.school_id },
+    //   //   { name: "Four", code: "004", has_section: false, school_id: response.school_id },
+    //   //   { name: "Five", code: "005", has_section: false, school_id: response.school_id },
+    //   //   { name: "Six", code: "006", has_section: false, school_id: response.school_id },
+    //   //   { name: "Seven", code: "007", has_section: false, school_id: response.school_id },
+    //   //   { name: "Eight", code: "008", has_section: false, school_id: response.school_id },
+    //   //   { name: "Nine", code: "009", has_section: false, school_id: response.school_id },
+    //   //   { name: "Ten", code: "010", has_section: false, school_id: response.school_id },
+    //   // ]
+    // });
+
+    await prisma.accounts.create({ data: { title: "Demo", account_number: "0001", description: " this is a demo bank accdount", balance: 0, school_id: response.school_id } })
+
     if (!response) throw new Error('Failed to create school');
     res.status(200).json({ success: true, message: 'Successfully created school' });
 
@@ -106,3 +132,107 @@ const postSchool = async (req, res, authenticate_user) => {
 };
 
 export default authenticate(postSchool);
+
+
+const createClassesWithSections = async (school_id) => {
+  // cls sec one
+  await prisma.section.create({
+    data: {
+      name: "default-One",
+      class: {
+        create:
+          { name: "One", code: "001", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec two
+  await prisma.section.create({
+    data: {
+      name: "default-Two",
+      class: {
+        create:
+          { name: "Two", code: "002", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec three
+  await prisma.section.create({
+    data: {
+      name: "default-Three",
+      class: {
+        create:
+          { name: "Three", code: "003", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec four
+  await prisma.section.create({
+    data: {
+      name: "default-Four",
+      class: {
+        create:
+          { name: "Four", code: "004", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec five
+  await prisma.section.create({
+    data: {
+      name: "default-Five",
+      class: {
+        create:
+          { name: "Five", code: "005", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec six
+  await prisma.section.create({
+    data: {
+      name: "default-Six",
+      class: {
+        create:
+          { name: "Six", code: "006", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec seven
+  await prisma.section.create({
+    data: {
+      name: "default-Seven",
+      class: {
+        create:
+          { name: "Seven", code: "007", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec eight
+  await prisma.section.create({
+    data: {
+      name: "default-Eight",
+      class: {
+        create:
+          { name: "Eight", code: "008", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec nine
+  await prisma.section.create({
+    data: {
+      name: "default-Nine",
+      class: {
+        create:
+          { name: "Nine", code: "009", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec ten
+  await prisma.section.create({
+    data: {
+      name: "default-Ten",
+      class: {
+        create:
+          { name: "Ten", code: "010", has_section: false, school_id, }
+      }
+    }
+  });
+}

@@ -184,17 +184,17 @@ model Teacher {
   photo             String?
   deleted_at        DateTime?
 
-  department_id Int
-  user_id       Int @unique
+  department_id Int?
+  user_id       Int  @unique
   school_id     Int
 
-  my_class   Section[]  @relation("class_teacher")
-  user       User       @relation(fields: [user_id], references: [id])
-  classes    Section[]  @relation("SectionToTeacher")
+  my_class   Section[]   @relation("class_teacher")
+  user       User        @relation(fields: [user_id], references: [id])
+  classes    Section[]   @relation("SectionToTeacher")
   periods    Period[]
-  school     School     @relation(fields: [school_id], references: [id])
-  department Department @relation(fields: [department_id], references: [id])
-  seatPlans  seatPlan[] @relation("teacher_to_seat_plan")
+  school     School      @relation(fields: [school_id], references: [id])
+  department Department? @relation(fields: [department_id], references: [id])
+  seatPlans  seatPlan[]  @relation("teacher_to_seat_plan")
 
   @@map("teachers")
 }
@@ -1522,9 +1522,9 @@ enum pushed_via_enum {
 }
 
 model tbl_schools_transactions {
-  id                    Int    @id @default(autoincrement())
-  school_id             Int
-  school_name           String
+  id                   Int     @id @default(autoincrement())
+  school_id            Int
+  school_name          String
   updated_by_user_id   Int?
   updated_by_user_name String?
 
@@ -1551,9 +1551,9 @@ model tbl_schools_transactions {
 
   voice_pulse_size      Int?
   prev_voice_pulse_size Int?
-  
+
   total_answered Int?
-  
+
   created_at DateTime @default(now())
 
   @@map("tbl_schools_transactions")

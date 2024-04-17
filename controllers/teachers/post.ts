@@ -12,19 +12,19 @@ const post = async (req, res, refresh_token) => {
   const { admin_panel_id } = refresh_token;
   const uploadFolderName = 'teacher';
 
-  const fileType = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+  const photoFileType = ['image/jpeg', 'image/jpg', 'image/png'];
+  const resumeFileType = ['application/pdf', 'application/vnd.ms-excel'];
+
   const filterFiles = {
-    logo: fileType,
-    signature: fileType,
-    background_image: fileType,
+    photo: photoFileType,
+    resume: resumeFileType
   }
 
   const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
 
-  if (error) throw new Error('Error')
-
   const { resume, photo } = files;
   try {
+    if (error) throw new Error(error)
 
     if (files && resume || fields?.resume) {
       if (photo) {
@@ -67,12 +67,9 @@ const post = async (req, res, refresh_token) => {
       !date_of_birth ||
       !present_address ||
       !permanent_address ||
-      !department_id ||
       !national_id
     )
-      return res.json({
-        message: 'username || password || first_name || gender || date_of_birth || present_address || permanent_address is missing'
-      });
+      throw new Error('username || password || first_name || gender || date_of_birth || present_address || permanent_address is missing');
 
     const encrypePassword = await bcrypt.hash(
       password,
@@ -114,7 +111,10 @@ const post = async (req, res, refresh_token) => {
         console.log('Successfully moved file!')
       })
     }
-
+    // console.log({ department_id, resume___: resume?.newFilename })
+    if (department_id) query["department"] = { connect: { id: parseInt(department_id) } };
+    // console.log(query)
+    
     const teacher = await prisma.teacher.create({
       // @ts-ignore
       data: {
@@ -127,9 +127,10 @@ const post = async (req, res, refresh_token) => {
         present_address: present_address,
         joining_date: joining_date ? new Date(joining_date) : new Date(),
         // @ts-ignore
-        resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : (filePathQuery?.resume || ''),
+        // resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : (filePathQuery?.resume || ''),
+        resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) :  '',
         school: { connect: { id: refresh_token.school_id } },
-        department: { connect: { id: parseInt(department_id) } },
+        // department: { connect: { id: parseInt(department_id) } },
         user: {
           create: {
             username: username,
@@ -148,9 +149,8 @@ const post = async (req, res, refresh_token) => {
     logFile.error(err.message)
     if (resume) deleteFiles(resume.filepath);
     if (photo) deleteFiles(photo.filepath);
-    res.status(404).json({ error: err.message });
     console.log({ err });
-    res.status(404).json({ err: err.message });
+    res.status(404).json({ error: err.message });
   }
 };
 export default authenticate(adminCheck(post))

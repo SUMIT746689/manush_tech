@@ -32,6 +32,7 @@ import dayjs from 'dayjs';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { generateUsername, getFile } from '@/utils/utilitY-functions';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const BoxUploadWrapper = styled(Box)(
   ({ theme }) => `
@@ -67,9 +68,7 @@ function PageHeader({
 
   useEffect(() => {
     if (editSchool) {
-      console.log("editSchool__", editSchool);
-
-      handleCreateProjectOpen();
+     handleCreateProjectOpen();
     }
   }, [editSchool]);
 
@@ -96,7 +95,7 @@ function PageHeader({
   ) => {
     try {
       const resume: any = [];
-      Array.prototype.forEach.call(_values.resume, function (file) {
+      if(_values.resume) Array.prototype.forEach.call(_values.resume, function (file) {
         resume.push(file);
       });
       const formData = new FormData();
@@ -104,7 +103,7 @@ function PageHeader({
       formData.append('middle_name', _values.middle_name);
       formData.append('last_name', _values.last_name);
       formData.append('national_id', _values.national_id);
-      formData.append('department_id', _values.department_id);
+      if(_values.department_id) formData.append('department_id', _values.department_id);
       formData.append('phone', _values.phone);
       formData.append('gender', _values.gender);
       formData.append('blood_group', _values.blood_group);
@@ -152,13 +151,12 @@ function PageHeader({
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`
           }
         });
-        // console.log({ res });
         if (res.data?.success)
           successProcess(t('A new teacher has been created successfully'));
         else throw new Error('created teacher failed');
       }
     } catch (err) {
-      console.error(err);
+      handleShowErrMsg(err, showNotification)
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -238,7 +236,7 @@ function PageHeader({
             national_id: Yup.number().required(
               t('The national id field is required')
             ),
-            resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
+            // resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
           })}
           onSubmit={async (
             _values,
@@ -458,7 +456,7 @@ function PageHeader({
                         }}
                         alignSelf="center"
                       >
-                        <b>{t('Department')}:*</b>
+                        <b>{t('Department')}:</b>
                       </Box>
                     </Grid>
                     <Grid
@@ -867,7 +865,7 @@ function PageHeader({
                         placeholder={t('Teacher username here...')}
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        disabled
+                        // disabled
                         value={values.username}
                         variant="outlined"
                       />
@@ -961,7 +959,7 @@ function PageHeader({
                         }}
                         alignSelf="center"
                       >
-                        <b>{t('Resume')}:*</b>
+                        <b>{t('Resume')}:</b>
                       </Box>
                     </Grid>
                     <Grid

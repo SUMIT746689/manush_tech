@@ -2,13 +2,11 @@ import { formidable } from 'formidable';
 import bcrypt from 'bcrypt';
 import { readFile, utils } from "xlsx";
 import dayjs from 'dayjs';
-import { academicYearVerify, authenticate } from 'middleware/authenticate';
+import { authenticate } from 'middleware/authenticate';
 import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
+import axios from 'axios';
 import prisma from '@/lib/prisma_client';
 import { logFile } from 'utilities_api/handleLogFile';
-import { handleDeleteFile } from 'utilities_api/handleDeleteFiles';
-import * as XLSX from 'xlsx/xlsx.mjs';
-import { createReadStream } from 'fs';
 
 export const config = {
     api: {
@@ -33,18 +31,31 @@ const gettingFile = (req) => {
 
 
 
-const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
+const handlePost = async (req, res, refresh_token) => {
 
     try {
-        console.log({ dcryptAcademicYear })
         const student_role = await prisma.role.findFirst({
             where: {
                 title: 'STUDENT'
             }
         })
         const { fields, files }: any = await gettingFile(req);
-        // console.log({files})
-        const { students } = files;
+        // console.log(files);
+
+        const f = Object.entries(files)[0][1];
+        //@ts-ignore
+        const workbook = await readFile(f.filepath);
+
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        let allStudents = []
+        const range = utils.decode_range(worksheet['!ref']);
+
+        // console.log("total row__", range.e.r);
+
+        const requestedStudentAdmissionCount = range.e.r;
+
         const schoolPackage = await prisma.subscription.findFirst({
             where: {
                 school_id: parseInt(refresh_token?.school_id),
@@ -58,24 +69,6 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 }
             }
         })
-
-        // get datas from excel or csv file
-        const requestedStudentAdmissionCount = 0;
-        await getDatasExcelOrCsvFile(students.filepath)
-            .then(res => {
-                console.log({ res })
-                const keys = Object.keys(res[0])
-                if (keys.length === 0) return;
-                res.forEach(res => {
-                    // const { number, err } = handleConvBanNum(String(res[keys[0]]));
-                    // console.log({ number,err })
-                    // if (!err) finalContacts.push(number);
-                })
-            })
-            .catch(err => { console.log({ getFileErr: err }) })
-
-
-
         const admittedStudentCount = await prisma.studentInformation.count({
             where: {
                 school_id: parseInt(refresh_token?.school_id)
@@ -87,8 +80,6 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
         }
 
 
-
-
         for (let row = range.s.r; row <= range.e.r; row++) {
 
             let student: any = {};
@@ -98,7 +89,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 for (let col = range.s.c; col <= range.e.c; col++) {
 
                     const columnLetter = utils.encode_col(col);
-                    console.log({ columnLetter })
+
                     const key = worksheet[`${columnLetter}1`].v
                     const value = worksheet[`${columnLetter}${row + 1}`]?.v ?
                         (key == 'section_id' || key == 'academic_year_id' || key == 'class_id') ?
@@ -139,7 +130,9 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                                 return res.status(404).json({ message: `${row + 1} number row ${key} Date invalid !!` });
                             }
                         }
+
                         student[key] = calculatedValue
+
                     }
                 }
                 let query = {};
@@ -229,9 +222,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 }
                 if (!Object.keys(query).length) {
                     return res.status(400).json({ message: `${row + 1} th row, academic year id or academic year title missing !` })
-                };
-
-
+                }
                 const academicYearValidity = await prisma.academicYear.findFirst({
                     where: {
                         ...query,
@@ -361,20 +352,20 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                     data: StudentFeeContainer
                 });
 
-                // try {
-                //     const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${i?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
-                //     if (sms_res.data == 1015) {
-                //         faildedSmS.push(student.id)
-                //     }
-                //     else if (sms_res.data.startsWith('SMS SUBMITTED')) {
-                //         successSmS.push(student.id)
-                //     }
-                //     else {
-                //         successSmS.push(student.id)
-                //     }
-                // } catch (err) {
-                //     faildedSmS.push(student.id)
-                // }
+                try {
+                    const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${i?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
+                    if (sms_res.data == 1015) {
+                        faildedSmS.push(student.id)
+                    }
+                    else if (sms_res.data.startsWith('SMS SUBMITTED')) {
+                        successSmS.push(student.id)
+                    }
+                    else {
+                        successSmS.push(student.id)
+                    }
+                } catch (err) {
+                    faildedSmS.push(student.id)
+                }
             })
 
         }
@@ -383,46 +374,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
     } catch (err) {
         logFile.error(err.message)
         res.status(404).json({ error: err.message });
-    }
+      }
 };
 
-
-const getDatasExcelOrCsvFile = (file_path): Promise<any> => {
-    return new Promise(function (resolve, reject) {
-
-        const datas = createReadStream(file_path, { highWaterMark: (128 * 100) });
-        let buffer_part = 0;
-        const bufferList = [];
-
-        datas.on("data", (buffer) => {
-            bufferList.push(buffer)
-            buffer_part += 1;
-        });
-
-        datas.on("end", async () => {
-
-            const totalBuffer = Buffer.concat(bufferList);
-
-            const uint8 = new Uint8Array(totalBuffer)
-            const workbook = XLSX.read(uint8, { type: "array" })
-            /* DO SOMETHING WITH workbook HERE */
-            const firstSheetName = workbook.SheetNames[0]
-            /* Get worksheet */
-            const worksheet = workbook.Sheets[firstSheetName];
-            const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
-
-            if (excelArrayDatas.length > 30000) {
-                handleDeleteFile(file_path);
-                reject("large file, maximum support 30,000 row")
-            }
-            resolve(excelArrayDatas);
-        });
-
-        datas.on("error", (err) => {
-            handleDeleteFile(file_path);
-            reject(err);
-        });
-    });
-}
-
-export default authenticate(academicYearVerify(handlePost));
+export default authenticate(handlePost);

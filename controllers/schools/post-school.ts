@@ -96,7 +96,7 @@ const postSchool = async (req, res, authenticate_user) => {
       }
     });
 
-    await prisma.academicYear.create({ data: { title: String((new Date()).getFullYear()), school_id: response.school_id } });
+    await prisma.academicYear.create({ data: { title: String((new Date()).getFullYear()), school_id: response.school_id, curr_active: true } });
     await createClassesWithSections(response.school_id);
     // await prisma.section.create({
     //   data: {

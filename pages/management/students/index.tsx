@@ -149,10 +149,14 @@ function ManagementClasses() {
   };
 
   const handleExcelUpload = () => {
-    console.log(excelFileUpload);
+    // console.log(excelFileUpload);
     if (excelFileUpload) {
       const form = new FormData();
+      if (!selectedClass?.id || !selectedSection?.id) return showNotification("class/section not selected", "error")
+      if (typeof selectedSection?.id !== "number") return showNotification("select a single section", "error");
       form.append('students', excelFileUpload);
+      form.append('class_id', selectedClass.id);
+      form.append('section_id', selectedSection.id);
 
       axios
         .post('/api/student/bulk-admission', form)
@@ -185,35 +189,32 @@ function ManagementClasses() {
 
       <PageTitleWrapper>
 
-        <Grid item >
-          <Typography variant="h3" component="h3" gutterBottom>
-            {t('Student Management')}
-          </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              'All aspects related to the students can be managed from this page'
-            )}
-          </Typography>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item >
+            <Typography variant="h3" component="h3" gutterBottom>
+              {t('Student Management')}
+            </Typography>
+            <Typography variant="subtitle2">
+              {t(
+                'All aspects related to the students can be managed from this page'
+              )}
+            </Typography>
+          </Grid>
+
+          <Grid item my="auto">
+            <ButtonWrapper handleClick={handleSendToRegistrationPage}>
+              {t('Registration student')}
+            </ButtonWrapper>
+          </Grid>
 
         </Grid>
       </PageTitleWrapper>
-      <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr auto 1fr" }, columnGap: 1 }}
-      >
 
-        <ButtonWrapper
-          handleClick={handleSendToRegistrationPage}
-        >
-          {t('Registration student')}
-        </ButtonWrapper>
+      <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr 1fr" }, columnGap: 1 }}>
 
-        <ButtonWrapper
-          handleClick={undefined}
-          href={`/student.xlsx`}
-        >
+        <ButtonWrapper handleClick={undefined} href={`/student.xlsx`}>
           Download Excel format
-
         </ButtonWrapper>
-
 
         <Grid >
           <FileUploadFieldWrapper
@@ -230,10 +231,8 @@ function ManagementClasses() {
             handleRemoveFile={(e) => { setExcelFileUpload(null) }}
           />
         </Grid>
-        <ButtonWrapper
-          disabled={excelFileUpload ? false : true}
-          handleClick={handleExcelUpload}
-        >
+
+        <ButtonWrapper disabled={excelFileUpload ? false : true} handleClick={handleExcelUpload}>
           {t('Bulk admission')}
         </ButtonWrapper>
 

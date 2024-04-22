@@ -204,8 +204,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
   };
 
   const handleDeleteCompleted = () => {
-    console.log(openConfirmDelete);
-
+    
     axios.delete(`/api/student/${openConfirmDelete}`)
       .then(res => {
         setOpenConfirmDelete(null);
@@ -477,7 +476,6 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
               <TableBody>
                 {paginatedClasses.map((i) => {
                   const isUserSelected = selectedItems.includes(i.id);
-                  console.log(i);
 
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
@@ -582,7 +580,6 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         <Grid ref={idCard} display={'grid'} gridTemplateColumns={'1fr 1fr'} container gap={1.5}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i, index) => {
-              console.log({i});
               
               const user = {
                 id: i?.class_roll_no,
@@ -667,7 +664,6 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 };
 
 const SingleFee = ({ singleFee, selectedUser }) => {
-  console.log({ singleFee, selectedUser });
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.waiver_fees?.length > 0
@@ -718,7 +714,6 @@ const SingleFee = ({ singleFee, selectedUser }) => {
 };
 
 const SingleDiscount = ({ singleDiscount, selectedUser }) => {
-  // console.log(singleDiscount, selectedUser);
 
   const [checked, setChecked] = useState(
     selectedUser && selectedUser?.discount?.length > 0

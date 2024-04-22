@@ -6,7 +6,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 
 
-import { Button, Card, Grid, Typography } from '@mui/material';
+import { Button, Card, Chip, Dialog, DialogTitle, Grid, Typography } from '@mui/material';
 import { useRefMounted } from 'src/hooks/useRefMounted';
 
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
@@ -23,12 +23,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
 import { ExportData } from '@/content/Management/Students/ExportData';
-import { FileUploadFieldWrapper } from '@/components/TextFields';
+import { FileUploadFieldWrapper, NewFileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { read, utils } from 'xlsx';
+import { handleCreateFileObj } from 'utilities_api/handleCreateFileObject';
+import CloseIcon from '@mui/icons-material/Close';
 
 function ManagementClasses() {
 
@@ -45,11 +48,10 @@ function ManagementClasses() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [discount, setDiscount] = useState([]);
   const [fee, setFee] = useState([]);
-  const [isLoadingBulkStdUpload, setIsLoadingBulkStdUpload] = useState(false);
-
+  const [openBulkStdUpload, setOpenBulkStdUpload] = useState(false);
+  const [isDownloadingExcelFile, setIsDownloadingExcelFile] = useState(false);
   const idCard = useRef();
 
-  const [excelFileUpload, setExcelFileUpload] = useState(null);
 
   const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
 
@@ -150,35 +152,6 @@ function ManagementClasses() {
     router.push('/management/students/registration');
   };
 
-  const handleExcelUpload = () => {
-    // console.log(excelFileUpload);
-    setIsLoadingBulkStdUpload(true);
-    if (excelFileUpload) {
-      const form = new FormData();
-      if (!selectedClass?.id || !selectedSection?.id) {
-        setIsLoadingBulkStdUpload(false);
-        return showNotification("class/section not selected", "error");
-      }
-      if (typeof selectedSection?.id !== "number") {
-        setIsLoadingBulkStdUpload(false);
-        return showNotification("select a single section", "error");
-      }
-      form.append('students', excelFileUpload);
-      form.append('class_id', selectedClass.id);
-      form.append('section_id', selectedSection.id);
-
-      axios
-        .post('/api/student/bulk-admission', form)
-        .then((res) => {
-          setExcelFileUpload(null);
-          showNotification(t('All students data inserted'))
-        })
-        .catch((err) => {
-          handleShowErrMsg(err, showNotification);
-        })
-        .finally(() => { setIsLoadingBulkStdUpload(false) })
-    }
-  };
   const handlePrint = useReactToPrint({
     content: () => idCard.current,
     // pageStyle: `@media print {
@@ -187,10 +160,14 @@ function ManagementClasses() {
     //   }
     // }`
   });
-  // size: 85.725mm 53.975mm;
+
+  const handleDownloadStudentExcelFile = () => {
+    setIsDownloadingExcelFile(true);
+  };
 
   return (
     <>
+      <BulkStudentUpload class_id={selectedClass?.id} section_id={selectedSection?.id} open={openBulkStdUpload} setOpen={setOpenBulkStdUpload} />
       <Head>
         <title>Students - Management</title>
       </Head>
@@ -223,27 +200,12 @@ function ManagementClasses() {
         <ButtonWrapper handleClick={undefined} href={`/Student-Bulk-Import-Sample.xlsx`}>
           Download Excel format
         </ButtonWrapper>
-
-        <Grid >
-          <FileUploadFieldWrapper
-            htmlFor="excelUpload"
-            label="select Excel file"
-            name="excelUpload"
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-            value={excelFileUpload?.name || ''}
-            handleChangeFile={(e) => {
-              if (e.target?.files?.length && e.target.files[0].type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-                setExcelFileUpload(e.target.files[0])
-              }
-            }}
-            handleRemoveFile={(e) => { setExcelFileUpload(null) }}
-          />
-        </Grid>
-
-        <SearchingButtonWrapper isLoading={isLoadingBulkStdUpload} disabled={excelFileUpload ? false : true} handleClick={handleExcelUpload}>
-          {t('Bulk admission')}
+        <ButtonWrapper handleClick={() => setOpenBulkStdUpload(true)} >
+          Upload Bulk Student
+        </ButtonWrapper>
+        <SearchingButtonWrapper disabled={isDownloadingExcelFile} isLoading={isDownloadingExcelFile} handleClick={handleDownloadStudentExcelFile} >
+          Downlaod All Student List (Excel Format)
         </SearchingButtonWrapper>
-
       </Card>
 
       <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 1, display: "grid", gridTemplateColumns: { sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr auto" }, columnGap: 1 }}>
@@ -327,3 +289,128 @@ ManagementClasses.getLayout = (page) => (
 );
 
 export default ManagementClasses;
+
+
+const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [excelFileUpload, setExcelFileUpload] = useState(null);
+  const { showNotification } = useNotistick();
+  const { t }: { t: any } = useTranslation();
+
+  const handleExcelUpload = () => {
+    // console.log(excelFileUpload);
+    setIsLoading(true);
+    if (!excelFileUpload) {
+      setIsLoading(false);
+      return showNotification("upload a student file", "error");;
+    }
+    const form = new FormData();
+    if (!class_id || !section_id) {
+      setIsLoading(false);
+      return showNotification("class/section not selected", "error");
+    }
+    if (typeof section_id !== "number") {
+      setIsLoading(false);
+      return showNotification("select a single section", "error");
+    }
+    form.append('students', excelFileUpload);
+    form.append('class_id', class_id);
+    form.append('section_id', String(section_id));
+
+    axios
+      .post('/api/student/bulk-admission', form)
+      .then((res) => {
+        setExcelFileUpload(null);
+        showNotification(t('All students data inserted'))
+      })
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
+      })
+      .finally(() => { setIsLoading(false) })
+
+  };
+  const handleModalClose = () => {
+    setOpen(close);
+  }
+
+  const handleUplaodFileChange = async (event) => {
+    if (!event.target.files[0]) return;
+    const reader = new FileReader();
+
+    reader.onload = async function (e) {
+      const data = e.target.result;
+      const workbook = read(data, { type: 'array' })
+      /* DO SOMETHING WITH workbook HERE */
+      const firstSheetName = workbook.SheetNames[0]
+      /* Get worksheet */
+      const worksheet = workbook.Sheets[firstSheetName]
+      const excelArrayDatas = utils.sheet_to_json(worksheet, { raw: true });
+      // setFieldValue("contact_column", null)
+
+      if (excelArrayDatas.length > 30_000) {
+        showNotification("file is to large", "error")
+        setExcelFileUpload(null);
+        // setSelectSheetHeaders(() => []);
+        return;
+      }
+
+      // set upload file 
+      const { err, files, objFiles } = handleCreateFileObj(event)
+      if (err) showNotification(err, "error");
+      setExcelFileUpload(files[0]);
+      // setFieldValue('preview_contact_file', objFiles[0]);
+    }
+    reader.readAsArrayBuffer(event.target.files[0]);
+  }
+  console.log({ isLoading })
+  return (
+    <Dialog
+      fullWidth
+      maxWidth="sm"
+      open={open}
+      onClose={handleModalClose}
+    >
+      <DialogTitle display="flex" justifyContent="space-between" sx={{ p: 3 }}>
+        <Grid>
+          <Typography variant="h4" gutterBottom>
+            {t('Add new Section')}
+          </Typography>
+          <Typography variant="subtitle2">
+            {t('Fill in the fields below to create and add a new section')}
+          </Typography>
+        </Grid>
+        <CloseIcon onClick={handleModalClose} sx={{ cursor: "pointer", borderRadius: 0.5, p: 0.5, fontSize: 30, color: themes => themes.colors.primary.dark, border: (themes) => `1px solid ${themes.colors.primary.dark}` }} />
+      </DialogTitle>
+
+      <Grid px={3} pb={4}>
+        <Grid pb={4}>
+          <Grid >Upload Student File: (.xlsx, .xls, .csv, text/csv) *</Grid>
+          <Grid item width="100%">
+            <NewFileUploadFieldWrapper
+              label='Upload Excel file'
+              htmlFor="student_upload_file"
+              accept=".xlsx, .xls, .csv, text/csv"
+              handleChangeFile={(event) => { handleUplaodFileChange(event) }}
+            />
+          </Grid>
+
+          {excelFileUpload?.name &&
+            <Grid>
+              <Grid color="#57ca22" width="100%" fontWeight={500}>Upload File Name:</Grid>
+              <Grid >
+                <Chip variant='outlined' label="File Name: " sx={{ borderRadius: 0, height: 40 }} />
+                <Chip color="success" variant="outlined" label={excelFileUpload.name} sx={{ borderRadius: 0, height: 40 }} />
+                <Chip color='warning' label="Remove" variant='outlined' sx={{ borderRadius: 0.5, px: 1, py: 2, ml: 0.5 }} onClick={() => { setExcelFileUpload(null) }} />
+              </Grid>
+            </Grid>
+          }
+        </Grid>
+
+        <SearchingButtonWrapper isLoading={isLoading} disabled={isLoading} handleClick={handleExcelUpload}>
+          {t('Bulk admission')}
+        </SearchingButtonWrapper>
+      </Grid>
+    </Dialog>
+  )
+}

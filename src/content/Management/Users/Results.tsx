@@ -6,6 +6,7 @@ import {
   Ref,
   forwardRef,
   useEffect,
+  useRef,
 } from 'react';
 
 import PropTypes from 'prop-types';
@@ -182,21 +183,23 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   });
   const [allUsers, setAllUsers] = useState(users);
   const [searchToken, setSearchToken] = useState(null);
-
+  const [filterByActiveStatus, setFilterByActiveStatus] = useState({ label: "All", id: 0 });
+  const isMountingRef = useRef(false);
 
   const getNsetOptions = () => {
-    axios.get(`/api/user?role=${searchToken}`)
+    let url = `/api/user?`
+    if (searchToken) url += `role=${searchToken}&`;
+    if (filterByActiveStatus?.label !== "All") url += `is_enabled=${filterByActiveStatus.label === "Active" ? true : false}`;
+
+    axios.get(url)
       .then(res => setAllUsers(res.data))
-      .catch(err => console.log(err))
+      .catch(err => handleShowErrMsg(err, showNotification))
   };
 
   useEffect(() => {
-    if (searchToken) {
-      getNsetOptions();
-    } else {
-      reFetchData()
-    }
-  }, [searchToken]);
+    if (isMountingRef.current) getNsetOptions();
+    isMountingRef.current = true;
+  }, [searchToken, filterByActiveStatus]);
 
 
   useEffect(() => {
@@ -264,7 +267,7 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
           reFetchData()
           showNotification('The user has been removed');
         })
-        .catch((err) => console.log(err));
+        .catch((err) => handleShowErrMsg(err, showNotification));
     }
 
   };
@@ -274,14 +277,18 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   //change user active or disable 
   const handleUserEnabled = async (user) => {
     const [err, response]: any = await fetchData(`/api/user/activition/${user.id}`, 'patch', { is_enabled: !!!user?.is_enabled });
-    if (response?.message) reFetchData(true);
+    if (response?.message) getNsetOptions();
     if (err) showNotification(err, "error")
   }
 
   const handleCngAdminPanelActiveStatus = async (user) => {
     const [err, response]: any = await fetchData(`/api/admin_panels/activations/${user.id}`, 'patch', { is_active: !!!user?.adminPanel?.is_active });
-    if (response?.message) reFetchData(true);
+    if (response?.message) getNsetOptions();
     if (err) showNotification(err, "error")
+  }
+
+  const handleFilterActiveStatusWise = (value) => {
+    setFilterByActiveStatus(() => value);
   }
 
   //@ts-ignore
@@ -363,22 +370,47 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
             />
             {
 
-              isNotSuperAdmin && <Autocomplete
-                size="small"
-                options={roleOptions || []}
-                value={searchToken}
-                onChange={(e, v) => setSearchToken(v)}
-                renderInput={(params) => <TextField
-                  sx={{
-                    [`& fieldset`]: {
-                      borderRadius: 0.6,
-                    }
-                  }}
-                  {...params}
-                  label="Filter by role"
+              isNotSuperAdmin &&
+              <Grid display="grid" gridTemplateColumns="1fr 1fr" columnGap={1}>
+                <Autocomplete
+                  size="small"
+                  options={roleOptions || []}
+                  value={searchToken}
+                  onChange={(e, v) => setSearchToken(v)}
+                  renderInput={(params) => <TextField
+                    sx={{
+                      [`& fieldset`]: {
+                        borderRadius: 0.6,
+                      }
+                    }}
+                    {...params}
+                    label="Filter by Role"
+                  />
+                  }
                 />
-                }
-              />
+                {/* for filter active/ desabled users */}
+                <Autocomplete
+                  size="small"
+                  options={[
+                    { label: "All", id: 0 },
+                    { label: "Active", id: 1 },
+                    { label: "Disable", id: 2 }
+                  ]}
+                  value={filterByActiveStatus}
+                  onChange={(e, v) => handleFilterActiveStatusWise(v)}
+                  disableClearable={true}
+                  renderInput={(params) => <TextField
+                    sx={{
+                      [`& fieldset`]: {
+                        borderRadius: 0.6,
+                      }
+                    }}
+                    {...params}
+                    label="Filter by Status"
+                  />
+                  }
+                />
+              </Grid>
             }
 
 
@@ -664,10 +696,10 @@ const MenuList = ({ targetUser, setEditUser, reFetchData, setSelectedUser, setPe
   };
 
   const handleAutoLogin = async (id) => {
-    if(!id || typeof id !== "number") return showNotification("user id not founds or not number");
+    if (!id || typeof id !== "number") return showNotification("user id not founds or not number");
     const [err, data] = await fetchData(`/api/login/automatics/${id}`, 'post', {});
-    if (err) return showNotification(err,"error");
-    window.location.href= "/";
+    if (err) return showNotification(err, "error");
+    window.location.href = "/";
     // @ts-ignore
     // await superAdminLogInAsAdmin(targetUser.id);
   };

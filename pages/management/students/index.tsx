@@ -27,7 +27,8 @@ import { FileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 function ManagementClasses() {
 
@@ -44,6 +45,7 @@ function ManagementClasses() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [discount, setDiscount] = useState([]);
   const [fee, setFee] = useState([]);
+  const [isLoadingBulkStdUpload, setIsLoadingBulkStdUpload] = useState(false);
 
   const idCard = useRef();
 
@@ -115,7 +117,7 @@ function ManagementClasses() {
   }
 
   const handleClassSelect = (event, newValue) => {
-    console.log(newValue);
+
     setSelectedClass(newValue);
     setSelectedSection(null);
     setStudents(null);
@@ -150,10 +152,17 @@ function ManagementClasses() {
 
   const handleExcelUpload = () => {
     // console.log(excelFileUpload);
+    setIsLoadingBulkStdUpload(true);
     if (excelFileUpload) {
       const form = new FormData();
-      if (!selectedClass?.id || !selectedSection?.id) return showNotification("class/section not selected", "error")
-      if (typeof selectedSection?.id !== "number") return showNotification("select a single section", "error");
+      if (!selectedClass?.id || !selectedSection?.id) {
+        setIsLoadingBulkStdUpload(false);
+        return showNotification("class/section not selected", "error");
+      }
+      if (typeof selectedSection?.id !== "number") {
+        setIsLoadingBulkStdUpload(false);
+        return showNotification("select a single section", "error");
+      }
       form.append('students', excelFileUpload);
       form.append('class_id', selectedClass.id);
       form.append('section_id', selectedSection.id);
@@ -165,9 +174,9 @@ function ManagementClasses() {
           showNotification(t('All students data inserted'))
         })
         .catch((err) => {
-          console.log(err);
-          showNotification(t(`${err?.response?.data?.message}`), 'error')
-        });
+          handleShowErrMsg(err, showNotification);
+        })
+        .finally(() => { setIsLoadingBulkStdUpload(false) })
     }
   };
   const handlePrint = useReactToPrint({
@@ -179,7 +188,6 @@ function ManagementClasses() {
     // }`
   });
   // size: 85.725mm 53.975mm;
-  console.log("students__", students, selectedClass, selectedSection);
 
   return (
     <>
@@ -212,7 +220,7 @@ function ManagementClasses() {
 
       <Card sx={{ mx: { sm: 4, xs: 1 }, p: 1, pb: 0, mb: 2, display: "grid", gridTemplateColumns: { sm: "1fr 1fr", md: "1fr 1fr 1fr" }, columnGap: 1 }}>
 
-        <ButtonWrapper handleClick={undefined} href={`/student.xlsx`}>
+        <ButtonWrapper handleClick={undefined} href={`/Student-Bulk-Import-Sample.xlsx`}>
           Download Excel format
         </ButtonWrapper>
 
@@ -232,9 +240,9 @@ function ManagementClasses() {
           />
         </Grid>
 
-        <ButtonWrapper disabled={excelFileUpload ? false : true} handleClick={handleExcelUpload}>
+        <SearchingButtonWrapper isLoading={isLoadingBulkStdUpload} disabled={excelFileUpload ? false : true} handleClick={handleExcelUpload}>
           {t('Bulk admission')}
-        </ButtonWrapper>
+        </SearchingButtonWrapper>
 
       </Card>
 

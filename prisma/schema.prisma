@@ -250,7 +250,7 @@ model StudentInformation {
   admission_no              String?
   admission_date            DateTime
   admission_status          AdmissionStatus @default(waiting)
-  date_of_birth             DateTime        @db.Date
+  date_of_birth             DateTime?        @db.Date
   gender                    Gender
   blood_group               String?         @db.VarChar(20)
   religion                  String?

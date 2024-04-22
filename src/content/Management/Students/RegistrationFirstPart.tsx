@@ -57,7 +57,7 @@ function RegistrationFirstPart({
           middle_name: Yup.string().max(255).nullable(true),
           last_name: Yup.string().max(255).nullable(true),
           admission_date: Yup.date().required(t('Admission date is required!')),
-          date_of_birth: Yup.date().required(t('Date of birth is required!')),
+          // date_of_birth: Yup.date().required(t('Date of birth is required!')),
           gender: Yup.string().required(t('select a gender')),
           blood_group: Yup.string().nullable(true),
           religion: Yup.string().nullable(true),
@@ -254,7 +254,6 @@ function RegistrationFirstPart({
                         }}
                         renderInput={(params) => (
                           <TextField
-                            required
                             fullWidth
                             name='date_of_birth'
                             size="small"

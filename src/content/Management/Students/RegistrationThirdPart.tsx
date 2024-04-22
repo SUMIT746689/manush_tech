@@ -21,6 +21,7 @@ import { NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@
 import { getFile } from '@/utils/utilitY-functions';
 import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUpload';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 function RegistrationFirstPart({
   totalFormData,
@@ -40,7 +41,6 @@ function RegistrationFirstPart({
   const [mother_photo, setMother_photo] = useState(null);
   const [guardian_photo, setGuardian_photo] = useState(null);
 
-  console.log({ student })
   return (
     <>
       <Formik
@@ -145,7 +145,8 @@ function RegistrationFirstPart({
 
           } catch (err) {
             console.log(err);
-            showNotification(err.response?.data?.message, 'error');
+            // showNotification(err.response?.data?.message, 'error');
+            handleShowErrMsg(err, showNotification)
             setStatus({ success: false });
             // @ts-ignore
             setErrors({ submit: err.message });

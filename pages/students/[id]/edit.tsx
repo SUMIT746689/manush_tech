@@ -49,7 +49,6 @@ export const getServerSideProps = async ({ params }) => {
 }
 
 const EditStudent = ({ student }) => {
-  console.log({student});
   
   const { t }: { t: any } = useTranslation();
   return (

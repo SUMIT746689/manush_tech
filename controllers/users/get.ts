@@ -21,7 +21,7 @@ export const get = async (req, res, refresh_token) => {
         role: true
       }
     });
-    const { role } = req.query;
+    const { role, is_enabled } = req.query;
 
     const AND = [];
     AND.push({
@@ -64,6 +64,8 @@ export const get = async (req, res, refresh_token) => {
     }
     else throw new Error('Only role 1 and 2 is allowed to see validate data')
     // : [{ school_id: user.school_id }, { id: { not: user.id } }]
+    console.log({is_enabled})
+    if (is_enabled) AND.push({ is_enabled: is_enabled === 'true' ? true : false })
 
     const users = await prisma.user.findMany({
       where: {

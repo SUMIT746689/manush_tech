@@ -27,7 +27,7 @@ const patchHandle = async (req, res, authenticate_user) => {
             !fields.first_name ||
             !fields.section_id ||
             !fields.admission_date ||
-            !fields.date_of_birth ||
+            // !fields.date_of_birth ||
             !fields.roll_no ||
             !fields.registration_no ||
             !fields.school_id ||
@@ -171,6 +171,14 @@ const patchHandle = async (req, res, authenticate_user) => {
                     }
                 }
             }
+
+            const extra_section_datas = {}
+            if (fields?.extra_section_id) {
+                extra_section_datas["extra_section"] = {
+                    connect: { id: parseInt(fields.extra_section_id) },
+                }
+            }
+
             await transaction.student.update({
                 where: {
                     id: student_id
@@ -199,9 +207,7 @@ const patchHandle = async (req, res, authenticate_user) => {
                     academic_year: {
                         connect: { id: parseInt(fields?.academic_year_id) }
                     },
-                    extra_section: {
-                        connect: { id: parseInt(fields.extra_section_id) || undefined },
-                    },
+                    ...extra_section_datas,
                     student_info: {
                         // connect: { id: studentInformation.id }
                         update: {
@@ -211,7 +217,7 @@ const patchHandle = async (req, res, authenticate_user) => {
                             admission_no: fields?.admission_no,
                             admission_date: new Date(fields?.admission_date),
                             admission_status: fields?.admission_status,
-                            date_of_birth: new Date(fields?.date_of_birth),
+                            date_of_birth: fields?.date_of_birth ? new Date(fields?.date_of_birth) : undefined,
                             gender: fields?.gender,
                             blood_group: fields?.blood_group,
                             religion: fields?.religion,

@@ -2,11 +2,14 @@ import { formidable } from 'formidable';
 import bcrypt from 'bcrypt';
 import { readFile, utils } from "xlsx";
 import dayjs from 'dayjs';
-import { authenticate } from 'middleware/authenticate';
-import { generateUsername, registration_no_generate, unique_password_generate } from '@/utils/utilitY-functions';
-import axios from 'axios';
+import { academicYearVerify, authenticate } from 'middleware/authenticate';
+import { generateUsername, registration_no_generate, } from '@/utils/utilitY-functions';
 import prisma from '@/lib/prisma_client';
 import { logFile } from 'utilities_api/handleLogFile';
+import { handleDeleteFile } from 'utilities_api/handleDeleteFiles';
+import * as XLSX from 'xlsx/xlsx.mjs';
+import { createReadStream } from 'fs';
+import { handleConvBanNum } from 'utilities_api/convertBanFormatNumber';
 
 export const config = {
     api: {
@@ -31,31 +34,24 @@ const gettingFile = (req) => {
 
 
 
-const handlePost = async (req, res, refresh_token) => {
+const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
 
     try {
+        const { id: user_id, school_id, admin_panel_id } = refresh_token;
         const student_role = await prisma.role.findFirst({
             where: {
                 title: 'STUDENT'
             }
         })
         const { fields, files }: any = await gettingFile(req);
-        // console.log(files);
+        const { class_id, section_id } = fields;
 
-        const f = Object.entries(files)[0][1];
-        //@ts-ignore
-        const workbook = await readFile(f.filepath);
+        // class_id/section_id verify
+        if (!class_id || !section_id) throw new Error("class/section id not founds");
 
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
+        const { students } = files;
 
-        let allStudents = []
-        const range = utils.decode_range(worksheet['!ref']);
-
-        // console.log("total row__", range.e.r);
-
-        const requestedStudentAdmissionCount = range.e.r;
-
+        // get school max students create no
         const schoolPackage = await prisma.subscription.findFirst({
             where: {
                 school_id: parseInt(refresh_token?.school_id),
@@ -69,270 +65,88 @@ const handlePost = async (req, res, refresh_token) => {
                 }
             }
         })
+
+        const customStudentsData = [];
+
+        // get datas from excel or csv file
+        const today = Date.now();
+        await getDatasExcelOrCsvFile(students.filepath)
+            .then(async res => {
+                const keys = Object.keys(res[0])
+                if (keys.length === 0) return;
+                for (const student of res) {
+
+                    if (!student['Students ID'] || !student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) return;
+                    // verify and convert number to 13 digits
+                    const { number, err } = handleConvBanNum(String(student['Mobile (SMS)']));
+                    if (err) return;
+
+                    const hashPassword = await bcrypt.hash(number, Number(process.env.SALTROUNDS));
+
+                    const userName = generateUsername(student['Student Name']);
+
+                    const studentData = {
+                        student_id: student['Students ID'],
+                        first_name: student['Student Name'],
+                        father_name: student["Father's Name"],
+                        mother_name: student["Mother's Name"],
+                        phone: number,
+                        admission_date: new Date(Date.now()),
+                        admission_status: "approved",
+                        gender: student.Gender,
+                        school: {
+                            connect: { id: school_id }
+                        },
+                        user: {
+                            create: {
+                                username: userName,
+                                password: hashPassword,
+                                user_role_id: student_role.id,
+                                role_id: student_role.id,
+                                school_id: school_id,
+                                admin_panel_id
+                            }
+                        }
+                    };
+                    customStudentsData.push(studentData);
+                    // if (!err) finalContacts.push(number);
+                }
+            })
+            .catch(err => { console.log({ getFileErr: err }) })
+
         const admittedStudentCount = await prisma.studentInformation.count({
             where: {
                 school_id: parseInt(refresh_token?.school_id)
             }
-        })
+        });
+
+        const requestedStudentAdmissionCount = customStudentsData.length;
+        if (requestedStudentAdmissionCount === 0) throw new Error("no valid students row founds");
 
         if (requestedStudentAdmissionCount + admittedStudentCount > schoolPackage?.package?.student_count) {
             return res.status(406).json({ message: 'Your package maximum students capacity has already been filled, please update your package !' });
         }
 
+        let faildedSmS = [], successSmS = [];
 
-        for (let row = range.s.r; row <= range.e.r; row++) {
-
-            let student: any = {};
-
-            if (row !== 0) {
-
-                for (let col = range.s.c; col <= range.e.c; col++) {
-
-                    const columnLetter = utils.encode_col(col);
-
-                    const key = worksheet[`${columnLetter}1`].v
-                    const value = worksheet[`${columnLetter}${row + 1}`]?.v ?
-                        (key == 'section_id' || key == 'academic_year_id' || key == 'class_id') ?
-                            Number(worksheet[`${columnLetter}${row + 1}`].v) :
-                            worksheet[`${columnLetter}${row + 1}`].v : null
-                    if (
-                        key == 'first_name' && !value ||
-                        // key == 'section_id' && !value ||
-                        // key == 'academic_year_id' && !value ||
-                        // key == 'password' && !value ||
-                        key == 'admission_date' && !value ||
-                        key == 'date_of_birth' && !value ||
-                        key == 'roll_no' && !value
-
-                    ) {
-                        return res.status(404).json({ message: `${row + 1} number row ${key} value missing !!` });
-                    } else {
-                        let calculatedValue = value;
-
-                        if (key == 'registration_no' && !value) {
-                            calculatedValue = registration_no_generate()
-                        }
-                        else if (key == 'first_name') {
-                            const userName = generateUsername(value);
-                            student['username'] = userName
-                            student['password'] = await bcrypt.hash(
-                                userName,
-                                Number(process.env.SALTROUNDS)
-                            )
-                        }
-                        else if (key == 'admission_date' || key == 'date_of_birth') {
-                            console.log("value__", value);
-
-                            if (dayjs(value).isValid()) {
-                                calculatedValue = new Date(value)
-                                console.log("calculatedValue___", calculatedValue);
-                            } else {
-                                return res.status(404).json({ message: `${row + 1} number row ${key} Date invalid !!` });
-                            }
-                        }
-
-                        student[key] = calculatedValue
-
-                    }
-                }
-                let query = {};
-
-                if (student?.class_id) {
-                    query = {
-                        ...query,
-                        id: student?.class_id
-                    }
-                }
-                if (student?.class_name) {
-                    query = {
-                        ...query,
-                        name: {
-                            equals: student?.class_name,
-                            // mode: 'insensitive'
-                        }
-                    }
-                }
-                if (!Object.keys(query).length) {
-                    return res.status(400).json({ message: `${row + 1} th row, class id or class name missing !` })
-                }
-                const classValidity = await prisma.class.findFirst({
-                    where: {
-                        ...query,
-                        school_id: parseInt(refresh_token?.school_id)
-                    }
-                })
-                if (!classValidity) {
-                    return res.status(400).json({ message: `${row + 1} th row, class is not exist !` })
-                }
-                else {
-                    student.class_id = classValidity.id
-                }
-                //@ts-ignore
-                query = {};
-
-                if (student?.section_id) {
-                    query = {
-                        ...query,
-                        id: student?.section_id
-                    }
-                }
-                if (student?.section_name) {
-                    query = {
-                        ...query,
-                        name: {
-                            equals: student?.section_name,
-                            // mode: 'insensitive'
-                        }
-                    }
-                }
-                if (!Object.keys(query).length) {
-                    return res.status(400).json({ message: `${row + 1} th row, section id or section name missing !` })
-                }
-                const sectionValidity = await prisma.section.findFirst({
-                    where: {
-                        ...query,
-                        class: {
-                            school_id: parseInt(refresh_token?.school_id)
-                        }
-                    }
-                })
-                if (!sectionValidity) {
-                    return res.status(400).json({ message: `${row + 1} th row, section is not exist !` })
-                }
-                else {
-                    student.section_id = sectionValidity.id
-                }
-
-                query = {};
-
-                if (student?.academic_year_id) {
-                    query = {
-                        ...query,
-                        id: student?.academic_year_id
-                    }
-                }
-                if (student?.academic_year_name) {
-                    query = {
-                        ...query,
-                        title: {
-                            equals: student?.academic_year_title,
-                            // mode: 'insensitive'
-                        }
-                    }
-                }
-                if (!Object.keys(query).length) {
-                    return res.status(400).json({ message: `${row + 1} th row, academic year id or academic year title missing !` })
-                }
-                const academicYearValidity = await prisma.academicYear.findFirst({
-                    where: {
-                        ...query,
-                        school_id: parseInt(refresh_token?.school_id),
-                        deleted_at: null
-                    }
-                })
-                if (!academicYearValidity) {
-                    return res.status(400).json({ message: `${row + 1} th row, academic year does not exist !` })
-                }
-                else {
-                    student.academic_year_id = academicYearValidity.id
-                }
-                console.log("student__", student);
-
-                allStudents.push(student)
-            }
-        }
-
-        const sms_res_gatewayinfo: any = await prisma.smsGateway.findFirst({
-            where: {
-                school_id: refresh_token?.school_id,
-                is_active: true
-            }
-        })
-
-        let faildedSmS = [], successSmS = []
-        for (const i of allStudents) {
+        customStudentsData.forEach(async (customStudentInfo, index) => {
             await prisma.$transaction(async (transaction) => {
-
-                const studentInformation = await transaction.studentInformation.create({
-                    // @ts-ignore
-                    data: {
-                        first_name: i?.first_name,
-                        middle_name: i?.middle_name,
-                        last_name: i?.last_name,
-                        admission_no: i?.admission_no?.toString(),
-                        admission_date: i?.admission_date,
-                        admission_status: i?.admission_status?.toLowerCase(),
-                        date_of_birth: i?.date_of_birth,
-                        gender: i?.gender?.toLowerCase(),
-                        blood_group: i?.blood_group,
-                        religion: i?.religion,
-                        phone: i?.phone?.toString(),
-                        email: i?.email,
-                        national_id: i?.national_id?.toString(),
-                        father_name: i?.father_name,
-                        father_phone: i?.father_phone?.toString(),
-                        father_profession: i?.father_profession,
-                        father_photo: '',
-                        mother_name: i?.mother_name,
-                        mother_phone: i?.mother_phone?.toString(),
-                        mother_profession: i?.mother_profession,
-                        mother_photo: '',
-
-                        student_permanent_address: i?.student_permanent_address,
-                        previous_school: i?.previous_school,
-
-                        school: {
-                            connect: { id: parseInt(refresh_token?.school_id) }
-                        },
-                        user: {
-                            create: {
-                                username: i?.username,
-                                password: i?.password,
-                                user_role_id: student_role.id,
-                                role_id: student_role.id,
-                                school_id: parseInt(refresh_token?.school_id)
-                            }
-                        }
-                    }
-
+                const stdInfo = await transaction.studentInformation.create({
+                    data: customStudentInfo
                 });
-                // console.log(i);
-
-                // console.log("studentInformation__", studentInformation);
-                // console.log(typeof (i?.academic_year_id), " ", i?.academic_year_id);
-                // console.log(typeof (i?.discount), " ", i?.discount);
-
-
-                const student = await transaction.student.create({
-                    //@ts-ignore
+                const resStd = await transaction.student.create({
                     data: {
-                        class_roll_no: i?.roll_no?.toString(),
-
-                        class_registration_no: i?.registration_no?.toString(),
-                        student_photo: '',
-                        guardian_name: i?.guardian_name,
-                        guardian_phone: i?.guardian_phone?.toString(),
-                        guardian_profession: i?.guardian_profession,
-                        guardian_photo: '',
-                        relation_with_guardian: i?.relation_with_guardian,
-                        student_present_address: i?.student_present_address,
-                        section: {
-                            connect: { id: i?.section_id }
-                        },
-                        academic_year: {
-                            connect: { id: i?.academic_year_id }
-                        },
-                        student_info: {
-                            connect: { id: studentInformation.id }
-
-                        }
+                        class_roll_no: String(today) + index,
+                        class_registration_no: registration_no_generate(index),
+                        section: { connect: { id: parseInt(section_id) } },
+                        academic_year: { connect: { id: dcryptAcademicYear.id } },
+                        student_info: { connect: { id: stdInfo.id } }
                     }
                 });
-
                 const fees = await transaction.fee.findMany({
                     where: {
-                        class_id: i.class_id,
-                        academic_year_id: i?.academic_year_id
+                        class_id: parseInt(class_id),
+                        academic_year_id: dcryptAcademicYear.id
                     },
                     select: {
                         id: true
@@ -342,7 +156,7 @@ const handlePost = async (req, res, refresh_token) => {
                 let StudentFeeContainer = [];
                 for (let i of fees) {
                     StudentFeeContainer.push({
-                        student_id: student?.id,
+                        student_id: resStd?.id,
                         fee_id: i.id,
                         collected_amount: 0,
                         payment_method: 'pending'
@@ -350,31 +164,56 @@ const handlePost = async (req, res, refresh_token) => {
                 }
                 await transaction.studentFee.createMany({
                     data: StudentFeeContainer
-                });
-
-                try {
-                    const sms_res = await axios.post(`https://${sms_res_gatewayinfo?.details?.sms_gateway}/smsapi?api_key=${sms_res_gatewayinfo?.details?.sms_api_key}&type=text&contacts=${i?.phone}&senderid=${sms_res_gatewayinfo?.details?.sender_id}&msg=${encodeURIComponent(`Dear ${i.first_name}, Your username: ${i.username} and password: ${i.mainPassword}`)}`)
-                    if (sms_res.data == 1015) {
-                        faildedSmS.push(student.id)
-                    }
-                    else if (sms_res.data.startsWith('SMS SUBMITTED')) {
-                        successSmS.push(student.id)
-                    }
-                    else {
-                        successSmS.push(student.id)
-                    }
-                } catch (err) {
-                    faildedSmS.push(student.id)
-                }
+                })
+            }).catch(err => {
+                logFile.error(`user_id=${user_id}` + err.message)
             })
-
-        }
+        });
 
         return res.status(200).json({ message: 'All students data inserted', faildedSmS, successSmS });
     } catch (err) {
         logFile.error(err.message)
         res.status(404).json({ error: err.message });
-      }
+    }
 };
 
-export default authenticate(handlePost);
+
+const getDatasExcelOrCsvFile = (file_path): Promise<any> => {
+    return new Promise(function (resolve, reject) {
+
+        const datas = createReadStream(file_path, { highWaterMark: (128 * 100) });
+        let buffer_part = 0;
+        const bufferList = [];
+
+        datas.on("data", (buffer) => {
+            bufferList.push(buffer)
+            buffer_part += 1;
+        });
+
+        datas.on("end", async () => {
+
+            const totalBuffer = Buffer.concat(bufferList);
+
+            const uint8 = new Uint8Array(totalBuffer)
+            const workbook = XLSX.read(uint8, { type: "array" })
+            /* DO SOMETHING WITH workbook HERE */
+            const firstSheetName = workbook.SheetNames[0]
+            /* Get worksheet */
+            const worksheet = workbook.Sheets[firstSheetName];
+            const excelArrayDatas = XLSX.utils.sheet_to_json(worksheet, { raw: true })
+
+            if (excelArrayDatas.length > 30000) {
+                handleDeleteFile(file_path);
+                reject("large file, maximum support 30,000 row")
+            }
+            resolve(excelArrayDatas);
+        });
+
+        datas.on("error", (err) => {
+            handleDeleteFile(file_path);
+            reject(err);
+        });
+    });
+}
+
+export default authenticate(academicYearVerify(handlePost));

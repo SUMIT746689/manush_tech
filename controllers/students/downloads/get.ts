@@ -50,7 +50,6 @@ async function get(req, res, refresh_token, dcryptAcademicYear) {
                     datas += res;
                 });
                 createReadStream.on("end", () => {
-                    console.log({ datas, totalLen });
 
                     res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
                     res.setHeader('Content-Type', 'application/vnd.ms-excel');

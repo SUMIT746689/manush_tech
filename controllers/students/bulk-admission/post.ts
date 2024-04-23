@@ -37,7 +37,7 @@ const gettingFile = (req) => {
 const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
 
     try {
-        const { school_id, admin_panel_id } = refresh_token;
+        const { id: user_id, school_id, admin_panel_id } = refresh_token;
         const student_role = await prisma.role.findFirst({
             where: {
                 title: 'STUDENT'
@@ -76,7 +76,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 if (keys.length === 0) return;
                 for (const student of res) {
 
-                    if (!student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) return;
+                    if (!student['Students ID'] || !student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) return;
                     // verify and convert number to 13 digits
                     const { number, err } = handleConvBanNum(String(student['Mobile (SMS)']));
                     if (err) return;
@@ -86,6 +86,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                     const userName = generateUsername(student['Student Name']);
 
                     const studentData = {
+                        student_id: student['Students ID'],
                         first_name: student['Student Name'],
                         father_name: student["Father's Name"],
                         mother_name: student["Mother's Name"],
@@ -120,6 +121,8 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
         });
 
         const requestedStudentAdmissionCount = customStudentsData.length;
+        if (requestedStudentAdmissionCount === 0) throw new Error("no valid students row founds");
+
         if (requestedStudentAdmissionCount + admittedStudentCount > schoolPackage?.package?.student_count) {
             return res.status(406).json({ message: 'Your package maximum students capacity has already been filled, please update your package !' });
         }
@@ -161,7 +164,9 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 }
                 await transaction.studentFee.createMany({
                     data: StudentFeeContainer
-                });
+                })
+            }).catch(err => {
+                logFile.error(`user_id=${user_id}` + err.message)
             })
         });
 

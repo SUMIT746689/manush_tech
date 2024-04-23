@@ -1,19 +1,31 @@
-import { customBorder } from "@/utils/mui_style"
-import { Autocomplete, Grid, TextField } from "@mui/material"
+import { customBorder } from '@/utils/mui_style';
+import { Autocomplete, Grid, TextField } from '@mui/material';
+import { useEffect } from 'react';
 
-export const AutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
-
+export const AutoCompleteWrapper = ({
+  minWidth = null,
+  required = false,
+  options,
+  value,
+  handleChange,
+  label,
+  placeholder,
+  ...params
+}) => {
   return (
-    <Grid item pb={1} sx={
-      minWidth && {
-        minWidth
+    <Grid
+      item
+      pb={1}
+      sx={
+        minWidth && {
+          minWidth
+        }
       }
-    }
     >
       <Autocomplete
         fullWidth
         {...params}
-        size='small'
+        size="small"
         sx={customBorder}
         id="tags-outlined"
         options={options}
@@ -32,23 +44,36 @@ export const AutoCompleteWrapper = ({ minWidth = null, required = false, options
         onChange={handleChange}
       />
     </Grid>
-  )
-}
+  );
+};
 
-
-export const AutoCompleteWrapperWithoutRenderInput = ({ minWidth = null, required = false, options, value, handleChange, label, name, error, touched, placeholder, ...params }) => {
-
+export const AutoCompleteWrapperWithoutRenderInput = ({
+  minWidth = null,
+  required = false,
+  options,
+  value,
+  handleChange,
+  label,
+  name,
+  error,
+  touched,
+  placeholder,
+  ...params
+}) => {
   return (
-    <Grid item pb={1} sx={
-      minWidth && {
-        minWidth
+    <Grid
+      item
+      pb={1}
+      sx={
+        minWidth && {
+          minWidth
+        }
       }
-    }
     >
       <Autocomplete
         fullWidth
         {...params}
-        size='small'
+        size="small"
         sx={customBorder}
         id="tags-outlined"
         options={options}
@@ -70,24 +95,31 @@ export const AutoCompleteWrapperWithoutRenderInput = ({ minWidth = null, require
         onChange={handleChange}
       />
     </Grid>
-  )
-}
+  );
+};
 
-
-
-export const EmptyAutoCompleteWrapper = ({ minWidth = null, options, value, label, placeholder, ...params }) => {
-
+export const EmptyAutoCompleteWrapper = ({
+  minWidth = null,
+  options,
+  value,
+  label,
+  placeholder,
+  ...params
+}) => {
   return (
-    <Grid item pb={1} sx={
-      minWidth && {
-        minWidth
+    <Grid
+      item
+      pb={1}
+      sx={
+        minWidth && {
+          minWidth
+        }
       }
-    }
     >
       <Autocomplete
         fullWidth
         {...params}
-        size='small'
+        size="small"
         sx={customBorder}
         id="tags-outlined"
         options={options}
@@ -102,8 +134,69 @@ export const EmptyAutoCompleteWrapper = ({ minWidth = null, options, value, labe
             placeholder={placeholder}
           />
         )}
-
       />
     </Grid>
-  )
-}
+  );
+};
+
+export const AutoCompleteWrapperWithDebounce = ({
+  debounceTimeout,
+  handleDebounce = (value) => {},
+  searchHandleUpdate = () => {},
+  minWidth = null,
+  required = false,
+  options,
+  value,
+  handleChange,
+  label,
+  placeholder,
+  ...params
+}) => {
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      handleDebounce(value);
+    }, debounceTimeout);
+
+    return () => clearTimeout(getData);
+  }, [value]);
+
+  const WarningMessage =
+    (value && (value.length < 3 ? 'Minimum 3 character required' : '')) ||
+    'No options available';
+
+  return (
+    <Grid
+      item
+      pb={1}
+      sx={
+        minWidth && {
+          minWidth
+        }
+      }
+    >
+      <Autocomplete
+        fullWidth
+        {...params}
+        size="small"
+        sx={customBorder}
+        id="tags-outlined"
+        options={options}
+        value={value}
+        filterSelectedOptions
+        renderInput={(rnParams) => (
+          <TextField
+            size="small"
+            fullWidth
+            required={required}
+            {...rnParams}
+            label={label}
+            placeholder={placeholder}
+          />
+        )}
+        onInputChange={handleChange}
+        onChange={searchHandleUpdate}
+        noOptionsText={WarningMessage}
+      />
+    </Grid>
+  );
+};

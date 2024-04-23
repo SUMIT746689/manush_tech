@@ -7,7 +7,7 @@ import {
   styled,
   Grid,
   Autocomplete,
-  TextField,
+  TextField
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -54,16 +54,18 @@ function Header() {
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const [menulist, setMenulist] = useState([])
+  const [menulist, setMenulist] = useState([]);
   const router = useRouter();
   const { showNotification } = useNotistick();
-  const { data } = useClientDataFetch(`/api/academic_years`)
-  const { data: current_active_academic_year, reFetchData } = useClientFetch(`/api/academic_years/current_active`)
+  const { data } = useClientDataFetch(`/api/academic_years`);
+  const { data: current_active_academic_year, reFetchData } = useClientFetch(
+    `/api/academic_years/current_active`
+  );
   // console.log({ current_active_academic_year })
   const auth: any = useAuth();
   const { user } = auth;
   const { school } = user || {};
-  const { academic_years } = school || {}
+  const { academic_years } = school || {};
 
   // console.log({ academic_years })
 
@@ -98,44 +100,46 @@ function Header() {
         //   );
         // }
 
-        axios.get('/api/academic_years/current_user')
-          .then(({ data }) => {
-            if (data?.success) setSelectedAcademicYear(() => ({ id: data.data.id, label: data.data.title }))
-          })
-
+        axios.get('/api/academic_years/current_user').then(({ data }) => {
+          if (data?.success)
+            setSelectedAcademicYear(() => ({
+              id: data.data.id,
+              label: data.data.title
+            }));
+        });
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-
   useEffect(() => {
     // @ts-ignore
-    if (auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN') {
-      const tempMenu = []
+    if (
+      auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+      auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN'
+    ) {
+      const tempMenu = [];
       for (const i of menuItems[0]?.items) {
         if (i.items) {
           for (const j of i.items) {
-
-            j.link && tempMenu.push({
-              label: j.name,
-              value: j.link
-            })
+            j.link &&
+              tempMenu.push({
+                label: j.name,
+                value: j.link
+              });
           }
         } else {
           tempMenu.push({
             label: i.name,
             value: i.link
-          })
+          });
         }
       }
 
-
-      setMenulist(tempMenu)
+      setMenulist(tempMenu);
 
       handleFetchAcademicYear();
-
     }
   }, [auth?.user]);
 
@@ -145,16 +149,23 @@ function Header() {
     }
   }, [selectedAcademicYear]);
 
-  const handleAcademicYearChange = async (event: any, newValue: { id: number, label: string } | null) => {
-    if (!newValue?.id && !newValue?.label) return showNotification("academic year values not found", "error")
-    axios.patch(`/api/academic_years/${newValue.id}/current_user`)
+  const handleAcademicYearChange = async (
+    event: any,
+    newValue: { id: number; label: string } | null
+  ) => {
+    if (!newValue?.id && !newValue?.label)
+      return showNotification('academic year values not found', 'error');
+    axios
+      .patch(`/api/academic_years/${newValue.id}/current_user`)
       .then(({ data }) => {
-        if (!data?.success) return
+        if (!data?.success) return;
         // localStorage.setItem('academicYear', JSON.stringify(newValue));
         setSelectedAcademicYear(newValue);
       })
-      .catch((error) => { showNotification("failed to change academic year", "error") })
-  }
+      .catch((error) => {
+        showNotification('failed to change academic year', 'error');
+      });
+  };
   // const permissionsArray = auth?.user?.permissions?.length > 0
   //   ? auth?.user?.permissions?.map((permission: any) => permission.group)
   //   : [];
@@ -170,10 +181,9 @@ function Header() {
       alignItems="center"
       sx={{
         // boxShadow: "-1px 15px 48px 0px rgba(0,40,132,1)"
-        boxShadow: "-2px 8px 21px -4px rgba(0,40,132,0.7)"
+        boxShadow: '-2px 8px 21px -4px rgba(0,40,132,0.7)'
       }}
     >
-
       {/* <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Select route</Grid> */}
 
       {/* <CustomAutoCompleteWrapper
@@ -204,23 +214,41 @@ function Header() {
         }}
       /> */}
 
-
+      {/* @ts-ignore */}
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+        auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+          <Box
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+              minWidth: 'fit-content',
+              backgroundColor: 'white',
+              textAlign: 'center',
+              py: 0.5,
+              px: 1,
+              borderRadius: 0.4,
+              fontWeight: 600,
+              fontSize: 12
+            }}
+          >
+            Customer Support <br />
+            <a
+              href="tel:+8801894884113"
+              style={{ borderBottom: '1px solid white' }}
+            >
+              +880 1894 884 113
+            </a>
+          </Box>
+        )}
 
       {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
-          Customer Support <br />
-          <a href="tel:+8801894884113" style={{ borderBottom: "1px solid white" }}>+880 1894 884 113</a>
-        </Box>
-      }
-
-      {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-        (
-          <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
-            <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+        auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+          <Grid minWidth={185} sx={{ display: { xs: 'block', sm: 'none' } }}>
+            <Grid sx={{ color: '#FFFFFF', textAlign: 'center', fontSize: 12 }}>
+              Academic Year
+            </Grid>
             <CustomAutoCompleteWrapper
-              // label="Academic Year"  
+              // label="Academic Year"
               label=""
               placeholder="select a academic year..."
               value={selectedAcademicYear}
@@ -230,27 +258,57 @@ function Header() {
           </Grid>
         )}
 
-      <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="right"
+        width="100%"
+        columnGap={2}
+      >
         {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-          (
-            <Grid item pr={2} color="white" fontSize={12} fontWeight={800} border={1} borderRadius={0.7} p={1} sx={{ borderStyle: 'dashed', display: { xs: "none", md: "block" } }}>
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+          auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+            <Grid
+              item
+              pr={2}
+              color="white"
+              fontSize={12}
+              fontWeight={800}
+              border={1}
+              borderRadius={0.7}
+              p={1}
+              sx={{
+                borderStyle: 'dashed',
+                display: { xs: 'none', md: 'block' }
+              }}
+            >
               Current Active
               <br />
               {`Academic Year: `}
-              <span style={{ color: "white" }}>
+              <span style={{ color: 'white' }}>
                 <i>
-                  {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}
+                  {current_active_academic_year?.success ? (
+                    current_active_academic_year?.data?.title
+                  ) : (
+                    <span style={{ color: 'red' }}>not found</span>
+                  )}
                 </i>
               </span>
             </Grid>
           )}
 
         {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-          (
-            <Grid minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
-              <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+          auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+            <Grid
+              minWidth={185}
+              sx={{ pr: 2, display: { xs: 'none', sm: 'block' } }}
+            >
+              <Grid
+                sx={{ color: '#FFFFFF', textAlign: 'center', fontSize: 12 }}
+              >
+                Academic Year
+              </Grid>
               <CustomAutoCompleteWrapper
                 // label="Academic Year"
                 label=""
@@ -260,15 +318,13 @@ function Header() {
                 handleChange={handleAcademicYearChange}
               />
             </Grid>
-          )
-        }
+          )}
 
-        {
-          permissionsArray_.includes("show_students") &&
-          <HeaderSearch />
-        }
+        {permissionsArray_.includes('show_students') && <HeaderSearch />}
         {/* <HeaderButtons /> */}
-        <HeaderUserbox current_active_academic_year={current_active_academic_year} />
+        <HeaderUserbox
+          current_active_academic_year={current_active_academic_year}
+        />
 
         <Box
           component="span"
@@ -277,8 +333,8 @@ function Header() {
             display: { lg: 'none', xs: 'inline-block' }
           }}
         >
-          <Tooltip arrow title="Show Menu" onClick={toggleSidebar} >
-            <IconButton sx={{ color: "#FFFFFF", border: "2px solid #FFFFFF" }}>
+          <Tooltip arrow title="Show Menu" onClick={toggleSidebar}>
+            <IconButton sx={{ color: '#FFFFFF', border: '2px solid #FFFFFF' }}>
               {!sidebarToggle ? (
                 <MenuTwoToneIcon fontSize="small" />
               ) : (
@@ -294,26 +350,36 @@ function Header() {
 
 export default Header;
 
-
-export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
-
+export const CustomAutoCompleteWrapper = ({
+  minWidth = null,
+  required = false,
+  options,
+  value,
+  handleChange,
+  label,
+  placeholder,
+  ...params
+}) => {
   return (
-    <Grid item pb={1} sx={
-      minWidth && {
-        minWidth
+    <Grid
+      item
+      pb={1}
+      sx={
+        minWidth && {
+          minWidth
+        }
       }
-    }
     >
       <Autocomplete
         fullWidth
         {...params}
-        size='small'
+        size="small"
         sx={{
           fontSize: '14px',
-          color: "#002884",
+          color: '#002884',
           [`& fieldset`]: {
-            color: "#002884",
-            borderRadius: 0.4,
+            color: '#002884',
+            borderRadius: 0.4
             // backgroundColor: "#FFFFFF",
             // border:"2px solid #FFFFFF",
             // ":hover":  {border:"2px solid #FFFFFF"},
@@ -324,12 +390,16 @@ export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, o
         value={value}
         filterSelectedOptions
         renderInput={(rnParams) => (
-          <div ref={rnParams.InputProps.ref} >
-            <input type="text" {...rnParams.inputProps} style={{ borderRadius: '4px', padding: '4px', maxWidth: '200px' }} />
+          <div ref={rnParams.InputProps.ref}>
+            <input
+              type="text"
+              {...rnParams.inputProps}
+              style={{ borderRadius: '4px', padding: '4px', maxWidth: '200px' }}
+            />
           </div>
         )}
         onChange={handleChange}
       />
     </Grid>
-  )
-}
+  );
+};

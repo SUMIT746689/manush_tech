@@ -66,7 +66,6 @@ const AvatarError = styled(Avatar)(
 `
 );
 
-
 const ButtonError = styled(Button)(
   ({ theme }) => `
      background: ${theme.colors.error.main};
@@ -77,7 +76,6 @@ const ButtonError = styled(Button)(
      }
     `
 );
-
 
 interface ResultsProps {
   schools: Project[];
@@ -98,7 +96,6 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-
 const applyFilters = (
   schools: Project[],
   query: string,
@@ -115,7 +112,9 @@ const applyFilters = (
         if (project[property]?.toLowerCase().includes(query.toLowerCase())) {
           containsQuery = true;
         }
-        if (project?.user[property]?.toLowerCase().includes(query.toLowerCase())) {
+        if (
+          project?.user[property]?.toLowerCase().includes(query.toLowerCase())
+        ) {
           containsQuery = true;
         }
       });
@@ -149,7 +148,12 @@ const applyPagination = (
   return schools.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetchData }) => {
+const Results: FC<ResultsProps> = ({
+  schools,
+  setTeachers,
+  setEditSchool,
+  reFetchData
+}) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -166,8 +170,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
     setQuery(event.target.value);
   };
 
-
-
   const handlePageChange = (_event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -178,8 +180,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
 
   const filteredschools = applyFilters(schools, query, filters);
   const paginatedschools = applyPagination(filteredschools, page, limit);
-
-
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
   const [deleteSchoolId, setDeleteSchoolId] = useState(null);
@@ -201,11 +201,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
       reFetchData();
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification(err?.response?.data?.message, 'error')
+      showNotification(err?.response?.data?.message, 'error');
     }
   };
-
-
 
   return (
     <>
@@ -219,7 +217,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
           <Grid item xs={12}>
             <Box p={0.5}>
               <TextField
-                size='small'
+                size="small"
                 sx={{
                   m: 0
                 }}
@@ -231,7 +229,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                   )
                 }}
                 onChange={handleQueryChange}
-                placeholder={t('Search by other users, username or phone number...')}
+                placeholder={t(
+                  'Search by other users, username or phone number...'
+                )}
                 value={query}
                 fullWidth
                 variant="outlined"
@@ -241,17 +241,11 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
         </Grid>
       </Card>
 
-
-      <Card
-        sx={{ minHeight: 'calc(100vh - 412px) !important' }}
-      >
-
+      <Card sx={{ minHeight: 'calc(100vh - 412px) !important' }}>
         <Divider />
 
         {paginatedschools.length === 0 ? (
-          <TableEmptyWrapper
-            title="other users"
-          />
+          <TableEmptyWrapper title="other users" />
         ) : (
           <>
             <Box p={2}>
@@ -268,7 +262,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
             <Divider />
 
             <TableContainer>
-              <Table size='small'>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">{t('ID')}</TableCell>
@@ -283,11 +277,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                 <TableBody>
                   {paginatedschools.map((i) => {
                     return (
-                      <TableRow
-                        hover
-                        key={i.id}
-
-                      >
+                      <TableRow hover key={i.id}>
                         <TableCell align="center">
                           <Typography noWrap variant="h5">
                             {i.id}
@@ -295,7 +285,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                         </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
-                            {[i?.first_name, i?.middle_name, i?.last_name].join(' ')}
+                            {[i?.first_name, i?.middle_name, i?.last_name].join(
+                              ' '
+                            )}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -346,12 +338,13 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                             </Tooltip>
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
-                                onClick={() =>
-                                  handleConfirmDelete(i.id)
-                                }
+                                onClick={() => handleConfirmDelete(i.id)}
                                 color="primary"
                               >
-                                <DeleteTwoToneIcon fontSize="small" color='error' />
+                                <DeleteTwoToneIcon
+                                  fontSize="small"
+                                  color="error"
+                                />
                               </IconButton>
                             </Tooltip>
                           </Typography>
@@ -362,7 +355,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                 </TableBody>
               </Table>
             </TableContainer>
-
           </>
         )}
       </Card>

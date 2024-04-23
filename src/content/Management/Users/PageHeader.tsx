@@ -20,7 +20,12 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
+import {
+  FileUploadFieldWrapper,
+  NewFileUploadFieldWrapper,
+  PreviewImageCard,
+  TextFieldWrapper
+} from '@/components/TextFields';
 import Image from 'next/image';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { getFile } from '@/utils/utilitY-functions';
@@ -29,21 +34,29 @@ import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 function PageHeader({ editUser, setEditUser, reFetchData }) {
   const { user }: any = useAuth();
-  const [user_photo, setUser_photo] = useState(null)
-  const [isAvailableUsername, setIsAvailableUsername] = useState(null)
+  const [user_photo, setUser_photo] = useState(null);
+  const [isAvailableUsername, setIsAvailableUsername] = useState(null);
 
   useEffect(() => {
     if (editUser) handleCreateUserOpen();
   }, [editUser]);
 
   const permissons = [
-    { label: 'Assistant Super Admin', role: 'ASSIST_SUPER_ADMIN', value: 'create_assist_super_admin' },
+    {
+      label: 'Assistant Super Admin',
+      role: 'ASSIST_SUPER_ADMIN',
+      value: 'create_assist_super_admin'
+    },
     { label: 'Admin', role: 'ADMIN', value: 'create_admin' },
     { label: 'Guardian', role: 'GURDIAN', value: 'create_gurdian' },
     { label: 'Stuff', role: 'STAFF', value: 'create_stuff' },
     { label: 'Accountant', role: 'ACCOUNTANT', value: 'create_accountant' },
     { label: 'Librarian', role: 'LIBRARIAN', value: 'create_librarian' },
-    { label: 'Receptionist', role: 'RECEPTIONIST', value: 'create_receptionist' },
+    {
+      label: 'Receptionist',
+      role: 'RECEPTIONIST',
+      value: 'create_receptionist'
+    }
   ];
   const available_permissions = user?.permissions?.map(
     (permission) => permission.value
@@ -56,13 +69,12 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
 
-
   const handleCreateUserOpen = () => {
     setOpen(true);
   };
 
   const handleCreateUserClose = () => {
-    setUser_photo(null)
+    setUser_photo(null);
     setOpen(false);
     setEditUser(null);
     setIsAvailableUsername(null);
@@ -73,9 +85,8 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     setOpen(false);
   };
 
-
   const handleFormSubmit = async (_values, formValue) => {
-    const { resetForm, setErrors, setStatus, setSubmitting } = formValue
+    const { resetForm, setErrors, setStatus, setSubmitting } = formValue;
     try {
       const handleResponseSuccess = (msg) => {
         resetForm();
@@ -83,54 +94,54 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
         setSubmitting(false);
         handleCreateUserSuccess(msg);
         reFetchData(true);
-      }
-
+      };
 
       const formData = new FormData();
       for (const i in _values) {
         if (i === 'role') {
-          formData.append(`${i}`, JSON.stringify(_values[i]))
-        }
-        else {
-          formData.append(`${i}`, _values[i])
+          formData.append(`${i}`, JSON.stringify(_values[i]));
+        } else {
+          formData.append(`${i}`, _values[i]);
         }
       }
       if (editUser) {
-        await axios.patch(`/api/user/${editUser.id}`, formData)
-        handleResponseSuccess('The user account was edited successfully')
-      }
-      else {
-        await axios.post(`/api/user`, formData)
-        handleResponseSuccess('The user account was created successfully')
+        await axios.patch(`/api/user/${editUser.id}`, formData);
+        handleResponseSuccess('The user account was edited successfully');
+      } else {
+        await axios.post(`/api/user`, formData);
+        handleResponseSuccess('The user account was created successfully');
       }
 
       // await wait(1000);
     } catch (err) {
-      handleShowErrMsg(err, showNotification)
+      handleShowErrMsg(err, showNotification);
       setStatus({ success: false });
       // @ts-ignore
       setErrors({ submit: err.message });
       setSubmitting(false);
     }
-  }
+  };
 
-  const temp = userPrermissionRoles.find(i => i.role == editUser?.user_role?.title);
+  const temp = userPrermissionRoles.find(
+    (i) => i.role == editUser?.user_role?.title
+  );
 
   const handleDebounce = (value) => {
-    if (editUser?.username?.toLowerCase() === value?.toLowerCase()) return setIsAvailableUsername(null);
+    if (editUser?.username?.toLowerCase() === value?.toLowerCase())
+      return setIsAvailableUsername(null);
     if (value) {
-      axios.get(`/api/user/is_available?username=${value}`)
+      axios
+        .get(`/api/user/is_available?username=${value}`)
         .then((res) => {
-          setIsAvailableUsername(null)
+          setIsAvailableUsername(null);
         })
-        .catch(err => {
-          setIsAvailableUsername(err?.response?.data?.message)
-        })
+        .catch((err) => {
+          setIsAvailableUsername(err?.response?.data?.message);
+        });
     }
-  }
+  };
 
   const handleFileChange = (e, setFieldValue, field, preview_field) => {
-   
     if (e?.target?.files?.length === 0) {
       setFieldValue(field, '');
       setFieldValue(preview_field, []);
@@ -142,7 +153,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     const imgPrev = [];
     Array.prototype.forEach.call(e.target.files, (file) => {
       const objectUrl = URL.createObjectURL(file);
-      imgPrev.push({ name: file.name, src: objectUrl })
+      imgPrev.push({ name: file.name, src: objectUrl });
     });
     setFieldValue(preview_field, imgPrev);
   };
@@ -150,13 +161,19 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
   const handleRemove = (setFieldValue, field, preview_field) => {
     setFieldValue(field, '');
     setFieldValue(preview_field, []);
-  }
+  };
+
   return (
     <>
       <PageHeaderTitleWrapper
-        name={"User"}
+        name={'User'}
         handleCreateClassOpen={handleCreateUserOpen}
-        actionButton={user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN' ? true : false}
+        actionButton={
+          user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+          user?.role?.title !== 'SUPER_ADMIN'
+            ? true
+            : false
+        }
       />
 
       <Dialog
@@ -175,7 +192,8 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           </Typography>
           <Typography variant="subtitle2">
             {t(
-              `Fill in the fields below to ${editUser ? 'edit' : 'create a'
+              `Fill in the fields below to ${
+                editUser ? 'edit' : 'create a'
               } user to the site`
             )}
           </Typography>
@@ -187,10 +205,12 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             confirm_password: '',
             user_photo: editUser?.user_photo || '',
             preview_user_photo: [],
-            role: temp ? {
-              role_title: temp?.role,
-              permission: temp?.value
-            } : undefined,
+            role: temp
+              ? {
+                  role_title: temp?.role,
+                  permission: temp?.value
+                }
+              : undefined,
             domain: editUser?.adminPanel?.domain || '',
             copy_right_txt: editUser?.adminPanel?.copy_right_txt,
             logo: null,
@@ -199,32 +219,41 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           validationSchema={Yup.object().shape({
             username: Yup.string()
               .max(255)
-              .when("role", (role, schema) => {
+              .when('role', (role, schema) => {
                 if (!role)
-                  return schema.required(t('The username field is required'))
-                return schema
+                  return schema.required(t('The username field is required'));
+                return schema;
               }),
 
-            password: Yup.string().max(255)
-              .when("role", (role, schema) => {
+            password: Yup.string()
+              .max(255)
+              .when('role', (role, schema) => {
                 if (!role)
-                  return schema.required(t('The password field is required')).min(8, 'Password is too short - should be 8 chars minimum.')
-                return schema
+                  return schema
+                    .required(t('The password field is required'))
+                    .min(
+                      8,
+                      'Password is too short - should be 8 chars minimum.'
+                    );
+                return schema;
               }),
 
             // .matches(/[0-9]/, 'Password requires a number'),
             // .matches(/[a-zA-Z]/, 'Password can only contain Latin letters.'),
             confirm_password: Yup.string()
               .max(255)
-              .when("role", (role, schema) => {
+              .when('role', (role, schema) => {
                 if (!role)
-                  return schema.required(t('confirm_password field is required')).oneOf([Yup.ref('password'), null], 'Passwords must match')
-                return schema
-              })
-            ,
-            role: Yup.object().required(t('Role field is required')),
+                  return schema
+                    .required(t('confirm_password field is required'))
+                    .oneOf([Yup.ref('password'), null], 'Passwords must match');
+                return schema;
+              }),
+            role: Yup.object().required(t('Role field is required'))
           })}
-          onSubmit={(_values, getValue: any) => handleFormSubmit(_values, getValue)}
+          onSubmit={(_values, getValue: any) =>
+            handleFormSubmit(_values, getValue)
+          }
         >
           {({
             errors,
@@ -246,11 +275,11 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                   }}
                 >
                   <Grid container spacing={1}>
-
+                    {/* <Grid>Touched value {touched.username}</Grid> */}
                     <NewDebounceInput
                       touched={touched.username}
                       errors={errors.username || isAvailableUsername}
-                      label={t('Username *')}
+                      label={''}
                       name="username"
                       handleBlur={handleBlur}
                       handleChange={handleChange}
@@ -284,15 +313,22 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       value={values.confirm_password}
                     />
 
-                    {
-                      !editUser && <Grid item width={"100%"} mb={1}>
+                    {!editUser && (
+                      <Grid item width={'100%'} mb={1}>
                         <Autocomplete
                           disablePortal
-                          size='small'
+                          size="small"
                           // @ts-ignore
-                          value={userPrermissionRoles.find((permRole) => permRole.value === values?.role?.permission) || null}
+                          value={
+                            userPrermissionRoles.find(
+                              (permRole) =>
+                                permRole.value === values?.role?.permission
+                            ) || null
+                          }
                           options={userPrermissionRoles}
-                          isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
+                          isOptionEqualToValue={(option: any, value: any) =>
+                            option.value === value.value
+                          }
                           getOptionLabel={(option) => option?.label}
                           renderInput={(params) => (
                             <TextField
@@ -300,7 +336,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                               fullWidth
                               sx={{
                                 [`& fieldset`]: {
-                                  borderRadius: 0.6,
+                                  borderRadius: 0.6
                                 }
                               }}
                               name="role"
@@ -311,13 +347,20 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                             />
                           )}
                           // @ts-ignore
-                          onChange={(event, value: any) => { setFieldValue('role', { role_title: value?.role, permission: value?.value } || ''); }}
+                          onChange={(event, value: any) => {
+                            setFieldValue(
+                              'role',
+                              {
+                                role_title: value?.role,
+                                permission: value?.value
+                              } || ''
+                            );
+                          }}
                         />
                       </Grid>
-                    }
+                    )}
 
-                    {
-                      values.role?.role_title === "ASSIST_SUPER_ADMIN" &&
+                    {values.role?.role_title === 'ASSIST_SUPER_ADMIN' && (
                       <>
                         <TextFieldWrapper
                           errors={errors.domain}
@@ -341,74 +384,98 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                           <NewFileUploadFieldWrapper
                             htmlFor="logo"
                             accept="image/*"
-                            handleChangeFile={(e) => handleFileChange(e, setFieldValue, "logo", "preview_logo")}
-                            label='Logo'
+                            handleChangeFile={(e) =>
+                              handleFileChange(
+                                e,
+                                setFieldValue,
+                                'logo',
+                                'preview_logo'
+                              )
+                            }
+                            label="Logo"
                           />
                         </Grid>
                         <Grid item>
-                          {
-                            values?.preview_logo?.map((image, index) => (
-                              <>
-                                <PreviewImageCard
-                                  data={image}
-                                  index={index}
-                                  key={index}
-                                  handleRemove={() => handleRemove(setFieldValue, "logo", "preview_logo")}
-                                />
-                              </>
-                            ))
-                          }
+                          {values?.preview_logo?.map((image, index) => (
+                            <>
+                              <PreviewImageCard
+                                data={image}
+                                index={index}
+                                key={index}
+                                handleRemove={() =>
+                                  handleRemove(
+                                    setFieldValue,
+                                    'logo',
+                                    'preview_logo'
+                                  )
+                                }
+                              />
+                            </>
+                          ))}
                         </Grid>
                         <Grid item>
-                          {
-                            editUser?.adminPanel?.logo &&
-                            <Image src={getFile(editUser?.adminPanel?.logo)}
+                          {editUser?.adminPanel?.logo && (
+                            <Image
+                              src={getFile(editUser?.adminPanel?.logo)}
                               height={150}
                               width={150}
-                              alt='Logo'
-                              loading='lazy'
+                              alt="Logo"
+                              loading="lazy"
                             />
-                          }
+                          )}
                         </Grid>
                       </>
-
-                    }
+                    )}
 
                     <Grid item xs={12}>
                       <NewFileUploadFieldWrapper
                         htmlFor="user_photo"
                         accept="image/*"
-                        handleChangeFile={(e) => handleFileChange(e, setFieldValue, "user_photo", "preview_user_photo")}
-                        label='Upload User Photo'
+                        handleChangeFile={(e) =>
+                          handleFileChange(
+                            e,
+                            setFieldValue,
+                            'user_photo',
+                            'preview_user_photo'
+                          )
+                        }
+                        label="Upload User Photo"
                       />
                     </Grid>
                     <Grid item>
-                      {
-                        values?.preview_user_photo?.map((image, index) => (
-                          <>
-                            <PreviewImageCard
-                              data={image}
-                              index={index}
-                              key={index}
-                              handleRemove={() => handleRemove(setFieldValue, "user_photo", "preview_user_photo")}
-                            />
-                          </>
-                        ))
-                      }
+                      {values?.preview_user_photo?.map((image, index) => (
+                        <>
+                          <PreviewImageCard
+                            data={image}
+                            index={index}
+                            key={index}
+                            handleRemove={() =>
+                              handleRemove(
+                                setFieldValue,
+                                'user_photo',
+                                'preview_user_photo'
+                              )
+                            }
+                          />
+                        </>
+                      ))}
                     </Grid>
 
                     <Grid item>
-                      {
-                        (user_photo || editUser?.user_photo) &&
-                        <Image src={user_photo ? user_photo : getFile(editUser?.user_photo)}
+                      {(user_photo || editUser?.user_photo) && (
+                        <Image
+                          src={
+                            user_photo
+                              ? user_photo
+                              : getFile(editUser?.user_photo)
+                          }
                           height={150}
                           width={150}
-                          alt='User photo'
-                          loading='lazy'
+                          alt="User photo"
+                          loading="lazy"
                         />
-                      }
+                      )}
                     </Grid>
-
                   </Grid>
                 </DialogContent>
 
@@ -426,17 +493,19 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       isSubmitting ? <CircularProgress size="1rem" /> : null
                     }
                     // @ts-ignore
-                    disabled={Boolean(isAvailableUsername) || Boolean(errors.submit) || isSubmitting}
+                    disabled={
+                      Boolean(isAvailableUsername) ||
+                      Boolean(errors.submit) ||
+                      isSubmitting
+                    }
                     variant="contained"
                   >
                     {t(editUser ? 'Edit user' : 'Add new user')}
                   </Button>
                 </DialogActions>
               </form>
-            )
-          }
-
-          }
+            );
+          }}
         </Formik>
       </Dialog>
     </>

@@ -161,8 +161,20 @@ function ManagementClasses() {
     // }`
   });
 
-  const handleDownloadStudentExcelFile = () => {
+  const handleDownloadStudentExcelFile = async () => {
     setIsDownloadingExcelFile(true);
+    await axios.get("/api/student/downloads?format=excel&is_all_student=true")
+      .then((res) => {
+        const type = res.headers['content-type'];
+        const fileName = res.headers['file-name'];
+        const blob = new Blob([res.data], { type: type })
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = fileName
+        link.click()
+      })
+      .catch(err => handleShowErrMsg(err, showNotification))
+      .finally(() => { setIsDownloadingExcelFile(false) })
   };
 
   return (

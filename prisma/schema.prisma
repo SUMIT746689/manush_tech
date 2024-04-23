@@ -242,6 +242,7 @@ model Section {
 
 model StudentInformation {
   id                        Int             @id @default(autoincrement())
+  student_id                Int?             
   user_id                   Int             @unique
   first_name                String
   middle_name               String?
@@ -250,7 +251,7 @@ model StudentInformation {
   admission_no              String?
   admission_date            DateTime
   admission_status          AdmissionStatus @default(waiting)
-  date_of_birth             DateTime?        @db.Date
+  date_of_birth             DateTime?       @db.Date
   gender                    Gender
   blood_group               String?         @db.VarChar(20)
   religion                  String?
@@ -275,6 +276,7 @@ model StudentInformation {
 
   variance Student[]
 
+  @@unique([student_id, school_id])
   @@map("student_informations")
 }
 

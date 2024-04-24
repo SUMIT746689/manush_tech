@@ -197,9 +197,9 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
 
     axios.get(url)
       .then(res => setAllUsers(res.data))
-      .catch(err => handleShowErrMsg(err, showNotification))
+      .catch(err => handleShowErrMsg(err, showNotification));
+    setPage(0)
   };
-
   useEffect(() => {
     if (isMountingRef.current) getNsetOptions();
     isMountingRef.current = true;

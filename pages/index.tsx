@@ -122,7 +122,7 @@ export async function getServerSideProps(context: any) {
             }
           }
         })
-        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id }, orderBy: { created_at: "desc" } });
         await updateHolidays();
         break;
 
@@ -150,7 +150,7 @@ export async function getServerSideProps(context: any) {
           }
 
         });
-        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id }, orderBy: { created_at: "desc" } });
         await updateHolidays();
         break;
 
@@ -159,7 +159,7 @@ export async function getServerSideProps(context: any) {
     }
 
   } catch (err) {
-    console.log({err})
+    console.log({ err })
   }
   const parseJson = JSON.parse(JSON.stringify(blockCount));
 

@@ -41,23 +41,28 @@ async function get(req, res, refresh_token, dcryptAcademicYear) {
         generateExcelFile(resStd, academic_year_title, uploadFilePath)
             .then((update_file_path: string) => {
 
+                res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
+                res.setHeader('Content-Type', 'application/vnd.ms-excel');
+                res.setHeader("File-Name", fileName);
+
                 const createReadStream = fs.createReadStream(update_file_path);
 
-                let totalLen = 0;
-                let datas = '';
-                createReadStream.on("data", (res) => {
-                    totalLen += res.length;
-                    datas += res;
+                // let totalLen = 0;
+                // let datas = '';
+                createReadStream.on("data", (data) => {
+                    // totalLen += res.length;
+                    // datas += res;
+                    res.send(data);
                 });
                 createReadStream.on("end", () => {
 
-                    res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
-                    res.setHeader('Content-Type', 'application/vnd.ms-excel');
-                    res.setHeader("Content-Length", `${totalLen}`);
-                    res.setHeader("File-Name", fileName);
-                
-                    res.send(datas);
-                
+                    // res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
+                    // res.setHeader('Content-Type', 'application/vnd.ms-excel');
+                    // res.setHeader("Content-Length", `${totalLen}`);
+                    // res.setHeader("File-Name", fileName);
+
+                    // res.send(datas);
+
                     // after sending done removing the file
                     removeFiles(update_file_path)
 
@@ -101,7 +106,8 @@ const generateExcelFile = (datas, academic_year_title, uploadFilePath) => {
         writeStream.write(header);
 
         datas.forEach(student => {
-            const subjects = student.section.class.subjects.map(subject => subject.name).join(',');
+            const subjects = JSON.stringify(student.section.class.subjects.map(subject => subject.name).join(", "));
+            
             const row = [
                 student.student_info.student_id || '',
                 student.student_info.first_name,

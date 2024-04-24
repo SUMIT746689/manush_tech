@@ -186,6 +186,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   const [filterByActiveStatus, setFilterByActiveStatus] = useState({ label: "All", id: 0 });
   const isMountingRef = useRef(false);
 
+  useEffect(() => {
+    setPage(0)
+  }, [query]);
+
   const getNsetOptions = () => {
     let url = `/api/user?`
     if (searchToken) url += `role=${searchToken}&`;
@@ -205,9 +209,6 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
   useEffect(() => {
     setAllUsers(users)
   }, [users])
-
-
-
 
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {

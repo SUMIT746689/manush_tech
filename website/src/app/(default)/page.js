@@ -26,6 +26,9 @@ export default async function Home() {
     select: {
       title: true,
       headLine: true,
+    },
+    orderBy:{
+      created_at:"desc"
     }
   })
   const speechDatas = [
@@ -50,7 +53,7 @@ export default async function Home() {
   const carousel_image = school_info?.carousel_image.map(i => ({
     path: `${process.env.SERVER_HOST}/api/get_file/${i?.path?.replace(/\\/g, '/')}`
   }))
-  console.log({ school_info });
+
   return (
     <div>
       <HomeContent
@@ -58,6 +61,7 @@ export default async function Home() {
         carousel_image={carousel_image || []}
         speechDatas={speechDatas || []}
         facebook_link={school_info?.facebook_link || ''}
+        school_info={school_info}
       />
     </div>
   )

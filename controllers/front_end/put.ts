@@ -1,6 +1,6 @@
 import { authenticate } from 'middleware/authenticate';
 import path from 'path';
-import {  fileUpload } from '@/utils/upload';
+import { fileUpload } from '@/utils/upload';
 import prisma from '@/lib/prisma_client';
 import fs from 'fs';
 import fsP from "fs/promises";
@@ -289,7 +289,12 @@ async function put(req, res, refresh_token) {
         if (fields?.youtube_link) {
             query['youtube_link'] = fields?.youtube_link
         }
-        console.log({ query });
+        if (fields?.e_books_section) {
+            query['e_books_section'] = JSON.parse(fields?.e_books_section)
+        }
+        if (fields?.downloads_section) {
+            query['downloads_section'] = JSON.parse(fields?.downloads_section)
+        }
         if (websiteUirow) {
             await prisma.websiteUi.update({
                 where: {
@@ -297,7 +302,6 @@ async function put(req, res, refresh_token) {
                 },
                 data: query
             });
-
         }
         else {
             const tempData = {
@@ -334,8 +338,8 @@ async function put(req, res, refresh_token) {
     } catch (error) {
         console.log("error__", error);
         for (const i of allFiles) {
-            const filePath = path.join(process.cwd(),i)
-            if(fs.existsSync(filePath)){
+            const filePath = path.join(process.cwd(), i)
+            if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath)
             }
         }

@@ -191,7 +191,7 @@ function RegistrationSecondPart({
                     <Grid item xs={12}>
                       <TextField
                         required
-                        disabled
+                        // disabled
                         fullWidth
                         size="small"
                         sx={{

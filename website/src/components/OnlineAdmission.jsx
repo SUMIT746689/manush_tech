@@ -14,7 +14,7 @@ import PdfDatas from './admissionForm/PdfDatas';
 import { useReactToPrint } from 'react-to-print';
 
 
-const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studentAdmissionForm }) => {
+const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studentAdmissionForm, school }) => {
     // console.log("classes,academicYears__", classes, academicYears);
     const router = useRouter();
     const { t } = useTranslation();
@@ -34,7 +34,6 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
     });
-
     return (
         <>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -125,7 +124,7 @@ const OnlineAdmission = ({ classes, academicYears, serverHost, school_id, studen
                 <Grid ref={componentRef}
                 >
                     <PdfDatas
-                        school={studentAdmissionForm?.school}
+                        school={school}
                         values={pdfDatas}
                         serverHost={serverHost}
                     />

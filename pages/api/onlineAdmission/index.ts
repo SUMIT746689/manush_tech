@@ -28,6 +28,9 @@ const index = async (req, res) => {
                 const school = await prisma.school.findFirst({
                     where: {
                         domain: reqDomain
+                    },
+                    select: {
+                        id: true
                     }
                 })
                 if (!school) {
@@ -43,8 +46,6 @@ const index = async (req, res) => {
                 }
 
                 const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
-
-                console.log(files, fields);
 
                 if (error) {
                     throw new Error('Server Error !')
@@ -81,6 +82,13 @@ const index = async (req, res) => {
                         school_id: school.id
                     }
                 })
+                res.setHeader('Access-Control-Allow-Credentials', true)
+                res.setHeader('Access-Control-Allow-Origin', '*') // replace this your actual origin
+                res.setHeader('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT')
+                res.setHeader(
+                    'Access-Control-Allow-Headers',
+                    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+                )
                 res.status(200).json({ success: true, message: "Admission Application submitted !!" });
                 break;
             default:

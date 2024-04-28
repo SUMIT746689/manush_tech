@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 # Copying prisma source files
 COPY . .
-COPY ../prisma .
+# COPY ../prisma .
 # prisma schema to update the generated Prisma Client code 
 RUN npx prisma generate 
 # This will do the trick, use the corresponding env file for each environment.
@@ -37,8 +37,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-ENV PORT 3000
-ENV SERVER_HOST='http://192.168.11.169:3000'
-ENV DATABASE_URL=mysql://root:mypassword@192.168.11.169:3306/school?parseTime=true
+# ENV PORT 3000
+# ENV SERVER_HOST='http://10.0.0.105:3000'
+# ENV DATABASE_URL=mysql://root:password@10.0.0.105:3306/school?parseTime=true
 
 CMD ["node", "server.js"]

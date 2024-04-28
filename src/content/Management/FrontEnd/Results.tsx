@@ -11,19 +11,19 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { getFile } from '@/utils/utilitY-functions';
 import { DialogTitleWrapper } from '@/components/DialogWrapper';
 import { handleFileChange, handleFileRemove } from 'utilities_api/handleFileUpload';
-
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const Results = ({ data, reFetchData }) => {
 
   const { t }: { t: any } = useTranslation();
   // const [notice, setNotice] = useState([{ title: '', headLine: '', body: undefined, link: undefined }]);
 
-  const [header_image, setHeader_image] = useState(null)
-  const [carousel_image, setCarousel_image] = useState(null)
-  const [gallery, setGallery] = useState(null)
-  const [history_photo, setHistory_photo] = useState(null)
-  const [chairman_photo, setChairman_photo] = useState(null)
-  const [principal_photo, setPrincipal_photo] = useState(null)
+  // const [header_image, setHeader_image] = useState(null)
+  // const [carousel_image, setCarousel_image] = useState(null)
+  // const [gallery, setGallery] = useState(null)
+  // const [history_photo, setHistory_photo] = useState(null)
+  // const [chairman_photo, setChairman_photo] = useState(null)
+  // const [principal_photo, setPrincipal_photo] = useState(null)
 
   const { showNotification } = useNotistick();
 
@@ -33,6 +33,21 @@ const Results = ({ data, reFetchData }) => {
       cnt.push(carousel_image[i])
     }
     return cnt.map(j => j.name).join(', ')
+  }
+
+  const handleChangeFromArr = (totalValues, index, setField, name, key, event) => {
+    const value = event.target.value;
+    const filterValues = totalValues.map((val, ind) => {
+      if (ind !== index) return val;
+      val[key] = value;
+      return val;
+    });
+    setField(name, filterValues)
+  }
+
+  const handleRemoveFromArr = (totalValues, index, setField, name) => {
+    const filterValues = totalValues.filter((val, ind) => ind !== index);
+    setField(name, filterValues)
   }
   return (
     <Formik
@@ -69,6 +84,9 @@ const Results = ({ data, reFetchData }) => {
 
         gallery: undefined,
         preview_gallery: [],
+
+        e_books_section: data?.e_books_section || [{ title: null, url: null }],
+        downloads_section: data?.downloads_section || [{ title: null, url: null }],
 
         submit: null
       }}
@@ -112,8 +130,11 @@ const Results = ({ data, reFetchData }) => {
             else if (["header_image", "history_photo", "chairman_photo", "principal_photo"].includes(i) && _values[i]) {
               formData.append(`${i}`, _values[i][0]);
             }
-
+            else if (["e_books_section", "downloads_section"].includes(i) && _values[i]) {
+              formData.append(`${i}`, JSON.stringify(_values[i]));
+            }
             else {
+              console.log({ i: _values[i] })
               formData.append(`${i}`, _values[i]);
             }
           }
@@ -562,7 +583,106 @@ const Results = ({ data, reFetchData }) => {
                       value={values.youtube_link}
                     />
                   </Grid>
+
+
+                  {/* ebooks sections */}
+                  <Grid item xs={12}>
+                    <Grid >
+                      E-books Section:
+                    </Grid>
+                    <Grid item display="grid" gridTemplateColumns="1fr 1fr auto" columnGap={1} px={2}>
+                      {
+                        values.e_books_section?.map((ebook, index) => (
+                          <>
+                            <Grid >
+                              E-book Title:
+                              <TextFieldWrapper
+                                touched={touched.e_books_section}
+                                errors={errors.e_books_section}
+                                // label={t('Eiin number')}
+                                label={t('')}
+                                name={'e-book title'}
+                                handleBlur={handleBlur}
+                                handleChange={(e) => handleChangeFromArr(values.e_books_section, index, setFieldValue, "e_books_section", "title", e)}
+                                value={ebook?.title}
+                              />
+                            </Grid>
+                            <Grid >
+                              E-book Url:
+                              <TextFieldWrapper
+                                touched={touched.e_books_section}
+                                errors={errors.e_books_section}
+                                // label={t('Eiin number')}
+                                label={t('')}
+                                name={'e-book url'}
+                                handleBlur={handleBlur}
+                                handleChange={(event) => handleChangeFromArr(values.e_books_section, index, setFieldValue, "e_books_section", "url", event)}
+                                value={ebook?.url}
+                              />
+                            </Grid>
+                            {/* <Grid > */}
+                            <DeleteOutlineIcon
+                              onClick={() => handleRemoveFromArr(values.e_books_section, index, setFieldValue, "e_books_section")}
+                              color="warning" sx={{ cursor: "pointer", height: 37, mt: 2.3, p: 1, fontSize: 50, border: '2px solid' }} />
+                            {/* </Grid> */}
+                          </>
+                        ))
+                      }
+                    </Grid>
+                    <ButtonWrapper sx={{ mx: 2 }} handleClick={() => setFieldValue("e_books_section", [...values.e_books_section, { title: null, url: null }])} > + Add More Ebooks Section </ButtonWrapper>
+                  </Grid>
+
+
+
+                  {/* downloads sections */}
+                  <Grid item xs={12}>
+                    <Grid >
+                      Downloads Section:
+                    </Grid>
+                    <Grid item display="grid" gridTemplateColumns="1fr 1fr auto" columnGap={1} px={2}>
+                      {
+                        values.downloads_section?.map((download_sec, index) => (
+                          <>
+                            <Grid >
+                              Download Title:
+                              <TextFieldWrapper
+                                touched={touched.downloads_section}
+                                errors={errors.downloads_section}
+                                // label={t('Eiin number')}
+                                label={t('')}
+                                name={"title"}
+                                handleBlur={handleBlur}
+                                handleChange={(event) => handleChangeFromArr(values.downloads_section, index, setFieldValue, "downloads_section", "title", event)}
+                                value={download_sec.title}
+                              />
+                            </Grid>
+                            <Grid >
+                              Download Url:
+                              <TextFieldWrapper
+                                touched={touched.downloads_section}
+                                errors={errors.downloads_section}
+                                // label={t('Eiin number')}
+                                label={t('')}
+                                name={"url"}
+                                handleBlur={handleBlur}
+                                handleChange={(event) => handleChangeFromArr(values.downloads_section, index, setFieldValue, "downloads_section", "url", event)}
+                                value={download_sec.url}
+                              />
+                            </Grid>
+                            {/* <Grid > */}
+                            <DeleteOutlineIcon
+                              onClick={() => handleRemoveFromArr(values.downloads_section, index, setFieldValue, "downloads_section")}
+                              color="warning" sx={{ cursor: "pointer", height: 37, mt: 2.3, p: 1, fontSize: 50, border: '2px solid' }} />
+                            {/* </Grid> */}
+                          </>
+                        ))
+                      }
+                    </Grid>
+                    <ButtonWrapper sx={{ mx: 2 }} handleClick={() => setFieldValue("downloads_section", [...values.downloads_section, { title: null, url: null }])} > + Add More Downloads Section </ButtonWrapper>
+                  </Grid>
+
                 </Grid>
+
 
                 <Grid display={'flex'} alignContent="center" justifyContent={'center'} alignItems="center" padding={2}>
 
@@ -581,11 +701,11 @@ const Results = ({ data, reFetchData }) => {
                   </Button>
                 </Grid>
               </Card>
-            </form>
+            </form >
           </>
         );
       }}
-    </Formik>
+    </Formik >
   )
 };
 

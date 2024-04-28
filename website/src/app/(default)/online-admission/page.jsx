@@ -32,13 +32,19 @@ export default async function Admission() {
     const studentAdmissionForm = await prisma.studentAdmissionForm.findFirst({
         where: {
             school: { domain }
-        },
-        include: {
-            school: { select: { name: true, address: true, websiteui: { select: { header_image: true } } } },
         }
     });
-    const serverHost =  JSON.stringify(process.env.SERVER_HOST);
-    console.log({serverHost,classes})
+
+    const resSchool = await prisma.school.findFirst({
+        where: { domain },
+        select: {
+            name: true,
+            address: true,
+            websiteui: { select: { header_image: true } }
+        }
+    })
+
+    const serverHost = JSON.stringify(process.env.SERVER_HOST);
     return (
         <div>
             <OnlineAdmission
@@ -46,6 +52,7 @@ export default async function Admission() {
                 academicYears={academicYear || []}
                 serverHost={`${process.env.SERVER_HOST}` || ''}
                 studentAdmissionForm={studentAdmissionForm}
+                school={resSchool}
             />
         </div>
     )

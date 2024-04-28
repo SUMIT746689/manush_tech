@@ -242,7 +242,7 @@ model Section {
 
 model StudentInformation {
   id                        Int             @id @default(autoincrement())
-  student_id                Int?             
+  student_id                Int?
   user_id                   Int             @unique
   first_name                String
   middle_name               String?
@@ -776,6 +776,8 @@ model WebsiteUi {
   twitter_link        String?
   google_link         String?
   linkedin_link       String?
+  e_books_section     Json?
+  downloads_section   Json?
 
   school School @relation(fields: [school_id], references: [id])
 

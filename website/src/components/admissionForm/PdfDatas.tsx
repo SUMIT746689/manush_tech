@@ -31,7 +31,6 @@ import { ShowImage } from '../ImageShow'
 function PdfDatas({ school, values, serverHost }) {
     const { t }: { t: any } = useTranslation();
 
-    console.log({ values, school })
     return (
         <>
             <Grid display="grid" sx={{ p: 8, pageBreakBefore: "always", pageBreakInside: "avoid" }} >

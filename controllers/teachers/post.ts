@@ -26,20 +26,6 @@ const post = async (req, res, refresh_token) => {
   try {
     if (error) throw new Error(error)
 
-    if (files && resume || fields?.resume) {
-      if (photo) {
-        if (
-          ['image/jpeg', 'image/jpg', 'image/png'].includes(resume.mimetype)
-        )
-          return res.json('Only png, jpg & jpeg is supported');
-      }
-      if (!resume && !fields?.resume) deleteFiles(photo.filepath);
-    }
-    else {
-      // console.log({ files });
-      if (photo) deleteFiles(photo.filepath);
-      return res.json('require resume');
-    }
     const {
       username,
       password,

@@ -80,6 +80,8 @@ function RegistrationThirdPart({
             }
 
             await axios.post(`${serverHost}/api/onlineAdmission`, formData)
+              // .then(res => { console.log({ res }) })
+              // .catch(err => { console.log({ err }) })
             setPdfDatas(() => _values)
 
             resetForm();
@@ -89,16 +91,16 @@ function RegistrationThirdPart({
             setUsersFlag(true);
             setActiveStep(0);
             showNotification('Online Admission form submitted !!');
-            router.push('/online-admission');
-            
+            // router.push('/online-admission');
+
             setTimeout(() => {
               handlePrint()
             }, 2000);
 
           } catch (err) {
             setPdfDatas({});
-            console.log(err);
-            showNotification(err.response?.data?.message, 'error');
+            console.log(err.message);
+            showNotification(err.response?.data?.message || err.message, 'error');
             setStatus({ success: false });
             // @ts-ignore
             setErrors({ submit: err.message });

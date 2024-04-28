@@ -27,7 +27,7 @@ const SpeechesCard = ({ title, image, description }) => {
         {title}
       </div>
       <div className="">
-      {image && image !== '*' && <img className=" w-1/3 float-left pr-2 md:pr-3" src={`${image}`} />}
+        {image && image !== '*' && <img className=" w-1/3 float-left pr-2 md:pr-3" src={`${image}`} />}
         <div className="text-lg font-medium leading-9 text-justify">
           {description}
         </div>
@@ -106,52 +106,52 @@ const SpeechesCard = ({ title, image, description }) => {
 //   }
 // ];
 
-const serviceDatas = [
-  // {
-  //   title: 'ছাত্র/ছাত্রী তথ্য/রেজাল্ট',
-  //   image: 'service1.png',
-  //   lists: [
-  //     'অনলাইন ভর্তি',
-  //     'পরিক্ষা এডমিট কার্ড',
-  //     'সার্টিফিকেট',
-  //     'রেজাল্ট (মঙ্গলকান্দি ইসলামিয়া ফাজিল মাদ্রাসা)',
-  //     'রেজাল্ট বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড'
-  //   ]
-  // },
-  {
-    title: 'ই-বুক',
-    image: 'service2.png',
-    lists: [
-      '২০২৩ শিক্ষাবর্ষের সকল পাঠ্যপুস্তক',
-      'ইসলামিক বই',
-      'সিলেবাস (BMEB)',
-      'সিলেবাস (IAU)'
-    ]
-  },
-  {
-    title: 'ডাউনলোড',
-    image: 'service3.png',
-    lists: [
-      'বার্ষিক পরীক্ষা 2022 রুটিন ডাউনলোড',
-      'এসএসসি পরীক্ষার রুটিন ডাউনলোড',
-      'ছুটির নোটিশ ডাউনলোড',
-      'ভর্তি ফরম ডাউনলোড',
-      'পরীক্ষার রুটিন ডাউনলোড'
-    ]
-  },
-  // {
-  //   title: 'নোটিশ',
-  //   image: 'service4.png',
-  //   lists: [
-  //     'নোটিশ (ইসলামি আরবি বিশ্ববিদ্যালয়)',
-  //     'নোটিশ (মাদ্রাাসা শিক্ষা অধিদপ্তর)',
-  //     'নোটিশ (বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড)',
-  //     'নোটিশ (উপবৃত্তি)',
-  //     'নোটিশ (এনটিআরসিএ)',
-  //     'নোটিশ তিতাস উপজেলা'
-  //   ]
-  // }
-];
+// const serviceDatas = [
+//   // {
+//   //   title: 'ছাত্র/ছাত্রী তথ্য/রেজাল্ট',
+//   //   image: 'service1.png',
+//   //   lists: [
+//   //     'অনলাইন ভর্তি',
+//   //     'পরিক্ষা এডমিট কার্ড',
+//   //     'সার্টিফিকেট',
+//   //     'রেজাল্ট (মঙ্গলকান্দি ইসলামিয়া ফাজিল মাদ্রাসা)',
+//   //     'রেজাল্ট বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড'
+//   //   ]
+//   // },
+//   {
+//     title: 'ই-বুক',
+//     image: 'service2.png',
+//     lists: [
+//       '২০২৩ শিক্ষাবর্ষের সকল পাঠ্যপুস্তক',
+//       'ইসলামিক বই',
+//       'সিলেবাস (BMEB)',
+//       'সিলেবাস (IAU)'
+//     ]
+//   },
+//   {
+//     title: 'ডাউনলোড',
+//     image: 'service3.png',
+//     lists: [
+//       'বার্ষিক পরীক্ষা 2022 রুটিন ডাউনলোড',
+//       'এসএসসি পরীক্ষার রুটিন ডাউনলোড',
+//       'ছুটির নোটিশ ডাউনলোড',
+//       'ভর্তি ফরম ডাউনলোড',
+//       'পরীক্ষার রুটিন ডাউনলোড'
+//     ]
+//   },
+//   // {
+//   //   title: 'নোটিশ',
+//   //   image: 'service4.png',
+//   //   lists: [
+//   //     'নোটিশ (ইসলামি আরবি বিশ্ববিদ্যালয়)',
+//   //     'নোটিশ (মাদ্রাাসা শিক্ষা অধিদপ্তর)',
+//   //     'নোটিশ (বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড)',
+//   //     'নোটিশ (উপবৃত্তি)',
+//   //     'নোটিশ (এনটিআরসিএ)',
+//   //     'নোটিশ তিতাস উপজেলা'
+//   //   ]
+//   // }
+// ];
 
 const color = [
   'bg-green-700',
@@ -192,14 +192,28 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
   const ref = useRef();
   useIntersectionObserver(ref, {});
 
-  const listData = lists?.map((list, index) => (
-    <li
-      className=" hover:text-sky-700 cursor-pointer text-ellipsis overflow-hidden"
-      key={index}
-    >
-      🕸️ {list}
-    </li>
-  ));
+  const listData = lists?.map(({ title, url }, index) => {
+    return (
+
+      url ?
+        <Link href={`http://${url}`} color="primary" rel="noopener noreferrer" >
+          <div
+            className=" hover:text-sky-700 cursor-pointer text-ellipsis overflow-hidden"
+            key={index}
+          >
+            🕸️  {title}
+          </div>
+        </Link>
+        :
+        <div
+          className=" hover:text-sky-700 text-ellipsis overflow-hidden"
+          key={index}
+        >
+          🕸️  {title}
+        </div>
+    )
+  });
+
   return (
     <div
       ref={ref}
@@ -223,8 +237,8 @@ const ServiceCard = ({ title, image, lists, headColor }) => {
 
 
 
-export default function HomeContent({ latest_news, carousel_image, speechDatas, facebook_link }) {
-  console.log({ latest_news });
+export default function HomeContent({ latest_news, carousel_image, speechDatas, facebook_link, school_info }) {
+  console.log({ latest_news, school_info: school_info?.e_books_section, downloads_section: school_info?.downloads_section });
   // const ref = useRef(null);
   const announceref = useRef(null);
   const noticeRef = useRef(null);
@@ -234,12 +248,20 @@ export default function HomeContent({ latest_news, carousel_image, speechDatas, 
   useIntersectionObserver(announceref, {});
   useIntersectionObserver(noticeRef, {});
   useIntersectionObserver(otherSiteRef, {});
-  // const isVisible = !!entry?.isIntersecting
 
-  // console.log(`Render Section `, { isVisible })
+  const serviceDatas = [
+    {
+      title: 'ই-বুক',
+      image: 'service2.png',
+      lists: school_info?.e_books_section || []
+    },
+    {
+      title: 'ডাউনলোড',
+      image: 'service3.png',
+      lists: school_info?.downloads_section || []
+    }
+  ];
 
-
-  // console.log("speechDatas__",speechDatas);
   return (
     <div>
       {/* slider */}

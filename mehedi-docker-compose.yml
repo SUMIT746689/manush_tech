@@ -1,19 +1,15 @@
-version: '3'
 services:
-  # db:
-  #   image: mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: mypassword
-  #   ports:
-  #     - "3306:3306"
-  #   restart: unless-stopped
   admin:
-    image: ridoy235/elitbuzz:school_admin_v1.1
+    image: ridoy235/elitbuzz:school_admin_v9
     pull_policy: always
-    # network_mode: host
+    volumes: 
+      - AllFiles:/app/AllFiles
+    #network_mode: host
+    ports:
+      - "3000:3000"
     restart: unless-stopped
     environment:
-      - DATABASE_URL=mysql://root:mypassword@192.168.10.181:3306/school?parseTime=true
+      - DATABASE_URL=${DATABASE_URL}
       - SALTROUNDS=${SALTROUNDS}
       - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
       - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
@@ -34,13 +30,6 @@ services:
       - bkash_execute_payment_url=${bkash_execute_payment_url}
       - NEXT_PUBLIC_BASE_API=${NEXT_PUBLIC_BASE_API}
       - base_url=${base_url}
-    ports:
-      - 3000:3000
-    volumes:
-      - AllFiles:/app/AllFiles
+      - voice_sms_api=${voice_sms_api}
 volumes:
   AllFiles:
-      # todo: need to persist files
-      #map ports
-      #tell to use system network, if I use system network then should I need to map?
-      # network_mode: host

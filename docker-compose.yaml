@@ -1,9 +1,35 @@
-version: '3'
 services:
-  app:
-    build:
-      dockerfile: Dockerfile
-    # todo: need to persist files
-    #map ports
-    #tell to use system network, if I use system network then should I need to map?
-    network_mode: host
+  admin:
+    image: ridoy235/elitbuzz:school_admin_v10
+    pull_policy: always
+    volumes: 
+      - AllFiles:/app/AllFiles
+    #network_mode: host
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SALTROUNDS=${SALTROUNDS}
+      - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
+      - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
+      - API_KEY=${API_KEY}
+      - SENDER_ID=${SENDER_ID}
+      - FILESFOLDER=${FILESFOLDER}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
+      - bkash_username=${bkash_username}
+      - bkash_password=${bkash_password}
+      - bkash_app_key=${bkash_app_key}
+      - bkash_app_secret=${bkash_app_secret}
+      - bkash_X_App_Key=${bkash_X_App_Key}
+      - bkash_grant_token_url=${bkash_grant_token_url}
+      - bkash_create_payment_url=${bkash_create_payment_url}
+      - bkash_execute_payment_url=${bkash_execute_payment_url}
+      - NEXT_PUBLIC_BASE_API=${NEXT_PUBLIC_BASE_API}
+      - base_url=${base_url}
+      - voice_sms_api=${voice_sms_api}
+volumes:
+  AllFiles:

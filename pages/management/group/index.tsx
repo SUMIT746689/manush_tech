@@ -10,10 +10,9 @@ import Results from 'src/content/Management/Group/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
 
 function ManagementGroups() {
-  
   const [editGroup, setEditGroup] = useState(null);
 
-  const {data:groups,reFetchData} = useClientFetch( `/api/group`)
+  const { data: groups, reFetchData } = useClientFetch(`/api/group`);
 
   return (
     <>
@@ -37,7 +36,7 @@ function ManagementGroups() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results setEditSection={setEditGroup} users={groups||[]} />
+          <Results setEditSection={setEditGroup} users={groups || []} />
         </Grid>
       </Grid>
       <Footer />

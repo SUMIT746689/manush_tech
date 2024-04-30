@@ -10,8 +10,8 @@ import Results from 'src/content/Management/Users/Results';
 import { useClientFetch } from '@/hooks/useClientFetch';
 
 function ManagementUsers() {
-  const { data: allUsers, reFetchData } = useClientFetch('/api/user')
-  const { data: roles } = useClientFetch('/api/role/school_other_role')
+  const { data: allUsers, reFetchData } = useClientFetch('/api/user');
+  const { data: roles } = useClientFetch('/api/role/school_other_role');
   const [editUser, setEditUser] = useState(null);
 
   return (
@@ -38,8 +38,10 @@ function ManagementUsers() {
         <Grid item xs={12}>
           <Results
             users={allUsers || []}
-            roleOptions={roles?.map(i => i.title) || []}
-            reFetchData={reFetchData} setEditUser={setEditUser} />
+            roleOptions={roles?.map((i) => i.title) || []}
+            reFetchData={reFetchData}
+            setEditUser={setEditUser}
+          />
         </Grid>
       </Grid>
       <Footer />

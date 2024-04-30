@@ -473,6 +473,7 @@ model StudentFee {
   transaction_id    Int?     @unique
   status            String?
   total_payable     Float?
+  other_fee_name    String?
 
   transaction         Transaction?    @relation(fields: [transaction_id], references: [id])
   account             Accounts?       @relation(fields: [account_id], references: [id])

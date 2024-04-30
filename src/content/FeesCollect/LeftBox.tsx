@@ -1,6 +1,5 @@
 import { Grid, TextField, Typography, Alert } from '@mui/material';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
-import { ChangeEvent, useState } from 'react';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 
@@ -137,7 +136,9 @@ const LeftBox = ({
                   *
                 </Typography>
               </Typography>
+
               <AutoCompleteWrapperWithDebounce
+                debounceTimeout=""
                 options={monthData}
                 value={''}
                 handleChange={monthHandleChange}

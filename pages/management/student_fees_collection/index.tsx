@@ -1,5 +1,12 @@
 import Head from 'next/head';
-import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  ChangeEvent,
+  MouseEvent,
+  useContext
+} from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
@@ -20,6 +27,7 @@ import RightBox from '@/content/FeesCollect/RightBox';
 import LeftFeesTable from '@/content/FeesCollect/LeftFeesTable';
 import RightFeesTable from '@/content/FeesCollect/RightFeesTable';
 import PaymentOptions from '@/content/FeesCollect/PaymentOptions';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 // updated searching code start
 
@@ -42,10 +50,19 @@ const monthData = [
 
 function Managementschools() {
   // updated code start
-  const [searchValue, setSearchValue] = useState<null | string>(null);
+  const [searchValue, setSearchValue] = useState<any>(null);
   const [searchOptionData, setSearchOptionData] = useState<Array<any>>([]);
   const [userInformation, setUserInformation] = useState<object | null>(null);
-
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const [leftFeesTableData, setLeftFeesTableData] = useState<Array<any>>([]);
+  const [totalDueValue, setTotalDueValue] = useState<string>('0');
+  const [feesUserData, setFeesUserData] = useState<object>({});
+  const [selectedRowsFeesTable, setSelectedRowsFeesTable] = useState([]);
+  const [leftFeesTableTotalCalculation, setLeftFeesTableTotalCalculation] =
+    useState<object | null>(null);
+  const [trackingCollectButton, setTrackingCollectButton] =
+    useState<Boolean>(false);
+  const [selectAll, setSelectAll] = useState<Boolean>(false);
   // handleDebounce function
 
   const handleDebounce = (value) => {
@@ -87,7 +104,149 @@ function Managementschools() {
     event: ChangeEvent<HTMLInputElement>
   ): void => {};
   const monthHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {};
-  const btnHandleClick = (event: MouseEvent<HTMLButtonElement>): void => {};
+  const leftFeesTableColumnData = (data) => {
+    let totalDue = 0;
+    let totalObj = {
+      amount: 0,
+      late_fee: 0,
+      paidAmount: 0,
+      discount: 0,
+      dueAmount: 0
+    };
+    // fees array
+    let feesData = data?.fees.map((item) => {
+      const last_trnsaction_time = new Date(item?.last_payment_date).getTime();
+      const last_date_time = new Date(item?.last_date).getTime();
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString();
+      const check_last_transaction_time = new Date(formattedDate).getTime();
+      let late_fee_value = null;
+      let due_fee_value = null;
+      let paid_amount_value = null;
+      if (last_trnsaction_time < last_date_time) {
+        late_fee_value = 0;
+      } else if (last_trnsaction_time > last_date_time) {
+        late_fee_value = item.late_fee ? item.late_fee : 0;
+      } else if (check_last_transaction_time < last_date_time) {
+        late_fee_value = 0;
+      } else if (check_last_transaction_time > last_date_time) {
+        late_fee_value = item.late_fee ? item.late_fee : 0;
+      }
+
+      // check duevalue
+      if (late_fee_value === 0) {
+        due_fee_value =
+          item.status === 'paid' ? 0 : item.amount - (item.paidAmount || 0);
+      } else if (late_fee_value > 0) {
+        due_fee_value =
+          item.status === 'paid'
+            ? 0
+            : item.amount + item.late_fee - (item.paidAmount || 0);
+      }
+
+      // check  paidAmount
+      if (item.status === 'paid') {
+        paid_amount_value = item.amount;
+      } else {
+        paid_amount_value = item.paidAmount ? item.paidAmount : 0;
+      }
+
+      return {
+        feeId: item.id,
+        title: item.title,
+        amount: item.amount ? item.amount : 0,
+        late_fee: late_fee_value,
+        paidAmount: paid_amount_value,
+        discount: 0,
+        dueAmount: due_fee_value
+      };
+    });
+
+    // calculate discount
+    for (let i = 0; i < feesData.length; i++) {
+      for (let j = 0; j < data?.discount.length; j++) {
+        if (feesData[i].feeId === data?.discount[j].fee_id) {
+          if (data?.discount[j].type === 'flat') {
+            feesData[i].discount =
+              feesData[i].discount + parseInt(data.discount[j].amt); // 100
+          } else if (data?.discount[j].type === 'percent') {
+            feesData[i].discount =
+              feesData[i].discount +
+              parseInt(feesData[i].amount) / parseInt(data.discount[j].amt);
+          }
+        }
+      }
+    }
+
+    // calculate dueAmount
+    feesData = feesData.map((item) => {
+      return {
+        ...item,
+        dueAmount: parseInt(item.dueAmount) - parseInt(item.discount)
+      };
+    });
+
+    // calculate totalDue
+
+    feesData.forEach((item) => {
+      totalDue = totalDue + parseInt(item.dueAmount);
+    });
+
+    // total (amount , Late Fee,  Paid Amount, Discount, Due)  functionality
+
+    feesData.forEach((item) => {
+      totalObj.amount = totalObj.amount + item.amount;
+      totalObj.late_fee = totalObj.late_fee + item.late_fee;
+      totalObj.paidAmount = totalObj.paidAmount + item.paidAmount;
+      totalObj.discount = totalObj.discount + item.discount;
+      totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
+    });
+
+    setLeftFeesTableData(feesData);
+    setTotalDueValue(totalDue.toString());
+    setFeesUserData(data);
+    setLeftFeesTableTotalCalculation({
+      ...totalObj
+    });
+
+    // discount array
+  };
+  const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    // searching data collect
+    // searchValue.id
+    // academicYear.id
+    if (searchValue?.id && academicYear?.id) {
+      const res = await axios.get(
+        `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
+      );
+
+      leftFeesTableColumnData(res?.data?.data);
+    }
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (
+          trackingCollectButton === true &&
+          searchValue?.id &&
+          academicYear?.id
+        ) {
+          const res = await axios.get(
+            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
+          );
+
+          leftFeesTableColumnData(res?.data?.data);
+        }
+      } catch (error) {}
+    };
+
+    fetchData();
+  }, [trackingCollectButton]);
+
+  const deSelectAllCheckbox = () => {
+    setSelectAll(false);
+    setSelectedRowsFeesTable([]);
+  };
 
   // updated searching code end
   const [datas, setDatas] = useState([]);
@@ -114,7 +273,6 @@ function Managementschools() {
 
       return false;
     });
-    console.log('printFees__', temp);
 
     setPrinCollectedtFees(temp);
   }, [printFees]);
@@ -152,7 +310,6 @@ function Managementschools() {
       })
       .catch((err) => {
         showNotification('faild to sending sms ', 'error');
-        console.log({ err });
       })
       .finally(() => {
         setIsSentSmsLoading(false);
@@ -298,12 +455,25 @@ function Managementschools() {
         mx={1}
         minHeight="fit-content"
       >
-        <LeftFeesTable />
+        <LeftFeesTable
+          selectAll={selectAll}
+          setSelectAll={setSelectAll}
+          leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
+          tableData={leftFeesTableData}
+          feesUserData={feesUserData}
+          selectedRows={selectedRowsFeesTable}
+          setSelectedRows={setSelectedRowsFeesTable}
+        />
         <RightFeesTable />
       </Grid>
       <Grid px={4} mt={1} mx={1}>
         <PaymentOptions
-          dueAmout="20000"
+          deSelectAllCheckbox={deSelectAllCheckbox}
+          trackingCollectButton={trackingCollectButton}
+          setTrackingCollectButton={setTrackingCollectButton}
+          tableData={leftFeesTableData}
+          feesUserData={feesUserData}
+          selectedRows={selectedRowsFeesTable}
           accounts={accounts}
           accountsOption={
             accounts?.map((i) => ({
@@ -311,6 +481,7 @@ function Managementschools() {
               id: i.id
             })) || []
           }
+          btnHandleClick={btnHandleClick}
         />
       </Grid>
       {/* fees collection code end*/}

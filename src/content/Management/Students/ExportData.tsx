@@ -7,9 +7,7 @@ export const ExportData = ({ students }) => {
 
   const [loading, setLoading] = useState(true)
   const [exportData, setExportData] = useState([]);
-  console.log({ students })
-  console.log({ exportData })
-  
+
   useEffect(() => {
     setLoading(true);
     if (Array.isArray(students)) {
@@ -34,7 +32,7 @@ export const ExportData = ({ students }) => {
 
   return (<>
     {
-      loading && <Grid display={"flex"} >
+      !loading && <Grid display={"flex"} >
         <CsvFileExport exportData={exportData} />
         <PdfExport title="Stident List" exportData={exportData} />
       </Grid>

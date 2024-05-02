@@ -242,7 +242,7 @@ model Section {
 
 model StudentInformation {
   id                        Int             @id @default(autoincrement())
-  student_id                Int?
+  student_id                String?         
   user_id                   Int             @unique
   first_name                String
   middle_name               String?

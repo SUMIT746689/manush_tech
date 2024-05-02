@@ -194,7 +194,6 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
     selectedItems.length > 0 && selectedItems.length < students.length;
   const selectedAllUsers = selectedItems.length === students.length;
 
-  ;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
 
@@ -204,7 +203,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
   };
 
   const handleDeleteCompleted = () => {
-    
+
     axios.delete(`/api/student/${openConfirmDelete}`)
       .then(res => {
         setOpenConfirmDelete(null);
@@ -580,7 +579,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         <Grid ref={idCard} display={'grid'} gridTemplateColumns={'1fr 1fr'} container gap={1.5}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(
             (i, index) => {
-              
+
               const user = {
                 id: i?.class_roll_no,
                 class_registration_no: i?.class_registration_no,

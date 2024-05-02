@@ -255,7 +255,11 @@ export const menuItems: MenuItems[] = [
             link: '/management/students/online-admission',
             icon: RecordVoiceOverIcon
           },
-
+          {
+            name: 'Multiple Updates',
+            link: '/management/students/multiple_students_update',
+            icon: RecordVoiceOverIcon
+          },
         ]
       },
       {

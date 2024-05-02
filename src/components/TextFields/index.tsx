@@ -1,9 +1,9 @@
 import { Button, Card, FormControl, Grid, InputLabel, TextField } from '@mui/material';
 import { FC } from 'react';
 
-export const TextFieldWrapper = ({ label, name, value, type = "text", touched, errors, handleChange, handleBlur, required = false, disabled = false, ...params }) => {
+export const TextFieldWrapper = ({ label, name, value, type = "text", touched, errors, handleChange, handleBlur, required = false, disabled = false, pb = 1, ...params }) => {
   return (
-    <Grid item container pb={1}>
+    <Grid item container pb={pb}>
       <TextField
         size='small'
         sx={{
@@ -156,7 +156,7 @@ export const FileUploadFieldWrapper = ({ htmlFor, label, name, value, accept = "
   )
 }
 
-export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple = false, handleChangeFile, label="Upload" }) => {
+export const NewFileUploadFieldWrapper = ({ htmlFor, accept = "image", multiple = false, handleChangeFile, label = "Upload" }) => {
 
   return (
     <Grid pb="1" mb={1} sx={{ position: "relative", height: 60 }} >

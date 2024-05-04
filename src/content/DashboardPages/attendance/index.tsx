@@ -74,7 +74,7 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
       start_date = new Date(Date.now());
       end_date = new Date(Date.now());
     }
-    else if (addtedanceFilter === 'Weekly') {
+    else if (addtedanceFilter === 'This Week') {
       start_date =  new Date((new Date()).valueOf() - 1000 * 60 * 60 * 24 * 7);
       end_date = new Date(Date.now());
     }
@@ -88,16 +88,18 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
   }, [addtedanceFilter])
 
   return (
-    <Card sx={{ p: 2 }}>
-      <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700, pt: 2, textAlign: "center" }}>Attendance</Grid>
+    <Card sx={{ py: 2, px:0.5 }}>
+      <Grid sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, textAlign: "center" }}>Attendance</Grid>
 
-      <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} py={2} gap={1}>
+      {/* <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} py={2} columnGap={0.5}> */}
+      <Grid display="flex" justifyContent={"space-between"} py={2} columnGap={0.5}>
+
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('Today') }}>Today</ButtonWrapper>
-        <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('Weekly') }}>Weekly</ButtonWrapper>
+        <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('This Week') }}>This Week</ButtonWrapper>
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('This Month') }}>This Month</ButtonWrapper>
       </Grid>
 
-      <Grid sx={{ display: 'grid', gap: 0.5, p: 1 }} >
+      <Grid sx={{ display: 'grid', gap: 0.5 }} >
         <ChartCard color="#FF715B" title="Students" width={`${studentsAttendPercent || 0}%`} />
         <ChartCard color="#34D1BF" title="Teachers" width={`${teachersAttendPercent}%`} />
         <ChartCard color="#0496FF" title="Staffs" width={`${employeesAttendPercent}%`} />
@@ -117,10 +119,10 @@ const ButtonWrapper = ({ isActive, handleClick, children }) => {
           backgroundColor: isActive === children ? ' #00C6FF' : '#e6f9ff',
           color: isActive === children ? 'white' : '#00C6FF',
         },
-        fontSize: 10,
+        fontSize: 9,
         borderRadius: 0.5,
         px: 0,
-        py: 1
+        py: 0.5
       }}>
       {children}
     </Button>

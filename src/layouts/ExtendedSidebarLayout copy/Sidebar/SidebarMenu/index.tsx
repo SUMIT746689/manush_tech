@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 import { AuthConsumer, AuthProvider } from '@/contexts/JWTAuthContext';
 import { permissionVerify } from '@/utils/permissionVerify';
-import items from './items/admin';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -767,9 +766,7 @@ function SidebarMenu() {
               permissions.push(permission)
             );
           }
-          const curModuleName = window.localStorage.getItem('moduleName') || '';
-          console.log({ curModuleName: items[curModuleName] })
-          return items[curModuleName]?.map((section: any) => (
+          return menuItems.map((section: any) => (
             <MenuWrapper key={section.heading}>
               <List
                 component="div"

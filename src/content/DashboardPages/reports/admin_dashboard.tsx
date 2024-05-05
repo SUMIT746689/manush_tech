@@ -57,28 +57,23 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   return (
     <>
 
-      <Grid p={2} display={{ sm: "flex" }} gap={4}>
+      <Grid p={2} display={{ sm: "flex" }} gap={4} >
 
-        <Grid sx={{ display: "grid", width: "100%" }}>
-          <Card sx={{ display: 'flex', justifyContent: "space-between", width: "100%", pl: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+        <Grid sx={{ display: "grid", width: "100%" }} height="fit-content">
+          <Card sx={{ display: 'flex', height: 170, justifyContent: "space-between", width: "100%", pl: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
             {/* <Image alt='sss' /> */}
             <Avatar sx={{ my: 'auto', width: { xs: 60, sm: 80, md: 120 }, height: { xs: 60, sm: 80, md: 120 } }} />
-            <Grid sx={{
-              display: 'flex',
-              flexDirection: "column",
-              gap: 1,
-              my: 'auto'
-            }}>
-              <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
-              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
-              <Grid sx={{ fontSize: { xs: 16, sm: 20 }, fontWeight: 400 }}> Package price: {blockCount?.school?.subscription[0]?.package.price}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} End date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
+            <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
+              <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
+              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
+              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
             </Grid>
             <Image
               src="/dashboard/student_teacher.svg"
-              width={350}
-              height={350}
+              width={300}
+              height={150}
               alt="Picture of the author"
-              style={{ position: "relative", bottom: -10, right: 0 }}
+              style={{ position: "relative", bottom: -1, right: 0, marginTop: 'auto' }}
             />
           </Card>
 
@@ -103,7 +98,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         </Grid>
 
 
-        <Grid sx={{ height: 'fit-content', maxWidth: { sm: 208 }, width: '100%', display: "grid", gap: 2 }}>
+        <Grid sx={{ height: 'fit-content', maxWidth: { sm: 220 }, width: '100%', display: "grid", gap: 2 }}>
 
           <Button variant='contained' sx={{ minWidth: '100%', background: '#494949', ":hover": { background: "#494949", opacity: 0.9 }, py: 2, width: '100%', fontSize: { xs: 16, sm: 18 } }}>
             <Link href={`http://${blockCount?.domain}`} target='_blank' color="primary" rel="noopener noreferrer" >
@@ -142,6 +137,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         </Grid>
         {/* attendance */}
         <Grid sx={{ maxWidth: { sm: 400 }, width: '100%' }}>
+          <Grid fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Grid>
           <Calander holidays={blockCount.holidays} />
         </Grid>
       </Grid>

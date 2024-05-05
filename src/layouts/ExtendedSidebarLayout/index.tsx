@@ -1,71 +1,163 @@
 import { FC, ReactNode } from 'react';
-import { Box, alpha, lighten, useTheme } from '@mui/material';
+// import { Box, alpha, lighten, useTheme } from '@mui/material';
 import ThemeSettings from 'src/components/ThemeSettings';
 import PropTypes from 'prop-types';
-
 import Sidebar from './Sidebar';
 import Header from './Header';
+import * as React from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import { Box } from '@mui/material';
+import Drawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+
+const drawerWidth = 290;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  open?: boolean;
+}>(({ theme, open }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  marginLeft: `-${drawerWidth}px`,
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  }),
+}));
+
+interface AppBarProps extends MuiAppBarProps {
+  open?: boolean;
+}
 
 interface ExtendedSidebarLayoutProps {
   children?: ReactNode;
 }
 
-const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({
-  children
-}) => {
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
+
+const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => {
   const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    const curModuleName = window.localStorage.getItem('drawer') || false;
+    setOpen(true);
+    window.localStorage.setItem('drawer', String(true));
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+    window.localStorage.setItem('drawer', String(false));
+  };
+  const [selectModule, setSelectModule] = React.useState('');
+
+  React.useEffect(() => {
+    const curModuleName = window.localStorage.getItem('moduleName') || '';
+    const curDrawer = window.localStorage.getItem('drawer') || '';
+
+    if (curDrawer) setOpen(curDrawer === 'true' ? true : false)
+
+    setSelectModule(curModuleName);
+    if (!curModuleName) handleDrawerClose();
+  }, []);
+
+
+  const handleChangeModule = (event) => {
+    const value = event.target.value
+    setSelectModule(value);
+    window.localStorage.setItem('moduleName', value);
+  }
+
 
   return (
-    <>
-      <Box
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" open={open}>
+        {/* <Toolbar>
+          <NavIcon
+            fillColor="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          <Typography variant="h6" noWrap component="div">
+            Persistent drawer
+          </Typography>
+        </Toolbar> */}
+        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} selectModule={selectModule} handleChangeModule={handleChangeModule} />
+      </AppBar>
+      <Drawer
         sx={{
-          flex: 1,
-          height: '100%',
-
-          '.MuiPageTitle-wrapper': {
-            background:
-              theme.palette.mode === 'dark'
-                ? theme.colors.alpha.trueWhite[5]
-                : theme.colors.alpha.white[50],
-            marginBottom: `${theme.spacing(2)}`,
-            boxShadow:
-              theme.palette.mode === 'dark'
-                ? `0 1px 0 ${alpha(
-                    lighten(theme.colors.primary.main, 0.7),
-                    0.15
-                  )}, 0px 2px 4px -3px rgba(0, 0, 0, 0.2), 0px 5px 12px -4px rgba(0, 0, 0, .1)`
-                : `0px 2px 4px -3px ${alpha(
-                    theme.colors.alpha.black[100],
-                    0.1
-                  )}, 0px 5px 12px -4px ${alpha(
-                    theme.colors.alpha.black[100],
-                    0.05
-                  )}`
-          }
+          display:{xs:"none",lg:"block"},
+          width: theme => theme.sidebar.width,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: theme => theme.sidebar.width,
+            boxSizing: 'border-box',
+          },
         }}
+        variant="persistent"
+        anchor="left"
+        open={open}
       >
-        <Header />
+        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} selectModule={selectModule} handleChangeModule={handleChangeModule} />
         <Sidebar />
+      </Drawer>
+      <Main open={open} sx={{ p: 0 }}>
         <Box
           sx={{
             position: 'relative',
-            zIndex: 5,
+            zIndex: 10,
             display: 'block',
             flex: 1,
+            p: 0,
             pt: `${theme.header.height}`,
-            [theme.breakpoints.up('lg')]: {
-              ml: `${theme.sidebar.width}`
-            },
+            // [theme.breakpoints.up('lg')]: {
+            //   ml: `${theme.sidebar.width}`
+            // },
             background: theme.colors.primary.lighter
           }}
         >
           <Box display="block" >{children}</Box>
           <ThemeSettings />
         </Box>
-      </Box>
-    </>
+      </Main>
+    </Box >
   );
-};
+}
 
 ExtendedSidebarLayout.propTypes = {
   children: PropTypes.node

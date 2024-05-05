@@ -8,10 +8,6 @@ import {
   Grid,
   Autocomplete,
   TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -33,7 +29,6 @@ import { useRouter } from 'next/router';
 import useNotistick from '@/hooks/useNotistick';
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import SearchInputWrapper from '@/components/SearchInput';
-import { NavIcon } from '@/components/Icon';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -47,30 +42,14 @@ const HeaderWrapper = styled(Box)(
         position: fixed;
         justify-content: space-between;
         width: 100%;
+        @media (min-width: ${theme.breakpoints.values.lg}px) {
+            left: ${theme.sidebar.width};
+            width: auto;
+        }
 `
 );
 
-const SelectWrpper = styled(Select)(
-  ({ theme }) => `
-        height: ${theme.header.height};
-        color: ${theme.header.textColor};
-        padding: ${theme.spacing(0, 2)};
-        right: 0;
-        z-index: 6;
-        background: ${theme.colors.primary.dark};
-        backdrop-filter: blur(3px);
-        position: fixed;
-        justify-content: space-between;
-        width: 100%;
-`
-);
-
-const modulesList = [
-  'online_addmission', 'students', 'teachers', 'staffs', 'attendance', 'accounting', 'notice',
-  'routine', 'study_materials', 'sms', 'website_settings', 'report', 'examination'
-]
-
-function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule, handleChangeModule }) {
+function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
@@ -191,25 +170,40 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule,
       alignItems="center"
       sx={{
         // boxShadow: "-1px 15px 48px 0px rgba(0,40,132,1)"
-        boxShadow: "-2px 8px 21px -4px rgba(0,40,132,0.7)",
-        ...(drawerOpen && { paddingLeft: theme => ({ xs: 1, lg: theme.sidebar.width }) })
+        boxShadow: "-2px 8px 21px -4px rgba(0,40,132,0.7)"
       }}
     >
 
-      {
-        selectModule
-        &&
-        (
-          drawerOpen ?
-            <Grid display={{ xs: "none", lg: "block" }} px={1} onClick={handleDrawerClose} >
-              <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
-            </Grid>
-            :
-            <Grid display={{ xs: "none", lg: "block" }} pr={1} onClick={handleDrawerOpen} >
-              <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
-            </Grid>
-        )
-      }
+      {/* <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Select route</Grid> */}
+
+      {/* <CustomAutoCompleteWrapper
+        minWidth={'200px'}
+        label="Select route"
+        placeholder="Route..."
+        value={undefined}
+        options={menulist}
+        handleChange={(e, v) => {
+          console.log(v,permissionsArray);
+          if (v) {
+            if (!router.isReady) {
+              return;
+            }
+            if (auth?.error) showNotification(auth?.error, 'error');
+
+            if (!auth.isAuthenticated) {
+              router.push({
+                pathname: '/login',
+                query: { backTo: router.asPath }
+              });
+            } else if (!permissionsArray.includes(v?.label)) {
+              router.back();
+            } else {
+              router.push(v?.value)
+            }
+          }
+        }}
+      /> */}
+
 
 
       {/* @ts-ignore */}
@@ -219,53 +213,6 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule,
           <a href="tel:+8801894884114" style={{ borderBottom: "1px solid white" }}>+880 1894 884 114</a>
         </Box>
       }
-
-      <Grid sx={{ width: 200, px: 1 }}>
-        <InputLabel
-          sx={{ color: "white", fontSize: 12 }}>
-          Select Module:
-        </InputLabel>
-        <Select
-          value={selectModule}
-          size='small'
-          onChange={handleChangeModule}
-          sx={{
-            minWidth: '100%',
-            color: "white",
-            '& fieldset': {
-              borderRadius: '3px',
-              color: "white"
-              // backgroundColor:"white",
-              // color:'black'
-            },
-            '&  .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white'
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'white'
-            },
-            ":hover": {
-              '&  .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white'
-              },
-              '& .MuiSvgIcon-root': {
-                color: 'white'
-              },
-            },
-            ":active": {
-              '&  .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white'
-              },
-              '& .MuiSvgIcon-root': {
-                color: 'white'
-              },
-            }
-          }}
-        >
-          {modulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
-        </Select>
-      </Grid>
-
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&

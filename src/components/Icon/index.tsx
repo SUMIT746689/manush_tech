@@ -309,3 +309,12 @@ export const ReportIcon = ({ style = {}, fillColor }) => {
 
   )
 }
+
+export const NavIcon = ({ style = {}, fillColor }) => {
+
+  return (
+    <svg style={style} width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M33.25 24.7158L31.0175 26.9167L23.085 19L31.0175 11.0833L33.25 13.2842L27.6133 19L33.25 24.7158ZM4.75 9.5H25.3333V12.6667H4.75V9.5ZM4.75 20.5833V17.4167H20.5833V20.5833H4.75ZM4.75 28.5V25.3333H25.3333V28.5H4.75Z" fill={fillColor} />
+    </svg>
+  )
+}

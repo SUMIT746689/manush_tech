@@ -700,6 +700,7 @@ const MenuList = ({ targetUser, setEditUser, reFetchData, setSelectedUser, setPe
     if (!id || typeof id !== "number") return showNotification("user id not founds or not number");
     const [err, data] = await fetchData(`/api/login/automatics/${id}`, 'post', {});
     if (err) return showNotification(err, "error");
+    window.localStorage.setItem('moduleName', '');
     window.location.href = "/";
     // @ts-ignore
     // await superAdminLogInAsAdmin(targetUser.id);

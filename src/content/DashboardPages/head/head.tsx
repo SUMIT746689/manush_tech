@@ -12,11 +12,11 @@ const Head = ({ name, extraInfo }) => {
       width="full"
 
     >
-      <Typography variant="h3" component="h3" gutterBottom>
+      <Typography variant="h3" component="h3" gutterBottom sx={{ color: theme => theme.colors.alpha.white[70] }}>
         {t(`Welcome, ${name}`)}
       </Typography>
 
-      <Grid className=' grid item grid-cols-2'>
+      <Grid className=' grid item' sx={{ fontSize: { xs: 20, sm: 24 } }}>
         {
           extraInfo.map((info) => (
             <Typography variant="h5" component="h5" gutterBottom>

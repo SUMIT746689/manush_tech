@@ -1,40 +1,81 @@
 import Footer from 'src/components/Footer';
-import { Card, Grid } from '@mui/material';
+import { Avatar, Card, Grid, Link } from '@mui/material';
 import Image from 'next/image';
 import Calander from '../calender/calander';
 import Notice from '../notice/notice';
 import Head from '../head/head';
-import QuickLinkCards from '../quick_link_card/quickLinkCard';
+import QuickLinkCards, { StudentPathButton } from '../quick_link_card/quickLinkCard';
 import { useAuth } from '@/hooks/useAuth';
+import ImageSlider from '@/components/ImageSlider/ImageSlider';
+import { useTranslation } from 'next-i18next';
+import { adminModulesList, studentModulesList } from '@/utils/moduleLists';
+import { AccountingIcon, AttendanceIcon, CertificateIcon, ExamIcon, FeesCollectionIcon, MarkSheetIcon, NoticeIcon, OnlineAddmissionIcon, ReportIcon, RoutineIcon, SmsIcon, StaffsIcon, StudentRegIcon, StudentsIcon, StudyMaterialsIcon, TabulationIcon, TeacherIcon, TeacherRoutineIcon, WebsiteSettingsIcon } from '@/components/Icon';
+
+const quickLinksColors = [
+  { dark: "#006ADC", light: "#E1F0FF" },
+  { dark: "#9C2BAD", light: "#F9E5F9" },
+  { dark: "#CA3214", light: "#FFE6E2" },
+]
+
+const quickLinks = [
+  { color: quickLinksColors[0], linkUrl: "/management/routine/class_routine", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Class Routine" },
+  { color: quickLinksColors[1], linkUrl: "/management/attendence/normalAttendence", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "View Attendence" },
+  { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Home Work" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Study Materials" },
+  { color: quickLinksColors[2], linkUrl: "/front_end/notice", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Notice" },
+  { color: quickLinksColors[0], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Payment Report" },
+]
+
+const examAndResultSecQuickLinks = [
+  { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Admit Card" },
+  { color: quickLinksColors[0], linkUrl: "/reports/exam/report_card", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam Routine" },
+  { color: quickLinksColors[0], linkUrl: "/management/routine/class_routine", icon: <MarkSheetIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Mark Sheet" },
+  { color: quickLinksColors[1], linkUrl: "/management/attendence/normalAttendence", icon: <TabulationIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Tabulation Icon" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Certificate" },
+]
+
 
 function StudentDashboardReportsContent({ blockCount }) {
   const { user } = useAuth()
-  console.log({ user,blockCount });
+  const { student, banners: banners_ } = blockCount || {};
+  const { banners } = banners_ || {};
+  const { left_banners, right_banners } = banners || {};
+  const { t }: { t: any } = useTranslation();
+  const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0;
 
-  const { student } = blockCount;
   const name = [student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(' ');
   const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class.name], ['Section', student.section.name]]
-  const quickLinks = [
-    { name: 'Exam', src: "exam.svg", href: "/management/exam" },
-    { name: 'Attendance', src: "attendance.svg", href: "/management/exam" },
-    { name: 'Routine', src: "routine.svg", href: "/management/exam" },
-    { name: 'Fees Collection', src: "fees_collection.svg", href: "/management/exam" }
-  ]
+  // const quickLinks = [
+  //   { name: 'Exam', src: "exam.svg", href: "/management/exam" },
+  //   { name: 'Attendance', src: "attendance.svg", href: "/management/exam" },
+  //   { name: 'Routine', src: "routine.svg", href: "/management/exam" },
+  //   { name: 'Fees Collection', src: "fees_collection.svg", href: "/management/exam" }
+  // ]
   return (
     <>
-      <Card sx={{ m: 4, borderRadius: 0.5 }}>
-        <Grid container justifyContent='space-between' >
-          <Grid item xs={8} p={2}>
-            <Head name={name} extraInfo={extraInfo} />
+
+      <Grid p={{ xs: 1, sm: 2 }}>
+        <Card sx={{ display: 'flex', height: 170, justifyContent: "space-between", width: "100%", p: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+          {/* <Image alt='sss' /> */}
+          <Avatar sx={{ my: 'auto', width: { xs: 60, sm: 80, md: 120 }, height: { xs: 60, sm: 80, md: 120 } }} />
+          <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 0.5, my: 'auto' }}>
+            <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 26 }, fontWeight: 600 }}>{name}</Grid>
+            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {extraInfo[0][0]}: {extraInfo[0][1]} </Grid>
+            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {extraInfo[1][0]}: {extraInfo[1][1]} </Grid>
+            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {extraInfo[2][0]}: {extraInfo[2][1]} </Grid>
+
+            {/* <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> <Head name={name} extraInfo={extraInfo}></Head></Grid> */}
           </Grid>
-          <Grid item xs={4} position="relative" >
-            {/* <Grid position="absolute"> */}
-            <Image width={50} height={50} className=' absolute object-cover h-full w-full content-center ' src={'school_classroom.svg'} alt="classroom" />
-            {/* </Grid> */}
-            {/* <Image width={60} height={60} className=' absolute object-contain h-full w-full  ' src={'curve_circle.svg'} alt="classroom" /> */}
-          </Grid>
-        </Grid>
-      </Card>
+
+          <Image
+            src="/dashboard/student_teacher.svg"
+            width={300}
+            height={150}
+            alt="Picture of the author"
+            style={{ position: "relative", bottom: -1, right: 0, marginTop: 'auto' }}
+          />
+        </Card>
+      </Grid>
 
       <Grid
         sx={{
@@ -51,13 +92,59 @@ function StudentDashboardReportsContent({ blockCount }) {
           <Grid display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
 
             {/* quick link cards */}
-            <QuickLinkCards quickLinks={quickLinks} />
+            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
+              {
+                quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
+              }
+            </Grid>
 
             {/* calander */}
-            <Calander holidays={blockCount.holidays} />
+            <Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content", minHeight: '100%' }}>
+              <Grid fontWeight={700}>Calander:</Grid>
+              <Calander holidays={blockCount.holidays} />
+            </Grid>
+          </Grid>
+
+          {/* exam and result section */}
+          <Grid>
+            <Grid borderRadius={0.5} p={1} width={'100%'} sx={{ fontWeight: 700, my: 2, border: '2px solid', textAlign: 'center', color: theme => theme.colors.primary.dark, borderColor: theme => theme.colors.primary.dark }} > Exam & Result Section</Grid>
+            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
+              {
+                examAndResultSecQuickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
+              }
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
+
+      {
+        banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
+          <Card sx={{
+            width: "100",
+            borderRadius: 0,
+            // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
+            overflow: "hidden"
+          }} >
+            <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
+          </Card>
+          <Card sx={{ width: "100", borderRadius: 0 }}>
+            {
+              (right_banner_check && right_banners[0]?.redirectUrl) ?
+                <Link target='_blank' href={right_banners[0].redirectUrl} >
+                  <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+                </Link>
+                :
+                right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+            }
+            {/* <Link
+            target='_blank'
+            href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : ''}
+          >
+            <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+          </Link> */}
+          </Card>
+        </Grid>
+      }
 
       {/* notice */}
       <Notice blockCount={blockCount} />

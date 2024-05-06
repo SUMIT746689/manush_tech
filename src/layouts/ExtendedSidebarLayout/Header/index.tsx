@@ -34,6 +34,9 @@ import useNotistick from '@/hooks/useNotistick';
 import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
 import SearchInputWrapper from '@/components/SearchInput';
 import { NavIcon } from '@/components/Icon';
+import { useTranslation } from 'next-i18next';
+import { ModuleContext } from '@/contexts/ModuleContext';
+import { adminModulesList } from '@/utils/moduleLists';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -65,16 +68,14 @@ const SelectWrpper = styled(Select)(
 `
 );
 
-const modulesList = [
-  'online_addmission', 'students', 'teachers', 'staffs', 'attendance', 'accounting', 'notice',
-  'routine', 'study_materials', 'sms', 'website_settings', 'report', 'examination'
-]
-
-function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule, handleChangeModule }) {
+function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const [academicYearList, setAcademicYearList] = useState([]);
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const { selectModule, handleChangeModule } = useContext(ModuleContext);
+  
+
   const [menulist, setMenulist] = useState([])
   const router = useRouter();
   const { showNotification } = useNotistick();
@@ -85,6 +86,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule,
   const { user } = auth;
   const { school } = user || {};
   const { academic_years } = school || {}
+  const { t } = useTranslation();
 
   // console.log({ academic_years })
 
@@ -201,71 +203,77 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose, selectModule,
         &&
         (
           drawerOpen ?
-            <Grid display={{ xs: "none", lg: "block" }} px={1} onClick={handleDrawerClose} >
-              <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
-            </Grid>
+            <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
+              <Grid >
+                <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
+              </Grid>
+            </Tooltip>
             :
-            <Grid display={{ xs: "none", lg: "block" }} pr={1} onClick={handleDrawerOpen} >
-              <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
-            </Grid>
+            <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerOpen}  >
+              <Grid   >
+                <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
+              </Grid>
+            </Tooltip>
         )
       }
 
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
+        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1,mx:1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884114" style={{ borderBottom: "1px solid white" }}>+880 1894 884 114</a>
         </Box>
       }
 
-      <Grid sx={{ width: 200, px: 1 }}>
-        <InputLabel
-          sx={{ color: "white", fontSize: 12 }}>
-          Select Module:
-        </InputLabel>
-        <Select
-          value={selectModule}
-          size='small'
-          onChange={handleChangeModule}
-          sx={{
-            minWidth: '100%',
-            color: "white",
-            '& fieldset': {
-              borderRadius: '3px',
-              color: "white"
-              // backgroundColor:"white",
-              // color:'black'
-            },
-            '&  .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white'
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'white'
-            },
-            ":hover": {
+      {
+        auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+        <Grid sx={{ width: 200, p: 1 }}>
+          <InputLabel
+            sx={{ color: "white", fontSize: 12 }}>
+            Select Module:
+          </InputLabel>
+          <Select
+            value={selectModule}
+            size='small'
+            onChange={(e) => handleChangeModule(e.target.value)}
+            sx={{
+              minWidth: '100%',
+              color: "white",
+              '& fieldset': {
+                borderRadius: '3px',
+                color: "white"
+                // backgroundColor:"white",
+                // color:'black'
+              },
               '&  .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'white'
               },
               '& .MuiSvgIcon-root': {
                 color: 'white'
               },
-            },
-            ":active": {
-              '&  .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'white'
+              ":hover": {
+                '&  .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white'
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                },
               },
-              '& .MuiSvgIcon-root': {
-                color: 'white'
-              },
-            }
-          }}
-        >
-          {modulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
-        </Select>
-      </Grid>
-
+              ":active": {
+                '&  .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white'
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                },
+              }
+            }}
+          >
+            {adminModulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
+          </Select>
+        </Grid>
+      }
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&

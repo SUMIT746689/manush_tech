@@ -10,6 +10,7 @@ import { Box } from '@mui/material';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import { ModuleContext } from '@/contexts/ModuleContext';
 
 const drawerWidth = 290;
 
@@ -69,6 +70,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const { selectModule } = React.useContext(ModuleContext)
 
   const handleDrawerOpen = () => {
     const curModuleName = window.localStorage.getItem('drawer') || false;
@@ -80,24 +82,20 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
     setOpen(false);
     window.localStorage.setItem('drawer', String(false));
   };
-  const [selectModule, setSelectModule] = React.useState('');
-
   React.useEffect(() => {
-    const curModuleName = window.localStorage.getItem('moduleName') || '';
     const curDrawer = window.localStorage.getItem('drawer') || '';
 
+    if (!selectModule) return handleDrawerClose();
     if (curDrawer) setOpen(curDrawer === 'true' ? true : false)
 
-    setSelectModule(curModuleName);
-    if (!curModuleName) handleDrawerClose();
-  }, []);
+  }, [selectModule]);
 
 
-  const handleChangeModule = (event) => {
-    const value = event.target.value
-    setSelectModule(value);
-    window.localStorage.setItem('moduleName', value);
-  }
+  // const handleChangeModule = (event) => {
+  //   const value = event.target.value
+  //   setSelectModule(value);
+  //   window.localStorage.setItem('moduleName', value);
+  // }
 
 
   return (
@@ -117,11 +115,11 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
             Persistent drawer
           </Typography>
         </Toolbar> */}
-        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} selectModule={selectModule} handleChangeModule={handleChangeModule} />
+        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} />
       </AppBar>
       <Drawer
         sx={{
-          display:{xs:"none",lg:"block"},
+          display: { xs: "none", lg: "block" },
           width: theme => theme.sidebar.width,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
@@ -133,7 +131,7 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
         anchor="left"
         open={open}
       >
-        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} selectModule={selectModule} handleChangeModule={handleChangeModule} />
+        <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} />
         <Sidebar />
       </Drawer>
       <Main open={open} sx={{ p: 0 }}>

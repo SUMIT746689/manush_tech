@@ -78,7 +78,7 @@ const ImageSlider = ({ images, target = '' }: { images: { url: string, redirectU
                                 <img className=" max-h-96 object-fill w-screen" src={`/api/get_file/${image?.url}`} />
                             </Link>
                             :
-                            <img className=" max-h-96 object-fill w-screen" src={`/api/get_file/${image?.url}`} />
+                            <img key={index} className=" max-h-96 object-fill w-screen" src={`/api/get_file/${image?.url}`} />
                     )
                 }
             </Slider >

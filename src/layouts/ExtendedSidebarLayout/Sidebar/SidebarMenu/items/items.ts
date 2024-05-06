@@ -75,7 +75,7 @@ export interface MenuItems {
   // heading: string;
 }
 
-export const menuItems: MenuItems[] = [
+export const allUserMenuItems: MenuItems[] = [
   {
     items: [
       {
@@ -679,4 +679,4 @@ export const menuItems: MenuItems[] = [
   }
 ];
 
-export default menuItems;
+export default allUserMenuItems;

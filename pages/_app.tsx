@@ -25,6 +25,7 @@ import { AcademicYearContext, Students } from '@/contexts/UtilsContextUse';
 import '@fullcalendar/common/main.css'
 import '@fullcalendar/daygrid/main.css'
 import '@fullcalendar/timegrid/main.css'
+import { ModuleProvider } from '@/contexts/ModuleContext';
 // import { headers } from 'next/headers';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -44,7 +45,7 @@ export async function getServerSideProps(context: any) {
   if (req) {
     let host = req.headers.host // will give you localhost:3000
     console.log({ host })
-  } 
+  }
   // console.log({ req })
   //   console.log({ host })
   let blockCount: any = { holidays: [] };
@@ -84,37 +85,39 @@ function TokyoApp(props: TokyoAppProps) {
         />
       </Head>
       <ReduxProvider store={store}>
-        <SidebarProvider>
-          <ThemeProvider>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <AuthProvider>
-                <AcademicYearContext.Provider value={[academicYear, setAcademicYear]}>
-                  <Students.Provider value={[students, setStudents]}>
-                    <SnackbarProvider
-                      maxSnack={6}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right'
-                      }}
-                    >
-                      <CssBaseline />
-                      <AuthConsumer>
-                        {(auth) =>
-                          !auth.isInitialized ? (
-                            <Loader />
-                          ) : (
-                            getLayout(<Component {...pageProps} />)
-                          )
-                        }
-                      </AuthConsumer>
-                    </SnackbarProvider>
-                  </Students.Provider>
+        <ModuleProvider>
+          <SidebarProvider>
+            <ThemeProvider>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <AuthProvider>
+                  <AcademicYearContext.Provider value={[academicYear, setAcademicYear]}>
+                    <Students.Provider value={[students, setStudents]}>
+                      <SnackbarProvider
+                        maxSnack={6}
+                        anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'right'
+                        }}
+                      >
+                        <CssBaseline />
+                        <AuthConsumer>
+                          {(auth) =>
+                            !auth.isInitialized ? (
+                              <Loader />
+                            ) : (
+                              getLayout(<Component {...pageProps} />)
+                            )
+                          }
+                        </AuthConsumer>
+                      </SnackbarProvider>
+                    </Students.Provider>
 
-                </AcademicYearContext.Provider>
-              </AuthProvider>
-            </LocalizationProvider>
-          </ThemeProvider>
-        </SidebarProvider>
+                  </AcademicYearContext.Provider>
+                </AuthProvider>
+              </LocalizationProvider>
+            </ThemeProvider>
+          </SidebarProvider>
+        </ModuleProvider>
       </ReduxProvider>
     </CacheProvider>
   );

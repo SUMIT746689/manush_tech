@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 
-import { ListSubheader, alpha, Box, List, styled } from '@mui/material';
+import { ListSubheader, alpha, Box, List, styled, Grid } from '@mui/material';
 import SidebarMenuItem from './item';
 import menuItems, { MenuItem } from './items';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 import { AuthConsumer, AuthProvider } from '@/contexts/JWTAuthContext';
 import { permissionVerify } from '@/utils/permissionVerify';
 import items from './items/admin';
+import allUserMenuItems from './items/items';
+import { ModuleContext } from '@/contexts/ModuleContext';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -747,6 +749,7 @@ const reduceChildRoutes = ({ permissions, ev, path, item }: { permissions: any; 
 function SidebarMenu() {
   const { t }: { t: any } = useTranslation();
   const router = useRouter();
+  const { selectModule } = useContext(ModuleContext)
 
   const handlePathChange = () => {
     if (!router.isReady) {
@@ -760,16 +763,16 @@ function SidebarMenu() {
     <>
       <AuthConsumer>
         {({ user }) => {
-
           const permissions = [];
           if (user?.permissions?.length > 0) {
             user.permissions.map((permission: any) =>
               permissions.push(permission)
             );
           }
-          const curModuleName = window.localStorage.getItem('moduleName') || '';
-          console.log({ curModuleName: items[curModuleName] })
-          return items[curModuleName]?.map((section: any) => (
+          // @ts-ignore
+          const roleTitle = user?.role?.title;
+
+          if (roleTitle !== "ADMIN") return allUserMenuItems?.map((section: any) => (
             <MenuWrapper key={section.heading}>
               <List
                 component="div"
@@ -787,6 +790,54 @@ function SidebarMenu() {
               </List>
             </MenuWrapper>
           ));
+
+          return (
+            <>
+              {
+                items['dashboard']?.map((section: any) => (
+                  <MenuWrapper key={section.heading}>
+                    <List
+                      component="div"
+                      subheader={
+                        <ListSubheader component="div" disableSticky>
+                          {t(section.heading)}
+                        </ListSubheader>
+                      }
+                    >
+                      {renderSidebarMenuItems({
+                        permissions: permissions,
+                        items: section.items,
+                        path: router.asPath
+                      })}
+                    </List>
+                  </MenuWrapper>
+                ))
+              }
+              <Grid textTransform={"uppercase"} pl={2} fontWeight={700} sx={{ color: theme=> theme.colors.alpha.white[70] }}>
+                {selectModule && `${selectModule.split('_').join(' ')} Module :`}
+              </Grid>
+              {
+                items[selectModule]?.map((section: any) => (
+                  <MenuWrapper key={section.heading}>
+                    <List
+                      component="div"
+                      subheader={
+                        <ListSubheader component="div" disableSticky>
+                          {t(section.heading)}
+                        </ListSubheader>
+                      }
+                    >
+                      {renderSidebarMenuItems({
+                        permissions: permissions,
+                        items: section.items,
+                        path: router.asPath
+                      })}
+                    </List>
+                  </MenuWrapper>
+                ))
+              }
+            </>
+          );
         }}
       </AuthConsumer>
     </>

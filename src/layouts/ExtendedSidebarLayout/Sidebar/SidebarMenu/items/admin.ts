@@ -679,6 +679,16 @@ export const menuItems: MenuItems[] = [
   }
 ];
 
+const all_users: MenuItems[] = [{
+  items: [
+    {
+      name: 'Users',
+      icon: AssignmentIndTwoToneIcon,
+      link: '/management/users',
+    },
+  ]
+}]
+
 const online_addmission: MenuItems[] = [
   {
     items: [
@@ -833,7 +843,7 @@ const teachers: MenuItems[] = [
   }
 ]
 
-const staffs: MenuItems[] = [
+const other_users: MenuItems[] = [
   {
     items: [
       {
@@ -1272,14 +1282,25 @@ const examination: MenuItems[] = [
 
         ]
       },
-      {
-        name: 'Result sheet',
-        link: '/reports/exam/result_sheet',
-        icon: DescriptionIcon
-      },
+      // {
+      //   name: 'Result sheet',
+      //   link: '/reports/exam/result_sheet',
+      //   icon: DescriptionIcon
+      // },
     ]
   }
 ]
+
+const dashboard: MenuItems[] = [{
+  items: [
+    {
+      name: 'Dashboard',
+      icon: DashboardIcon,
+      link: '/',
+
+    },
+  ]
+}]
 
 
 
@@ -1287,9 +1308,10 @@ const examination: MenuItems[] = [
 
 // const adminItems = 
 export default {
-  online_addmission, students, teachers, staffs, attendance, accounting, notice, routine, sms,
+  all_users, online_addmission, students, teachers, other_users, attendance, accounting, notice, routine, sms,
   // study materials, 
   website_settings,
-  report, examination
+  report, examination,
+  dashboard
 }
 // export default adminItems

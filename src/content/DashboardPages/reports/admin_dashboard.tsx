@@ -1,15 +1,18 @@
 import Footer from 'src/components/Footer';
-import { Avatar, Button, Card, Grid } from '@mui/material';
+import { Avatar, Button, Card, Grid, Typography } from '@mui/material';
 import Calander from '../calender/calander';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { AccountingIcon, AttendanceIcon, ExamIcon, FeesCollectionIcon, OnlineAddmissionIcon, ReportIcon, RoutineIcon, SmsIcon, StaffsIcon, StudentRegIcon, StudentsIcon, StudyMaterialsIcon, TeacherIcon, TeacherRoutineIcon, WebsiteSettingsIcon } from '@/components/Icon';
+import { AccountingIcon, AttendanceIcon, ExamIcon, FeesCollectionIcon, NoticeIcon, OnlineAddmissionIcon, ReportIcon, RoutineIcon, SmsIcon, StaffsIcon, StudentRegIcon, StudentsIcon, StudyMaterialsIcon, TeacherIcon, TeacherRoutineIcon, WebsiteSettingsIcon } from '@/components/Icon';
 import Notices from '../admin_notices';
 import { Attendance } from '../attendance';
 import ImageSlider from '@/components/ImageSlider/ImageSlider';
 import dayjs from 'dayjs';
 import { formatNumber } from '@/utils/numberFormat';
 import Image from 'next/image';
+import { adminModulesList } from '@/utils/moduleLists';
+import { useContext } from 'react';
+import { ModuleContext } from '@/contexts/ModuleContext';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -25,22 +28,22 @@ const quickLinksColors = [
   { dark: "#9C2BAD", light: "#F9E5F9" },
   { dark: "#CA3214", light: "#FFE6E2" },
 ]
-
 const quickLinks = [
+  { color: quickLinksColors[2], linkUrl: "/management/users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "All Users", },
   { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Online Admission" },
   { color: quickLinksColors[1], linkUrl: "/management/students", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Students" },
   { color: quickLinksColors[2], linkUrl: "/management/teachers", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teachers" },
   { color: quickLinksColors[0], linkUrl: "/management/users/entry_other_users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Other Users" },
-  { color: quickLinksColors[1], linkUrl: "#", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Attendance" },
-  { color: quickLinksColors[2], linkUrl: "#", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Accounting" },
-  { color: quickLinksColors[0], linkUrl: "#", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
+  { color: quickLinksColors[1], linkUrl: "/management/attendence/normalAttendence", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Attendance" },
+  { color: quickLinksColors[2], linkUrl: "/management/accounting/account", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Accounting" },
+  { color: quickLinksColors[0], linkUrl: "/front_end/notice", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
   { color: quickLinksColors[1], linkUrl: "/management/routine/class_routine", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
-  { color: quickLinksColors[2], linkUrl: "/management/routine/class_routine", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
-  { color: quickLinksColors[0], linkUrl: "/management/routine/class_routine", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
+  { color: quickLinksColors[2], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
+  { color: quickLinksColors[0], linkUrl: "/bulk_sms_and_email/send_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
 
-  { color: quickLinksColors[1], linkUrl: "/management/routine/class_routine", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Website Settings" },
-  { color: quickLinksColors[2], linkUrl: "/management/routine/class_routine", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Reports" },
-  { color: quickLinksColors[0], linkUrl: "/management/routine/class_routine", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Examinations" },
+  { color: quickLinksColors[1], linkUrl: "/front_end", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Website Settings" },
+  { color: quickLinksColors[2], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Reports" },
+  { color: quickLinksColors[0], linkUrl: "/reports/exam/report_card", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Examinations" },
 
 
   // { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherRoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teacher Routine" },
@@ -54,6 +57,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   const { left_banners, right_banners } = banners || {};
   const { t }: { t: any } = useTranslation();
   const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0;
+
   return (
     <>
 
@@ -131,13 +135,13 @@ function AdminDashboardReportsContent({ blockCount = null }) {
         <Grid width="100%" display="flex" justifyContent="center">
           <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
             {
-              quickLinks.map(({ color, linkUrl, icon, name }) => <StudentPathButton color={color} linkUrl={linkUrl} icon={icon} name={name} />)
+              quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
             }
           </Grid>
         </Grid>
         {/* attendance */}
-        <Grid sx={{ maxWidth: { sm: 400 }, width: '100%' }}>
-          <Grid fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Grid>
+        <Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
+          <Typography fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Typography>
           <Calander holidays={blockCount.holidays} />
         </Grid>
       </Grid>
@@ -200,10 +204,11 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   );
 }
 
-const StudentPathButton = ({ color, linkUrl, name, icon }) => {
+const StudentPathButton = ({ color, linkUrl, name, icon, value }) => {
+  const { handleChangeModule } = useContext(ModuleContext);
   return (
     <>
-      <Link href={linkUrl}  >
+      <Link href={linkUrl} onClick={() => handleChangeModule(value)} >
         <Card
           sx={{
             p: 1.5,

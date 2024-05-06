@@ -36,7 +36,7 @@ import SearchInputWrapper from '@/components/SearchInput';
 import { NavIcon } from '@/components/Icon';
 import { useTranslation } from 'next-i18next';
 import { ModuleContext } from '@/contexts/ModuleContext';
-import { adminModulesList } from '@/utils/moduleLists';
+import { adminModulesList, studentModulesList, teacherModulesList } from '@/utils/moduleLists';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -74,7 +74,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { selectModule, handleChangeModule } = useContext(ModuleContext);
-  
+
 
   const [menulist, setMenulist] = useState([])
   const router = useRouter();
@@ -220,7 +220,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
 
       {/* @ts-ignore */}
       {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1,mx:1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
+        <Box sx={{ display: { xs: "none", sm: "block" }, minWidth: "fit-content", backgroundColor: "white", textAlign: "center", py: 0.5, px: 1, mx: 1, borderRadius: 0.4, fontWeight: 600, fontSize: 12 }}>
           Customer Support <br />
           <a href="tel:+8801894884114" style={{ borderBottom: "1px solid white" }}>+880 1894 884 114</a>
         </Box>
@@ -270,7 +270,10 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
               }
             }}
           >
-            {adminModulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
+            {auth?.user?.role?.title === 'ADMIN' && adminModulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
+            {auth?.user?.role?.title === 'TEACHER' && teacherModulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
+            {auth?.user?.role?.title === 'STUDENT' && studentModulesList.map((module, index) => <MenuItem key={index} value={module} >{module.split('_').join(' ')}</MenuItem>)}
+
           </Select>
         </Grid>
       }

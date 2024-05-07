@@ -8,6 +8,7 @@ WORKDIR /app
 RUN npm install -g npm@latest
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN npm i sharp --legacy-peer-deps
 RUN npm i --legacy-peer-deps
 
 

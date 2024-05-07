@@ -679,4 +679,16 @@ export const allUserMenuItems: MenuItems[] = [
   }
 ];
 
+export const dashboardMenuItem: MenuItems[] = [
+  {
+    items: [
+      {
+        name: 'Dashboard',
+        icon: DashboardIcon,
+        link: '/',
+      },
+    ]
+  }
+]
+
 export default allUserMenuItems;

@@ -8,7 +8,6 @@ import SidebarTopSection from './SidebarTopSection';
 import SidebarMenu from './SidebarMenu';
 import SidebarFooter from './SidebarFooter';
 import Logo from 'src/components/LogoSign';
-import { ModuleContext } from '@/contexts/ModuleContext';
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -25,7 +24,6 @@ function Sidebar() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const closeSidebar = () => toggleSidebar();
   const theme = useTheme();
-  const { selectModule } = useContext(ModuleContext)
   return (
     <>
       {/* for desktop device */}

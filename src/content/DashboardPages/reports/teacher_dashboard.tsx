@@ -18,20 +18,20 @@ const quickLinksColors = [
 ]
 
 const quickLinks = [
-  { color: quickLinksColors[1], linkUrl: "/management/attendence/normalAttendence", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Student Attendance" },
-  { color: quickLinksColors[2], linkUrl: "/management/teachers", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Class Exam" },
-  { color: quickLinksColors[1], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Mark Entry" },
-  { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Student Home Work" },
-  { color: quickLinksColors[1], linkUrl: "/management/users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Salary", },
-  { color: quickLinksColors[0], linkUrl: "/front_end/notice", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
-  { color: quickLinksColors[1], linkUrl: "/management/routine/class_routine", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Student Attendance" },
+  { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Class Exam" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Mark Entry" },
+  { color: quickLinksColors[0], linkUrl: "#", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Student Home Work" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Salary", },
+  { color: quickLinksColors[0], linkUrl: "#", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
   { color: quickLinksColors[2], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
-  { color: quickLinksColors[0], linkUrl: "/bulk_sms_and_email/send_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
-  { color: quickLinksColors[2], linkUrl: "/reports/attendence/student/normal", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"My Attendence" },
-  { color: quickLinksColors[1], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Reports" },
-  { color: quickLinksColors[0], linkUrl: "/reports/attendence/student/normal", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Work Schedule" },
+  { color: quickLinksColors[0], linkUrl: "#", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
+  { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"My Attendence" },
+  { color: quickLinksColors[1], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Reports" },
+  { color: quickLinksColors[0], linkUrl: "#", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Work Schedule" },
   
-  { color: quickLinksColors[2], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"Other Activities" },
+  { color: quickLinksColors[2], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"Other Activities" },
 
 ]
 

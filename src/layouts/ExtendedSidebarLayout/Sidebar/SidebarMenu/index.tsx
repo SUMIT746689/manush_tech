@@ -7,8 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 import { AuthConsumer, AuthProvider } from '@/contexts/JWTAuthContext';
 import { permissionVerify } from '@/utils/permissionVerify';
-import items from './items/admin';
-import allUserMenuItems from './items/items';
+import adminItems from './items/admin';
+import teacherItems from './items/teacher';
+import studentItems from './items/student';
+import allUserMenuItems, { dashboardMenuItem } from './items/items';
 import { ModuleContext } from '@/contexts/ModuleContext';
 
 const MenuWrapper = styled(Box)(
@@ -771,75 +773,90 @@ function SidebarMenu() {
           }
           // @ts-ignore
           const roleTitle = user?.role?.title;
-
-          if (roleTitle !== "ADMIN") return allUserMenuItems?.map((section: any) => (
-            <MenuWrapper key={section.heading}>
-              <List
-                component="div"
-                subheader={
-                  <ListSubheader component="div" disableSticky>
-                    {t(section.heading)}
-                  </ListSubheader>
+          const roleLower = roleTitle?.toLowerCase()
+          // select role wise module lists
+          const allItems = {
+            adminItems, teacherItems, studentItems
+          };
+          const selectRoleWiseMenuItems = allItems[`${roleLower}Items`];
+          const selectModuleFromRoleWiseMenuItems = selectRoleWiseMenuItems ? selectRoleWiseMenuItems[selectModule] : [];
+          console.log({ selectRoleWiseMenuItems, selectModuleFromRoleWiseMenuItems })
+          if (!['ADMIN', 'TEACHER', 'STUDENT'].includes(roleTitle))
+            return (
+              <>
+                {
+                  allUserMenuItems?.map((section: any) => (
+                    <MenuWrapper key={section.heading}>
+                      <List
+                        component="div"
+                        subheader={
+                          <ListSubheader component="div" disableSticky>
+                            {t(section.heading)}
+                          </ListSubheader>
+                        }
+                      >
+                        {renderSidebarMenuItems({
+                          permissions: permissions,
+                          items: section.items,
+                          path: router.asPath
+                        })}
+                      </List>
+                    </MenuWrapper>
+                  ))
                 }
-              >
-                {renderSidebarMenuItems({
-                  permissions: permissions,
-                  items: section.items,
-                  path: router.asPath
-                })}
-              </List>
-            </MenuWrapper>
-          ));
+                </>
+            );
 
           return (
             <>
-              {
-                items['dashboard']?.map((section: any) => (
-                  <MenuWrapper key={section.heading}>
-                    <List
-                      component="div"
-                      subheader={
-                        <ListSubheader component="div" disableSticky>
-                          {t(section.heading)}
-                        </ListSubheader>
-                      }
-                    >
-                      {renderSidebarMenuItems({
-                        permissions: permissions,
-                        items: section.items,
-                        path: router.asPath
-                      })}
-                    </List>
-                  </MenuWrapper>
-                ))
-              }
-              <Grid textTransform={"uppercase"} pl={2} fontWeight={700} sx={{ color: theme=> theme.colors.alpha.white[70] }}>
-                {selectModule && `${selectModule.split('_').join(' ')} Module :`}
-              </Grid>
-              {
-                items[selectModule]?.map((section: any) => (
-                  <MenuWrapper key={section.heading}>
-                    <List
-                      component="div"
-                      subheader={
-                        <ListSubheader component="div" disableSticky>
-                          {t(section.heading)}
-                        </ListSubheader>
-                      }
-                    >
-                      {renderSidebarMenuItems({
-                        permissions: permissions,
-                        items: section.items,
-                        path: router.asPath
-                      })}
-                    </List>
-                  </MenuWrapper>
-                ))
-              }
-            </>
-          );
+                {
+                  dashboardMenuItem.map((section: any) => (
+                    <MenuWrapper key={section.heading}>
+                      <List
+                        component="div"
+                        subheader={
+                          <ListSubheader component="div" disableSticky>
+                            {t(section.heading)}
+                          </ListSubheader>
+                        }
+                      >
+                        {renderSidebarMenuItems({
+                          permissions: permissions,
+                          items: section.items,
+                          path: router.asPath
+                        })}
+                      </List>
+                    </MenuWrapper>
+                  ))
+                }
+                <Grid textTransform={"uppercase"} pl={2} fontWeight={700} sx={{ color: theme => theme.colors.alpha.white[70] }}>
+                  {selectModule && `${selectModule.split('_').join(' ')} Module :`}
+                </Grid>
+                {/* selected nav for users */}
+                {
+                  selectModuleFromRoleWiseMenuItems?.map((section: any) => (
+                    <MenuWrapper key={section.heading}>
+                      <List
+                        component="div"
+                        subheader={
+                          <ListSubheader component="div" disableSticky>
+                            {t(section.heading)}
+                          </ListSubheader>
+                        }
+                      >
+                        {renderSidebarMenuItems({
+                          permissions: permissions,
+                          items: section.items,
+                          path: router.asPath
+                        })}
+                      </List>
+                    </MenuWrapper>
+                  ))
+                }
+              </>
+            );
         }}
-      </AuthConsumer>
+      </AuthConsumer >
     </>
   );
 }

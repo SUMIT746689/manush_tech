@@ -73,7 +73,6 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
   const { selectModule } = React.useContext(ModuleContext)
 
   const handleDrawerOpen = () => {
-    const curModuleName = window.localStorage.getItem('drawer') || false;
     setOpen(true);
     window.localStorage.setItem('drawer', String(true));
   };
@@ -85,7 +84,6 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
   React.useEffect(() => {
     const curDrawer = window.localStorage.getItem('drawer') || '';
 
-    if (!selectModule) return handleDrawerClose();
     if (curDrawer) setOpen(curDrawer === 'true' ? true : false)
 
   }, [selectModule]);

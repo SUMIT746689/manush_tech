@@ -199,23 +199,23 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
     >
 
       {
-        auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' ?
-          selectModule &&
-          (
-            drawerOpen ?
-              <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
-                <Grid >
-                  <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
-                </Grid>
-              </Tooltip>
-              :
-              <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerOpen}  >
-                <Grid   >
-                  <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
-                </Grid>
-              </Tooltip>
-          )
-          :
+        // auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' ?
+        //   selectModule &&
+        //   (
+        //     drawerOpen ?
+        //       <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
+        //         <Grid >
+        //           <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
+        //         </Grid>
+        //       </Tooltip>
+        //       :
+        //       <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerOpen}  >
+        //         <Grid   >
+        //           <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
+        //         </Grid>
+        //       </Tooltip>
+        //   )
+        //   :
           drawerOpen ?
             <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
               <Grid >

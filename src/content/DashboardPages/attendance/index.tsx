@@ -21,13 +21,13 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth() + 1;
   const daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth + 1);
-  
+
 
   const [studentsAttendPercent, setStudentsAttendPercent] = useState(0);
   const [teachersAttendPercent, setTeachersAttendPercent] = useState(0);
   const [employeesAttendPercent, setEmployeesAttendPercent] = useState(0);
   const [addtedanceFilter, setAttendancesFilter] = useState('Today');
-  
+
   const studentsAttendance = (start_date, end_date) => {
     let url = `/api/attendance/day_wise/students?start_date=${start_date}&end_date=${end_date}`;
     axios.get(url).then((response) => {
@@ -75,7 +75,7 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
       end_date = new Date(Date.now());
     }
     else if (addtedanceFilter === 'This Week') {
-      start_date =  new Date((new Date()).valueOf() - 1000 * 60 * 60 * 24 * 7);
+      start_date = new Date((new Date()).valueOf() - 1000 * 60 * 60 * 24 * 7);
       end_date = new Date(Date.now());
     }
     else {
@@ -88,18 +88,20 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
   }, [addtedanceFilter])
 
   return (
-    <Card sx={{ py: 2, px:0.5 }}>
+    <Card sx={{ py: 2, px: 1 }}>
       <Grid sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, textAlign: "center" }}>Attendance</Grid>
 
       {/* <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} py={2} columnGap={0.5}> */}
-      <Grid display="flex" justifyContent={"space-between"} py={2} columnGap={0.5}>
+      <Grid display="flex" justifyContent={"space-between"} maxWidth={200} mx="auto" pt={2} columnGap={0.5}>
 
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('Today') }}>Today</ButtonWrapper>
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('This Week') }}>This Week</ButtonWrapper>
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('This Month') }}>This Month</ButtonWrapper>
       </Grid>
 
-      <Grid sx={{ display: 'grid', gap: 0.5 }} >
+      <Grid sx={{ display: 'grid', gap: 0.5, 
+      // borderTop: '1px solid lightgray'
+       }}  >
         <ChartCard color="#FF715B" title="Students" width={`${studentsAttendPercent || 0}%`} />
         <ChartCard color="#34D1BF" title="Teachers" width={`${teachersAttendPercent}%`} />
         <ChartCard color="#0496FF" title="Staffs" width={`${employeesAttendPercent}%`} />

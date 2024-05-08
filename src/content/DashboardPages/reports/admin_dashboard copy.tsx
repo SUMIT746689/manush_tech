@@ -61,10 +61,10 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   return (
     <>
 
-      <Grid p={2} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr 420px' }} gap={2} >
+      <Grid p={2} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr auto' }} gap={2} >
 
-        <Grid sx={{ display: "grid", width: "100%" }} height="fit-content" rowGap={2} >
-          <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+        <Grid sx={{ display: "grid", width: "100%" }} height="fit-content" >
+          <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
             {/* <Image alt='sss' /> */}
             <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80, md: 120 }, height: { xs: 40, sm: 80, md: 120 } }} />
             <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
@@ -83,51 +83,24 @@ function AdminDashboardReportsContent({ blockCount = null }) {
             </Grid>
           </Card>
 
-          {/* quick links and attendance */}
-          < Grid display="flex" flexDirection={{ xs: 'column', sm: 'row' }
-          } gap={2} >
-
-            {/* quick links */}
-            < Grid width="100%" display="flex" justifyContent="center" >
-              <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
-                {
-                  quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
-                }
+          <Grid sx={{ width: '100%', height: '140px', display: "flex", justifyContent: "center", columnGap: { xs: 2, sm: 4 }, mt: 4, mb: 2 }}>
+            <Card sx={{ minWidth: { md: '320px', xl: '380px' }, p: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: { xs: 1, sm: 2 }, justifyContent: "center", alignItems: "center" }}>
+              <StudentsIcon fillColor='white' />
+              <Grid fontWeight={700} fontSize={{ xs: 16, sm: 20, md: 23, xl: 26 }} >
+                <Grid>Total Students</Grid>
+                <Grid>{blockCount?.students?.count}</Grid>
               </Grid>
-            </Grid >
+            </Card>
 
-          </Grid >
+            <Card sx={{ minWidth: { md: '320px', xl: '380px' }, p: 3, background: 'linear-gradient(180deg, #F5952D 0%, #F36717 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center" }}>
+              <StaffsIcon fillColor='white' />
+              <Grid fontWeight={700} fontSize={{ xs: 16, sm: 20, md: 23, xl: 26 }} >
+                <Grid sx={{}}>Total Staffs</Grid>
+                <Grid>0 -static</Grid>
+              </Grid>
+            </Card>
 
-
-          {/* banners */}
-          {
-            banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2}}>
-              <Card sx={{
-                width: "100",
-                borderRadius: 0,
-                // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
-                overflow: "hidden"
-              }} >
-                <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
-              </Card>
-              <Card sx={{ width: "100", borderRadius: 0 }}>
-                {
-                  (right_banner_check && right_banners[0]?.redirectUrl) ?
-                    <Link target='_blank' href={right_banners[0].redirectUrl} >
-                      <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-                    </Link>
-                    :
-                    right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-                }
-                {/* <Link
-            target='_blank'
-            href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : ''}
-          >
-            <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
-          </Link> */}
-              </Card>
-            </Grid>
-          }
+          </Grid>
         </Grid >
 
 
@@ -138,31 +111,6 @@ function AdminDashboardReportsContent({ blockCount = null }) {
               {t('Website Link')}
             </Link>
           </Button>
-
-          {/* total students and staffs */}
-          <Grid sx={{ width: '100%', minHeight: '100px', display: "grid", gridTemplateColumns: '1fr 1fr', justifyContent: "center", columnGap: { xs: 1, sm: 2 } }}>
-            <Card sx={{
-              // minWidth: { md: '320px', xl: '380px' },
-              py: 1, px: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: { xs: 1, sm: 2 }, justifyContent: "center", alignItems: "center"
-            }}>
-              <StudentsIcon fillColor='white' />
-              <Grid fontWeight={700} fontSize={{ xs: 12, sm: 14, md: 16 }} >
-                <Grid>Total Students</Grid>
-                <Grid>{blockCount?.students?.count}</Grid>
-              </Grid>
-            </Card>
-
-            <Card sx={{
-              // minWidth: { md: '320px', xl: '380px' },
-              py: 1, px: 3, background: 'linear-gradient(180deg, #F5952D 0%, #F36717 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center"
-            }}>
-              <StaffsIcon fillColor='white' />
-              <Grid fontWeight={700} fontSize={{ xs: 12, sm: 14, md: 16 }} >
-                <Grid sx={{}}>Total Staffs</Grid>
-                <Grid>0 -static</Grid>
-              </Grid>
-            </Card>
-          </Grid>
 
           <Card sx={{ color: colorBlue, px: 2, py: 3 }}>
             <Grid sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
@@ -176,19 +124,62 @@ function AdminDashboardReportsContent({ blockCount = null }) {
             </Grid>
           </Card>
 
-          {/* attendence */}
           <Attendance todayAttendance={blockCount.attendance} />
 
-          {/* calander */}
-          < Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
-            <Typography fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Typography>
-            <Calander holidays={blockCount.holidays} />
-          </Grid >
         </Grid>
+      </Grid >
+
+
+      {/* quick links and attendance */}
+      < Grid px={2} display="flex" flexDirection={{ xs: 'column', sm: 'row' }
+      } gap={2} >
+
+        {/* quick links */}
+        < Grid width="100%" display="flex" justifyContent="center" >
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
+            {
+              quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
+            }
+          </Grid>
+        </Grid >
+        {/* attendance */}
+        < Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
+          <Typography fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Typography>
+          <Calander holidays={blockCount.holidays} />
+        </Grid >
       </Grid >
 
       {/* banners */}
       {/* <Grid sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, p: 2 }}> */}
+
+      {
+        banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, px: 2, py: { xs: 2, sm: 2 } }}>
+          <Card sx={{
+            width: "100",
+            borderRadius: 0,
+            // borderTopLeftRadius: 0.5, borderTopRightRadius: 0.5,
+            overflow: "hidden"
+          }} >
+            <ImageSlider target='_blank' images={left_banners ? left_banners?.map(banner => ({ url: banner.url, redirectUrl: banner.redirectUrl })) : []} />
+          </Card>
+          <Card sx={{ width: "100", borderRadius: 0 }}>
+            {
+              (right_banner_check && right_banners[0]?.redirectUrl) ?
+                <Link target='_blank' href={right_banners[0].redirectUrl} >
+                  <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+                </Link>
+                :
+                right_banner_check && right_banners[0].url && right_banners[0].url && <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(right_banner_check && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+            }
+            {/* <Link
+            target='_blank'
+            href={(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].redirectUrl) ? right_banners[0].redirectUrl : ''}
+          >
+            <img style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} src={`/api/get_file/${(Array.isArray(right_banners) && right_banners.length > 0 && right_banners[0].url) && right_banners[0].url}`} alt="right_banner" />
+          </Link> */}
+          </Card>
+        </Grid>
+      }
 
       {/* notice board and calander */}
       {/* < Grid sx={{ display: 'grid', width: "100%", height: "100%", gridTemplateColumns: { md: '1fr 1fr' }, px: 2, gap: 2 }
@@ -197,6 +188,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           <Grid sx={{ fontSize: { xs: 20, sm: 26 }, fontWeight: 700 }}>Notice Board</Grid>
           <Notices notices={blockCount?.school?.Notice || []} />
         </Grid>
+
 
         <Grid
           xs={12}

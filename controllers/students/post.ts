@@ -89,7 +89,7 @@ const postHandle = async (req, res, refresh_token) => {
       !fields.section_id ||
       !fields.password ||
       !fields.admission_date ||
-      !fields.date_of_birth ||
+      // !fields.date_of_birth ||
       !fields.roll_no ||
       !fields.registration_no ||
       !fields.school_id ||
@@ -188,7 +188,7 @@ const postHandle = async (req, res, refresh_token) => {
           admission_no: fields?.admission_no,
           admission_date: new Date(fields?.admission_date),
           admission_status: fields?.admission_status,
-          date_of_birth: new Date(fields?.date_of_birth),
+          date_of_birth: fields?.date_of_birth ? new Date(fields?.date_of_birth) : undefined,
           gender: fields?.gender,
           blood_group: fields?.blood_group,
           religion: fields?.religion,

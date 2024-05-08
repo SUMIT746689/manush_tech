@@ -27,6 +27,7 @@ import Text from 'src/components/Text';
 import MonetizationOnTwoToneIcon from '@mui/icons-material/MonetizationOnTwoTone';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { getFile } from '@/utils/utilitY-functions';
+import { CustomAutoCompleteWrapper } from '@/layouts/ExtendedSidebarLayout copy/Header';
 
 const DotLegend = styled('span')(
   ({ theme }) => `
@@ -114,7 +115,7 @@ const UserBoxDescription = styled(Typography)(
 `
 );
 
-function HeaderUserbox({ current_active_academic_year }) {
+function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicYearChange, current_active_academic_year }) {
   const { t }: { t: any } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -268,6 +269,25 @@ function HeaderUserbox({ current_active_academic_year }) {
               // @ts-ignore
               user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
               <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{ color: "green" }}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
+            }
+          </Grid>
+          <Divider sx={{ mt: 2 }} />
+          <Grid pt={2}>
+            {/* @ts-ignore */}
+            {user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+              (
+                <Grid sx={{ pr: 2}}>
+                  <Grid sx={{ color: theme => theme.colors.primary.dark, fontWeight: 700, fontSize: 12 }}>Academic Year:</Grid>
+                  <CustomAutoCompleteWrapper
+                    // label="Academic Year"
+                    label="Academic Year"
+                    placeholder="select a academic year..."
+                    value={selectedAcademicYear}
+                    options={academicYearList}
+                    handleChange={handleAcademicYearChange}
+                  />
+                </Grid>
+              )
             }
           </Grid>
 

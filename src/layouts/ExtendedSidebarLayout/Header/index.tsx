@@ -216,18 +216,18 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
         //       </Tooltip>
         //   )
         //   :
-          drawerOpen ?
-            <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
-              <Grid >
-                <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
-              </Grid>
-            </Tooltip>
-            :
-            <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerOpen}  >
-              <Grid   >
-                <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
-              </Grid>
-            </Tooltip>
+        drawerOpen ?
+          <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerClose} >
+            <Grid >
+              <NavIcon fillColor={"white"} style={{ cursor: "pointer" }} />
+            </Grid>
+          </Tooltip>
+          :
+          <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: "none", lg: "block" } }} onClick={handleDrawerOpen}  >
+            <Grid   >
+              <NavIcon fillColor={"white"} style={{ cursor: "pointer", rotate: '180deg' }} />
+            </Grid>
+          </Tooltip>
       }
 
 
@@ -292,9 +292,9 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
       }
 
       {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
+      {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
         (
-          <Grid minWidth={185} sx={{ display: { xs: "block", sm: "none" } }}>
+          <Grid minWidth={185} sx={{ display: { sm: "block", sm: "none" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
               // label="Academic Year"  
@@ -305,7 +305,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
               handleChange={handleAcademicYearChange}
             />
           </Grid>
-        )}
+        )} */}
 
       <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
         {/* @ts-ignore */}
@@ -326,7 +326,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
         {/* @ts-ignore */}
         {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
           (
-            <Grid minWidth={185} sx={{ pr: 2, display: { xs: "none", sm: "block" } }}>
+            <Grid minWidth={150} sx={{ pr: 2, display: { xs: "none", md: "block" } }}>
               <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
               <CustomAutoCompleteWrapper
                 // label="Academic Year"
@@ -345,12 +345,17 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
           <HeaderSearch />
         }
         {/* <HeaderButtons /> */}
-        <HeaderUserbox current_active_academic_year={current_active_academic_year} />
+        <HeaderUserbox
+          selectedAcademicYear={selectedAcademicYear}
+          academicYearList={academicYearList}
+          handleAcademicYearChange={handleAcademicYearChange}
+          current_active_academic_year={current_active_academic_year}
+        />
 
         <Box
           component="span"
           sx={{
-            ml: 2,
+            // m: 2,
             display: { lg: 'none', xs: 'inline-block' }
           }}
         >

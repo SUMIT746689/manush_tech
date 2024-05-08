@@ -18,18 +18,26 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
+  // padding: theme.spacing(3),
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
+  [theme.breakpoints.down('lg')]: {
+    marginLeft: 0,
+  },
+  [theme.breakpoints.up('lg')]: {
+    marginLeft: `-${drawerWidth}px`,
+  },
   ...(open && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: 0,
+    [theme.breakpoints.up('lg')]: {
+      marginLeft: 0,
+    },
+    // marginLeft: 0,
   }),
 }));
 
@@ -132,7 +140,7 @@ const ExtendedSidebarLayout: FC<ExtendedSidebarLayoutProps> = ({ children }) => 
         <Header drawerOpen={open} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} />
         <Sidebar />
       </Drawer>
-      <Main open={open} sx={{ p: 0 }}>
+      <Main open={open}>
         <Box
           sx={{
             position: 'relative',

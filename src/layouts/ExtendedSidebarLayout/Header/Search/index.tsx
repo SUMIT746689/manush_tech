@@ -167,8 +167,8 @@ function HeaderSearch() {
   return (
     <>
       <Tooltip arrow title={t('Search Student')}>
-        <IconButtonWrapper sx={{ borderColor: "red" }} onClick={handleClickOpen}>
-          <SearchTwoToneIcon sx={{ fontSize: 40, color: "white", p: 0.5, ":hover": { border: "1px solid white", borderRadius: 0.5 } }} fontSize="small" />
+        <IconButtonWrapper onClick={handleClickOpen}>
+          <SearchTwoToneIcon sx={{ width:"36px",height:"36px", fontSize: 38, color: "white", p: 0.25, ":hover": { border: "2px solid white", borderRadius: 0.5 } }} fontSize="small" />
         </IconButtonWrapper>
       </Tooltip>
 

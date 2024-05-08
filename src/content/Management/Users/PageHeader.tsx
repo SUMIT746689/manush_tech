@@ -170,7 +170,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
         handleCreateClassOpen={handleCreateUserOpen}
         actionButton={
           user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-          user?.role?.title !== 'SUPER_ADMIN'
+            user?.role?.title !== 'SUPER_ADMIN'
             ? true
             : false
         }
@@ -192,8 +192,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           </Typography>
           <Typography variant="subtitle2">
             {t(
-              `Fill in the fields below to ${
-                editUser ? 'edit' : 'create a'
+              `Fill in the fields below to ${editUser ? 'edit' : 'create a'
               } user to the site`
             )}
           </Typography>
@@ -207,9 +206,9 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             preview_user_photo: [],
             role: temp
               ? {
-                  role_title: temp?.role,
-                  permission: temp?.value
-                }
+                role_title: temp?.role,
+                permission: temp?.value
+              }
               : undefined,
             domain: editUser?.adminPanel?.domain || '',
             copy_right_txt: editUser?.adminPanel?.copy_right_txt,
@@ -493,11 +492,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       isSubmitting ? <CircularProgress size="1rem" /> : null
                     }
                     // @ts-ignore
-                    disabled={
-                      Boolean(isAvailableUsername) ||
-                      Boolean(errors.submit) ||
-                      isSubmitting
-                    }
+                    disabled={Boolean(isAvailableUsername) || Boolean(errors.submit) || isSubmitting}
                     variant="contained"
                   >
                     {t(editUser ? 'Edit user' : 'Add new user')}

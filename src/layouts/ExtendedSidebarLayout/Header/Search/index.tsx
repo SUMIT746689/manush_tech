@@ -112,7 +112,6 @@ const ListButton = styled(Box)(
 `
 );
 
-
 function HeaderSearch() {
   const { t }: { t: any } = useTranslation();
   const theme = useTheme();
@@ -125,7 +124,7 @@ function HeaderSearch() {
 
   const handleSearchChange = (event: ChangeEvent<{ value: unknown }>) => {
     setSearchValue(event.target.value as string);
-  }
+  };
 
   const [open, setOpen] = useState(false);
 
@@ -140,23 +139,25 @@ function HeaderSearch() {
   const handleFetch = async () => {
     try {
       if (!searchValue || searchValue.length < 3) return setSearchResults([]);
-      setSearchLoading(true)
-      const { data } = await axios.get(`/api/student/search-students?search_value=${searchValue}`);
-      setSearchResults(data)
+      setSearchLoading(true);
+      const { data } = await axios.get(
+        `/api/student/search-students?search_value=${searchValue}`
+      );
+      setSearchResults(data);
     } catch (err) {
-      setSearchResults([])
-      handleShowErrMsg(err, showNotification)
-      console.log({ err })
+      setSearchResults([]);
+      handleShowErrMsg(err, showNotification);
+      console.log({ err });
     } finally {
-      // setTimeout(() => 
-      setSearchLoading(false)
+      // setTimeout(() =>
+      setSearchLoading(false);
       // , 5000)
     }
-  }
+  };
 
   useEffect(() => {
     const getData = setTimeout(() => {
-      handleFetch()
+      handleFetch();
       // handleDebounce(value);
       // handleSearchChange(searchValue)
     }, 500);
@@ -168,7 +169,17 @@ function HeaderSearch() {
     <>
       <Tooltip arrow title={t('Search Student')}>
         <IconButtonWrapper onClick={handleClickOpen}>
-          <SearchTwoToneIcon sx={{ width:"36px",height:"36px", fontSize: 38, color: "white", p: 0.25, ":hover": { border: "2px solid white", borderRadius: 0.5 } }} fontSize="small" />
+          <SearchTwoToneIcon
+            sx={{
+              width: '36px',
+              height: '36px',
+              fontSize: 38,
+              color: 'white',
+              p: 0.25,
+              ':hover': { border: '2px solid white', borderRadius: 0.5 }
+            }}
+            fontSize="small"
+          />
         </IconButtonWrapper>
       </Tooltip>
 
@@ -251,17 +262,18 @@ function HeaderSearch() {
             )}
           </>
         )} */}
-        {
-          searchValue.length < 3 &&
-          <Alert severity="warning" sx={{ mx: 2, mt: 1 }}>Minimum 3 character required...</Alert>
-        }
+        {searchValue.length < 3 && (
+          <Alert severity="warning" sx={{ mx: 2, mt: 1 }}>
+            Minimum 3 character required...
+          </Alert>
+        )}
         {searchLoading ? (
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'center',
               py: 5,
-              height: 450,
+              height: 450
             }}
           >
             <CircularProgress />
@@ -276,10 +288,20 @@ function HeaderSearch() {
             >
               <Scrollbar>
                 {searchResults?.map((result) => (
-                  <Link href={`/students/${result?.id}`} key={result.id} style={{ textDecoration: "none" }} onClick={handleClose}>
+                  <Link
+                    href={`/students/${result?.id}`}
+                    key={result.id}
+                    style={{ textDecoration: 'none' }}
+                    onClick={handleClose}
+                  >
                     <ListButton>
                       <Box display="flex" alignItems="flex-start">
-                        <Typography>{result.first_name} {result?.middle_name || ''} {result?.last_name} | class: {result?.class_name} | section: {result?.section_name} | roll: {result?.class_roll_no}</Typography>
+                        <Typography>
+                          {result.first_name} {result?.middle_name || ''}{' '}
+                          {result?.last_name} | class: {result?.class_name} |
+                          section: {result?.section_name} | roll:{' '}
+                          {result?.class_roll_no}
+                        </Typography>
                       </Box>
                       <KeyboardArrowRightTwoToneIcon fontSize="small" />
                     </ListButton>

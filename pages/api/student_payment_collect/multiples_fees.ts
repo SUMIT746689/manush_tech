@@ -1,20 +1,17 @@
-import { get } from 'controllers/student_payment_collects/student_payment_collect/get';
-import { patch } from 'controllers/student_payment_collects/student_payment_collect/patch';
+import { post } from 'controllers/student_payment_collects/multipleFees/post';
+import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
 
-const id = async (req, res) => {
+const index = async (req, res, refresh_token) => {
   // try {
   const { method } = req;
 
   switch (method) {
-    case 'GET':
-      get(req, res);
-      break;
-    case 'PATCH':
-      patch(req, res);
+    case 'POST':
+      post(req, res, refresh_token);
       break;
     default:
-      res.setHeader('Allow', ['PATCH']);
+      res.setHeader('Allow', ['GET', 'POST']);
       logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
@@ -24,4 +21,4 @@ const id = async (req, res) => {
   // }
 };
 
-export default id;
+export default authenticate(index);

@@ -95,9 +95,9 @@ const Transition = forwardRef(function Transition(
 });
 
 const filterFees = (fees, filter) => {
-  if (filter === "all") return fees;
-  return fees.filter(fee => (fee["status"] === filter ? true : false))
-}
+  if (filter === 'all') return fees;
+  return fees.filter((fee) => (fee['status'] === filter ? true : false));
+};
 
 const applyPagination = (sessions, page, limit) => {
   return sessions.slice(page * limit, page * limit + limit);
@@ -125,7 +125,7 @@ const Results = ({
   const [limit, setLimit] = useState<number>(5);
   const [filter, setFilter] = useState<string>('all');
   const [paginatedfees, setPaginatedfees] = useState<any>([]);
-  const [sentSms, setSentSms] = useState<number[]>([])
+  const [sentSms, setSentSms] = useState<number[]>([]);
 
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
@@ -134,67 +134,74 @@ const Results = ({
   const { currency } = school || {};
   const handleStudentPaymentCollect = () => {
     if (selectedStudent && academicYear) {
-      axios.get(`/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`)
+      axios
+        .get(
+          `/api/student_payment_collect/${selectedStudent.id}?academic_year_id=${academicYear?.id}`
+        )
         .then((res) => {
           if (res.data?.success) {
-            console.log("res.data.data__", res.data);
+            setSessions(
+              res.data.data?.fees?.map((fee, index) => {
+                const last_payment_date =
+                  fee?.status !== 'unpaid' ? fee?.last_payment_date : '';
+                const last_date = new Date(fee.last_date);
+                const today = new Date();
+                const status_color = { p: 0.5 };
+                let due,
+                  total_payable_amt,
+                  payableAmount = 0;
 
-            setSessions(res.data.data?.fees?.map((fee, index) => {
+                if (fee?.status == 'paid' || fee?.status === 'paid late') {
+                  due = 0;
+                  total_payable_amt = '';
+                } else {
+                  const late_fee = fee.late_fee ? fee.late_fee : 0;
+                  if (late_fee && today > last_date) {
+                    payableAmount = Number(fee?.amount) + Number(fee?.late_fee);
+                    total_payable_amt = `${Number(fee?.amount).toFixed(
+                      1
+                    )} + ${Number(fee?.late_fee).toFixed(
+                      1
+                    )} = ${payableAmount.toFixed(2)}`;
+                  } else {
+                    total_payable_amt = '';
+                  }
 
-              const last_payment_date = fee?.status !== 'unpaid' ? fee?.last_payment_date : ''
-              const last_date = new Date(fee.last_date)
-              const today = new Date()
-              const status_color = { p: 0.5 };
-              let due, total_payable_amt, payableAmount = 0;
+                  due =
+                    fee?.amount +
+                    late_fee -
+                    (fee.paidAmount
+                      ? fee.paidAmount
+                      : fee?.status == 'unpaid'
+                      ? 0
+                      : fee?.amount);
 
-              if (fee?.status == 'paid' || fee?.status === 'paid late') {
-                due = 0
-                total_payable_amt = ""
-              }
-              else {
-                const late_fee = fee.late_fee ? fee.late_fee : 0
-                if (late_fee && today > last_date) {
-                  payableAmount = (Number(fee?.amount) + Number(fee?.late_fee))
-                  total_payable_amt = `${Number(fee?.amount).toFixed(1)} + ${Number(fee?.late_fee).toFixed(1)} = ${payableAmount.toFixed(2)}`;
+                  if (today < last_date) {
+                    due -= late_fee;
+                  }
                 }
-                else {
-                  total_payable_amt = ""
+
+                if (fee?.status === 'paid' || fee?.status === 'paid late') {
+                  status_color['color'] = 'green';
+                } else if (fee?.status === 'partial paid') {
+                  status_color['color'] = 'blue';
+                } else {
+                  status_color['color'] = 'red';
                 }
 
-                due = (fee?.amount + late_fee - (fee.paidAmount ? fee.paidAmount : ((fee?.status == 'unpaid') ? 0 : fee?.amount)))
-
-                console.log(fee.title, "due__", due, today < last_date);
-
-                if (today < last_date) {
-                  due -= late_fee
-                }
-              }
-
-
-              if (fee?.status === 'paid' || fee?.status === 'paid late') {
-                status_color['color'] = 'green'
-              }
-              else if (fee?.status === 'partial paid') {
-                status_color['color'] = 'blue'
-              }
-              else {
-                status_color['color'] = 'red'
-              }
-
-
-              fee['last_payment_date'] = last_payment_date
-              fee['due'] = due
-              fee['total_payable_amt'] = total_payable_amt
-              fee['payableAmount'] = payableAmount
-              fee['status_color'] = status_color
-              fee['sl'] = index + 1
-              return fee
-            }
-            ));
+                fee['last_payment_date'] = last_payment_date;
+                fee['due'] = due;
+                fee['total_payable_amt'] = total_payable_amt;
+                fee['payableAmount'] = payableAmount;
+                fee['status_color'] = status_color;
+                fee['sl'] = index + 1;
+                return fee;
+              })
+            );
           }
         })
         .catch((err) => {
-          console.log(err.message);
+          //  console.log(err.message);
         });
     }
   };
@@ -209,33 +216,34 @@ const Results = ({
     event: ChangeEvent<HTMLInputElement>
   ): void => {
     if (event.target.checked) {
-      const temp = sessions?.map((project) => project.id)
+      const temp = sessions?.map((project) => project.id);
       setSelectedFees(sessions);
       setSelectedItems(temp);
-    }
-    else {
+    } else {
       setSelectedFees([]);
       setSelectedItems([]);
     }
-
   };
 
   const handleSelectOneProject = (
     _event: ChangeEvent<HTMLInputElement>,
     projectId: string,
-    project: any,
+    project: any
   ): void => {
     if (!selectedItems.includes(projectId)) {
       setSelectedFees((prevSelected) => [...prevSelected, project]);
       setSelectedItems((prevSelected) => [...prevSelected, projectId]);
     } else {
-      setSelectedFees((prevSelected) => prevSelected.filter(({ id }) => id !== projectId));
-      setSelectedItems((prevSelected) => prevSelected.filter((id) => id !== projectId));
+      setSelectedFees((prevSelected) =>
+        prevSelected.filter(({ id }) => id !== projectId)
+      );
+      setSelectedItems((prevSelected) =>
+        prevSelected.filter((id) => id !== projectId)
+      );
     }
   };
 
   const handlePageChange = (_event: any, newPage: number): void => {
-
     setPage(newPage);
   };
 
@@ -244,17 +252,16 @@ const Results = ({
   };
 
   useEffect(() => {
-
-    const filterFees_ = filterFees(sessions || [], filter)
-    setFilteredFees(() => filterFees_ || [])
+    const filterFees_ = filterFees(sessions || [], filter);
+    setFilteredFees(() => filterFees_ || []);
 
     const paginatedschools = applyPagination(filterFees_ || [], page, limit);
     setPaginatedfees(paginatedschools);
-
-  }, [sessions, filter, page, limit])
+  }, [sessions, filter, page, limit]);
 
   // @ts-ignore
-  const selectedSomeschools = selectedItems.length > 0 && selectedItems.length < sessions?.length;
+  const selectedSomeschools =
+    selectedItems.length > 0 && selectedItems.length < sessions?.length;
   // @ts-ignore
   const selectedAllschools = selectedItems.length === sessions?.length;
 
@@ -266,7 +273,10 @@ const Results = ({
 
   useEffect(() => {
     if (selectedSection && academicYear && user) {
-      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}`)
+      axios
+        .get(
+          `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${selectedSection.id}`
+        )
         .then((res) => {
           setStudents(res.data);
         })
@@ -296,34 +306,42 @@ const Results = ({
     }
   };
 
-  const handleCollection = ({ fee, amount, selectedAccount, selectedGateway, transID }) => {
-    axios.post('/api/student_payment_collect', {
-      student_id: selectedStudent.id,
-      collected_by_user: user?.id,
-      fee_id: fee.id,
-      account_id: selectedAccount?.id,
-      payment_method_id: selectedGateway?.id,
-      collected_amount: amount,
-      transID: transID,
-      total_payable: fee?.payableAmount,
-      sent_sms: !!sentSms.find(id => id === fee.id)
-    })
+  const handleCollection = ({
+    fee,
+    amount,
+    selectedAccount,
+    selectedGateway,
+    transID
+  }) => {
+    axios
+      .post('/api/student_payment_collect', {
+        student_id: selectedStudent.id,
+        collected_by_user: user?.id,
+        fee_id: fee.id,
+        account_id: selectedAccount?.id,
+        payment_method_id: selectedGateway?.id,
+        collected_amount: amount,
+        transID: transID,
+        total_payable: fee?.payableAmount,
+        sent_sms: !!sentSms.find((id) => id === fee.id)
+      })
       .then((res) => {
         // console.log("res.data__", res.data);
         // setPrintFees([])
         if (res.data.err) throw new Error(res.data.err);
-        setPrintFees([{
-          fee_id: fee.id,
-          paidAmount: amount,
-          tracking_number: res.data?.tracking_number,
-          created_at: res.data?.created_at,
-          last_payment_date: res.data?.last_payment_date,
-          account: res.data?.account_name,
-          transID: res.data?.transID,
-          payment_method: res.data?.payment_method,
-          status: res.data?.status,
-
-        }]);
+        setPrintFees([
+          {
+            fee_id: fee.id,
+            paidAmount: amount,
+            tracking_number: res.data?.tracking_number,
+            created_at: res.data?.created_at,
+            last_payment_date: res.data?.last_payment_date,
+            account: res.data?.account_name,
+            transID: res.data?.transID,
+            payment_method: res.data?.payment_method,
+            status: res.data?.status
+          }
+        ]);
         handleStudentPaymentCollect();
         showNotification('The payment has been collected successfully');
       })
@@ -337,13 +355,19 @@ const Results = ({
     let payment = { paid: 0, remaining: 0, due: 0 };
 
     const filterPayment = fees.reduce((prev, curr) => {
-      const last_date = new Date(curr.last_date)
-      const today = new Date()
-
+      const last_date = new Date(curr.last_date);
+      const today = new Date();
 
       if (curr?.status !== 'paid' && curr?.status !== 'paid late') {
-        prev.due += (curr?.amount + (curr.late_fee ? curr.late_fee : 0) - (curr.paidAmount ? curr.paidAmount : ((curr?.status == 'unpaid') ? 0 : curr?.amount)));
-        if (today < last_date) prev.due -= (curr.late_fee ? curr.late_fee : 0);
+        prev.due +=
+          curr?.amount +
+          (curr.late_fee ? curr.late_fee : 0) -
+          (curr.paidAmount
+            ? curr.paidAmount
+            : curr?.status == 'unpaid'
+            ? 0
+            : curr?.amount);
+        if (today < last_date) prev.due -= curr.late_fee ? curr.late_fee : 0;
       }
 
       if (curr?.status === 'paid') prev.paid += curr.amount || 0;
@@ -354,17 +378,25 @@ const Results = ({
 
     return (
       <TableRow>
-        <TableCell>Total : {formatNumber(filterPayment?.paid + filterPayment?.due)} {currency}</TableCell>
-        <TableCell>Paid : {formatNumber(filterPayment?.paid)} {currency}</TableCell>
-        <TableCell>Remaining : {formatNumber(filterPayment?.due)} {currency}</TableCell>
+        <TableCell>
+          Total : {formatNumber(filterPayment?.paid + filterPayment?.due)}{' '}
+          {currency}
+        </TableCell>
+        <TableCell>
+          Paid : {formatNumber(filterPayment?.paid)} {currency}
+        </TableCell>
+        <TableCell>
+          Remaining : {formatNumber(filterPayment?.due)} {currency}
+        </TableCell>
       </TableRow>
     );
   };
 
   const handleClassSelect = (event, newValue) => {
-    setSessions([])
+    setSessions([]);
     setSelectedFees([]);
-    setSelectedItems([])
+    setSelectedItems([]);
+
     if (newValue) {
       const targetClassSections = classes.find((i) => i.id == newValue.id);
       setSections(
@@ -383,10 +415,9 @@ const Results = ({
       } else {
         setSelectedSection(null);
       }
-    }
-    else {
-      setSections([])
-      setStudents([])
+    } else {
+      setSections([]);
+      setStudents([]);
       setSelectedSection(null);
       setSelectedStudent(null);
     }
@@ -405,18 +436,28 @@ const Results = ({
     <>
       <Card
         sx={{
-          pt: 1, px: 1, mb: 1, width: '100%'
+          pt: 1,
+          px: 1,
+          mb: 1,
+          width: '100%'
         }}
       >
-        <Grid container display={"grid"} gridTemplateColumns={{ sm: "1fr 1fr 1fr" }} columnGap={1}>
+        <Grid
+          container
+          display={'grid'}
+          gridTemplateColumns={{ sm: '1fr 1fr 1fr' }}
+          columnGap={1}
+        >
           <AutoCompleteWrapper
-            options={classes?.map((i) => {
-              return {
-                label: i.name,
-                id: i.id,
-                has_section: i.has_section
-              };
-            }) || []}
+            options={
+              classes?.map((i) => {
+                return {
+                  label: i.name,
+                  id: i.id,
+                  has_section: i.has_section
+                };
+              }) || []
+            }
             value={undefined}
             label="Select Class"
             placeholder="select a class"
@@ -431,10 +472,10 @@ const Results = ({
             handleChange={(e, v) => {
               setSelectedSection(v);
               setStudents(() => []);
-              setSessions([])
+              setSessions([]);
               setSelectedStudent(null);
               setSelectedFees([]);
-              setSelectedItems([])
+              setSelectedItems([]);
             }}
           />
 
@@ -442,11 +483,13 @@ const Results = ({
             value={selectedStudent}
             options={students}
             label="Select Roll"
-            placeholder={"select a roll"}
+            placeholder={'select a roll'}
             isOptionEqualToValue={(option: any, value: any) =>
               option.id === value.id
             }
-            getOptionLabel={(option) => `${option.class_roll_no}  (${option.student_info.first_name})`}
+            getOptionLabel={(option) =>
+              `${option.class_roll_no}  (${option.student_info.first_name})`
+            }
             // @ts-ignore
             handleChange={(e: any, value: any) => {
               setSelectedStudent(value);
@@ -455,15 +498,22 @@ const Results = ({
             }}
           />
         </Grid>
-      </Card >
+      </Card>
 
-      {selectedStudent &&
+      {selectedStudent && (
         <Card
           sx={{
-            pt: 1, px: 1, mb: 1, width: '100%'
+            pt: 1,
+            px: 1,
+            mb: 1,
+            width: '100%'
           }}
         >
-          <Grid container display="grid" gridTemplateColumns={{ sm: "1fr 1fr" }} >
+          <Grid
+            container
+            display="grid"
+            gridTemplateColumns={{ sm: '1fr 1fr' }}
+          >
             <Grid container display="grid" gridTemplateColumns="1fr 1fr">
               <Grid
                 container
@@ -476,11 +526,16 @@ const Results = ({
                 sx={{ p: 1 }}
               >
                 {selectedStudent && (
-                  <Image src={selectedStudent?.student_photo ? getFile(selectedStudent?.student_photo) : `/dumy_teacher.png`}
+                  <Image
+                    src={
+                      selectedStudent?.student_photo
+                        ? getFile(selectedStudent?.student_photo)
+                        : `/dumy_teacher.png`
+                    }
                     height={100}
                     width={100}
-                    alt='student photo'
-                    loading='lazy'
+                    alt="student photo"
+                    loading="lazy"
                     style={{
                       borderRadius: '15px'
                     }}
@@ -494,46 +549,54 @@ const Results = ({
                     <Grid direction={'column'} container>
                       <span>
                         Name:{' '}
-                        {[selectedStudent?.student_info?.first_name, selectedStudent?.student_info?.middle_name, selectedStudent?.student_info?.last_name].join(' ')}
+                        {[
+                          selectedStudent?.student_info?.first_name,
+                          selectedStudent?.student_info?.middle_name,
+                          selectedStudent?.student_info?.last_name
+                        ].join(' ')}
                       </span>
                       <span>Id: {selectedStudent?.id}</span>
                       <span>Roll: {selectedStudent?.class_roll_no}</span>
-                      <span><a href={`tel:${selectedStudent?.student_info?.phone}`}>Number: {selectedStudent?.student_info?.phone}</a></span>
+                      <span>
+                        <a href={`tel:${selectedStudent?.student_info?.phone}`}>
+                          Number: {selectedStudent?.student_info?.phone}
+                        </a>
+                      </span>
                     </Grid>
                   )
                 }
               </Grid>
             </Grid>
 
-            <Grid
-              item
-              direction={'row'}
-              sx={{ p: 1, mx: 'auto' }}
-            >
+            <Grid item direction={'row'} sx={{ p: 1, mx: 'auto' }}>
               {sessions?.length > 0 && handlePaymentStatus(sessions)}
             </Grid>
           </Grid>
         </Card>
-      }
+      )}
 
       <Card sx={{ minHeight: 'calc(100vh - 358px) !important' }}>
-
         <Box
           p={2}
           display="flex"
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid  >
-            <FormControl sx={{ pr: 1 }} >
-              <InputLabel size='small' sx={{ backgroundColor: 'white' }} id="demo-simple-select-label">Filter By</InputLabel>
+          <Grid>
+            <FormControl sx={{ pr: 1 }}>
+              <InputLabel
+                size="small"
+                sx={{ backgroundColor: 'white' }}
+                id="demo-simple-select-label"
+              >
+                Filter By
+              </InputLabel>
               <Select
                 fullWidth
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 size="small"
                 label="Filter By"
-
                 sx={{
                   [`& fieldset`]: {
                     borderRadius: 0.6
@@ -541,7 +604,6 @@ const Results = ({
                   px: '10px',
                   minWidth: '50px'
                 }}
-
                 value={filter}
                 onChange={(e: any) => {
                   setFilter(e.target.value);
@@ -592,9 +654,8 @@ const Results = ({
           </>
         ) : (
           <TableContainer>
-
-            <Table size='small'>
-              <TableHead >
+            <Table size="small">
+              <TableHead>
                 <TableRow>
                   <TableCell padding="checkbox" align="center">
                     <Checkbox
@@ -603,20 +664,52 @@ const Results = ({
                       onChange={handleSelectAllschools}
                     />
                   </TableCell>
-                  <TableCell align="center" >
+                  <TableCell align="center">
                     <Typography noWrap variant="h5">
-                      {t('SL')}</Typography>
+                      {t('SL')}
+                    </Typography>
                   </TableCell>
 
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Title')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Fee Amount')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Status')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Due')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Last date')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Last payment date')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Total payable amount')}</Typography></TableCell>
-                  <TableCell align="center"><Typography noWrap variant="h5">{t('Actions')}</Typography></TableCell>
-
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Fee Title')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Fee Amount')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Status')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Due')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Last date')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Last payment date')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Total payable amount')}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography noWrap variant="h5">
+                      {t('Actions')}
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -625,11 +718,7 @@ const Results = ({
                   // console.log('fee__', fee);
 
                   return (
-                    <TableRow
-                      hover
-                      key={fee.id}
-                      selected={isschoolselected}
-                    >
+                    <TableRow hover key={fee.id} selected={isschoolselected}>
                       <TableCell padding="checkbox" sx={{ p: 0.5 }}>
                         <Checkbox
                           checked={isschoolselected}
@@ -651,7 +740,7 @@ const Results = ({
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {(fee?.amount.toFixed(2))}
+                          {fee?.amount.toFixed(2)}
                         </Typography>
                       </TableCell>
 
@@ -674,7 +763,11 @@ const Results = ({
                       </TableCell>
                       <TableCell sx={{ p: 0.5 }} align="center">
                         <Typography noWrap variant="h5">
-                          {fee?.last_payment_date ? dayjs(fee?.last_payment_date).format('DD/MM/YYYY, h:mm a') : ''}
+                          {fee?.last_payment_date
+                            ? dayjs(fee?.last_payment_date).format(
+                                'DD/MM/YYYY, h:mm a'
+                              )
+                            : ''}
                         </Typography>
                       </TableCell>
 
@@ -685,12 +778,12 @@ const Results = ({
                       </TableCell>
 
                       <TableCell align="center">
-                        <Typography noWrap display="flex" my="auto" >
+                        <Typography noWrap display="flex" my="auto">
                           {/* <Grid color="darkblue" my="auto" pr={1} >
                             <Checkbox checked={!!sentSms.find(id => id === fee.id)} onClick={() => handleSentSms(fee.id)} />
                             Sent Sms
                           </Grid> */}
-                          <Grid pt={1} >
+                          <Grid pt={1}>
                             <AmountCollection
                               accounts={accounts}
                               accountsOption={accountsOption}
@@ -733,7 +826,6 @@ const Results = ({
                 })}
               </TableBody>
             </Table>
-
           </TableContainer>
         )}
       </Card>
@@ -811,29 +903,39 @@ const Results = ({
   );
 };
 
-const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption }) => {
+const AmountCollection = ({
+  due,
+  fee,
+  handleCollection,
+  accounts,
+  accountsOption
+}) => {
   const { t }: { t: any } = useTranslation();
   const [amount, setAmount] = useState(due);
   const [selectedGateway, setSelectedGateway] = useState(null);
-  const [transID, setTransID] = useState(null)
-  const [selectedAccount, setSelectedAccount] = useState(null)
-  const [gatewayOption, setGatewayOption] = useState([])
+  const [transID, setTransID] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [gatewayOption, setGatewayOption] = useState([]);
 
   return (
-    <Grid container
+    <Grid
+      container
       sx={{
         display: 'grid',
-        gridTemplateColumns: "1fr 1fr 1fr 1fr",
+        gridTemplateColumns: '1fr 1fr 1fr 1fr',
         columnGap: 1,
-        justifyContent: 'center',
+        justifyContent: 'center'
       }}
     >
-      <Grid item sx={{
-        display: 'grid',
-        gridTemplateColumns: "130px 130px",
-        gap: 1,
-        // p: 1,
-      }}>
+      <Grid
+        item
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: '130px 130px',
+          gap: 1
+          // p: 1,
+        }}
+      >
         <AutoCompleteWrapper
           label={t('Account')}
           placeholder={t('Select account...')}
@@ -842,18 +944,19 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
           value={selectedAccount}
           handleChange={(e, v) => {
             if (v) {
-              const temp = accounts?.find((i) => i.id === v?.id)?.payment_method?.map(j => ({
-                label: j.title,
-                id: j.id
-              }))
-              console.log(temp);
-              setGatewayOption(temp)
+              const temp = accounts
+                ?.find((i) => i.id === v?.id)
+                ?.payment_method?.map((j) => ({
+                  label: j.title,
+                  id: j.id
+                }));
+              //  console.log(temp);
+              setGatewayOption(temp);
+            } else {
+              setGatewayOption([]);
             }
-            else {
-              setGatewayOption([])
-            }
-            setSelectedAccount(v)
-            setSelectedGateway(null)
+            setSelectedAccount(v);
+            setSelectedGateway(null);
           }}
         />
         <AutoCompleteWrapper
@@ -864,18 +967,20 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
           handleChange={(e, value) => {
             console.log(value);
             if (value == 'Cash') {
-              setTransID(null)
+              setTransID(null);
             }
-            setSelectedGateway(value)
+            setSelectedGateway(value);
           }}
         />
-
       </Grid>
-      {
-        selectedGateway && selectedAccount?.label?.toLowerCase() !== 'cash' && <Grid item sx={{
-          minWidth: '130px',
-          // p: 1
-        }}>
+      {selectedGateway && selectedAccount?.label?.toLowerCase() !== 'cash' && (
+        <Grid
+          item
+          sx={{
+            minWidth: '130px'
+            // p: 1
+          }}
+        >
           <TextFieldWrapper
             label="trans ID"
             name=""
@@ -885,13 +990,14 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
             handleChange={(e) => setTransID(e.target.value)}
             handleBlur={undefined}
             required={selectedGateway !== 'Cash' ? true : false}
-          // type
+            // type
           />
-
         </Grid>
-      }
-      <Grid item minWidth={120}
-      // p={1} 
+      )}
+      <Grid
+        item
+        minWidth={120}
+        // p={1}
       >
         <TextFieldWrapper
           label="Amount"
@@ -905,17 +1011,32 @@ const AmountCollection = ({ due, fee, handleCollection, accounts, accountsOption
         />
       </Grid>
 
-      <Grid item
-      // pt={0.8}
+      <Grid
+        item
+        // pt={0.8}
       >
         <Button
           variant="contained"
-          disabled={amount && selectedGateway && Number(amount) > 0 && (selectedAccount?.label?.toLowerCase() !== 'cash' && transID || selectedAccount?.label?.toLowerCase() === 'cash' && !transID) ? false : true}
+          disabled={
+            amount &&
+            selectedGateway &&
+            Number(amount) > 0 &&
+            ((selectedAccount?.label?.toLowerCase() !== 'cash' && transID) ||
+              (selectedAccount?.label?.toLowerCase() === 'cash' && !transID))
+              ? false
+              : true
+          }
           onClick={() => {
-            handleCollection({ fee, amount, selectedAccount, selectedGateway, transID });
-            setSelectedAccount(null)
+            handleCollection({
+              fee,
+              amount,
+              selectedAccount,
+              selectedGateway,
+              transID
+            });
+            setSelectedAccount(null);
             setSelectedGateway(null);
-            setTransID(null)
+            setTransID(null);
             setAmount(() => null);
           }}
           sx={{ borderRadius: 0.5 }}

@@ -1061,7 +1061,7 @@ model Transaction {
   school              School          @relation(fields: [school_id], references: [id])
   StudentFee          StudentFee?
 
-  @@unique([tracking_number, school_id])
+ // @@unique([tracking_number, school_id])
   @@map("transactions")
 }
 

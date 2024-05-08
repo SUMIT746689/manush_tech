@@ -4,7 +4,6 @@ import { serialize } from 'cookie';
 import prisma from '@/lib/prisma_client';
 import { logFile } from 'utilities_api/handleLogFile';
 
-
 export default async function post(req, res, refresh_token) {
   try {
     const {
@@ -41,14 +40,15 @@ export default async function post(req, res, refresh_token) {
 
     if (months && months.length) {
       for (const i of months) {
-        if (!i.value || !i.last_date) throw new Error('provide valid months data !')
+        if (!i.value || !i.last_date)
+          throw new Error('provide valid months data !');
       }
       for (const i of months) {
         const fee = await prisma.fee.create({
           data: {
             ...data,
             title: `${i.value} - ${title}`,
-            last_date: new Date(i.last_date),
+            last_date: new Date(i.last_date)
           }
         });
         await prisma.voucher.create({
@@ -56,13 +56,15 @@ export default async function post(req, res, refresh_token) {
             title: `${data.title} exam fee`,
             description: data.title,
             amount: data.amount,
-            reference: `${refresh_token.name}, ${refresh_token.role.title.toUpperCase()}`,
+            reference: `${
+              refresh_token.name
+            }, ${refresh_token.role.title.toUpperCase()}`,
             type: 'credit',
             resource_type: 'fee',
             resource_id: fee.id,
             school_id: refresh_token.school_id
           }
-        })
+        });
       }
     } else {
       const fee = await prisma.fee.create({
@@ -73,18 +75,20 @@ export default async function post(req, res, refresh_token) {
           title: `${data.title} exam fee`,
           description: data.title,
           amount: data.amount,
-          reference: `${refresh_token.name}, ${refresh_token.role.title.toUpperCase()}`,
+          reference: `${
+            refresh_token.name
+          }, ${refresh_token.role.title.toUpperCase()}`,
           type: 'credit',
           resource_type: 'fee',
           resource_id: fee.id,
           school_id: refresh_token.school_id
         }
-      })
+      });
     }
 
     res.status(200).json({ success: true });
   } catch (err) {
-    logFile.error(err.message)
+    logFile.error(err.message);
     console.log(err.message);
     res.status(404).json({ err: err.message });
   }

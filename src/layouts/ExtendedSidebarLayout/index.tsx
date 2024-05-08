@@ -23,7 +23,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  [theme.breakpoints.down('lg')]: {
+  [theme.breakpoints.up('xs')]: {
     marginLeft: 0,
   },
   [theme.breakpoints.up('lg')]: {

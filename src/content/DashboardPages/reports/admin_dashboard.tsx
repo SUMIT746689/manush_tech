@@ -61,48 +61,50 @@ function AdminDashboardReportsContent({ blockCount = null }) {
   return (
     <>
 
-      <Grid p={2} display={{ sm: "flex" }} gap={4} >
+      <Grid p={2} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr auto' }} gap={2} >
 
-        <Grid sx={{ display: "grid", width: "100%" }} height="fit-content">
-          <Card sx={{ display: 'flex', height: 170, justifyContent: "space-between", width: "100%", pl: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+        <Grid sx={{ display: "grid", width: "100%" }} height="fit-content" >
+          <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
             {/* <Image alt='sss' /> */}
-            <Avatar sx={{ my: 'auto', width: { xs: 60, sm: 80, md: 120 }, height: { xs: 60, sm: 80, md: 120 } }} />
+            <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80, md: 120 }, height: { xs: 40, sm: 80, md: 120 } }} />
             <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
-              <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
-              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
-              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
+              <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 22, lg: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
+              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
+              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
             </Grid>
-            <Image
-              src="/dashboard/student_teacher.svg"
-              width={300}
-              height={150}
-              alt="Picture of the author"
-              style={{ position: "relative", bottom: -1, right: 0, marginTop: 'auto' }}
-            />
+            <Grid item height={'100%'} width='fit-content' display={{ xs: 'none', md: 'flex' }}>
+              <Image
+                src="/dashboard/student_teacher.svg"
+                width={300}
+                height={150}
+                alt="Picture of the author"
+                style={{ position: "relative", bottom: 0, right: 0, marginTop: 'auto' }}
+              />
+            </Grid>
           </Card>
 
-          <Grid sx={{ width: '100%', height: '140px', display: "flex", justifyContent: "center", columnGap: 4, mt: 4, mb: 2 }}>
-            <Card sx={{ width: '380px', p: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center" }}>
+          <Grid sx={{ width: '100%', height: '140px', display: "flex", justifyContent: "center", columnGap: { xs: 2, sm: 4 }, mt: 4, mb: 2 }}>
+            <Card sx={{ minWidth: { md: '320px', xl: '380px' }, p: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: { xs: 1, sm: 2 }, justifyContent: "center", alignItems: "center" }}>
               <StudentsIcon fillColor='white' />
-              <Grid fontWeight={700} fontSize={{ xs: 20, sm: 26 }} >
+              <Grid fontWeight={700} fontSize={{ xs: 16, sm: 20, md: 23, xl: 26 }} >
                 <Grid>Total Students</Grid>
                 <Grid>{blockCount?.students?.count}</Grid>
               </Grid>
             </Card>
 
-            <Card sx={{ width: '380px', p: 3, background: 'linear-gradient(180deg, #F5952D 0%, #F36717 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center" }}>
+            <Card sx={{ minWidth: { md: '320px', xl: '380px' }, p: 3, background: 'linear-gradient(180deg, #F5952D 0%, #F36717 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center" }}>
               <StaffsIcon fillColor='white' />
-              <Grid fontWeight={700} fontSize={{ xs: 20, sm: 26 }} >
+              <Grid fontWeight={700} fontSize={{ xs: 16, sm: 20, md: 23, xl: 26 }} >
                 <Grid sx={{}}>Total Staffs</Grid>
                 <Grid>0 -static</Grid>
               </Grid>
             </Card>
 
           </Grid>
-        </Grid>
+        </Grid >
 
 
-        <Grid sx={{ height: 'fit-content', maxWidth: { sm: 220 }, width: '100%', display: "grid", gap: 2 }}>
+        <Grid sx={{ height: 'fit-content', minWidth: { sm: 220, md: 240 }, width: '100%', display: "grid", gap: 2 }}>
 
           <Button variant='contained' sx={{ minWidth: '100%', background: '#494949', ":hover": { background: "#494949", opacity: 0.9 }, py: 2, width: '100%', fontSize: { xs: 16, sm: 18 } }}>
             <Link href={`http://${blockCount?.domain}`} target='_blank' color="primary" rel="noopener noreferrer" >
@@ -125,26 +127,27 @@ function AdminDashboardReportsContent({ blockCount = null }) {
           <Attendance todayAttendance={blockCount.attendance} />
 
         </Grid>
-      </Grid>
+      </Grid >
 
 
       {/* quick links and attendance */}
-      <Grid px={2} display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2} >
+      < Grid px={2} display="flex" flexDirection={{ xs: 'column', sm: 'row' }
+      } gap={2} >
 
         {/* quick links */}
-        <Grid width="100%" display="flex" justifyContent="center">
+        < Grid width="100%" display="flex" justifyContent="center" >
           <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
             {
               quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
             }
           </Grid>
-        </Grid>
+        </Grid >
         {/* attendance */}
-        <Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
+        < Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
           <Typography fontWeight={700} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Typography>
           <Calander holidays={blockCount.holidays} />
-        </Grid>
-      </Grid>
+        </Grid >
+      </Grid >
 
       {/* banners */}
       {/* <Grid sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, p: 2 }}> */}

@@ -399,7 +399,7 @@ console.log({i});
                 </Grid>
 
                 <Grid ref={selectedInvoiceRef}>
-                    <PaymentInvoice printFees={selectedInvoice} student={selectedInvoice[0]?.student} />
+                    {/* <PaymentInvoice printFees={selectedInvoice} student={selectedInvoice[0]?.student} /> */}
                 </Grid>
 
             </Dialog>

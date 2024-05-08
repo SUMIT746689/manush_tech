@@ -336,19 +336,28 @@ const accounting: MenuItems[] = [
       },
       {
         name: 'Fees',
-        icon: PaidIcon,
+        icon: AccountBalanceIcon,
         items: [
           {
-            name: 'Payment history',
-            link: '/reports/fees/payment_history',
-            icon: HistoryIcon
+            name: 'Fees',
+            link: '/management/fees',
+            icon: PaidIcon
           },
           {
-            name: 'Recipt report',
-            link: '/reports/fees/recipt_report',
-            icon: HistoryIcon
+            name: 'Payment',
+            link: '/management/fees/student_payment',
+            icon: PaidIcon
           },
-
+          {
+            name: 'Payment History',
+            icon: AccountTreeTwoToneIcon,
+            link: '/management/fees/student_payment_history',
+          },
+          {
+            name: 'Collect Fee',
+            icon: AccountTreeTwoToneIcon,
+            link: '/management/student_fees_collection',
+          },
         ]
       },
       {

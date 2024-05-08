@@ -1,4 +1,6 @@
 import { Grid, Typography } from '@mui/material';
+import Image from 'next/image';
+import { getFile } from '@/utils/utilitY-functions';
 
 const RightBox = ({ userInformation }) => {
   return (
@@ -38,13 +40,26 @@ const RightBox = ({ userInformation }) => {
         >
           <Grid
             sx={{
-              width: '200px',
-              height: '200px',
+              width: '150px',
+              height: '150px',
               backgroundColor: '#ccc'
             }}
-          ></Grid>
+          >
+            {userInformation?.student_photo ? (
+              <Image
+                src={getFile(userInformation?.student_photo)}
+                height={100}
+                width={100}
+                alt={`${userInformation?.first_name} photo`}
+                loading="lazy"
+                style={{ width: '100%', height: '100%' }}
+              />
+            ) : (
+              ''
+            )}
+          </Grid>
         </Grid>
-        {/* user details information */}
+
         <Grid
           sx={{
             flexGrow: 1
@@ -61,86 +76,94 @@ const RightBox = ({ userInformation }) => {
                 flexBasis: '40%'
               }}
             >
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Student Name:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Fathers Name:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Class:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Group:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Shift:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Section:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Roll No:
-              </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px',
-                  textAlign: 'right'
-                }}
-              >
-                Year:
-              </Typography>
+              {userInformation?.first_name ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Student Name:
+                </Typography>
+              ) : (
+                ''
+              )}
+              {userInformation?.father_name ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Fathers Name:
+                </Typography>
+              ) : (
+                ''
+              )}
+
+              {userInformation?.class_name ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Class:
+                </Typography>
+              ) : (
+                ''
+              )}
+
+              {userInformation?.group_title ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Group:
+                </Typography>
+              ) : (
+                ''
+              )}
+
+              {userInformation?.section_name ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Section:
+                </Typography>
+              ) : (
+                ''
+              )}
+
+              {userInformation?.class_roll_no ? (
+                <Typography
+                  component="p"
+                  sx={{
+                    color: '#223354b3',
+                    fontSize: '14px',
+                    textAlign: 'right'
+                  }}
+                >
+                  Roll No:
+                </Typography>
+              ) : (
+                ''
+              )}
             </Grid>
             <Grid
               sx={{
@@ -154,7 +177,15 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                Rakibul Islam
+                {`${
+                  userInformation?.first_name ? userInformation?.first_name : ''
+                } ${
+                  userInformation?.middle_name
+                    ? userInformation?.middle_name
+                    : ''
+                } ${
+                  userInformation?.last_name ? userInformation?.last_name : ''
+                }`}
               </Typography>
               <Typography
                 component="p"
@@ -163,7 +194,9 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                Md. Nurul Islam
+                {userInformation?.father_name
+                  ? userInformation?.father_name
+                  : ''}
               </Typography>
               <Typography
                 component="p"
@@ -172,7 +205,7 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                One
+                {userInformation?.class_name ? userInformation.class_name : ''}
               </Typography>
               <Typography
                 component="p"
@@ -181,9 +214,11 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                PC-C
+                {userInformation?.group_title
+                  ? userInformation?.group_title
+                  : ''}
               </Typography>
-              <Typography
+              {/* <Typography
                 component="p"
                 sx={{
                   color: '#223354b3',
@@ -191,6 +226,17 @@ const RightBox = ({ userInformation }) => {
                 }}
               >
                 Morning
+              </Typography> */}
+              <Typography
+                component="p"
+                sx={{
+                  color: '#223354b3',
+                  fontSize: '14px'
+                }}
+              >
+                {userInformation?.section_name
+                  ? userInformation?.section_name
+                  : ''}
               </Typography>
               <Typography
                 component="p"
@@ -199,18 +245,11 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                A
+                {userInformation?.class_roll_no
+                  ? userInformation.class_roll_no
+                  : ''}
               </Typography>
-              <Typography
-                component="p"
-                sx={{
-                  color: '#223354b3',
-                  fontSize: '14px'
-                }}
-              >
-                100
-              </Typography>
-              <Typography
+              {/* <Typography
                 component="p"
                 sx={{
                   color: '#223354b3',
@@ -218,7 +257,7 @@ const RightBox = ({ userInformation }) => {
                 }}
               >
                 2023
-              </Typography>
+              </Typography> */}
             </Grid>
           </Grid>
         </Grid>

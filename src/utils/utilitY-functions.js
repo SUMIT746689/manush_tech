@@ -2,8 +2,7 @@ import prisma from '@/lib/prisma_client';
 import crypto from 'crypto';
 
 export const getOneCookies = (cname) => {
-
-  let name = cname + "=";
+  let name = cname + '=';
   let decodedCookie = decodeURIComponent(document.cookie);
   let ca = decodedCookie.split(';');
   for (let i = 0; i < ca.length; i++) {
@@ -15,22 +14,29 @@ export const getOneCookies = (cname) => {
       return c.substring(name.length, c.length);
     }
   }
-  return "";
-}
+  return '';
+};
 
 export function onlyUnique(value, index, array) {
   console.log(value, array.indexOf(value), index);
   return array.indexOf(value) === index;
 }
 export function registration_no_generate(index) {
-  return (Date.now().toString() + Math.random().toString()).substring(0, 11) + (index || '');
+  return (
+    (Date.now().toString() + Math.random().toString()).substring(0, 11) +
+    (index || '')
+  );
 }
 export function unique_password_generate() {
   return Date.now().toString(36) + Math.random().toString(36).substring(0, 8);
 }
 export function generateUsername(firstName) {
-  const text = Date.now().toString()
-  return firstName?.split(' ').join('').toLowerCase() + text.substring(text.length - 5) + Math.random().toString(36).substring(0, 8)
+  const text = Date.now().toString();
+  return (
+    firstName?.split(' ').join('').toLowerCase() +
+    text.substring(text.length - 5) +
+    Math.random().toString(36).substring(0, 8)
+  );
 }
 
 // export async function generateUsernameUsingNumber(value) {
@@ -41,7 +47,20 @@ export function generateUsername(firstName) {
 // }
 
 export function unique_tracking_number(str = '') {
-  return str + Date.now().toString() + crypto.randomBytes(5).toString("hex")
+  return str + Date.now().toString() + crypto.randomBytes(5).toString('hex');
+}
+
+export async function new_unique_tracking_number(str = '', school_id) {
+  const trackingNumber =
+    str + Date.now().toString() + crypto.randomBytes(5).toString('hex');
+  const resisAlreadyHave = await prisma.transaction.findFirst({
+    where: {
+      tracking_number: trackingNumber,
+      school_id
+    }
+  });
+  if (!resisAlreadyHave) return trackingNumber;
+  unique_tracking_number(str, school_id);
 }
 
 export function accessNestedProperty(obj, array) {
@@ -57,10 +76,18 @@ export function accessNestedProperty(obj, array) {
 }
 
 export function getFile(str) {
-  return str && typeof (str) == 'string' ? `/api/get_file/${str?.replace(/\\/g, '/')}` : ''
+  return str && typeof str == 'string'
+    ? `/api/get_file/${str?.replace(/\\/g, '/')}`
+    : '';
 }
 
-export const imagePdfDocType = ['image/x-png', 'image/png', 'image/gif', 'image/jpeg',
-  'image/jpg', 'application/pdf',
+export const imagePdfDocType = [
+  'image/x-png',
+  'image/png',
+  'image/gif',
+  'image/jpeg',
+  'image/jpg',
+  'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/msword']
+  'application/msword'
+];

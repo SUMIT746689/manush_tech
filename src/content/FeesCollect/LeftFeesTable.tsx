@@ -34,12 +34,29 @@ export default function LeftFeesTable({
   selectAll,
   setSelectAll
 }) {
-  // const [selectedRows, setSelectedRows] = useState([]);
-
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelectedRows = tableData.map((row) => row.feeId);
-      setSelectedRows(newSelectedRows);
+
+      let newArrSelectedRow = [];
+
+      for (let i = 0; i < newSelectedRows.length; i++) {
+        for (let j = 0; j < tableData.length; j++) {
+          if (
+            tableData[j].feeId === newSelectedRows[i] &&
+            tableData[j].dueAmount > 0
+          ) {
+            newArrSelectedRow.push(newSelectedRows[i]);
+          }
+        }
+      }
+
+      // old version code
+      // setSelectedRows(newSelectedRows);
+      // setSelectAll(true);
+
+      // new version code
+      setSelectedRows(newArrSelectedRow);
       setSelectAll(true);
     } else {
       setSelectedRows([]);
@@ -64,7 +81,35 @@ export default function LeftFeesTable({
       );
     }
 
-    setSelectedRows(newSelected);
+    // check if dueAmount is 0 or greater than
+    // let newSelectedRow = tableData.filter((item, i) => {
+    //   if (item.feeId === newSelected[i] && item.dueAmount > 0) {
+    //     console.log('item');
+    //     console.log(item);
+    //     return item.feeId;
+    //   }
+    // });
+    let newSelectedRow = [];
+
+    for (let i = 0; i < newSelected.length; i++) {
+      for (let j = 0; j < tableData.length; j++) {
+        if (
+          tableData[j].feeId === newSelected[i] &&
+          tableData[j].dueAmount > 0
+        ) {
+          newSelectedRow.push(newSelected[i]);
+        }
+      }
+    }
+
+    // old version code
+
+    // setSelectedRows(newSelected);
+    // setSelectAll(newSelected.length === tableData.length);
+
+    // new version code
+
+    setSelectedRows(newSelectedRow);
     setSelectAll(newSelected.length === tableData.length);
   };
 

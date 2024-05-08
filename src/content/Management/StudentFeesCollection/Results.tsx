@@ -140,8 +140,6 @@ const Results = ({
         )
         .then((res) => {
           if (res.data?.success) {
-            console.log('res.data.data__', res.data);
-
             setSessions(
               res.data.data?.fees?.map((fee, index) => {
                 const last_payment_date =
@@ -177,8 +175,6 @@ const Results = ({
                       : fee?.status == 'unpaid'
                       ? 0
                       : fee?.amount);
-
-                  console.log(fee.title, 'due__', due, today < last_date);
 
                   if (today < last_date) {
                     due -= late_fee;
@@ -400,6 +396,7 @@ const Results = ({
     setSessions([]);
     setSelectedFees([]);
     setSelectedItems([]);
+
     if (newValue) {
       const targetClassSections = classes.find((i) => i.id == newValue.id);
       setSections(

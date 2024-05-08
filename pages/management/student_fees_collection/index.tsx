@@ -27,6 +27,8 @@ import RightBox from '@/content/FeesCollect/RightBox';
 import LeftFeesTable from '@/content/FeesCollect/LeftFeesTable';
 import RightFeesTable from '@/content/FeesCollect/RightFeesTable';
 import PaymentOptions from '@/content/FeesCollect/PaymentOptions';
+import Reset_Sent_SMS_Collect_Invoice from '@/content/FeesCollect/Reset_Sent_SMS_Collect_Invoice';
+
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 // updated searching code start
@@ -52,7 +54,7 @@ function Managementschools() {
   // updated code start
   const [searchValue, setSearchValue] = useState<any>(null);
   const [searchOptionData, setSearchOptionData] = useState<Array<any>>([]);
-  const [userInformation, setUserInformation] = useState<object | null>(null);
+  const [userInformation, setUserInformation] = useState<any>(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [leftFeesTableData, setLeftFeesTableData] = useState<Array<any>>([]);
   const [totalDueValue, setTotalDueValue] = useState<string>('0');
@@ -63,6 +65,17 @@ function Managementschools() {
   const [trackingCollectButton, setTrackingCollectButton] =
     useState<Boolean>(false);
   const [selectAll, setSelectAll] = useState<Boolean>(false);
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [selectedGateway, setSelectedGateway] = useState(null);
+  const [transID, setTransID] = useState<string | null>(null);
+  const [feesName, setFeesName] = useState<any>(null);
+  const [feesAmount, setFeesAmount] = useState<string | null>(null);
+  const [collect_other_fees_btn, setCollect_other_fees_btn] =
+    useState<boolean>(false);
+  const [totalFeesCalculate, setTotalFeesCalculate] = useState<string | null>(
+    null
+  );
+  const [amount, setAmount] = useState(null);
   // handleDebounce function
 
   const handleDebounce = (value) => {
@@ -92,7 +105,7 @@ function Managementschools() {
     event: ChangeEvent<HTMLInputElement>,
     v
   ) => {
-    setSearchValue(event.target.value);
+    setSearchValue(v);
   };
   const searchHandleUpdate = async (
     event: ChangeEvent<HTMLInputElement>,
@@ -210,11 +223,17 @@ function Managementschools() {
     });
 
     // discount array
+
+    // student information code start
+
+    setUserInformation(data);
+    // student information code end
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     // searching data collect
     // searchValue.id
     // academicYear.id
+
     if (searchValue?.id && academicYear?.id) {
       const res = await axios.get(
         `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
@@ -249,6 +268,107 @@ function Managementschools() {
   };
 
   // updated searching code end
+
+  // updated reset button code start
+  const resetBtnHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setSearchValue('');
+    setLeftFeesTableData([]);
+    setFeesName('');
+    setFeesAmount('');
+    setSelectedAccount(null);
+    setSelectedGateway(null);
+    setTransID('');
+    setAmount(null);
+    setUserInformation({});
+    setSelectedRowsFeesTable([]);
+    setSelectAll(false);
+    setPrintFees([]);
+  };
+
+  // updated reset button code end
+  function handleStudentPaymentCollect(res_arr) {
+    const calculate_arr = res_arr?.map((fee_, index) => {
+      const last_payment_date =
+        fee_?.status !== 'unpaid' ? fee_?.last_payment_date : '';
+
+      // old code
+      // const last_date = new Date(fee.last_date);
+      // const today = new Date();
+
+      // update code
+      const last_date = new Date(fee_.last_date).getTime();
+      const today = new Date().getTime();
+
+      const status_color = { p: 0.5 };
+      let due = 0,
+        total_payable_amt,
+        due_fee = 0,
+        payableAmount = 0;
+
+      if (fee_?.status == 'paid' || fee_?.status === 'paid late') {
+        due = 0;
+        total_payable_amt = '';
+      } else {
+        const late_fee = fee_.late_fee ? fee_.late_fee : 0;
+        if (late_fee && today > last_date) {
+          // due fee part start
+          due =
+            Number(fee_?.amount) +
+            Number(fee_?.late_fee) -
+            (fee_?.paidAmount ? Number(fee_?.paidAmount) : 0);
+
+          // due fee part end
+          payableAmount = Number(fee_?.amount) + Number(fee_?.late_fee);
+          total_payable_amt = `${Number(fee_?.amount).toFixed(1)} + ${Number(
+            fee_?.late_fee
+          ).toFixed(1)} = ${payableAmount.toFixed(2)}`;
+        } else {
+          total_payable_amt = '';
+        }
+
+        // updated due calculation start
+
+        // updated due calculation end
+
+        due =
+          fee_?.amount +
+          late_fee -
+          (fee_.paidAmount
+            ? fee_.paidAmount
+            : fee_?.status == 'unpaid'
+            ? 0
+            : fee_?.amount);
+
+        // console.log(fee.title, 'due__', due, today < last_date);
+
+        if (today < last_date) {
+          due -= late_fee;
+        }
+      }
+
+      if (fee_?.status === 'paid' || fee_?.status === 'paid late') {
+        status_color['color'] = 'green';
+      } else if (fee_?.status === 'partial paid') {
+        status_color['color'] = 'blue';
+      } else {
+        status_color['color'] = 'red';
+      }
+
+      fee_['last_payment_date'] = last_payment_date;
+      fee_['due'] = due;
+      fee_['total_payable_amt'] = total_payable_amt;
+      fee_['payableAmount'] = payableAmount;
+      fee_['status_color'] = status_color;
+      fee_['sl'] = index + 1;
+      return fee_;
+    });
+
+    setDatas(calculate_arr);
+  }
+
+  // update setSession functionality code start
+
+  // update setSession functionality code end
   const [datas, setDatas] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [printFees, setPrintFees] = useState([]);
@@ -263,7 +383,10 @@ function Managementschools() {
 
   useEffect(() => {
     const temp = datas.filter((i) => {
-      const got = printFees.find((j) => j.fee_id == i.id);
+      const got = printFees.find(
+        (j) => j.fee_id === i.fee_id && i.fee_id !== ''
+      );
+
       if (got) {
         for (const index in got) {
           i[index] = got[index];
@@ -273,6 +396,32 @@ function Managementschools() {
 
       return false;
     });
+
+    let lastOne = printFees.find((item, i) => {
+      if (!item.fee_id) {
+        return item;
+      }
+    });
+
+    if (lastOne) {
+      temp.push({
+        ...temp[0],
+
+        amount: lastOne.paidAmount,
+        late_fee: 0,
+        account: lastOne.account,
+        created_at: lastOne.created_at,
+        fee_id: lastOne.fee_id,
+        last_payment_date: lastOne.last_payment_date,
+        paidAmount: lastOne.paidAmount,
+        payment_method: lastOne.payment_method,
+        status: lastOne.status,
+        tracking_number: lastOne.tracking_number,
+        title: lastOne.other_fee_name,
+        transID: lastOne.transID,
+        due: 0
+      });
+    }
 
     setPrinCollectedtFees(temp);
   }, [printFees]);
@@ -293,17 +442,63 @@ function Managementschools() {
     content: () => printAllPageARef.current
   });
 
-  const handleSentSms = () => {
-    if (!selectedStudent?.student_info?.phone)
+  // useEffect(() => {
+  //   console.log('Hello useEffect hook ');
+  //   console.log(userInformation?.section_id);
+  //   console.log(academicYear);
+  //   if (userInformation?.section_id && academicYear) {
+  //     axios
+  //       .get(
+  //         `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${userInformation?.section_id}`
+  //       )
+  //       .then((res) => {
+  //         // setStudents(res.data);
+  //       })
+  //       .catch((err) => console.log(err));
+  //   }
+  // }, [userInformation.section_id, academicYear]);
+
+  const handleSentSms = async () => {
+    // updated code start
+    const student_list = await axios.get(
+      `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${userInformation?.section_id}`
+    );
+
+    const singleUser = student_list.data.find((item, i) => {
+      return item.student_information_id === userInformation.id;
+    });
+
+    // updated code end
+
+    if (!singleUser?.student_info?.phone)
       return showNotification('phone number not founds', 'error');
 
     setIsSentSmsLoading(true);
-    const sms_text = `${prinCollectedtFees[0].title} fees, paid amount: ${printFees[0].paidAmount} TK(${printFees[0].status}), due: ${prinCollectedtFees[0].due} TK. Tracking number: ${printFees[0].tracking_number}`;
+
+    let full_title = '';
+    let total_due = 0;
+    let total_paid_amount = 0;
+
+    for (let i = 0; i < prinCollectedtFees.length; i++) {
+      full_title += '|' + prinCollectedtFees[i].title;
+      if (prinCollectedtFees[i].fee_id) {
+        total_due += prinCollectedtFees[i].due;
+      }
+    }
+
+    for (let i = 0; i < printFees.length; i++) {
+      total_paid_amount += printFees[i].paidAmount;
+    }
+
+    full_title = full_title.substring(1);
+
+    // const sms_text = `${prinCollectedtFees[0].title} fees, paid amount: ${printFees[0].paidAmount} TK(${printFees[0].status}), due: ${prinCollectedtFees[0].due} TK. Tracking number: ${printFees[0].tracking_number}`;
+    const sms_text = `${full_title} fees, paid amount: ${total_paid_amount} TK. Tracking number: ${printFees[0].tracking_number}`;
 
     axios
       .post('/api/sent_sms/student_fees', {
         sms_text,
-        contacts: selectedStudent?.student_info?.phone
+        contacts: singleUser?.student_info?.phone
       })
       .then(({ data }) => {
         if (data?.success) showNotification('sending sms successfully');
@@ -328,7 +523,7 @@ function Managementschools() {
         <title>Student Fee Collection - Management</title>
       </Head>
 
-      <Grid
+      {/*    <Grid
         sx={{ px: 4, mt: 1 }}
         container
         direction="row"
@@ -356,8 +551,8 @@ function Managementschools() {
             setSelectedFees={setSelectedFees}
           />
         </Grid>
-      </Grid>
-      <Grid px={4} mt={1}>
+      </Grid>  */}
+      {/* <Grid px={4} mt={1}>
         <Card
           sx={{
             pt: 1,
@@ -393,15 +588,24 @@ function Managementschools() {
             {'Collect Invoice Print'}
           </ButtonWrapper>
         </Card>
-      </Grid>
+      </Grid>   */}
+
       <Grid sx={{ display: 'none' }}>
         <Grid ref={printPageRef}>
           <PaymentInvoice
+            leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
+            feesUserData={feesUserData}
+            totalDueValue={totalDueValue}
+            leftFeesTableData={leftFeesTableData}
             setShowPrint={setShowPrint}
             printFees={prinCollectedtFees}
             student={selectedStudent}
           />
           <PaymentInvoice
+            leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
+            feesUserData={feesUserData}
+            totalDueValue={totalDueValue}
+            leftFeesTableData={leftFeesTableData}
             setShowPrint={setShowPrint}
             printFees={prinCollectedtFees}
             student={selectedStudent}
@@ -464,10 +668,40 @@ function Managementschools() {
           selectedRows={selectedRowsFeesTable}
           setSelectedRows={setSelectedRowsFeesTable}
         />
-        <RightFeesTable />
+
+        <RightFeesTable
+          collect_other_fees_btn={collect_other_fees_btn}
+          setCollect_other_fees_btn={setCollect_other_fees_btn}
+          feesName={feesName}
+          setFeesName={setFeesName}
+          feesAmount={feesAmount}
+          setFeesAmount={setFeesAmount}
+          transID={transID}
+          feesUserData={feesUserData}
+          selectedAccount={selectedAccount}
+          selectedGateway={selectedGateway}
+        />
       </Grid>
+
       <Grid px={4} mt={1} mx={1}>
         <PaymentOptions
+          handleStudentPaymentCollect={handleStudentPaymentCollect}
+          setPrintFees={setPrintFees}
+          amount={amount}
+          setAmount={setAmount}
+          totalFeesCalculate={totalFeesCalculate}
+          setTotalFeesCalculate={setTotalFeesCalculate}
+          setFeesAmount={setFeesAmount}
+          setFeesName={setFeesName}
+          collect_other_fees_btn={collect_other_fees_btn}
+          feesName={feesName}
+          feesAmount={feesAmount}
+          transID={transID}
+          setTransID={setTransID}
+          selectedGateway={selectedGateway}
+          setSelectedGateway={setSelectedGateway}
+          selectedAccount={selectedAccount}
+          setSelectedAccount={setSelectedAccount}
           deSelectAllCheckbox={deSelectAllCheckbox}
           trackingCollectButton={trackingCollectButton}
           setTrackingCollectButton={setTrackingCollectButton}
@@ -485,6 +719,16 @@ function Managementschools() {
         />
       </Grid>
       {/* fees collection code end*/}
+      <Grid px={4} mt={1} mx={1}>
+        <Reset_Sent_SMS_Collect_Invoice
+          handlePrint={handlePrint}
+          prinCollectedtFees={prinCollectedtFees}
+          printFees={printFees}
+          handleSentSms={handleSentSms}
+          isSentSmsLoading={isSentSmsLoading}
+          resetBtnHandleClick={resetBtnHandleClick}
+        />
+      </Grid>
       <Footer />
     </>
   );

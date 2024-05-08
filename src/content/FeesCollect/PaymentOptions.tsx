@@ -6,8 +6,26 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import useNotistick from '@/hooks/useNotistick';
 import axios from 'axios';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  handleStudentPaymentCollect,
+  setPrintFees,
+  amount,
+  setAmount,
+  totalFeesCalculate,
+  setTotalFeesCalculate,
+  setFeesAmount,
+  setFeesName,
+  collect_other_fees_btn,
+  feesName,
+  feesAmount,
+  transID,
+  setTransID,
+  selectedGateway,
+  setSelectedGateway,
+  selectedAccount,
+  setSelectedAccount,
   deSelectAllCheckbox,
   trackingCollectButton,
   setTrackingCollectButton,
@@ -19,15 +37,27 @@ const PaymentOptions = ({
   btnHandleClick
 }) => {
   const { t }: { t: any } = useTranslation();
-  const [selectedAccount, setSelectedAccount] = useState(null);
+  // const [selectedAccount, setSelectedAccount] = useState(null);
   const [gatewayOption, setGatewayOption] = useState([]);
-  const [selectedGateway, setSelectedGateway] = useState(null);
-  const [transID, setTransID] = useState(null);
-  const [amount, setAmount] = useState(null);
+  // const [selectedGateway, setSelectedGateway] = useState(null);
+  // const [transID, setTransID] = useState(null);
+  // const [amount, setAmount] = useState(null);
   const { user } = useAuth();
 
   const { showNotification } = useNotistick();
 
+  // totalAmount calculation
+  useEffect(() => {
+    if (amount && feesAmount) {
+      setTotalFeesCalculate(parseInt(amount) + parseInt(feesAmount));
+    } else if (amount) {
+      setTotalFeesCalculate(parseInt(amount));
+    } else if (feesAmount) {
+      setTotalFeesCalculate(parseInt(feesAmount));
+    } else {
+      setTotalFeesCalculate(0);
+    }
+  }, [amount, feesAmount]);
   // dueAmount update
   useEffect(() => {
     let dueValue = 0;
@@ -64,42 +94,23 @@ const PaymentOptions = ({
       (accumulator, currentValue) => accumulator + currentValue,
       0
     );
-    // handle amount input field error message
-    // if (!amount) {
-    //   showNotification(
-    //     'The amount is less than or equal to the due amount.',
-    //     'error'
-    //   );
-    //   return;
-    // } else if (amount > totalDueAmount) {
-    //   showNotification(
-    //     'The amount is less than or equal to the due amount.',
-    //     'error'
-    //   );
-    //   return;
-    // } else if (amount < totalDueAmount && amount > 0) {
-    // } else if (amount < 0) {
-    //   showNotification(
-    //     'The amount is less than or equal to the due amount.',
-    //     'error'
-    //   );
-    //   return;
-    // }
-    // handle bank account input field error message
 
     if (!selectedAccount?.id) {
-      showNotification('Please select a bank account.', 'error');
+      showNotification('please select bank account.', 'error');
       return;
     }
     // handle pay via input field error message
     if (!selectedGateway?.id) {
-      showNotification('Please select a Pay via option.', 'error');
+      showNotification('please select pay via option.', 'error');
       return;
     }
     // handle transId input field error message
+
     if (selectedGateway?.label !== 'Cash' ? true : false) {
-      showNotification('Please provide the transaction ID.', 'error');
-      return;
+      if (!transID) {
+        showNotification('please provide the transaction id.', 'error');
+        return;
+      }
     }
 
     // amount calculation part start
@@ -117,7 +128,7 @@ const PaymentOptions = ({
     }, 0);
     const copy_dueAmount_arr = dueAmount;
     let remaining_due_value = null;
-    if (!amount) {
+    if (!amount && !totalFeesCalculate) {
       showNotification('please fill out amount field.', 'error');
       return;
     } else if (parseInt(amount) > parseInt(total_amount)) {
@@ -197,6 +208,37 @@ const PaymentOptions = ({
 
     // amount calculation part end
 
+    let other_fees_data = null;
+    if (feesName && feesAmount) {
+      other_fees_data = {
+        student_id: feesUserData.id,
+        collected_by_user: user?.id,
+        //  fee_id: selectedRows,  // optional
+        account_id: selectedAccount?.id,
+        payment_method_id: selectedGateway?.id,
+        collected_amount: amount
+          ? parseInt(totalFeesCalculate) - parseInt(amount)
+          : parseInt(totalFeesCalculate),
+        transID: transID ? transID : null,
+        total_payable: [
+          amount
+            ? parseInt(totalFeesCalculate) - parseInt(amount)
+            : parseInt(totalFeesCalculate)
+        ],
+        sent_sms: false,
+        collect_filter_data: [
+          {
+            collected_amount: amount
+              ? parseInt(totalFeesCalculate) - parseInt(amount)
+              : parseInt(totalFeesCalculate),
+            total_payable: amount
+              ? parseInt(totalFeesCalculate) - parseInt(amount)
+              : parseInt(totalFeesCalculate)
+          }
+        ],
+        fees_name: feesName
+      };
+    }
     axios
       .post('/api/student_payment_collect/multiples_fees', {
         student_id: feesUserData.id,
@@ -208,12 +250,41 @@ const PaymentOptions = ({
         transID: transID ? transID : null,
         total_payable: copy_dueAmount_arr,
         sent_sms: false,
-        collect_filter_data
+        collect_filter_data,
+        other_fees_data
       })
       .then((res) => {
         if (res.data.success) {
+          const printResult = res?.data?.result.map((item, i) => {
+            const last_date = new Date(
+              item?.last_date ? item?.last_date : ''
+            ).getTime();
+            const today = new Date().getTime();
+            return {
+              fee_id: item?.fee_id ? item?.fee_id : '',
+              paidAmount: item?.collect_amount,
+              tracking_number: item?.tracking_number,
+              created_at: item?.created_at,
+              last_payment_date: item?.last_payment_date,
+              account: item?.account_name,
+              transID: item?.transID,
+              payment_method: item?.payment_method,
+              status: item?.status,
+              other_fee_name: item?.other_fee_name ? item?.other_fee_name : '',
+              amount: item?.amount ? item?.amount : 0,
+              // late_fee: item?.late_fee ? item?.late_fee : 0,
+              late_fee: today > last_date ? item?.late_fee : 0,
+              last_date: item?.last_date ? item?.last_date : 0,
+              title: item?.title ? item?.title : 0
+            };
+          });
+
+          setPrintFees(printResult);
+          handleStudentPaymentCollect(printResult);
           btnHandleClick();
           deSelectAllCheckbox();
+          setFeesAmount('');
+          setFeesName('');
           showNotification(
             `Congratulations! Payment Successfully Processed`,
             'success'
@@ -221,7 +292,7 @@ const PaymentOptions = ({
         }
       })
       .catch((error) => {
-        // console.log('Frontend catch block error message is here');
+        handleShowErrMsg(error, showNotification);
       });
   };
 
@@ -231,7 +302,7 @@ const PaymentOptions = ({
         backgroundColor: '#fff',
         padding: '18px',
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 150px)',
+        gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(6, 150px)' },
         gap: 1,
         justifyContent: 'center'
       }}
@@ -239,7 +310,6 @@ const PaymentOptions = ({
       <AutoCompleteWrapper
         label={t('Account')}
         placeholder={t('Select account...')}
-        // getOptionLabel={(option) => option.name}
         options={accountsOption}
         value={selectedAccount}
         handleChange={(e, v) => {
@@ -295,14 +365,34 @@ const PaymentOptions = ({
         errors={undefined}
         value={amount || ''}
         handleChange={(e) => {
-          setAmount(e.target.value);
+          const int_value = parseInt(e.target.value);
+          const value = Math.abs(int_value);
+          setAmount(value);
         }}
+        handleBlur={undefined}
+      />
+
+      <TextFieldWrapper
+        disabled={true}
+        label="Total Amount"
+        name=""
+        type="number"
+        touched={undefined}
+        errors={undefined}
+        value={totalFeesCalculate || ''}
+        handleChange={() => {}}
         handleBlur={undefined}
       />
       <Grid>
         <Button
           variant="contained"
-          disabled={selectedRows.length > 0 ? false : true}
+          disabled={
+            (selectedRows.length > 0 || totalFeesCalculate > 0) &&
+            feesUserData?.id
+              ? false
+              : true
+          }
+          //disabled={feesUserData?.id ? false : true}
           onClick={handleCollect}
           sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
         >

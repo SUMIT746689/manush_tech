@@ -7,10 +7,9 @@ import StudentForm from '@/components/Student/StudentForm';
 import { Grid, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 
-
 export const getServerSideProps = async ({ params }) => {
   try {
-    const studentID = parseInt(params.id)
+    const studentID = parseInt(params.id);
 
     const student = await prisma.student.findUniqueOrThrow({
       where: {
@@ -26,12 +25,12 @@ export const getServerSideProps = async ({ params }) => {
                 user_role_id: true,
                 role_id: true,
                 // "deleted_at": null,
-                "is_enabled": true,
+                is_enabled: true,
                 // "created_at": "2024-02-08T10:51:48.311Z",
                 // "updated_at": "2024-03-10T06:32:41.608Z",
                 user_photo: true,
                 school_id: true,
-                admin_panel_id: true,
+                admin_panel_id: true
               }
             }
           }
@@ -39,17 +38,15 @@ export const getServerSideProps = async ({ params }) => {
         section: true,
         extra_section: true
       }
-    })
+    });
 
-    return { props: { student: JSON.parse(JSON.stringify(student)) } }
-
+    return { props: { student: JSON.parse(JSON.stringify(student)) } };
   } catch (e) {
-    return { notFound: true }
+    return { notFound: true };
   }
-}
+};
 
 const EditStudent = ({ student }) => {
-  
   const { t }: { t: any } = useTranslation();
   return (
     <>
@@ -59,7 +56,11 @@ const EditStudent = ({ student }) => {
             {t('Student Edit')}
           </Typography>
           <Typography variant="subtitle2">
-            {t(`Student name: ${student?.student_info?.first_name} ${student?.student_info?.middle_name || ''} ${student?.student_info?.last_name || ''}`)}
+            {t(
+              `Student name: ${student?.student_info?.first_name} ${
+                student?.student_info?.middle_name || ''
+              } ${student?.student_info?.last_name || ''}`
+            )}
           </Typography>
         </Grid>
       </PageTitleWrapper>
@@ -67,9 +68,8 @@ const EditStudent = ({ student }) => {
       <StudentForm student={student} />
       <Footer />
     </>
-  )
-}
-
+  );
+};
 
 EditStudent.getLayout = (page) => (
   <Authenticated name="student">

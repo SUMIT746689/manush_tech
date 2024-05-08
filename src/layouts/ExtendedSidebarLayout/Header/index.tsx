@@ -7,12 +7,11 @@ import {
   styled,
   Grid,
   Autocomplete,
-  TextField
   TextField,
   Select,
   MenuItem,
   InputLabel,
-  FormControl,
+  FormControl
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -358,7 +357,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
           <Grid minWidth={185} sx={{ display: { sm: "block", sm: "none" } }}>
             <Grid sx={{ color: "#FFFFFF", textAlign: "center", fontSize: 12 }}>Academic Year</Grid>
             <CustomAutoCompleteWrapper
-              // label="Academic Year"
+              // label="Academic Year"  
               label=""
               placeholder="select a academic year..."
               value={selectedAcademicYear}

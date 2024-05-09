@@ -455,7 +455,7 @@ const routine: MenuItems[] = [
 
 const sms: MenuItems[] = [
   {
-    
+
     items: [
       {
         name: 'Pending Buy Sms',
@@ -673,7 +673,39 @@ const report: MenuItems[] = [
 
 const examination: MenuItems[] = [
   {
+
     items: [
+      {
+        name: 'Exam',
+        icon: AssignmentIcon,
+        items: [
+          {
+            name: 'Manage Exam Term',
+            link: '/management/exam/exam_terms',
+            icon: AssignmentIcon
+          },
+          {
+            name: 'Manage Exam',
+            link: '/management/exam',
+            icon: AssignmentIcon
+          },
+          {
+            name: 'Addtional Marks',
+            link: '/management/exam/addtional_marks',
+            icon: AssignmentIcon
+          },
+          {
+            name: 'Exam seat plan',
+            link: '/management/exam/seat-plan',
+            icon: AssignmentIcon
+          },
+          {
+            name: 'Exam Question',
+            link: '/management/exam/question',
+            icon: AssignmentIcon
+          },
+        ]
+      },
       {
         name: 'Report card',
         link: '/reports/exam/report_card',
@@ -785,7 +817,7 @@ const dashboard: MenuItems[] = [{
 // const adminItems = 
 export default {
   all_users, online_addmission, students, teachers, other_users, attendance, accounting, notice, routine, sms,
-  study_materials, 
+  study_materials,
   website_settings,
   report, examination,
   dashboard

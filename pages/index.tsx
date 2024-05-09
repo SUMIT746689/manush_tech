@@ -10,7 +10,7 @@ import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/tea
 import dayjs from 'dayjs';
 // import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
-import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard';
+import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard/index';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };

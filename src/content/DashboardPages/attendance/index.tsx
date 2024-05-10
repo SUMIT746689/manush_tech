@@ -88,8 +88,8 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
   }, [addtedanceFilter])
 
   return (
-    <Card sx={{ py: 2, px: 1 }}>
-      <Grid sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, textAlign: "center" }}>Attendance</Grid>
+    <Card sx={{ py: 1, px: 1 }}>
+      <Grid sx={{ fontSize: { xs: 16, xl: 18 }, fontWeight: 700, textAlign: "center" }}>Attendance</Grid>
 
       {/* <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} py={2} columnGap={0.5}> */}
       <Grid display="flex" justifyContent={"space-between"} maxWidth={200} mx="auto" pt={2} columnGap={0.5}>
@@ -99,9 +99,11 @@ export const Attendance: FC<AttendanceProps> = ({ todayAttendance }) => {
         <ButtonWrapper isActive={addtedanceFilter} handleClick={() => { setAttendancesFilter('This Month') }}>This Month</ButtonWrapper>
       </Grid>
 
-      <Grid sx={{ display: 'grid', gap: 0.5, 
-      // borderTop: '1px solid lightgray'
-       }}  >
+      <Grid sx={{
+        display: 'grid', gap: 0.5,
+        pt: 0.5
+        // borderTop: '1px solid lightgray'
+      }}  >
         <ChartCard color="#FF715B" title="Students" width={`${studentsAttendPercent || 0}%`} />
         <ChartCard color="#34D1BF" title="Teachers" width={`${teachersAttendPercent}%`} />
         <ChartCard color="#0496FF" title="Staffs" width={`${employeesAttendPercent}%`} />
@@ -135,8 +137,8 @@ const ChartCard = ({ width, title, color }) => {
   return (
     <>
       <Grid fontWeight={700} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Grid >{title}</Grid>
-        <Grid fontSize={12} my="auto" color={color}>{width}</Grid>
+        <Grid fontSize={10} >{title}</Grid>
+        <Grid fontSize={10} my="auto" color={color}>{width}</Grid>
       </Grid>
 
       <Grid sx={{ position: 'relative' }}>

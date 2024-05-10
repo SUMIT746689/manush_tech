@@ -779,8 +779,14 @@ function SidebarMenu() {
             adminItems, teacherItems, studentItems
           };
           const selectRoleWiseMenuItems = allItems[`${roleLower}Items`];
-          const selectModuleFromRoleWiseMenuItems = selectRoleWiseMenuItems ? selectRoleWiseMenuItems[selectModule] : [];
-          console.log({ selectRoleWiseMenuItems, selectModuleFromRoleWiseMenuItems })
+          const selectModuleFromRoleWiseMenuItems = selectRoleWiseMenuItems ? selectRoleWiseMenuItems[selectModule] : [{ items: [] }];
+          const showMenuItems = [{ items: [] }];
+          if (Array.isArray(selectModuleFromRoleWiseMenuItems) && selectModuleFromRoleWiseMenuItems[0]?.items && selectRoleWiseMenuItems?.module_dashboard) {
+            showMenuItems[0].items = [
+              selectRoleWiseMenuItems.module_dashboard,
+              ...selectModuleFromRoleWiseMenuItems[0]?.items
+            ];
+          }
           if (!['ADMIN', 'TEACHER', 'STUDENT'].includes(roleTitle))
             return (
               <>
@@ -804,57 +810,57 @@ function SidebarMenu() {
                     </MenuWrapper>
                   ))
                 }
-                </>
+              </>
             );
 
           return (
             <>
-                {
-                  dashboardMenuItem.map((section: any) => (
-                    <MenuWrapper key={section.heading}>
-                      <List
-                        component="div"
-                        subheader={
-                          <ListSubheader component="div" disableSticky>
-                            {t(section.heading)}
-                          </ListSubheader>
-                        }
-                      >
-                        {renderSidebarMenuItems({
-                          permissions: permissions,
-                          items: section.items,
-                          path: router.asPath
-                        })}
-                      </List>
-                    </MenuWrapper>
-                  ))
-                }
-                <Grid textTransform={"uppercase"} pl={2} fontWeight={700} sx={{ color: theme => theme.colors.alpha.white[70] }}>
-                  {selectModule && `${selectModule.split('_').join(' ')} Module :`}
-                </Grid>
-                {/* selected nav for users */}
-                {
-                  selectModuleFromRoleWiseMenuItems?.map((section: any) => (
-                    <MenuWrapper key={section.heading}>
-                      <List
-                        component="div"
-                        subheader={
-                          <ListSubheader component="div" disableSticky>
-                            {t(section.heading)}
-                          </ListSubheader>
-                        }
-                      >
-                        {renderSidebarMenuItems({
-                          permissions: permissions,
-                          items: section.items,
-                          path: router.asPath
-                        })}
-                      </List>
-                    </MenuWrapper>
-                  ))
-                }
-              </>
-            );
+              {
+                dashboardMenuItem.map((section: any) => (
+                  <MenuWrapper key={section.heading}>
+                    <List
+                      component="div"
+                      subheader={
+                        <ListSubheader component="div" disableSticky>
+                          {t(section.heading)}
+                        </ListSubheader>
+                      }
+                    >
+                      {renderSidebarMenuItems({
+                        permissions: permissions,
+                        items: section.items,
+                        path: router.asPath
+                      })}
+                    </List>
+                  </MenuWrapper>
+                ))
+              }
+              <Grid textTransform={"uppercase"} pl={2} fontWeight={700} sx={{ color: theme => theme.colors.alpha.white[70] }}>
+                {selectModule && `${selectModule.split('_').join(' ')} Module :`}
+              </Grid>
+              {/* selected nav for users */}
+              {
+                showMenuItems?.map((section: any) => (
+                  <MenuWrapper key={section.heading}>
+                    <List
+                      component="div"
+                      subheader={
+                        <ListSubheader component="div" disableSticky>
+                          {t(section.heading)}
+                        </ListSubheader>
+                      }
+                    >
+                      {renderSidebarMenuItems({
+                        permissions: permissions,
+                        items: section.items,
+                        path: router.asPath
+                      })}
+                    </List>
+                  </MenuWrapper>
+                ))
+              }
+            </>
+          );
         }}
       </AuthConsumer >
     </>

@@ -109,13 +109,14 @@ export async function getServerSideProps(context: any) {
         blockCount['teacher'] = await prisma.teacher.findFirst({
           where: {
             user_id: refresh_token.id,
-            deleted_at: null, department: { deleted_at: null }
+            deleted_at: null
           },
           select: {
             first_name: true,
             middle_name: true,
             last_name: true,
             department: {
+              where: { deleted_at: null },
               select: {
                 title: true
               }

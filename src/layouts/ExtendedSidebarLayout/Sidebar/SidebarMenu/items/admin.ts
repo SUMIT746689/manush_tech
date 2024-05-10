@@ -75,6 +75,12 @@ export interface MenuItems {
   // heading: string;
 }
 
+const module_dashboard: MenuItem = {
+  name: 'Module Dashboard',
+  icon: DashboardIcon,
+  link: '/dashboards/modules/admin',
+};
+
 const all_users: MenuItems[] = [{
   items: [
     {
@@ -799,27 +805,11 @@ const examination: MenuItems[] = [
   }
 ]
 
-const dashboard: MenuItems[] = [{
-  items: [
-    {
-      name: 'Dashboard',
-      icon: DashboardIcon,
-      link: '/',
-
-    },
-  ]
-}]
-
-
-
-// export default menuItems;
-
-// const adminItems = 
 export default {
   all_users, online_addmission, students, teachers, other_users, attendance, accounting, notice, routine, sms,
   study_materials,
   website_settings,
   report, examination,
-  dashboard
+  module_dashboard
 }
 // export default adminItems

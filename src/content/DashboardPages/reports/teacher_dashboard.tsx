@@ -10,6 +10,7 @@ import { useTranslation } from 'next-i18next';
 import ImageSlider from '@/components/ImageSlider/ImageSlider';
 import { teacherModulesList } from '@/utils/moduleLists';
 import { AccountingIcon, AttendanceIcon, CertificateIcon, ExamIcon, FeesCollectionIcon, NoticeIcon, OnlineAddmissionIcon, ReportIcon, RoutineIcon, SmsIcon, StaffsIcon, StudentRegIcon, StudentsIcon, StudyMaterialsIcon, TeacherAttendenceIcon, TeacherIcon, TeacherRoutineIcon, WebsiteSettingsIcon } from '@/components/Icon';
+import { DashboardQuickLinkButtonWrapper } from '@/components/DashboardQuickLinkButtonWrapper';
 
 const quickLinksColors = [
   { dark: "#006ADC", light: "#E1F0FF" },
@@ -27,20 +28,21 @@ const quickLinks = [
   { color: quickLinksColors[1], linkUrl: "#", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
   { color: quickLinksColors[2], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
   { color: quickLinksColors[0], linkUrl: "#", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
-  { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"My Attendence" },
+  { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "My Attendence" },
   { color: quickLinksColors[1], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Reports" },
   { color: quickLinksColors[0], linkUrl: "#", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Work Schedule" },
-  
-  { color: quickLinksColors[2], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name:"Other Activities" },
+
+  { color: quickLinksColors[2], linkUrl: "#", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Other Activities" },
 
 ]
 
 
 function StudentDashboardReportsContent({ blockCount }) {
 
+  console.log({ blockCount })
   const { teacher } = blockCount;
-  const name = [teacher.first_name, teacher.middle_name, teacher.last_name].join(' ');
-  const extraInfo = [['Department', teacher.department.title]];
+  const name = [teacher?.first_name, teacher?.middle_name, teacher?.last_name].join(' ');
+  const extraInfo = [['Department', teacher?.department?.title]];
   // const quickLinks = [
   //   { name: 'Exam', src: "exam.svg", href: "/management/exam" },
   //   { name: 'Class Attendance', src: "attendance.svg", href: "/management/attendence/normalAttendence" },
@@ -117,14 +119,14 @@ function StudentDashboardReportsContent({ blockCount }) {
             {/* <QuickLinkCards quickLinks={quickLinks} /> */}
             <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
               {
-                quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={teacherModulesList[index]} />)
+                quickLinks.map(({ color, linkUrl, icon, name }, index) => <DashboardQuickLinkButtonWrapper key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={teacherModulesList[index]} />)
               }
             </Grid>
 
             {/* calander */}
             <Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content", minHeight: '100%' }}>
               <Calander holidays={blockCount.holidays} />
-            </Grid> 
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

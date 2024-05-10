@@ -42,13 +42,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import GroupIcon from '@mui/icons-material/Group';
 import HistoryIcon from '@mui/icons-material/History';
 import DescriptionIcon from '@mui/icons-material/Description';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
-import MoneyOffCsredSharpIcon from '@mui/icons-material/MoneyOffCsredSharp';
-import JoinFullSharpIcon from '@mui/icons-material/JoinFullSharp';
-import AccountBalanceWalletSharpIcon from '@mui/icons-material/AccountBalanceWalletSharp';
-import BorderBottomSharpIcon from '@mui/icons-material/BorderBottomSharp';
 import GradeIcon from '@mui/icons-material/Grade';
 import WifiTetheringErrorIcon from '@mui/icons-material/WifiTetheringError';
 import NotesIcon from '@mui/icons-material/Notes';
@@ -74,6 +67,12 @@ export interface MenuItems {
     items: MenuItem[];
     // heading: string;
 }
+
+const module_dashboard: MenuItem = {
+    name: 'Module Dashboard',
+    icon: DashboardIcon,
+    link: '/dashboards/modules/student',
+};
 
 export const allUserMenuItems: MenuItems[] = [
     {
@@ -816,5 +815,6 @@ const certificate: MenuItems[] = [
 
 export default {
     class_routine, view_attendence, home_work, study_materials, notice, payment_report,
-    admit_card, exam_routine, mark_sheet, tabulation_sheet, certificate
+    admit_card, exam_routine, mark_sheet, tabulation_sheet, certificate,
+    module_dashboard
 };

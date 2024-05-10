@@ -10,15 +10,15 @@ import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/tea
 import dayjs from 'dayjs';
 // import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
-import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard';
+import AdminDashboardContent from '@/content/DashboardPages/reports/admin_dashboard/index';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
   try {
 
     const refresh_token: any = serverSideAuthentication(context);
+    console.log({ refresh_token })
     if (!refresh_token) return { redirect: { destination: '/login' } };
-
     const updateHolidays = async () => {
       const resHolidays = await prisma.holiday.findMany({
         where: { school_id: refresh_token.school_id }
@@ -100,7 +100,7 @@ export async function getServerSideProps(context: any) {
       case 'TEACHER':
         blockCount['role'] = 'teacher';
         blockCount['teacher'] = await prisma.teacher.findFirst({
-          where: { user_id: refresh_token.id, deleted_at: null, department: { deleted_at: null } },
+          where: { user_id: refresh_token.id, deleted_at: null },
           select: {
             first_name: true,
             middle_name: true,
@@ -144,7 +144,7 @@ export async function getServerSideProps(context: any) {
         });
         blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
         blockCount["banners"] = await prisma.banners.findFirst({});
-        
+
         await updateHolidays();
         break;
 
@@ -181,7 +181,7 @@ function DashboardReports({ blockCount }) {
       return (
         <>
           <Head><title>Dashboard</title></Head>
-          <AdminDashboardReportsContent blockCount={blockCount} />
+          <AdminDashboardContent blockCount={blockCount} />
         </>
       )
     default:

@@ -75,6 +75,11 @@ export interface MenuItems {
   // heading: string;
 }
 
+const module_dashboard: MenuItem = {
+  name: 'Module Dashboard',
+  icon: DashboardIcon,
+  link: '/dashboards/modules/teacher',
+};
 
 const student_attendence: MenuItems[] = [
   {
@@ -319,6 +324,6 @@ const other_activities: MenuItems[] = [
 
 export default {
   student_attendence, class_exam, mark_entry, student_home_work,
-  salary, notice, routine, study_materials, sms, my_attendence, report, leave, work_schedule, other_activities
-
+  salary, notice, routine, study_materials, sms, my_attendence, report, leave, work_schedule, other_activities,
+  module_dashboard
 };

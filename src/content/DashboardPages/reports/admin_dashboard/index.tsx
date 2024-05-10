@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { adminModulesList } from '@/utils/moduleLists';
 import { useContext } from 'react';
 import { ModuleContext } from '@/contexts/ModuleContext';
+import { DashboardQuickLinkButtonWrapper } from '@/components/DashboardQuickLinkButtonWrapper';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -28,6 +29,7 @@ const quickLinksColors = [
     { dark: "#9C2BAD", light: "#F9E5F9" },
     { dark: "#CA3214", light: "#FFE6E2" },
 ]
+
 const quickLinks = [
     { color: quickLinksColors[2], linkUrl: "/management/users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "All Users", },
     { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Online Admission" },
@@ -51,7 +53,7 @@ const quickLinks = [
     // { color: quickLinksColors[2], linkUrl: "/management/student_fees_collection", icon: < FeesCollectionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: 'Fees Colelction' }
 ]
 
-function AdminDashboardReportsContent({ blockCount = null }) {
+function AdminDashboardContent({ blockCount = null }) {
     const { banners: banners_ } = blockCount || {};
     const { banners } = banners_ || {};
     const { left_banners, right_banners } = banners || {};
@@ -61,47 +63,45 @@ function AdminDashboardReportsContent({ blockCount = null }) {
     return (
         <>
 
-            <Grid p={2} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr 420px' }} gap={2} >
+            <Grid p={{ xs: 1, xl: 2 }} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr ' }} gap={2} >
+                <Card sx={{ display: 'flex', minHeight: { xl: 170 }, justifyContent: "space-between", width: "100%", pl: 2, py: { xs: 2, md: 0 }, pr: { xs: 2, md: 0 }, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+                    <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80 }, height: { xs: 40, sm: 80 } }} />
+                    <Grid item sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto', py: 1 }}>
+                        <Grid sx={{ fontSize: { xs: 15, sm: 17, md: 17, lg: 18, xl: 22 }, fontWeight: 500 }}>{blockCount?.school?.name} </Grid>
+                        <Grid sx={{ fontSize: { xs: 12, xl: 16 }, fontWeight: 300 }}> Address: {blockCount?.school?.address}</Grid>
+                        <Grid sx={{ fontSize: { xs: 12, xl: 16 }, fontWeight: 300 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
+                    </Grid>
+                    <Grid item height="fit-content" width='fit-content' display={{ xs: 'none', md: 'Grid' }}>
+                        <Image
+                            src="/dashboard/student_teacher.svg"
+                            width={200}
+                            height={100}
+                            alt="Picture of the author"
+                            style={{ position: "relative", objectFit: 'contain', bottom: -1, right: 0, marginTop: 'auto' }}
+                        />
+                    </Grid>
+                </Card>
+            </Grid>
 
+            <Grid px={{ xs: 1, xl: 2 }} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr 300px', xl: '1fr 420px' }} gap={2} >
                 <Grid sx={{ display: "grid", width: "100%" }} height="fit-content" rowGap={2} >
-                    <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
-                        {/* <Image alt='sss' /> */}
-                        <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80, md: 120 }, height: { xs: 40, sm: 80, md: 120 } }} />
-                        <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
-                            <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 22, lg: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
-                            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
-                            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
-                        </Grid>
-                        <Grid item height={'100%'} width='fit-content' display={{ xs: 'none', md: 'flex' }}>
-                            <Image
-                                src="/dashboard/student_teacher.svg"
-                                width={300}
-                                height={150}
-                                alt="Picture of the author"
-                                style={{ position: "relative", bottom: 0, right: 0, marginTop: 'auto' }}
-                            />
-                        </Grid>
-                    </Card>
 
                     {/* quick links and attendance */}
-                    < Grid display="flex" flexDirection={{ xs: 'column', sm: 'row' }
-                    } gap={2} >
-
+                    < Grid display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2} >
                         {/* quick links */}
                         < Grid width="100%" display="flex" justifyContent="center" >
-                            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
+                            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: { xs: 1, xl: 2 }, justifyContent: { xs: "space-between", md: "center" }, height: 'fit-content', transition: 'all 5s' }} >
                                 {
-                                    quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
+                                    quickLinks.map(({ color, linkUrl, icon, name }, index) => <DashboardQuickLinkButtonWrapper key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
                                 }
                             </Grid>
                         </Grid >
-
                     </Grid >
 
 
                     {/* banners */}
                     {
-                        banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                        banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
                             <Card sx={{
                                 width: "100",
                                 borderRadius: 0,
@@ -131,22 +131,22 @@ function AdminDashboardReportsContent({ blockCount = null }) {
                 </Grid >
 
 
-                <Grid sx={{ height: 'fit-content', minWidth: { sm: 220, md: 240 }, width: '100%', display: "grid", gap: 2 }}>
+                <Grid sx={{ height: 'fit-content', minWidth: { sm: 220, xl: 240 }, width: '100%', display: "grid", gap: 1 }}>
 
-                    <Button variant='contained' sx={{ minWidth: '100%', background: '#494949', ":hover": { background: "#494949", opacity: 0.9 }, py: 2, width: '100%', fontSize: { xs: 16, sm: 18 } }}>
+                    <Button variant='contained' sx={{ minWidth: '100%', background: '#494949', ":hover": { background: "#494949", opacity: 0.9 }, py: { xs: 1.5, xl: 2 }, width: '100%', fontSize: { xs: 16, xl: 18 } }}>
                         <Link href={`http://${blockCount?.domain}`} target='_blank' color="primary" rel="noopener noreferrer" >
                             {t('Website Link')}
                         </Link>
                     </Button>
 
                     {/* total students and staffs */}
-                    <Grid sx={{ width: '100%', minHeight: '100px', display: "grid", gridTemplateColumns: '1fr 1fr', justifyContent: "center", columnGap: { xs: 1, sm: 2 } }}>
+                    <Grid sx={{ width: '100%', minHeight: { xs: '80px', xl: '100px' }, display: "grid", gridTemplateColumns: '1fr 1fr', justifyContent: "center", columnGap: { xs: 1, sm: 2 } }}>
                         <Card sx={{
                             // minWidth: { md: '320px', xl: '380px' },
-                            py: 1, px: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: { xs: 1, sm: 2 }, justifyContent: "center", alignItems: "center"
+                            py: 0.5, px: 3, background: 'linear-gradient(180deg, #017D8F 0%, #004A54 100%)', color: 'white', display: 'flex', gap: { xs: 1, sm: 2 }, justifyContent: "center", alignItems: "center"
                         }}>
                             <StudentsIcon fillColor='white' />
-                            <Grid fontWeight={700} fontSize={{ xs: 12, sm: 14, md: 16 }} >
+                            <Grid fontWeight={700} fontSize={{ xs: 12, xl: 16 }} >
                                 <Grid>Total Students</Grid>
                                 <Grid>{blockCount?.students?.count}</Grid>
                             </Grid>
@@ -157,20 +157,20 @@ function AdminDashboardReportsContent({ blockCount = null }) {
                             py: 1, px: 3, background: 'linear-gradient(180deg, #F5952D 0%, #F36717 100%)', color: 'white', display: 'flex', gap: 2, justifyContent: "center", alignItems: "center"
                         }}>
                             <StaffsIcon fillColor='white' />
-                            <Grid fontWeight={700} fontSize={{ xs: 12, sm: 14, md: 16 }} >
+                            <Grid fontWeight={700} fontSize={{ xs: 12, xl: 16 }} >
                                 <Grid sx={{}}>Total Staffs</Grid>
                                 <Grid>0 -static</Grid>
                             </Grid>
                         </Card>
                     </Grid>
 
-                    <Card sx={{ color: colorBlue, px: 2, py: 3 }}>
-                        <Grid sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
-                        <Grid sx={{ fontSize: 12, display: 'flex', justifyContent: 'space-between', pt: 2, pb: 2 }}>
+                    <Card sx={{ color: colorBlue, px: 2, py: 2 }}>
+                        <Grid sx={{ fontSize: { xs: 12, sm: 14 }, fontWeight: 700, textAlign: "center" }}>SMS QUANTITY</Grid>
+                        <Grid sx={{ fontSize: { xs: 10, xl: 12 }, display: 'flex', justifyContent: 'space-between', py: 1 }}>
                             <span>Masking Sms:</span>
                             <span>{blockCount?.school?.masking_sms_count ? formatNumber(blockCount?.school?.masking_sms_count) : 0}</span>
                         </Grid>
-                        <Grid sx={{ fontSize: 12, display: 'flex', justifyContent: 'space-between' }}>
+                        <Grid sx={{ fontSize: { xs: 10, xl: 12 }, display: 'flex', justifyContent: 'space-between' }}>
                             <span>Non Masking Sms:</span>
                             <span>{blockCount?.school?.non_masking_sms_count ? formatNumber(blockCount?.school?.non_masking_sms_count) : 0}</span>
                         </Grid>
@@ -267,6 +267,4 @@ const StudentPathButton = ({ color, linkUrl, name, icon, value }) => {
 
 
 
-
-
-export default AdminDashboardReportsContent;
+export default AdminDashboardContent;

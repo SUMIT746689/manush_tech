@@ -10,6 +10,7 @@ import ImageSlider from '@/components/ImageSlider/ImageSlider';
 import { useTranslation } from 'next-i18next';
 import { studentModulesList } from '@/utils/moduleLists';
 import { AccountingIcon, AttendanceIcon, CertificateIcon, ExamIcon, FeesCollectionIcon, MarkSheetIcon, NoticeIcon, OnlineAddmissionIcon, ReportIcon, RoutineIcon, SmsIcon, StaffsIcon, StudentRegIcon, StudentsIcon, StudyMaterialsIcon, TabulationIcon, TeacherIcon, TeacherRoutineIcon, WebsiteSettingsIcon } from '@/components/Icon';
+import { DashboardQuickLinkButtonWrapper } from '@/components/DashboardQuickLinkButtonWrapper';
 
 const quickLinksColors = [
   { dark: "#006ADC", light: "#E1F0FF" },
@@ -44,7 +45,7 @@ function StudentDashboardReportsContent({ blockCount }) {
   const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0;
 
   const name = [student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(' ');
-  const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class.name], ['Section', student.section.name]]
+  const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class?.name], ['Section', student.section.name]]
   // const quickLinks = [
   //   { name: 'Exam', src: "exam.svg", href: "/management/exam" },
   //   { name: 'Attendance', src: "attendance.svg", href: "/management/exam" },
@@ -95,7 +96,7 @@ function StudentDashboardReportsContent({ blockCount }) {
             <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
               {
                 // quickLinks.slice(0,6).map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
-                quickLinks.map(({ value, color, linkUrl, icon, name }) => <StudentPathButton key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
+                quickLinks.map(({ value, color, linkUrl, icon, name }) => <DashboardQuickLinkButtonWrapper key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
               }
             </Grid>
 

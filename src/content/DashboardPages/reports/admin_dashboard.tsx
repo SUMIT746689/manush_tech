@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { adminModulesList } from '@/utils/moduleLists';
 import { useContext } from 'react';
 import { ModuleContext } from '@/contexts/ModuleContext';
+import { DashboardQuickLinkButtonWrapper } from '@/components/DashboardQuickLinkButtonWrapper';
 
 const colorBlue = "#0052B4"
 const colorLightRed = "#FFE6E2"
@@ -62,26 +63,26 @@ function AdminDashboardReportsContent({ blockCount = null }) {
     <>
 
       <Grid p={2} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr 420px' }} gap={2} >
+        <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+          {/* <Image alt='sss' /> */}
+          <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80, md: 120 }, height: { xs: 40, sm: 80, md: 120 } }} />
+          <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
+            <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 22, lg: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
+            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
+            <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
+          </Grid>
+          <Grid item height={'100%'} width='fit-content' display={{ xs: 'none', md: 'flex' }}>
+            <Image
+              src="/dashboard/student_teacher.svg"
+              width={300}
+              height={150}
+              alt="Picture of the author"
+              style={{ position: "relative", bottom: 0, right: 0, marginTop: 'auto' }}
+            />
+          </Grid>
+        </Card>
 
         <Grid sx={{ display: "grid", width: "100%" }} height="fit-content" rowGap={2} >
-          <Card sx={{ display: 'flex', height: { xs: 150, md: 170 }, justifyContent: "space-between", width: "100%", pl: 2, pr: 2, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
-            {/* <Image alt='sss' /> */}
-            <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80, md: 120 }, height: { xs: 40, sm: 80, md: 120 } }} />
-            <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
-              <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 22, lg: 26 }, fontWeight: 600 }}>{blockCount?.school?.name}</Grid>
-              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> Address: {blockCount?.school?.address}</Grid>
-              <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20, lg: 20 }, fontWeight: 400 }}> {blockCount?.school?.subscription[0]?.package?.name && `Package: ${blockCount?.school?.subscription[0]?.package?.name}`}{blockCount?.school?.subscription[0]?.package?.is_std_cnt_wise === true ? ',Package type: Student count wise,' : ''} Package Expire Date: {dayjs(blockCount?.school?.subscription[0]?.end_date).format('MMMM D, YYYY')} </Grid>
-            </Grid>
-            <Grid item height={'100%'} width='fit-content' display={{ xs: 'none', md: 'flex' }}>
-              <Image
-                src="/dashboard/student_teacher.svg"
-                width={300}
-                height={150}
-                alt="Picture of the author"
-                style={{ position: "relative", bottom: 0, right: 0, marginTop: 'auto' }}
-              />
-            </Grid>
-          </Card>
 
           {/* quick links and attendance */}
           < Grid display="flex" flexDirection={{ xs: 'column', sm: 'row' }
@@ -91,7 +92,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
             < Grid width="100%" display="flex" justifyContent="center" >
               <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
                 {
-                  quickLinks.map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
+                  quickLinks.map(({ color, linkUrl, icon, name }, index) => <DashboardQuickLinkButtonWrapper key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={adminModulesList[index]} />)
                 }
               </Grid>
             </Grid >
@@ -101,7 +102,7 @@ function AdminDashboardReportsContent({ blockCount = null }) {
 
           {/* banners */}
           {
-            banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2}}>
+            banners && <Grid sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
               <Card sx={{
                 width: "100",
                 borderRadius: 0,

@@ -41,6 +41,7 @@ import {
   studentModulesList,
   teacherModulesList
 } from '@/utils/moduleLists';
+import Link from 'next/link';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -295,7 +296,13 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
             <Select
               value={selectModule}
               size="small"
-              onChange={(e) => handleChangeModule(e.target.value)}
+              onChange={(e) => {
+                handleChangeModule(e.target.value);
+                // router.push(`/dashboards/modules/admin`);
+                if (auth?.user?.role?.title === 'ADMIN') return router.push(`/dashboards/modules/admin`);
+                if (auth?.user?.role?.title === 'TEACHER') return router.push(`/dashboards/modules/teacher`);
+                if (auth?.user?.role?.title === 'STUDENT') return router.push(`/dashboards/modules/student`);
+              }}
               sx={{
                 minWidth: '100%',
                 color: 'white',

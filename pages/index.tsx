@@ -5,12 +5,14 @@ import { Authenticated } from 'src/components/Authenticated';
 
 import DashboardReportsContent from 'src/content/DashboardPages/reports';
 import prisma from '@/lib/prisma_client';
-import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
-import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
+// import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
+// import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 import dayjs from 'dayjs';
 // import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
 import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard/index';
+import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard/index';
+import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard/index';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
@@ -171,7 +173,7 @@ export async function getServerSideProps(context: any) {
   return { props: { blockCount: parseJson } }
 }
 
-function DashboardReports({ blockCount }) {
+function MainDashboard({ blockCount }) {
 
   switch (blockCount?.role) {
     case 'teacher':
@@ -205,10 +207,10 @@ function DashboardReports({ blockCount }) {
   }
 }
 
-DashboardReports.getLayout = (page) => (
+MainDashboard.getLayout = (page) => (
   <Authenticated>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );
 
-export default DashboardReports;
+export default MainDashboard;

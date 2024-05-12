@@ -414,7 +414,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
           )}
 
         {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
+        {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
           auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
             <Grid
               minWidth={150}
@@ -434,7 +434,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
                 handleChange={handleAcademicYearChange}
               />
             </Grid>
-          )}
+          )} */}
 
         {permissionsArray_.includes('show_students') && <HeaderSearch />}
         {/* <HeaderButtons /> */}

@@ -30,22 +30,45 @@ const quickLinksColors = [
     { dark: "#CA3214", light: "#FFE6E2" },
 ]
 
-const quickLinks = [
-    { color: quickLinksColors[2], linkUrl: "/management/users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "All Users", },
-    { color: quickLinksColors[0], linkUrl: "/management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Online Admission" },
-    { color: quickLinksColors[1], linkUrl: "/management/students", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Students" },
-    { color: quickLinksColors[2], linkUrl: "/management/teachers", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teachers" },
-    { color: quickLinksColors[0], linkUrl: "/management/users/entry_other_users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Other Users" },
-    { color: quickLinksColors[1], linkUrl: "/management/attendence/normalAttendence", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Attendance" },
-    { color: quickLinksColors[2], linkUrl: "/management/accounting/account", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Accounting" },
-    { color: quickLinksColors[0], linkUrl: "/front_end/notice", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
-    { color: quickLinksColors[1], linkUrl: "/management/routine/class_routine", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
-    { color: quickLinksColors[2], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
-    { color: quickLinksColors[0], linkUrl: "/bulk_sms_and_email/send_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
+// const quickLinks = [
+//     { color: quickLinksColors[2], linkUrl: "management/users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "All Users", },
+//     { color: quickLinksColors[0], linkUrl: "management/students/online-admission", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Online Admission" },
+//     { color: quickLinksColors[1], linkUrl: "management/students", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Students" },
+//     { color: quickLinksColors[2], linkUrl: "management/teachers", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teachers" },
+//     { color: quickLinksColors[0], linkUrl: "management/users/entry_other_users", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Other Users" },
+//     { color: quickLinksColors[1], linkUrl: "management/attendence/normalAttendence", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Attendance" },
+//     { color: quickLinksColors[2], linkUrl: "management/accounting/account", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Accounting" },
+//     { color: quickLinksColors[0], linkUrl: "front_end/notice", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
+//     { color: quickLinksColors[1], linkUrl: "management/routine/class_routine", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
+//     { color: quickLinksColors[2], linkUrl: "#", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
+//     { color: quickLinksColors[0], linkUrl: "bulk_sms_and_email/send_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
 
-    { color: quickLinksColors[1], linkUrl: "/front_end", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Website Settings" },
-    { color: quickLinksColors[2], linkUrl: "/reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Reports" },
-    { color: quickLinksColors[0], linkUrl: "/reports/exam/report_card", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Examinations" },
+//     { color: quickLinksColors[1], linkUrl: "front_end", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Website Settings" },
+//     { color: quickLinksColors[2], linkUrl: "reports/attendence/student/normal", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Reports" },
+//     { color: quickLinksColors[0], linkUrl: "reports/exam/report_card", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Examinations" },
+
+
+//     // { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherRoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teacher Routine" },
+//     // { color: quickLinksColors[0], linkUrl: "/management/exam", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam" },
+//     // { color: quickLinksColors[2], linkUrl: "/management/student_fees_collection", icon: < FeesCollectionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: 'Fees Colelction' }
+// ]
+
+const quickLinks = [
+    { color: quickLinksColors[2], linkUrl: "dashboards/modules/admin", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "All Users", },
+    { color: quickLinksColors[0], linkUrl: "dashboards/modules/admin", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Online Admission" },
+    { color: quickLinksColors[1], linkUrl: "dashboards/modules/admin", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Students" },
+    { color: quickLinksColors[2], linkUrl: "dashboards/modules/admin", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teachers" },
+    { color: quickLinksColors[0], linkUrl: "dashboards/modules/admin", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Other Users" },
+    { color: quickLinksColors[1], linkUrl: "dashboards/modules/admin", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Attendance" },
+    { color: quickLinksColors[2], linkUrl: "dashboards/modules/admin", icon: < AccountingIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Accounting" },
+    { color: quickLinksColors[0], linkUrl: "dashboards/modules/admin", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
+    { color: quickLinksColors[1], linkUrl: "dashboards/modules/admin", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
+    { color: quickLinksColors[2], linkUrl: "dashboards/modules/admin", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
+    { color: quickLinksColors[0], linkUrl: "dashboards/modules/admin", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
+
+    { color: quickLinksColors[1], linkUrl: "dashboards/modules/admin", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Website Settings" },
+    { color: quickLinksColors[2], linkUrl: "dashboards/modules/admin", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Reports" },
+    { color: quickLinksColors[0], linkUrl: "dashboards/modules/admin", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Examinations" },
 
 
     // { color: quickLinksColors[2], linkUrl: "#", icon: <TeacherRoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Teacher Routine" },

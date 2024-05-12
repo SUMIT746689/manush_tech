@@ -5,20 +5,29 @@ import { Authenticated } from 'src/components/Authenticated';
 
 import DashboardReportsContent from 'src/content/DashboardPages/reports';
 import prisma from '@/lib/prisma_client';
-import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
-import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
+// import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard';
+// import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard';
 import dayjs from 'dayjs';
 // import { useEffect } from 'react';
 import { serverSideAuthentication } from '@/utils/serverSideAuthentication';
-import AdminDashboardContent from '@/content/DashboardPages/reports/admin_dashboard/index';
+import AdminDashboardReportsContent from '@/content/DashboardPages/reports/admin_dashboard/index';
+import StudentDashboardReportsContent from '@/content/DashboardPages/reports/student_dashboard/index';
+import TeacherDashboardReportsContent from '@/content/DashboardPages/reports/teacher_dashboard/index';
 
 export async function getServerSideProps(context: any) {
   let blockCount: any = { holidays: [] };
   try {
+    // const { req, query, res, asPath, pathname } = context;
+    // if (req) {
+    //   let host = req.headers.host // will give you localhost:3000
+    //   const findAdminPanel = await prisma.user.findFirst({ where: { domain: host }, select: { id: true } })
+    //   blockCount["findAdminPanel"] = findAdminPanel ? true : false;
+    //   if(!findAdminPanel) throw new Error("domain is not founds")
+    // }
 
     const refresh_token: any = serverSideAuthentication(context);
-    console.log({ refresh_token })
     if (!refresh_token) return { redirect: { destination: '/login' } };
+
     const updateHolidays = async () => {
       const resHolidays = await prisma.holiday.findMany({
         where: { school_id: refresh_token.school_id }
@@ -100,19 +109,23 @@ export async function getServerSideProps(context: any) {
       case 'TEACHER':
         blockCount['role'] = 'teacher';
         blockCount['teacher'] = await prisma.teacher.findFirst({
-          where: { user_id: refresh_token.id, deleted_at: null },
+          where: {
+            user_id: refresh_token.id,
+            deleted_at: null
+          },
           select: {
             first_name: true,
             middle_name: true,
             last_name: true,
             department: {
+              where: { deleted_at: null },
               select: {
                 title: true
               }
             }
           }
         })
-        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id }, orderBy: { created_at: "desc" } });
         blockCount["banners"] = await prisma.banners.findFirst({});
 
         await updateHolidays();
@@ -142,7 +155,7 @@ export async function getServerSideProps(context: any) {
           }
 
         });
-        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id } });
+        blockCount['notices'] = await prisma.notice.findMany({ where: { school_id: refresh_token.school_id }, orderBy: { created_at: "desc" } });
         blockCount["banners"] = await prisma.banners.findFirst({});
 
         await updateHolidays();
@@ -153,14 +166,14 @@ export async function getServerSideProps(context: any) {
     }
 
   } catch (err) {
-    console.log(err)
+    console.log({ err })
   }
   const parseJson = JSON.parse(JSON.stringify(blockCount));
 
   return { props: { blockCount: parseJson } }
 }
 
-function DashboardReports({ blockCount }) {
+function MainDashboard({ blockCount }) {
 
   switch (blockCount?.role) {
     case 'teacher':
@@ -181,7 +194,7 @@ function DashboardReports({ blockCount }) {
       return (
         <>
           <Head><title>Dashboard</title></Head>
-          <AdminDashboardContent blockCount={blockCount} />
+          <AdminDashboardReportsContent blockCount={blockCount} />
         </>
       )
     default:
@@ -194,10 +207,10 @@ function DashboardReports({ blockCount }) {
   }
 }
 
-DashboardReports.getLayout = (page) => (
+MainDashboard.getLayout = (page) => (
   <Authenticated>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );
 
-export default DashboardReports;
+export default MainDashboard;

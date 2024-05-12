@@ -1,5 +1,6 @@
 import { ModuleContext } from "@/contexts/ModuleContext";
-import { Card, Grid, Link } from "@mui/material";
+import { Card, Grid } from "@mui/material";
+import Link from "next/link";
 import { useContext } from "react";
 
 // export const DashboardQuickLinkButtonWrapper = ({ color, linkUrl, name, icon, value }) => {

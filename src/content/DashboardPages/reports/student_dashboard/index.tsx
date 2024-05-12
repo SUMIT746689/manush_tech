@@ -3,8 +3,6 @@ import { Avatar, Card, Grid, Link } from '@mui/material';
 import Image from 'next/image';
 import Calander from '../../calender/calander';
 import Notice from '../../notice/notice';
-import Head from '../../head/head';
-import QuickLinkCards, { StudentPathButton } from '../../quick_link_card/quickLinkCard';
 import { useAuth } from '@/hooks/useAuth';
 import ImageSlider from '@/components/ImageSlider/ImageSlider';
 import { useTranslation } from 'next-i18next';
@@ -19,20 +17,20 @@ const quickLinksColors = [
 ]
 
 const quickLinks = [
-  { value: 0, color: quickLinksColors[0], linkUrl: "dashboards/modules/student", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Class Routine" },
-  { value: 1, color: quickLinksColors[1], linkUrl: "dashboards/modules/student", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "View Attendence" },
-  { value: 2, color: quickLinksColors[2], linkUrl: "dashboards/modules/student", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Home Work" },
-  { value: 3, color: quickLinksColors[1], linkUrl: "dashboards/modules/student", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Study Materials" },
-  { value: 4, color: quickLinksColors[2], linkUrl: "dashboards/modules/student", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Notice" },
-  { value: 5, color: quickLinksColors[0], linkUrl: "dashboards/modules/student", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Payment Report" },
+  { value: 0, color: quickLinksColors[0], linkUrl: "/dashboards/modules/student", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Class Routine" },
+  { value: 1, color: quickLinksColors[1], linkUrl: "/dashboards/modules/student", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "View Attendence" },
+  { value: 2, color: quickLinksColors[2], linkUrl: "/dashboards/modules/student", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Home Work" },
+  { value: 3, color: quickLinksColors[1], linkUrl: "/dashboards/modules/student", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Study Materials" },
+  { value: 4, color: quickLinksColors[2], linkUrl: "/dashboards/modules/student", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Notice" },
+  { value: 5, color: quickLinksColors[0], linkUrl: "/dashboards/modules/student", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Payment Report" },
 ]
 
 const examAndResultSecQuickLinks = [
-  { value: 6, color: quickLinksColors[2], linkUrl: "dashboards/modules/student", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Admit Card" },
-  { value: 7, color: quickLinksColors[1], linkUrl: "dashboards/modules/student", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exam Routine" },
-  { value: 8, color: quickLinksColors[0], linkUrl: "dashboards/modules/student", icon: <MarkSheetIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Mark Sheet" },
-  { value: 9, color: quickLinksColors[1], linkUrl: "dashboards/modules/student", icon: <TabulationIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Tabulation Sheet" },
-  { value: 10, color: quickLinksColors[2],linkUrl: "dashboards/modules/student", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Certificate" },
+  { value: 6, color: quickLinksColors[2], linkUrl: "/dashboards/modules/student", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Admit Card" },
+  { value: 7, color: quickLinksColors[1], linkUrl: "/dashboards/modules/student", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exam Routine" },
+  { value: 8, color: quickLinksColors[0], linkUrl: "/dashboards/modules/student", icon: <MarkSheetIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Mark Sheet" },
+  { value: 9, color: quickLinksColors[1], linkUrl: "/dashboards/modules/student", icon: <TabulationIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Tabulation Sheet" },
+  { value: 10, color: quickLinksColors[2],linkUrl: "/dashboards/modules/student", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Certificate" },
 ]
 
 
@@ -106,38 +104,38 @@ function StudentDashboardReportsContent({ blockCount }) {
         alignItems='center'
         spacing={4}
       > */}
-        <Grid sx={{ px: 2 }} display="grid" gridTemplateColumns={{ md: '1fr 250px', xl: '1fr 420px' }} gap={1} >
-          <Grid sx={{ display: "grid", width: "100%" }} gap={1}>
+      <Grid sx={{ px: 2 }} display="grid" gridTemplateColumns={{ md: '1fr 250px', xl: '1fr 420px' }} gap={1} >
+        <Grid sx={{ display: "grid", width: "100%" }} gap={1}>
 
-            {/* quick link cards */}
+          {/* quick link cards */}
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 1, justifyContent: "center", height: 'fit-content', transition: 'all 2s' }} >
+            {
+              // quickLinks.slice(0,6).map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
+              quickLinks.map(({ value, color, linkUrl, icon, name }) => <DashboardQuickLinkButtonWrapper key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
+            }
+          </Grid>
+
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 1, justifyContent: "center", height: 'fit-content', transition: 'all 2s' }} >
+            {/* exam and result quicklinks section */}
+            <Grid borderRadius={0.5} p={0.5} width={'100%'} sx={{ fontWeight: 500, border: '1px solid', textAlign: 'center', color: theme => theme.colors.primary.dark, borderColor: theme => theme.colors.primary.dark }} > Exam & Result Section</Grid>
             <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 1, justifyContent: "center", height: 'fit-content', transition: 'all 2s' }} >
               {
-                // quickLinks.slice(0,6).map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
-                quickLinks.map(({ value, color, linkUrl, icon, name }) => <DashboardQuickLinkButtonWrapper key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
+                // quickLinks.slice(6,).map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
+                examAndResultSecQuickLinks.map(({ value, color, linkUrl, icon, name }) => <DashboardQuickLinkButtonWrapper key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
               }
             </Grid>
-
-            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap:1, justifyContent: "center", height: 'fit-content', transition: 'all 2s' }} >
-              {/* exam and result quicklinks section */}
-              <Grid borderRadius={0.5} p={0.5} width={'100%'} sx={{ fontWeight: 500, border: '1px solid', textAlign: 'center', color: theme => theme.colors.primary.dark, borderColor: theme => theme.colors.primary.dark }} > Exam & Result Section</Grid>
-              <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 1, justifyContent: "center", height: 'fit-content', transition: 'all 2s' }} >
-                {
-                  // quickLinks.slice(6,).map(({ color, linkUrl, icon, name }, index) => <StudentPathButton key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[index]} />)
-                  examAndResultSecQuickLinks.map(({ value, color, linkUrl, icon, name }) => <DashboardQuickLinkButtonWrapper key={value} color={color} linkUrl={linkUrl} icon={icon} name={name} value={studentModulesList[value]} />)
-                }
-              </Grid>
-            </Grid>
-
           </Grid>
 
-          <Grid>
-            {/* calander */}
-            <Grid item sx={{ minWidth: "fit-content", maxHeight: 'fit-content' }}>
-              <Grid fontWeight={700}>Calander:</Grid>
-              <Calander holidays={blockCount.holidays} />
-            </Grid>
+        </Grid>
+
+        <Grid>
+          {/* calander */}
+          <Grid item sx={{ minWidth: "fit-content", maxHeight: 'fit-content' }}>
+            <Grid fontWeight={700}>Calander:</Grid>
+            <Calander holidays={blockCount.holidays} />
           </Grid>
         </Grid>
+      </Grid>
       {/* </Grid> */}
 
       {

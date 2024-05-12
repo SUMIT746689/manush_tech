@@ -1,5 +1,5 @@
 import Footer from 'src/components/Footer';
-import { Avatar, Card, Grid, Link } from '@mui/material';
+import { Avatar, Card, Grid, Link, Typography } from '@mui/material';
 import Block1 from 'src/content/Blocks/Statistics/Block3';
 import Image from 'next/image';
 import Calander from '../../calender/calander';
@@ -19,19 +19,19 @@ const quickLinksColors = [
 ]
 
 const quickLinks = [
-  { color: quickLinksColors[1], linkUrl: "dashboards/modules/teacher", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Student Attendance" },
-  { color: quickLinksColors[2], linkUrl: "dashboards/modules/teacher", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Class Exam" },
-  { color: quickLinksColors[1], linkUrl: "dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Mark Entry" },
-  { color: quickLinksColors[0], linkUrl: "dashboards/modules/teacher", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Student Home Work" },
-  { color: quickLinksColors[1], linkUrl: "dashboards/modules/teacher", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Salary", },
-  { color: quickLinksColors[0], linkUrl: "dashboards/modules/teacher", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
-  { color: quickLinksColors[1], linkUrl: "dashboards/modules/teacher", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
-  { color: quickLinksColors[2], linkUrl: "dashboards/modules/teacher", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
-  { color: quickLinksColors[0], linkUrl: "dashboards/modules/teacher", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
-  { color: quickLinksColors[2], linkUrl: "dashboards/modules/teacher", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "My Attendence" },
-  { color: quickLinksColors[1], linkUrl: "dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Reports" },
-  { color: quickLinksColors[0], linkUrl: "dashboards/modules/teacher", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Work Schedule" },
-  { color: quickLinksColors[2], linkUrl: "dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Other Activities" },
+  { color: quickLinksColors[1], linkUrl: "/dashboards/modules/teacher", icon: < AttendanceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Student Attendance" },
+  { color: quickLinksColors[2], linkUrl: "/dashboards/modules/teacher", icon: <TeacherIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Class Exam" },
+  { color: quickLinksColors[1], linkUrl: "/dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Mark Entry" },
+  { color: quickLinksColors[0], linkUrl: "/dashboards/modules/teacher", icon: <OnlineAddmissionIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Student Home Work" },
+  { color: quickLinksColors[1], linkUrl: "/dashboards/modules/teacher", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Salary", },
+  { color: quickLinksColors[0], linkUrl: "/dashboards/modules/teacher", icon: < NoticeIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Notice" },
+  { color: quickLinksColors[1], linkUrl: "/dashboards/modules/teacher", icon: <RoutineIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Routine" },
+  { color: quickLinksColors[2], linkUrl: "/dashboards/modules/teacher", icon: <StudyMaterialsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Study Materials" },
+  { color: quickLinksColors[0], linkUrl: "/dashboards/modules/teacher", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sms" },
+  { color: quickLinksColors[2], linkUrl: "/dashboards/modules/teacher", icon: <TeacherAttendenceIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "My Attendence" },
+  { color: quickLinksColors[1], linkUrl: "/dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Reports" },
+  { color: quickLinksColors[0], linkUrl: "/dashboards/modules/teacher", icon: <CertificateIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Work Schedule" },
+  { color: quickLinksColors[2], linkUrl: "/dashboards/modules/teacher", icon: <ReportIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Other Activities" },
 
 ]
 
@@ -60,25 +60,32 @@ function StudentDashboardReportsContent({ blockCount }) {
 
   return (
     <>
-      {/* <Card sx={{ m: 4, borderRadius: 0.5 }}>
-        <Grid container justifyContent='space-between' >
-          <Grid item xs={8} p={2}>
-            <Head name={name} extraInfo={extraInfo} />
-          </Grid>
-          <Grid item xs={4} position="relative" >
-            <Image width={50} height={50} className=' absolute object-cover h-full w-full content-center ' src={'school_classroom.svg'} alt="classroom" />
-          </Grid>
-        </Grid>
-      </Card> */}
 
-      <Grid p={{ xs: 1, sm: 2 }}>
+      <Grid p={{ xs: 1, xl: 2 }} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr ' }} gap={2} >
+        <Card sx={{ display: 'flex', minHeight: { xl: 170 }, justifyContent: "space-between", width: "100%", pl: 2, py: { xs: 2, md: 0 }, pr: { xs: 2, md: 0 }, columnGap: 2, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
+          <Avatar sx={{ my: 'auto', width: { xs: 40, sm: 80 }, height: { xs: 40, sm: 80 } }} />
+          <Grid item sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto', py: 1 }}>
+            <Grid sx={{ fontSize: { xs: 15, sm: 17, md: 17, lg: 18, xl: 22 }, fontWeight: 500 }}>{name} </Grid>
+            <Grid sx={{ fontSize: { xs: 12, xl: 16 }, fontWeight: 300 }}> {extraInfo[0][0]}: {extraInfo[0][1]}</Grid>
+          </Grid>
+          <Grid item height="fit-content" width='fit-content' display={{ xs: 'none', md: 'Grid' }}>
+            <Image
+              src="/dashboard/student_teacher.svg"
+              width={200}
+              height={100}
+              alt="Picture of the author"
+              style={{ position: "relative", objectFit: 'contain', bottom: -1, right: 0, marginTop: 'auto' }}
+            />
+          </Grid>
+        </Card>
+      </Grid>
+
+      {/* <Grid p={{ xs: 1, sm: 2 }}>
         <Card sx={{ display: 'flex', height: 170, justifyContent: "space-between", width: "100%", p: 2, columnGap: 4, backgroundColor: (theme) => theme.colors.primary.main, color: "whitesmoke", borderRadius: 1 }}>
-          {/* <Image alt='sss' /> */}
           <Avatar sx={{ my: 'auto', width: { xs: 60, sm: 80, md: 120 }, height: { xs: 60, sm: 80, md: 120 } }} />
           <Grid sx={{ display: 'flex', height: 'fit-content', flexDirection: "column", gap: 1, my: 'auto' }}>
             <Grid sx={{ fontSize: { xs: 18, sm: 20, md: 26 }, fontWeight: 600 }}>{name}</Grid>
             <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> {extraInfo[0][0]}: {extraInfo[0][1]} </Grid>
-            {/* <Grid sx={{ fontSize: { xs: 14, sm: 16, md: 20 }, fontWeight: 400 }}> <Head name={name} extraInfo={extraInfo}></Head></Grid> */}
           </Grid>
 
           <Image
@@ -89,45 +96,25 @@ function StudentDashboardReportsContent({ blockCount }) {
             style={{ position: "relative", bottom: -1, right: 0, marginTop: 'auto' }}
           />
         </Card>
-      </Grid>
+      </Grid> */}
 
-      <Grid
-        sx={{
-          px: 4
-        }}
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems='center'
-        spacing={4}
-      >
-        <Grid item xs={12}>
-          <Block1 blockCount={blockCount} />
-        </Grid>
+      <Grid px={{ xs: 1, xl: 2 }} display={{ sm: "grid" }} gridTemplateColumns={{ md: '1fr 300px', xl: '1fr 420px' }} gap={{ xs: 1, xl: 2 }} >
 
-        <Grid
-          xs={12}
-          md={11}
-          sx={{
-            pl: 4,
-            pt: 2,
-          }}
-        >
-          <Grid width="100%" display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
-            {/* quick links */}
-            {/* <QuickLinkCards quickLinks={quickLinks} /> */}
-            <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: 2, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
-              {
-                quickLinks.map(({ color, linkUrl, icon, name }, index) => <DashboardQuickLinkButtonWrapper key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={teacherModulesList[index]} />)
-              }
-            </Grid>
-
-            {/* calander */}
-            <Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content", minHeight: '100%' }}>
-              <Calander holidays={blockCount.holidays} />
-            </Grid>
+        <Grid width="100%" display="flex" gap={4} sx={{ flexDirection: { xs: 'column', sm: 'row' } }}>
+          {/* quick links */}
+          {/* <QuickLinkCards quickLinks={quickLinks} /> */}
+          <Grid sx={{ display: 'flex', flexWrap: "wrap", gap: { xs: 1, xl: 2 }, justifyContent: "center", height: 'fit-content', transition: 'all 5s' }} >
+            {
+              quickLinks.map(({ color, linkUrl, icon, name }, index) => <DashboardQuickLinkButtonWrapper key={index} color={color} linkUrl={linkUrl} icon={icon} name={name} value={teacherModulesList[index]} />)
+            }
           </Grid>
         </Grid>
+
+        {/* calander */}
+        < Grid item sx={{ maxWidth: { sm: 400 }, minWidth: "fit-content" }}>
+          <Typography fontWeight={500} fontSize={{ xs: 16, sm: 18 }} pb={1}>Calander</Typography>
+          <Calander holidays={blockCount.holidays} />
+        </Grid >
       </Grid>
 
       {/* banners  */}

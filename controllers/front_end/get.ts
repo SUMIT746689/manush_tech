@@ -23,17 +23,14 @@ export default async function get(req, res) {
         where: { school_id: refresh_token.school_id }
       });
       res.status(200).json(ui);
-    }
-    else {
+    } else {
       const ui = await prisma.websiteUi.findFirst({
         where: { school_id: findSchool.id }
       });
       res.status(200).json(ui);
     }
-
   } catch (error) {
-    logFile.error(error.message)
+    logFile.error(error.message);
     res.status(404).json({ Error: error.message });
   }
 }
-

@@ -334,7 +334,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
       .post('/api/student/bulk-admission', form)
       .then((res) => {
         setExcelFileUpload(null);
-        showNotification(t('All students data inserted'))
+        showNotification(t( `${res?.data?.message}, (failed: ${res?.data?.faildedCreateStd})`))
       })
       .catch((err) => {
         handleShowErrMsg(err, showNotification);
@@ -375,7 +375,6 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
     }
     reader.readAsArrayBuffer(event.target.files[0]);
   }
-  console.log({ isLoading })
   return (
     <Dialog
       fullWidth

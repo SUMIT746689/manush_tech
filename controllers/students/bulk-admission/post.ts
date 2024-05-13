@@ -86,7 +86,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                     const userName = generateUsername(student['Student Name']);
 
                     const studentData = {
-                        student_id: student['Students ID'],
+                        student_id: String(student['Students ID']),
                         first_name: student['Student Name'],
                         father_name: student["Father's Name"],
                         mother_name: student["Mother's Name"],
@@ -128,49 +128,78 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
         }
 
         let faildedSmS = [], successSmS = [];
+        let faildedCreateStd = [], succesCreateStd = [];
 
-        customStudentsData.forEach(async (customStudentInfo, index) => {
-            await prisma.$transaction(async (transaction) => {
-                const stdInfo = await transaction.studentInformation.create({
-                    data: customStudentInfo
-                });
-                const resStd = await transaction.student.create({
-                    data: {
-                        class_roll_no: String(today) + index,
-                        class_registration_no: registration_no_generate(index),
-                        section: { connect: { id: parseInt(section_id) } },
-                        academic_year: { connect: { id: dcryptAcademicYear.id } },
-                        student_info: { connect: { id: stdInfo.id } }
-                    }
-                });
-                const fees = await transaction.fee.findMany({
-                    where: {
-                        class_id: parseInt(class_id),
-                        academic_year_id: dcryptAcademicYear.id
-                    },
-                    select: {
-                        id: true
-                    }
-                });
-
-                let StudentFeeContainer = [];
-                for (let i of fees) {
-                    StudentFeeContainer.push({
-                        student_id: resStd?.id,
-                        fee_id: i.id,
-                        collected_amount: 0,
-                        payment_method: 'pending'
+        const allPromise = customStudentsData.map((customStudentInfo, index) => {
+            return new Promise(async (resolve, reject) => {
+                await prisma.$transaction(async (transaction) => {
+                    const stdInfo = await transaction.studentInformation.create({
+                        data: customStudentInfo
                     });
-                }
-                await transaction.studentFee.createMany({
-                    data: StudentFeeContainer
-                })
-            }).catch(err => {
-                logFile.error(`user_id=${user_id}` + err.message)
-            })
-        });
+                    const resStd = await transaction.student.create({
+                        data: {
+                            class_roll_no: String(today) + index,
+                            class_registration_no: registration_no_generate(index),
+                            section: { connect: { id: parseInt(section_id) } },
+                            academic_year: { connect: { id: dcryptAcademicYear.id } },
+                            student_info: { connect: { id: stdInfo.id } }
+                        }
+                    });
+                    const fees = await transaction.fee.findMany({
+                        where: {
+                            class_id: parseInt(class_id),
+                            academic_year_id: dcryptAcademicYear.id
+                        },
+                        select: {
+                            id: true
+                        }
+                    });
 
-        return res.status(200).json({ message: 'All students data inserted', faildedSmS, successSmS });
+                    let StudentFeeContainer = [];
+                    for (let i of fees) {
+                        StudentFeeContainer.push({
+                            student_id: resStd?.id,
+                            fee_id: i.id,
+                            collected_amount: 0,
+                            payment_method: 'pending'
+                        });
+                    }
+                    await transaction.studentFee.createMany({
+                        data: StudentFeeContainer
+                    })
+                })
+                    .then(res => {
+                        console.log({ tran: res })
+                        succesCreateStd.push(customStudentInfo.student_id);
+                        // resolve({ isSuccess: true, student_id: customStudentInfo.student_id });
+                        resolve(true);
+                    })
+                    .catch(err => {
+                        faildedCreateStd.push(customStudentInfo.student_id);
+                        logFile.error(`user_id=${user_id}` + err.message)
+                        if (err.message === '\n' + 'Invalid `prisma.studentInformation.create()` invocation:\n' + '\n' + '\n' + 'Unique constraint failed on the constraint: `student_informations_student_id_school_id_key`') {
+                            // resolve({ isSuccess: false, error: 'student id already used', student_id: customStudentInfo.student_id })
+                            resolve(false)
+                        }
+                        // resolve({ isSuccess: false, error: err.message, student_id: customStudentInfo.student_id });
+                        resolve(false)
+
+                    })
+            })
+
+        });
+        Promise
+            .all(allPromise)
+            .then(resp => {
+                console.log({ resp })
+                if (resp.includes(true)) return res.status(200).json({ message: 'students data inserted', faildedCreateStd, succesCreateStd });
+                // if (resp[0].isSuccess) return res.status(200).json({ message: 'students data inserted', faildedCreateStd, succesCreateStd });
+                res.status(404).json({ error: 'failed insert all students' });
+            })
+            .catch(err => {
+                console.log({ "promise All error": err })
+                res.status(404).json({ error: err.message });
+            })
     } catch (err) {
         logFile.error(err.message)
         res.status(404).json({ error: err.message });

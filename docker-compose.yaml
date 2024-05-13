@@ -1,6 +1,6 @@
 services:
   admin:
-    image: ridoy235/elitbuzz:school_admin_v14
+    image: ridoy235/elitbuzz:school_admin_v15
     pull_policy: always
     volumes: 
       - AllFiles:/app/AllFiles
@@ -9,7 +9,7 @@ services:
       - "3000:3000"
     restart: unless-stopped
     environment:
-      - DATABASE_URL=mysql://root:password@10.0.0.107:3306/school?parseTime=true
+      - DATABASE_URL=mysql://root:password@192.168.11.169:3306/school?parseTime=true
       - SALTROUNDS=${SALTROUNDS}
       - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
       - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}

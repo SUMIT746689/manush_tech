@@ -722,7 +722,7 @@ const AdmitCard = () => {
 };
 
 AdmitCard.getLayout = (page) => (
-  <Authenticated name="Admit_Card">
+  <Authenticated requiredPermissions={["create_admit_card", "show_admit_card"]}>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

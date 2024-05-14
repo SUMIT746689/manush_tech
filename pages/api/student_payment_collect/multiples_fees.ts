@@ -11,7 +11,7 @@ const index = async (req, res, refresh_token) => {
       post(req, res, refresh_token);
       break;
     default:
-      res.setHeader('Allow', ['GET', 'POST']);
+      res.setHeader('Allow', ['POST']);
       logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }

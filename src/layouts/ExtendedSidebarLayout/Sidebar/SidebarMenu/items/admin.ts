@@ -172,6 +172,11 @@ const students: MenuItems[] = [
         icon: HolidayVillageIcon
       },
       {
+        name: 'Admit Card',
+        link: '/admit_card',
+        icon: DesignServicesIcon
+      },
+      {
         name: 'Daily Notes',
         icon: NotesIcon,
         items: [

@@ -27,7 +27,6 @@ function ManagementFees() {
   const { data: classData, error: classError } = useClientFetch('/api/class');
   const { data: feesHeads } = useClientFetch('/api/fees_heads');
 
-  console.log({feesHeads})
   useEffect(() => {
     if (data?.success) setDatas(data.data);
   }, [data, error]);

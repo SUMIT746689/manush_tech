@@ -50,7 +50,7 @@ function ManagementClasses() {
 }
 
 ManagementClasses.getLayout = (page) => (
-  <Authenticated name="fees_heads" requiredPermissions={["create_fees_heads,show_fees_heads"]}>
+  <Authenticated requiredPermissions={["create_fees_heads", "show_fees_heads"]}>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

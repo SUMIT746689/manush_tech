@@ -171,7 +171,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
               .min(1)
               .required(t('The school id is required')),
             // last_date: !checked && Yup.date().required(t('Date is required')),
-            months: Yup.array().min(1, "select a month"),
+            months: !editData && Yup.array().min(1, "select a month"),
             // academic_year_id: Yup.number()
             //   .min(1)
             //   .required(t('academic field is required')),
@@ -339,7 +339,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                   } */}
 
                   {
-                    <Grid item columnGap={1} pt={1}>
+                    !editData && <Grid item columnGap={1} pt={1}>
                       <AutoCompleteWrapperWithoutRenderInput
                         minWidth="100%"
                         label="Select multiple month"
@@ -353,10 +353,14 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                         // @ts-ignore
                         handleChange={(e, value: any) => setFieldValue('months', value)}
                       />
-                      <Grid display="flex" justifyContent="start" columnGap={1}>
-                        <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>Select All</ButtonWrapper>
-                        <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>Remove All</ButtonWrapper>
-                      </Grid>
+                      {
+                        !editData && (
+                          <Grid display="flex" justifyContent="start" columnGap={1}>
+                            <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>Select All</ButtonWrapper>
+                            <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>Remove All</ButtonWrapper>
+                          </Grid>
+                        )
+                      }
 
                     </Grid>
                   }

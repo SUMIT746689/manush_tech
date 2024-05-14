@@ -13,7 +13,7 @@ export default async function patchSchool(req, res) {
 
     if (title) {
       data['title'] = title;
-      voucher_data['title'] = `${title} exam fee`;
+      voucher_data['title'] = `${title} fee`;
     }
     if (_for) data['for'] = _for;
     if (amount) {

@@ -199,7 +199,7 @@ const Results: FC<ResultsProps> = ({
   const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLimit(parseInt(event.target.value));
   };
-  console.log({ sessions });
+
   const filteredschools = applyFilters(sessions, query, filters);
   const paginatedFees = applyPagination(filteredschools, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
@@ -244,10 +244,10 @@ const Results: FC<ResultsProps> = ({
           <Grid item xs={12}>
             <Box p={0.5}>
               <DebounceInput
-              debounceTimeout={500}
-              handleDebounce={(v) => setQuery(v)}
-              value={searchValue}
-              handleChange={(v) => setSearchValue(v.target?.value)}
+                debounceTimeout={500}
+                handleDebounce={(v) => setQuery(v)}
+                value={searchValue}
+                handleChange={(v) => setSearchValue(v.target?.value)}
                 label={'Search by fees title, id or amount......'}
                 InputProps={{
                   startAdornment: (

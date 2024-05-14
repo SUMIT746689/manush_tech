@@ -25,8 +25,7 @@ function Managementschools() {
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [classes, setClasses] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const { data: examTerms } = useClientDataFetch("/api/exam_terms")
-
+  const { data: examTerms } = useClientDataFetch('/api/exam_terms');
 
   const getExam = () => {
     axios
@@ -34,7 +33,7 @@ function Managementschools() {
         `/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`
       )
       .then((res) => {
-        setExams(res.data)
+        setExams(res.data);
       })
       .catch((err) => console.log(err));
   };
@@ -45,19 +44,20 @@ function Managementschools() {
   }, [academicYear]);
 
   useEffect(() => {
+    axios
+      .get(`/api/class?school_id=${user?.school_id}`)
+      .then((res) => setClasses(res.data))
+      .catch((err) => console.log(err));
 
-    axios.get(`/api/class?school_id=${user?.school_id}`)
-      .then(res => setClasses(res.data))
-      .catch(err => console.log(err));
-
-    axios.get('/api/rooms').then(res => {
-      setRooms(res.data.rooms.map(i => ({
-        label: i.name,
-        id: i.id
-      })))
-    })
-  }, [])
-
+    axios.get('/api/rooms').then((res) => {
+      setRooms(
+        res.data.rooms.map((i) => ({
+          label: i.name,
+          id: i.id
+        }))
+      );
+    });
+  }, []);
 
   return (
     <>
@@ -71,9 +71,10 @@ function Managementschools() {
           editExam={editExam}
           setEditExam={setEditExam}
           getExam={getExam}
-          examTerms={examTerms?.map(examTerm => {
-            return { id: examTerm.id, label: examTerm.title }
-          }) || []
+          examTerms={
+            examTerms?.map((examTerm) => {
+              return { id: examTerm.id, label: examTerm.title };
+            }) || []
           }
         />
       </PageTitleWrapper>
@@ -87,10 +88,7 @@ function Managementschools() {
         spacing={1}
       >
         <Grid item xs={12}>
-          <Results
-            exams={exams}
-            setEditExam={setEditExam}
-          />
+          <Results exams={exams} setEditExam={setEditExam} />
         </Grid>
       </Grid>
       <Footer />

@@ -6,9 +6,7 @@ type ModuleContext = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ModuleContext = createContext<ModuleContext>(
-  {} as ModuleContext
-);
+export const ModuleContext = createContext<ModuleContext>({} as ModuleContext);
 
 type Props = {
   children: ReactNode;
@@ -26,12 +24,10 @@ export function ModuleProvider({ children }: Props) {
   const handleChangeModule = (value) => {
     setSelectModule(value);
     window.localStorage.setItem('moduleName', value);
-  }
+  };
 
   return (
-    <ModuleContext.Provider
-      value={{ selectModule, handleChangeModule }}
-    >
+    <ModuleContext.Provider value={{ selectModule, handleChangeModule }}>
       {children}
     </ModuleContext.Provider>
   );

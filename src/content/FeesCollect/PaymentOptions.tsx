@@ -9,6 +9,7 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  collectionDate,
   handleStudentPaymentCollect,
   setPrintFees,
   amount,
@@ -239,8 +240,10 @@ const PaymentOptions = ({
         fees_name: feesName
       };
     }
+
     axios
       .post('/api/student_payment_collect/multiples_fees', {
+        collection_date: collectionDate,
         student_id: feesUserData.id,
         collected_by_user: user?.id,
         fee_id: selectedRows,
@@ -259,7 +262,8 @@ const PaymentOptions = ({
             const last_date = new Date(
               item?.last_date ? item?.last_date : ''
             ).getTime();
-            const today = new Date().getTime();
+            const today = new Date(collectionDate).getTime();
+
             return {
               fee_id: item?.fee_id ? item?.fee_id : '',
               paidAmount: item?.collect_amount,

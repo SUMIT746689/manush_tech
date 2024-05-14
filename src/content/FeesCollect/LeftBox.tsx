@@ -2,6 +2,7 @@ import { Grid, TextField, Typography, Alert } from '@mui/material';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { ChangeEvent } from 'react';
 
 const LeftBox = ({
   debounceTimeout,
@@ -13,8 +14,16 @@ const LeftBox = ({
   datePickerHandleChange,
   monthData,
   monthHandleChange,
-  btnHandleClick
+  btnHandleClick,
+  setStudentId,
+  student_id,
+  collectionDate,
+  setCollectionDate
 }) => {
+  const handleChangeStudentId = (event: ChangeEvent<HTMLInputElement>) => {
+    setStudentId(event.target.value);
+  };
+
   return (
     <Grid
       sx={{
@@ -81,6 +90,8 @@ const LeftBox = ({
               placeholder="Student Id"
               fullWidth
               variant="outlined"
+              onChange={handleChangeStudentId}
+              value={student_id}
             />
           </Grid>
           <Grid
@@ -112,7 +123,7 @@ const LeftBox = ({
               </Typography>
               <DatePickerWrapper
                 label={''}
-                date="27-03-2024"
+                date={collectionDate}
                 handleChange={datePickerHandleChange}
               />
             </Grid>

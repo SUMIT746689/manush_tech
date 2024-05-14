@@ -2,10 +2,8 @@ import prisma from '@/lib/prisma_client';
 import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
 
-
 async function get(req, res, refresh_token) {
   try {
-
     const { section_id, academic_year_id, class_id } = req.query;
 
     const where = {};
@@ -15,9 +13,10 @@ async function get(req, res, refresh_token) {
     } else if (class_id) {
       where['section'] = {
         class_id: parseInt(class_id)
-      }
+      };
     }
-    if (academic_year_id) where['academic_year_id'] = parseInt(academic_year_id);
+    if (academic_year_id)
+      where['academic_year_id'] = parseInt(academic_year_id);
 
     const students = await prisma.student.findMany({
       where: {
@@ -64,21 +63,20 @@ async function get(req, res, refresh_token) {
               }
             }
           }
-
         },
         group: {
           select: {
             title: true
           }
-        },
+        }
       }
     });
 
     res.status(200).json(students);
   } catch (err) {
-    logFile.error(err.message)
+    logFile.error(err.message);
     res.status(404).json({ error: err.message });
   }
 }
 
-export default authenticate(get)
+export default authenticate(get);

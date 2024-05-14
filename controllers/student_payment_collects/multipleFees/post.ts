@@ -12,95 +12,6 @@ export let new_student_fees_id = [];
 export let new_transaction_fees_id = [];
 export let account_table_update_info = [];
 
-const createSmsQueueTableHandler = ({
-  user_id,
-  contacts,
-  sms_text,
-  submission_time,
-  school_id,
-  school_name,
-  sender_id,
-  sms_type,
-  index,
-  number_of_sms_parts,
-  charges_per_sms
-}) => {
-  const currentDate = new Date().getTime();
-  const sms_shoot_id = [
-    String(school_id),
-    String(currentDate),
-    String(index)
-  ].join('_');
-
-  prisma
-    .$transaction([
-      prisma.tbl_queued_sms.create({
-        data: {
-          sms_shoot_id,
-          user_id: parseInt(user_id),
-          school_id,
-          school_name,
-          sender_id,
-          sms_type,
-          sms_text,
-          // // sender_id: 1,
-          // // sender_name: "",
-          submission_time: new Date(submission_time),
-          contacts,
-          pushed_via: '',
-          // // status: status,
-          // // route_id: 1,
-          // // coverage_id: 1,
-          charges_per_sms,
-          total_count: 1,
-          number_of_sms_parts
-          // // is_black_list: 2,
-          //fail_count: 3,
-          //priority: 4
-        }
-      }),
-      prisma.tbl_sent_sms.create({
-        data: {
-          sms_shoot_id,
-          user_id: parseInt(user_id),
-          school_id,
-          school_name,
-          sender_id,
-          sms_type,
-          sms_text,
-          // // sender_id: 1,
-          // // sender_name: "",
-          submission_time: new Date(submission_time),
-          contacts,
-          pushed_via: '',
-          // // status: status,
-          // // route_id: 1,
-          // // coverage_id: 1,
-          charges_per_sms,
-          total_count: 1,
-          number_of_sms_parts
-          // // is_black_list: 2,
-          //fail_count: 3,
-          //priority: 4
-        }
-      }),
-      prisma.school.update({
-        where: { id: school_id },
-        data: {
-          masking_sms_count:
-            sms_type === 'masking' ? { decrement: 1 } : undefined,
-          non_masking_sms_count:
-            sms_type === 'non_masking' ? { decrement: 1 } : undefined
-        }
-      })
-    ])
-    .then((res) => {})
-    .catch((err) => {});
-
-  // .then(res => { logFile.error(`tbl_queue_sms, tbl_sent_sms created & school_id(${school_id}) update sucessfully`) })
-  // .catch(err => { logFile.error("error tbl_queue_sms or tbl_sent_sms create", err) })
-};
-
 // accounts table update code start
 const handleAccounts = async (resultsArr) => {
   // account.balance + data.collected_amount
@@ -143,6 +54,7 @@ const handleAccounts = async (resultsArr) => {
 // accounts table update code end
 
 const handleTransaction = ({
+  collection_date,
   data,
   status,
   account,
@@ -164,6 +76,7 @@ const handleTransaction = ({
             collected_amount: data.collected_amount,
             payment_method: data.payment_method,
             transID: data.transID,
+            collection_date: collection_date,
             account: { connect: { id: data.account_id } },
             payment_method_list: { connect: { id: data.payment_method_id } },
             collected_by_user: { connect: { id: data.collected_by } },
@@ -201,7 +114,8 @@ const handleTransaction = ({
           collect_amount: data.collected_amount,
           tracking_number,
           created_at: temp.created_at,
-          last_payment_date: temp.created_at,
+          //  last_payment_date: temp.created_at,
+          last_payment_date: temp.collection_date,
           account_name: account.title,
           transID: data.transID,
           payment_method: account?.payment_method[0]?.title,
@@ -224,6 +138,7 @@ export const post = async (req, res, refresh_token) => {
   try {
     const { id: user_id, school_id } = refresh_token;
     let {
+      collection_date,
       student_id,
       fee_id,
       account_id,
@@ -338,9 +253,13 @@ export const post = async (req, res, refresh_token) => {
           const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount
             ? isAlreadyAvaliable._sum.collected_amount
             : 0;
+          // old
+          // const last_trnsation_date = isAlreadyAvaliable._max.created_at
+          //   ? new Date(isAlreadyAvaliable._max.created_at)
+          //   : new Date();
           const last_trnsation_date = isAlreadyAvaliable._max.created_at
             ? new Date(isAlreadyAvaliable._max.created_at)
-            : new Date();
+            : new Date(collection_date);
 
           const late_fee = fee.late_fee ? fee.late_fee : 0;
 
@@ -353,7 +272,9 @@ export const post = async (req, res, refresh_token) => {
             isAlreadyAvaliable._sum.collected_amount > 0
           ) {
             const last_date = new Date(fee.last_date);
-            const new_trnsation_date = new Date();
+            // old
+            // const new_trnsation_date = new Date();
+            const new_trnsation_date = new Date(collection_date);
 
             if (
               new_trnsation_date > last_date &&
@@ -391,6 +312,7 @@ export const post = async (req, res, refresh_token) => {
                 );
               } else {
                 return await handleTransaction({
+                  collection_date,
                   data,
                   account,
                   status,
@@ -420,6 +342,7 @@ export const post = async (req, res, refresh_token) => {
               );
             } else {
               return await handleTransaction({
+                collection_date,
                 data,
                 account,
                 status,
@@ -454,6 +377,7 @@ export const post = async (req, res, refresh_token) => {
 
         if (req.body?.other_fees_data !== null) {
           const post_other_fees_res = await post_other_fees(
+            collection_date,
             req.body.other_fees_data,
             res,
             refresh_token,
@@ -496,6 +420,7 @@ export const post = async (req, res, refresh_token) => {
       }
     } else if (req.body?.other_fees_data !== null) {
       const post_other_fees_res = await post_other_fees(
+        collection_date,
         req.body.other_fees_data,
         res,
         refresh_token,

@@ -18,6 +18,7 @@ import dayjs from 'dayjs';
 import { useState, useEffect, FC, useRef } from 'react';
 
 type PaymentInvoiceType = {
+  collectionDate: any;
   leftFeesTableTotalCalculation: object | null;
   feesUserData: object;
   totalDueValue: string;
@@ -28,6 +29,7 @@ type PaymentInvoiceType = {
 };
 
 const PaymentInvoice: FC<PaymentInvoiceType> = ({
+  collectionDate,
   leftFeesTableTotalCalculation,
   feesUserData,
   totalDueValue,
@@ -51,7 +53,7 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
       // @ts-ignore
       const today = payment?.last_payment_date
         ? new Date(payment?.last_payment_date)
-        : new Date();
+        : new Date(collectionDate);
       let payableAmount = payment.amount;
 
       if (

@@ -257,6 +257,7 @@ const voucherTableDataInsert = async (student_fees_info_arr) => {
 // student_fee table data insert code start
 
 const createStudentFees = ({
+  collection_date,
   data,
   status,
   account,
@@ -274,6 +275,7 @@ const createStudentFees = ({
           collected_amount: data.collected_amount,
           payment_method: data.payment_method,
           transID: data.transID,
+          collection_date: collection_date,
           other_fee_name: data.fees_name,
           status,
           total_payable: data?.total_payable
@@ -285,7 +287,7 @@ const createStudentFees = ({
       resolve({
         collect_amount: data.collected_amount,
         created_at: temp.created_at,
-        last_payment_date: temp.created_at,
+        last_payment_date: temp.collection_date,
         transID: data.transID,
         status: temp.status,
         student_id: temp.id,
@@ -322,6 +324,7 @@ const createStudentFees = ({
 
 // student_fee table data insert code end
 export const post_other_fees = async (
+  collection_date,
   req,
   res,
   refresh_token,
@@ -396,6 +399,7 @@ export const post_other_fees = async (
         // student_fees_info_arr
 
         return await createStudentFees({
+          collection_date,
           data,
           status,
           account,

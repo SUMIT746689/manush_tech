@@ -23,7 +23,9 @@ function ManagementFees() {
   const [datas, setDatas] = useState<Project[]>([]);
   const [editData, setEditData] = useState<Project>(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const { data, error, reFetchData } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
+  const { data, error, reFetchData } = useClientFetch(
+    `/api/fee?academic_year_id=${academicYear?.id}`
+  );
   const { data: classData, error: classError } = useClientFetch('/api/class');
 
   useEffect(() => {

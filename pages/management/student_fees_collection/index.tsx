@@ -28,7 +28,7 @@ import LeftFeesTable from '@/content/FeesCollect/LeftFeesTable';
 import RightFeesTable from '@/content/FeesCollect/RightFeesTable';
 import PaymentOptions from '@/content/FeesCollect/PaymentOptions';
 import Reset_Sent_SMS_Collect_Invoice from '@/content/FeesCollect/Reset_Sent_SMS_Collect_Invoice';
-
+import dayjs from 'dayjs';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 // updated searching code start
@@ -76,6 +76,8 @@ function Managementschools() {
     null
   );
   const [amount, setAmount] = useState(null);
+  const [student_id, setStudentId] = useState<string>('');
+  const [collectionDate, setCollectionDate] = useState<any>(dayjs(Date.now()));
   // handleDebounce function
 
   const handleDebounce = (value) => {
@@ -88,7 +90,8 @@ function Managementschools() {
           const userInfoArr = res.data.map((item) => {
             return {
               label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
-              id: item.id
+              id: item.id,
+              student_id: item.student_id
             };
           });
           setSearchOptionData(userInfoArr);
@@ -111,12 +114,16 @@ function Managementschools() {
     event: ChangeEvent<HTMLInputElement>,
     v
   ) => {
+    setStudentId(v?.student_id || '');
     setSearchValue(v || null);
   };
   const datePickerHandleChange = (
     event: ChangeEvent<HTMLInputElement>
-  ): void => {};
+  ): void => {
+    setCollectionDate(event);
+  };
   const monthHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {};
+
   const leftFeesTableColumnData = (data) => {
     let totalDue = 0;
     let totalObj = {
@@ -126,16 +133,22 @@ function Managementschools() {
       discount: 0,
       dueAmount: 0
     };
+
     // fees array
     let feesData = data?.fees.map((item) => {
       const last_trnsaction_time = new Date(item?.last_payment_date).getTime();
       const last_date_time = new Date(item?.last_date).getTime();
-      const currentDate = new Date();
+      // old code
+      // const currentDate = new Date();
+      const currentDate = new Date(collectionDate);
+
       const formattedDate = currentDate.toISOString();
       const check_last_transaction_time = new Date(formattedDate).getTime();
+
       let late_fee_value = null;
       let due_fee_value = null;
       let paid_amount_value = null;
+
       if (last_trnsaction_time < last_date_time) {
         late_fee_value = 0;
       } else if (last_trnsaction_time > last_date_time) {
@@ -230,11 +243,25 @@ function Managementschools() {
     // student information code end
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
-    // searching data collect
-    // searchValue.id
-    // academicYear.id
+    if (student_id) {
+      const res = await axios.get(
+        `/api/student/search-students?student_id=${student_id?.toLowerCase()}`
+      );
+      if (res?.data?.length > 0) {
+        const response = await axios.get(
+          `/api/student_payment_collect/${res?.data[0]?.id}?academic_year_id=${academicYear.id}`
+        );
+        // set search level code
+        setSearchValue(
+          `${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`
+        );
 
-    if (searchValue?.id && academicYear?.id) {
+        leftFeesTableColumnData(response?.data?.data);
+      } else {
+        setSearchValue('');
+        return showNotification('student_id not founds', 'error');
+      }
+    } else if (searchValue?.id && academicYear?.id) {
       const res = await axios.get(
         `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
       );
@@ -283,6 +310,7 @@ function Managementschools() {
     setSelectedRowsFeesTable([]);
     setSelectAll(false);
     setPrintFees([]);
+    setStudentId('');
   };
 
   // updated reset button code end
@@ -297,7 +325,7 @@ function Managementschools() {
 
       // update code
       const last_date = new Date(fee_.last_date).getTime();
-      const today = new Date().getTime();
+      const today = new Date(collectionDate).getTime();
 
       const status_color = { p: 0.5 };
       let due = 0,
@@ -511,11 +539,11 @@ function Managementschools() {
       });
   };
 
-  useEffect(() => {
-    if (!showPrint || prinCollectedtFees.length === 0) return;
-    handlePrint();
-    setShowPrint(false);
-  }, [showPrint]);
+  // useEffect(() => {
+  //   if (!showPrint || prinCollectedtFees.length === 0) return;
+  //   handlePrint();
+  //   setShowPrint(false);
+  // }, [showPrint]);
 
   return (
     <>
@@ -593,6 +621,7 @@ function Managementschools() {
       <Grid sx={{ display: 'none' }}>
         <Grid ref={printPageRef}>
           <PaymentInvoice
+            collectionDate={collectionDate}
             leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
             feesUserData={feesUserData}
             totalDueValue={totalDueValue}
@@ -602,6 +631,7 @@ function Managementschools() {
             student={selectedStudent}
           />
           <PaymentInvoice
+            collectionDate={collectionDate}
             leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
             feesUserData={feesUserData}
             totalDueValue={totalDueValue}
@@ -644,6 +674,10 @@ function Managementschools() {
           monthData={monthData}
           monthHandleChange={monthHandleChange}
           btnHandleClick={btnHandleClick}
+          setStudentId={setStudentId}
+          student_id={student_id}
+          collectionDate={collectionDate}
+          setCollectionDate={setCollectionDate}
         />
         <RightBox userInformation={userInformation} />
       </Grid>
@@ -685,6 +719,7 @@ function Managementschools() {
 
       <Grid px={4} mt={1} mx={1}>
         <PaymentOptions
+          collectionDate={collectionDate}
           handleStudentPaymentCollect={handleStudentPaymentCollect}
           setPrintFees={setPrintFees}
           amount={amount}

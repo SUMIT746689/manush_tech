@@ -123,7 +123,7 @@ export const get = async (req, res) => {
             return {
               ...fee,
               last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
+                findStudentFee[findStudentFeeSize - 1].created_at,
               status: 'paid late',
               paidAmount,
               collected_by_user:
@@ -138,7 +138,7 @@ export const get = async (req, res) => {
             return {
               ...fee,
               last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
+                findStudentFee[findStudentFeeSize - 1].created_at,
               status: 'fine unpaid',
               paidAmount,
               collected_by_user:
@@ -152,7 +152,7 @@ export const get = async (req, res) => {
             return {
               ...fee,
               last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
+                findStudentFee[findStudentFeeSize - 1].created_at,
               status: 'paid',
               collected_by_user:
                 findStudentFee[findStudentFeeSize - 1]?.collected_by_user
@@ -162,7 +162,7 @@ export const get = async (req, res) => {
             return {
               ...fee,
               last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
+                findStudentFee[findStudentFeeSize - 1].created_at,
               paidAmount: paidAmount,
               status: 'partial paid',
               collected_by_user:

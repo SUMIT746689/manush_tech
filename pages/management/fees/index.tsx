@@ -15,8 +15,6 @@ import type { Project } from 'src/models/project';
 // import { schoolsApi } from 'src/mocks/schools';
 import Results from 'src/content/Management/Fees/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
-import { DataSaverOnRounded } from '@mui/icons-material';
-import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 function ManagementFees() {
   // const isMountedRef = useRefMounted();
@@ -25,7 +23,9 @@ function ManagementFees() {
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const { data, error, reFetchData } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
+  const { data: feesHeads } = useClientFetch('/api/fees_heads');
 
+  console.log({feesHeads})
   useEffect(() => {
     if (data?.success) setDatas(data.data);
   }, [data, error]);
@@ -45,6 +45,7 @@ function ManagementFees() {
               value: i.id
             })) || []
           }
+          feesHeads={feesHeads?.map(feesH=>({label:feesH.title,value:feesH.id})) || []}
           editData={editData}
           seteditData={setEditData}
           reFetchData={reFetchData}

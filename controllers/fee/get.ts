@@ -25,6 +25,9 @@ export default async function get(req: any, res: any, refresh_token) {
             name: true
           }
         }
+      },
+      orderBy:{
+        id: "desc"
       }
     });
     // delete user['password'];

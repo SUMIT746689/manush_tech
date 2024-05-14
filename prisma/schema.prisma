@@ -129,6 +129,7 @@ model School {
   OtherUsersInfo             OtherUsersInfo[]
   VoiceGateway               VoiceGateway?
   VoiceTemplate              VoiceTemplate[]
+  FeesHaed                   FeesHaed[]
 
   // routines Routine[]
   @@map("schools")
@@ -242,7 +243,7 @@ model Section {
 
 model StudentInformation {
   id                        Int             @id @default(autoincrement())
-  student_id                String?         
+  student_id                String?
   user_id                   Int             @unique
   first_name                String
   middle_name               String?
@@ -437,21 +438,60 @@ model Group {
 //   @@map("sessions")
 // }
 
-model Fee {
-  id        Int      @id @default(autoincrement())
+enum Frequency {
+  on_demand
+  half_yearly
+  monthly
+  annual
+}
+
+// enum  
+model FeesHaed {
+  id        Int       @id @default(autoincrement())
   title     String
-  for       String?
-  amount    Float
-  last_date DateTime
-  late_fee  Float?
+  frequency Frequency
+  school_id Int
+
+  school School @relation(fields: [school_id], references: [id])
+  Fee    Fee[]
+
+  @@map("fees_head")
+}
+
+enum AllMonths {
+  january
+  february
+  march
+  april
+  may
+  june
+  july
+  august
+  september
+  october
+  november
+  december
+}
+
+model Fee {
+  id         Int        @id @default(autoincrement())
+  title      String
+  for        String?
+  amount     Float
+  last_date  DateTime
+  late_fee   Float?
+  frequency  Frequency?
+  fees_month AllMonths?
 
   academic_year_id Int
   class_id         Int
   school_id        Int
+  fees_head_id     Int?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
   school              School       @relation(fields: [school_id], references: [id])
+  fees_head           FeesHaed?    @relation(fields: [fees_head_id], references: [id])
   student_fees        StudentFee[]
   Discount            Discount[]
   waiverFeesToStudent Student[]    @relation("WaiverFeesToStudent")
@@ -1061,7 +1101,7 @@ model Transaction {
   school              School          @relation(fields: [school_id], references: [id])
   StudentFee          StudentFee?
 
- // @@unique([tracking_number, school_id])
+  // @@unique([tracking_number, school_id])
   @@map("transactions")
 }
 

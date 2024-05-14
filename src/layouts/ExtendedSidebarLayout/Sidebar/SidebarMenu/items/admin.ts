@@ -345,6 +345,11 @@ const accounting: MenuItems[] = [
         icon: AccountBalanceIcon,
         items: [
           {
+            name: 'Fees Head',
+            link: '/management/fees_heads',
+            icon: PaidIcon
+          },
+          {
             name: 'Fees',
             link: '/management/fees',
             icon: PaidIcon

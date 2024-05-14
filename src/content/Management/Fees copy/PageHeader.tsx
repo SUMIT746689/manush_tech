@@ -27,13 +27,11 @@ import dayjs from 'dayjs';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/components/AutoCompleteWrapper';
-import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
-import { DropDownSelectWrapper } from '@/components/DropDown';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
 
-const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i.toLocaleLowerCase() }))
+const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i }))
 
-function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetchData }) {
+function PageHeader({ name, editData, seteditData, classData, reFetchData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
@@ -75,7 +73,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       };
       _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
       _values['late_fee'] = parseFloat(_values.late_fee)
-      _values['months'] = _values.months.map(month => month.value)
+
       // dayjs(_values.last_date).format('YYYY-MM-DD')
 
       if (editData) {
@@ -94,13 +92,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       setErrors({ submit: err.message });
       setSubmitting(false);
     }
-  }
-
-  const handleSelectAllMonths = (setValue) => {
-    setValue('months', month)
-  }
-  const handleRemoveAllMonths = (setValue) => {
-    setValue('months', [])
   }
 
   return (
@@ -135,16 +126,24 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       </Grid> */}
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
         open={open}
         onClose={handleCreateClassClose}
       >
-
-        <DialogTitleWrapper editData={editData} name="fees" />
-
+        <DialogTitle
+          sx={{
+            px: 1
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {t(editData ? 'Edit fees' : 'Add new fees')}
+          </Typography>
+          <Typography variant="subtitle2">
+            {t('Fill in the fields below to create and add a new fees')}
+          </Typography>
+        </DialogTitle>
         <Formik
           initialValues={{
-            fees_head_id: editData?.fees_head_id || undefined,
             title: editData?.title || undefined,
             amount: editData?.amount || undefined,
             school_id: user?.school_id || undefined,
@@ -152,29 +151,25 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
             _for: editData?.for || undefined,
             academic_year_id: editData?.academic_year_id || academicYear?.id || undefined,
             class_id: editData?.class_id || undefined,
-            frequency: editData?.frequency || undefined,
             months: [],
             late_fee: editData?.late_fee || 0,
             submit: null
           }}
           validationSchema={Yup.object().shape({
-            // title: Yup.string()
-            //   .max(255)
-            //   .required(t('The title field is required')),
-            fees_head_id: Yup.number()
-              .min(1, 'The fees head is required')
-              .required(t('The fees head is required')),
+            title: Yup.string()
+              .max(255)
+              .required(t('The title field is required')),
             amount: Yup.number()
               .min(1)
               .required(t('The amount code field is required')),
             school_id: Yup.number()
               .min(1)
               .required(t('The school id is required')),
-            // last_date: !checked && Yup.date().required(t('Date is required')),
-            months: Yup.array().min(1, "select a month"),
-            // academic_year_id: Yup.number()
-            //   .min(1)
-            //   .required(t('academic field is required')),
+            last_date: !checked && Yup.date().required(t('Date is required')),
+            months: Yup.array(),
+            academic_year_id: Yup.number()
+              .min(1)
+              .required(t('academic field is required')),
             class_id: Yup.number()
               .min(1)
               .required(t('class filed field is required'))
@@ -182,7 +177,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
           onSubmit={handleSubmit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-            console.log({ values, errors })
+
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -191,25 +186,9 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     p: 3
                   }}
                 >
-                  <Grid display={'grid'} columnGap={2} rowGap={1} gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}>
-
-                    {/* fees heads */}
-                    <AutoCompleteWrapperWithoutRenderInput
-                      minWidth="100%"
-                      label="Select Fees Head"
-                      placeholder="select a fees head..."
-                      value={feesHeads.find((cls) => cls.value === values.fees_head_id) || null}
-                      options={feesHeads}
-                      isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
-                      name="fees_head_id"
-                      error={errors?.fees_head_id}
-                      touched={touched?.fees_head_id}
-                      // @ts-ignore
-                      handleChange={(e, value: any) => setFieldValue('fees_head_id', value?.value || 0)}
-                    />
-
+                  <Grid display={'grid'} gap={2} gridTemplateColumns={'auto auto'}>
                     {/* title  */}
-                    {/* <TextFieldWrapper
+                    <TextFieldWrapper
                       errors={errors?.title}
                       touched={touched?.title}
                       name="title"
@@ -217,7 +196,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       handleBlur={handleBlur}
                       handleChange={handleChange}
                       value={values?.title}
-                    /> */}
+                    />
 
                     {/* fee's for which month */}
                     <TextFieldWrapper
@@ -230,8 +209,8 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       value={values?._for}
                     />
 
-
                     {/* Class */}
+
                     <AutoCompleteWrapperWithoutRenderInput
                       minWidth="100%"
                       label="Select Class"
@@ -246,16 +225,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       handleChange={(e, value: any) => setFieldValue('class_id', value?.value || 0)}
                     />
 
-                    <Grid item minWidth="100%">
-                      <DropDownSelectWrapper
-                        value={values.frequency}
-                        name='frequency'
-                        label='Frequency'
-                        handleChange={handleChange}
-                        menuItems={['on_demand', 'half_yearly', 'monthly', 'annual']}
-                      />
-                    </Grid>
-
                     {/* Amount */}
                     <TextFieldWrapper
                       type="number"
@@ -269,7 +238,8 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     />
 
                     {/* Last Date */}
-                    {/* {
+                    {
+
                       !checked && <MobileDatePicker
                         label="Last Date"
                         inputFormat='dd/MM/yyyy'
@@ -293,7 +263,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                           />
                         )}
                       />
-                    } */}
+                    }
 
                     {/* late_fee */}
                     <TextFieldWrapper
@@ -309,7 +279,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
 
                   </Grid>
 
-                  {/* {
+                  {
                     !editData && <Grid
                       container
                       display={'grid'}
@@ -336,76 +306,67 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       </>
 
                     </Grid>
-                  } */}
+                  }
+                  {
+                    !editData && checked && <AutoCompleteWrapperWithoutRenderInput
+                      minWidth="100%"
+                      label="Select multiple month"
+                      placeholder="Month..."
+                      multiple
+                      value={values.months}
+                      options={month}
+                      name="month"
+                      error={errors?.months}
+                      touched={touched?.months}
+                      // @ts-ignore
+                      handleChange={(e, value: any) => setFieldValue('months', value)}
+                    />
+                  }
+
 
                   {
-                    <Grid item columnGap={1} pt={1}>
-                      <AutoCompleteWrapperWithoutRenderInput
-                        minWidth="100%"
-                        label="Select multiple month"
-                        placeholder="Month..."
-                        multiple
-                        value={values.months}
-                        options={month}
-                        name="month"
-                        error={errors?.months}
-                        touched={touched?.months}
-                        // @ts-ignore
-                        handleChange={(e, value: any) => setFieldValue('months', value)}
-                      />
-                      <Grid display="flex" justifyContent="start" columnGap={1}>
-                        <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>Select All</ButtonWrapper>
-                        <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>Remove All</ButtonWrapper>
-                      </Grid>
+                    !editData && checked && <Grid pt={1}>
+
+                      {
+                        values?.months?.map((option, index) => {
+                          const onKeyDown = (e) => {
+                            e.preventDefault();
+                          };
+
+                          return <>
+                            <DatePicker
+                              label={`${option.label} Last Date`}
+                              inputFormat='dd/MM/yyyy'
+                              value={option.last_date || null}
+                              onChange={(n: any) => {
+                                const temp = [...values.months];
+                                temp[index].last_date = n;
+                                console.log(temp);
+                                setFieldValue('months', temp);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  required
+                                  size='small'
+                                  sx={{
+                                    [`& fieldset`]: {
+                                      borderRadius: 0.6,
+                                    },
+                                    mb: 1
+                                  }}
+                                  {...params}
+                                  onKeyDown={onKeyDown}
+                                  fullWidth
+                                />
+                              )}
+                            />
+                          </>
+                        })
+                      }
+
 
                     </Grid>
                   }
-
-
-                  {
-                    // !editData && checked && <Grid pt={1}>
-
-                    //   {
-                    //     values?.months?.map((option, index) => {
-                    //       const onKeyDown = (e) => {
-                    //         e.preventDefault();
-                    //       };
-
-                    //       return <>
-                    //         <DatePicker
-                    //           label={`${option.label} Last Date`}
-                    //           inputFormat='dd/MM/yyyy'
-                    //           value={option.last_date || null}
-                    //           onChange={(n: any) => {
-                    //             const temp = [...values.months];
-                    //             temp[index].last_date = n;
-                    //             console.log(temp);
-                    //             setFieldValue('months', temp);
-                    //           }}
-                    //           renderInput={(params) => (
-                    //             <TextField
-                    //               required
-                    //               size='small'
-                    //               sx={{
-                    //                 [`& fieldset`]: {
-                    //                   borderRadius: 0.6,
-                    //                 },
-                    //                 mb: 1
-                    //               }}
-                    //               {...params}
-                    //               onKeyDown={onKeyDown}
-                    //               fullWidth
-                    //             />
-                    //           )}
-                    //         />
-                    //       </>
-                    //     })
-                    //   }
-
-
-                    // </Grid>
-                  }
-
                 </DialogContent>
                 <DialogActionWrapper
                   title="Fees"

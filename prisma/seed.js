@@ -149,7 +149,12 @@ async function seed() {
       { name: 'show syllabus', value: 'show_syllabus', group: 'syllabus' },
       { name: 'home work', value: 'homework', group: 'homework' },
       { name: 'student auto sent sms', value: 'modify_student_auto_sent_sms', group: 'student_auto_sent_sms' },
-      {name:'request buy sms',value:'request_buy_sms',group:'buy_sms'}
+      { name: 'request buy sms', value: 'request_buy_sms', group: 'buy_sms' },
+      { name: 'create admit card', value: 'create_admit_card', group: 'admit_card' },
+      { name: 'show admit card', value: 'show_admit_card', group: 'admit_card' },
+      { name: 'create fees heads', value: 'create_fees_heads', group: 'fees_heads' },
+      { name: 'show fees heads', value: 'show_fees_heads', group: 'fees_heads' },
+
     ]
   });
 
@@ -172,7 +177,7 @@ async function seed() {
           value: 'package_payment_history'
         },
         {
-          value:'create_banner'
+          value: 'create_banner'
         }
       ]
     },

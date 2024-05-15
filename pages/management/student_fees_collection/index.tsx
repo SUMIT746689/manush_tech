@@ -33,20 +33,34 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 // updated searching code start
 
+// const monthData = [
+//   { label: 'January', id: 1 },
+//   { label: 'February', id: 2 },
+//   { label: 'March', id: 3 },
+//   { label: 'April', id: 4 },
+//   { label: 'May', id: 5 },
+//   { label: 'June', id: 6 },
+//   { label: 'July', id: 7 },
+//   { label: 'August', id: 8 },
+//   { label: 'September', id: 9 },
+//   { label: 'October', id: 10 },
+//   { label: 'November', id: 11 },
+//   { label: 'December', id: 12 }
+// ];
 const monthData = [
-  { label: 'January', id: 1 },
-  { label: 'February', id: 2 },
-  { label: 'March', id: 3 },
-  { label: 'April', id: 4 },
-  { label: 'May', id: 5 },
-  { label: 'June', id: 6 },
-  { label: 'July', id: 7 },
-  { label: 'August', id: 8 },
-  { label: 'September', id: 9 },
-  { label: 'October', id: 10 },
-  { label: 'November', id: 11 },
-  { label: 'December', id: 12 }
-];
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december'
+].map((month) => ({ label: month, value: month }));
 
 // updated searching code end
 
@@ -78,6 +92,11 @@ function Managementschools() {
   const [amount, setAmount] = useState(null);
   const [student_id, setStudentId] = useState<string>('');
   const [collectionDate, setCollectionDate] = useState<any>(dayjs(Date.now()));
+  const [leftFeesTableColumnDataState, setLeftFeesTableColumnDataState] =
+    useState<any>();
+  //const [currDiscount, setCurrDiscount] = useState<string | null>(null);
+  const [currDiscount, setCurrDiscount] = useState({});
+  const [selected_month, setSelectMonth] = useState<string | null>(null);
   // handleDebounce function
 
   const handleDebounce = (value) => {
@@ -122,15 +141,16 @@ function Managementschools() {
   ): void => {
     setCollectionDate(event);
   };
-  const monthHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {};
 
-  const leftFeesTableColumnData = (data) => {
-    let totalDue = 0;
+  const leftFeesTableColumnData = (data, default_current_discount = []) => {
+    let totalDue = 0,
+      totalCurrentDue = 0;
     let totalObj = {
       amount: 0,
       late_fee: 0,
       paidAmount: 0,
       discount: 0,
+      currDiscount: 0,
       dueAmount: 0
     };
 
@@ -162,12 +182,19 @@ function Managementschools() {
       // check duevalue
       if (late_fee_value === 0) {
         due_fee_value =
-          item.status === 'paid' ? 0 : item.amount - (item.paidAmount || 0);
+          item.status === 'paid'
+            ? 0
+            : item.amount -
+              (item.paidAmount || 0) -
+              (item.on_time_discount || 0);
       } else if (late_fee_value > 0) {
         due_fee_value =
           item.status === 'paid'
             ? 0
-            : item.amount + item.late_fee - (item.paidAmount || 0);
+            : item.amount +
+              item.late_fee -
+              (item.paidAmount || 0) -
+              (item.on_time_discount || 0);
       }
 
       // check  paidAmount
@@ -184,7 +211,8 @@ function Managementschools() {
         late_fee: late_fee_value,
         paidAmount: paid_amount_value,
         discount: 0,
-        dueAmount: due_fee_value
+        dueAmount: due_fee_value,
+        on_time_discount: item.on_time_discount
       };
     });
 
@@ -208,9 +236,56 @@ function Managementschools() {
     feesData = feesData.map((item) => {
       return {
         ...item,
-        dueAmount: parseInt(item.dueAmount) - parseInt(item.discount)
+        dueAmount: parseInt(item.dueAmount) - parseInt(item.discount),
+        mainDueAmount: parseInt(item.dueAmount) - parseInt(item.discount)
+        // on_time_discount: 0
       };
     });
+
+    // // calculate totalDue
+
+    // feesData.forEach((item) => {
+    //   totalDue = totalDue + parseInt(item.dueAmount);
+    // });
+
+    // total (amount , Late Fee,  Paid Amount, Discount, Due)  functionality
+
+    // feesData.forEach((item) => {
+    //   totalObj.amount = totalObj.amount + item.amount;
+    //   totalObj.late_fee = totalObj.late_fee + item.late_fee;
+    //   totalObj.paidAmount = totalObj.paidAmount + item.paidAmount;
+    //   totalObj.discount = totalObj.discount + item.discount;
+    //   totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
+    // });
+
+    // re-calculate due-amount based on current_discount
+
+    if (default_current_discount.length > 0) {
+      for (let i = 0; i < default_current_discount.length; i++) {
+        for (let j = 0; j < feesData.length; j++) {
+          if (
+            default_current_discount[i].id === feesData[j].feeId &&
+            !Number.isNaN(default_current_discount[i].value)
+          ) {
+            feesData[j].dueAmount =
+              parseInt(feesData[j].dueAmount) -
+              parseInt(default_current_discount[i].value);
+            // feesData[j].currDiscount = parseInt(
+            //   default_current_discount[i].value
+            // );
+            feesData[j].on_time_discount = parseInt(
+              default_current_discount[i].value
+            );
+          }
+        }
+      }
+
+      // calculate current totalDue
+
+      default_current_discount.forEach((item) => {
+        totalCurrentDue += parseInt(item.value);
+      });
+    }
 
     // calculate totalDue
 
@@ -225,8 +300,16 @@ function Managementschools() {
       totalObj.late_fee = totalObj.late_fee + item.late_fee;
       totalObj.paidAmount = totalObj.paidAmount + item.paidAmount;
       totalObj.discount = totalObj.discount + item.discount;
+      totalObj.currDiscount = totalCurrentDue ? totalCurrentDue : 0;
       totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
     });
+
+    // console.log('feesData');
+    // console.log(feesData);
+    // console.log('total Due');
+    // console.log(totalDue);
+    // console.log('total object');
+    // console.log(totalObj);
 
     setLeftFeesTableData(feesData);
     setTotalDueValue(totalDue.toString());
@@ -243,19 +326,21 @@ function Managementschools() {
     // student information code end
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    setCurrDiscount({});
     if (student_id) {
       const res = await axios.get(
         `/api/student/search-students?student_id=${student_id?.toLowerCase()}`
       );
       if (res?.data?.length > 0) {
         const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.id}?academic_year_id=${academicYear.id}`
+          `/api/student_payment_collect/${res?.data[0]?.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
         );
         // set search level code
         setSearchValue(
           `${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`
         );
 
+        setLeftFeesTableColumnDataState(response?.data?.data);
         leftFeesTableColumnData(response?.data?.data);
       } else {
         setSearchValue('');
@@ -263,9 +348,10 @@ function Managementschools() {
       }
     } else if (searchValue?.id && academicYear?.id) {
       const res = await axios.get(
-        `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
+        `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
       );
 
+      setLeftFeesTableColumnDataState(res?.data?.data);
       leftFeesTableColumnData(res?.data?.data);
     }
   };
@@ -278,9 +364,9 @@ function Managementschools() {
           academicYear?.id
         ) {
           const res = await axios.get(
-            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}`
+            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
           );
-
+          setLeftFeesTableColumnDataState(res?.data?.data);
           leftFeesTableColumnData(res?.data?.data);
         }
       } catch (error) {}
@@ -311,6 +397,7 @@ function Managementschools() {
     setSelectAll(false);
     setPrintFees([]);
     setStudentId('');
+    setCurrDiscount({});
   };
 
   // updated reset button code end
@@ -664,6 +751,8 @@ function Managementschools() {
         minHeight="fit-content"
       >
         <LeftBox
+          selected_month={selected_month}
+          setSelectMonth={setSelectMonth}
           debounceTimeout={500}
           handleDebounce={handleDebounce}
           searchHandleUpdate={searchHandleUpdate}
@@ -672,7 +761,6 @@ function Managementschools() {
           searchHandleChange={searchHandleChange}
           datePickerHandleChange={datePickerHandleChange}
           monthData={monthData}
-          monthHandleChange={monthHandleChange}
           btnHandleClick={btnHandleClick}
           setStudentId={setStudentId}
           student_id={student_id}
@@ -694,6 +782,11 @@ function Managementschools() {
         minHeight="fit-content"
       >
         <LeftFeesTable
+          leftFeesTableData={leftFeesTableData}
+          leftFeesTableColumnDataState={leftFeesTableColumnDataState}
+          leftFeesTableColumnData={leftFeesTableColumnData}
+          currDiscount={currDiscount}
+          setCurrDiscount={setCurrDiscount}
           selectAll={selectAll}
           setSelectAll={setSelectAll}
           leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
@@ -719,6 +812,7 @@ function Managementschools() {
 
       <Grid px={4} mt={1} mx={1}>
         <PaymentOptions
+          totalDueValue={totalDueValue}
           collectionDate={collectionDate}
           handleStudentPaymentCollect={handleStudentPaymentCollect}
           setPrintFees={setPrintFees}

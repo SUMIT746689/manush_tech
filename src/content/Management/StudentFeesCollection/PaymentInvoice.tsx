@@ -46,6 +46,8 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
   const [selectedFees, setSelectedFees] = useState([]);
   const [totalDueAmount, setTotalDueAmount] = useState(0);
   const [totalPreAmount, setTotalPreDueAmount] = useState(0);
+  const [totalCurrentDisountAmount, setTotalCurrentDiscountAmount] =
+    useState(0);
 
   useEffect(() => {
     const temp = printFees.map((payment: any) => {
@@ -80,7 +82,8 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
           temp[i].prevAmount =
             parseInt(temp[i].payableAmount) -
             (parseInt(leftFeesTableData[j].dueAmount) +
-              parseInt(temp[i].paidAmount));
+              parseInt(temp[i].paidAmount) +
+              parseInt(leftFeesTableData[j].on_time_discount)); /// +500 + 1000 + 500 + 2500 - 5500
 
           temp[i].due = leftFeesTableData[j].dueAmount;
         } else {
@@ -90,6 +93,9 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
     }
 
     // update printFees data end
+    const totalCurrentDiscountValue =
+      temp.reduce((prev, curr) => prev + Number(curr.on_time_discount), 0) || 0;
+    setTotalCurrentDiscountAmount(totalCurrentDiscountValue);
     const totalPrePaidvalue =
       temp.reduce((prev, curr) => prev + Number(curr.prevAmount), 0) || 0;
     setTotalPreDueAmount(totalPrePaidvalue);
@@ -243,6 +249,9 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
                   Curr. Paid
                 </TableCell>
                 <TableCell sx={{ p: 1 }} align="right">
+                  Curr. Discount
+                </TableCell>
+                <TableCell sx={{ p: 1 }} align="right">
                   Due
                 </TableCell>
               </TableRow>
@@ -281,6 +290,11 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
                         : 0}
                     </TableCell>
                     <TableCell sx={{ p: 1 }} align="right">
+                      {payment.on_time_discount
+                        ? formatNumber(payment.on_time_discount)
+                        : 0}
+                    </TableCell>
+                    <TableCell sx={{ p: 1 }} align="right">
                       {payment.paidAmount ? formatNumber(payment.due) : 0}
                     </TableCell>
                   </TableRow>
@@ -307,6 +321,9 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
                 {/* <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">
                   Total due:
                 </TableCell> */}
+                <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">
+                  {totalCurrentDisountAmount}
+                </TableCell>
                 <TableCell sx={{ p: 1, fontWeight: 'bold' }} align="right">
                   {totalDueAmount}
                 </TableCell>

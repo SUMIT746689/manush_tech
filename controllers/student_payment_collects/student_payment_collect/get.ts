@@ -4,6 +4,7 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 export const get = async (req, res) => {
   try {
+    let on_time_discount_total_arr = [];
     const { id, fromDate, toDate, academic_year_id } = req.query;
 
     if (!id) throw new Error('provide student_id');
@@ -87,11 +88,27 @@ export const get = async (req, res) => {
           (pay_fee) => pay_fee.fee?.id === fee.id
         );
 
+        // updated on_time_discount calculation code start
+        if (findStudentFee.length > 0) {
+          let discount_sum = 0;
+          let fee_id;
+          for (let i = 0; i < findStudentFee.length; i++) {
+            discount_sum += Number(findStudentFee[i].on_time_discount);
+            fee_id = findStudentFee[i].fee_id;
+          }
+          on_time_discount_total_arr.push({
+            fee_id: fee_id,
+            on_time_discount: discount_sum
+          });
+        }
+        // updated on_time_discount calculation code end
+
         const late_fee = fee.late_fee ? fee.late_fee : 0;
         // console.log("fee", fee);
         // console.log("findStudentFee__", findStudentFee);
 
         const findStudentFeeSize = findStudentFee.length;
+
         if (findStudentFeeSize) {
           // console.log("findStudentFee__",findStudentFee);
 
@@ -124,6 +141,8 @@ export const get = async (req, res) => {
               ...fee,
               last_payment_date:
                 findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount:
+                findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'paid late',
               paidAmount,
               collected_by_user:
@@ -139,6 +158,8 @@ export const get = async (req, res) => {
               ...fee,
               last_payment_date:
                 findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount:
+                findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'fine unpaid',
               paidAmount,
               collected_by_user:
@@ -153,6 +174,8 @@ export const get = async (req, res) => {
               ...fee,
               last_payment_date:
                 findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount:
+                findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'paid',
               collected_by_user:
                 findStudentFee[findStudentFeeSize - 1]?.collected_by_user
@@ -163,6 +186,8 @@ export const get = async (req, res) => {
               ...fee,
               last_payment_date:
                 findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount:
+                findStudentFee[findStudentFeeSize - 1].on_time_discount,
               paidAmount: paidAmount,
               status: 'partial paid',
               collected_by_user:
@@ -170,7 +195,7 @@ export const get = async (req, res) => {
                   ?.username
             };
           } else {
-            return { ...fee, status: 'unpaid' };
+            return { ...fee, status: 'unpaid', on_time_discoun: 0 };
           }
         } else {
           const discount = all_fees?.discount?.filter(
@@ -184,9 +209,27 @@ export const get = async (req, res) => {
           }, 0);
           const feeAmount = fee.amount - totalDiscount;
           fee['amount'] = feeAmount;
-          return { ...fee, status: 'unpaid' };
+          return { ...fee, status: 'unpaid', on_time_discount: 0 };
         }
       });
+
+    let newFees = fees.map((item) => {
+      return {
+        ...item,
+        on_time_discount: 0
+      };
+    });
+
+    if (on_time_discount_total_arr.length > 0 && newFees.length > 0) {
+      for (let i = 0; i < on_time_discount_total_arr.length; i++) {
+        for (let j = 0; j < newFees.length; j++) {
+          if (on_time_discount_total_arr[i].fee_id === newFees[j].id) {
+            newFees[j].on_time_discount =
+              on_time_discount_total_arr[i].on_time_discount;
+          }
+        }
+      }
+    }
 
     const data = {
       ...all_fees.student_info,
@@ -198,7 +241,7 @@ export const get = async (req, res) => {
       class_registration_no: all_fees.class_registration_no,
       class_roll_no: all_fees.class_roll_no,
       discount: all_fees.discount,
-      fees
+      fees: newFees
     };
 
     res.status(200).json({ data, success: true });

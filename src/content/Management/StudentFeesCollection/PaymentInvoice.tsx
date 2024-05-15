@@ -79,16 +79,18 @@ const PaymentInvoice: FC<PaymentInvoiceType> = ({
     for (let i = 0; i < temp.length; i++) {
       for (let j = 0; j < leftFeesTableData.length; j++) {
         if (temp[i].fee_id === leftFeesTableData[j].feeId) {
-          temp[i].prevAmount =
+          const sum =
             parseInt(temp[i].payableAmount) -
             (parseInt(leftFeesTableData[j].dueAmount) +
               parseInt(temp[i].paidAmount) +
-              parseInt(leftFeesTableData[j].on_time_discount)); /// +500 + 1000 + 500 + 2500 - 5500
+              parseInt(leftFeesTableData[j].on_time_discount)); // 20000 - 0 + 14000 + 4000
 
+          temp[i].prevAmount = sum;
           temp[i].due = leftFeesTableData[j].dueAmount;
-        } else {
-          temp[i].prevAmount = 0;
         }
+        //else {
+        //   temp[i].prevAmount = 0;
+        // }
       }
     }
 

@@ -5,6 +5,8 @@ import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { ChangeEvent } from 'react';
 
 const LeftBox = ({
+  selected_month,
+  setSelectMonth,
   debounceTimeout,
   handleDebounce,
   searchHandleUpdate,
@@ -13,7 +15,6 @@ const LeftBox = ({
   searchHandleChange,
   datePickerHandleChange,
   monthData,
-  monthHandleChange,
   btnHandleClick,
   setStudentId,
   student_id,
@@ -22,6 +23,10 @@ const LeftBox = ({
 }) => {
   const handleChangeStudentId = (event: ChangeEvent<HTMLInputElement>) => {
     setStudentId(event.target.value);
+  };
+
+  const monthHandleChange = (event: ChangeEvent<HTMLInputElement>, v): void => {
+    setSelectMonth(v);
   };
 
   return (
@@ -151,7 +156,8 @@ const LeftBox = ({
               <AutoCompleteWrapperWithDebounce
                 debounceTimeout=""
                 options={monthData}
-                value={''}
+                value={selected_month}
+                // value={undefined}
                 handleChange={monthHandleChange}
                 label=""
                 placeholder="Month To"

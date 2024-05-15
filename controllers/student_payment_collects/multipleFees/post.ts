@@ -77,6 +77,7 @@ const handleTransaction = ({
             payment_method: data.payment_method,
             transID: data.transID,
             collection_date: collection_date,
+            on_time_discount: data?.on_time_discount,
             account: { connect: { id: data.account_id } },
             payment_method_list: { connect: { id: data.payment_method_id } },
             collected_by_user: { connect: { id: data.collected_by } },
@@ -114,6 +115,7 @@ const handleTransaction = ({
           collect_amount: data.collected_amount,
           tracking_number,
           created_at: temp.created_at,
+          on_time_discount: temp.on_time_discount,
           //  last_payment_date: temp.created_at,
           last_payment_date: temp.collection_date,
           account_name: account.title,
@@ -168,6 +170,7 @@ export const post = async (req, res, refresh_token) => {
           let collected_amount = null;
           let fee_id = item.id;
           let total_payable = item.total_payable;
+          let on_time_discount = item.on_time_discount;
 
           if (!item?.collected_amount) {
             collected_amount = Number(req.body.collected_amount);
@@ -175,7 +178,11 @@ export const post = async (req, res, refresh_token) => {
             collected_amount = Number(item.collected_amount);
           }
 
-          if (!student_id || !fee_id || !collected_amount) {
+          if (
+            !student_id ||
+            !fee_id ||
+            (typeof collected_amount !== 'number' && collected_amount < 0)
+          ) {
             throw new Error('provide valid informations');
           }
 
@@ -245,7 +252,8 @@ export const post = async (req, res, refresh_token) => {
             payment_method: account?.payment_method[0]?.title,
             transID,
             collected_by: Number(collected_by_user),
-            total_payable: Number(total_payable)
+            total_payable: Number(total_payable),
+            on_time_discount: Number(on_time_discount)
           };
 
           const last_date = new Date(fee.last_date);
@@ -322,19 +330,13 @@ export const post = async (req, res, refresh_token) => {
                   tracking_number,
                   fee
                 });
-
-                // res.status(200).json({
-                //   success: true,
-                //   // @ts-ignore
-                //   ...tr
-                // });
               }
             }
           } else {
             // Mehedi vai checking part
-            if (totalPaidAmount === feeAmount)
+            if (totalPaidAmount === feeAmount) {
               throw new Error('Already Paid !');
-            else if (totalPaidAmount + collected_amount > feeAmount) {
+            } else if (totalPaidAmount + collected_amount > feeAmount) {
               throw new Error(
                 `you paid ${totalPaidAmount},now pay ${
                   feeAmount - totalPaidAmount
@@ -352,11 +354,6 @@ export const post = async (req, res, refresh_token) => {
                 tracking_number,
                 fee
               });
-              // res.status(200).json({
-              //   success: true,
-              //   // @ts-ignore
-              //   ...tr
-              // });
             }
           }
         } catch (error) {

@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
+import { TextFieldWrapper } from '@/components/TextFields';
 
 function createData(
   name: string,
@@ -26,6 +27,11 @@ const rows = [
 ];
 
 export default function LeftFeesTable({
+  leftFeesTableData,
+  leftFeesTableColumnDataState,
+  leftFeesTableColumnData,
+  currDiscount,
+  setCurrDiscount,
   leftFeesTableTotalCalculation,
   tableData,
   feesUserData,
@@ -113,6 +119,36 @@ export default function LeftFeesTable({
     setSelectAll(newSelected.length === tableData.length);
   };
 
+  const handleCurrDiscountChange = (feeId, value) => {
+    const obj = { ...currDiscount, [feeId]: value };
+    const arr = [];
+
+    for (const key in obj) {
+      arr.push({ id: parseInt(key), value: obj[key] });
+    }
+
+    const singleFeeInfo = leftFeesTableData?.find((item) => {
+      return item?.feeId === feeId;
+    });
+
+    if (isNaN(value)) {
+      for (let key in obj) {
+        if (isNaN(obj[key])) {
+          delete obj[key];
+        }
+      }
+
+      setCurrDiscount(obj);
+      leftFeesTableColumnData(leftFeesTableColumnDataState, arr);
+      return;
+    }
+
+    if (parseInt(value) < parseInt(singleFeeInfo?.mainDueAmount)) {
+      setCurrDiscount(obj);
+      leftFeesTableColumnData(leftFeesTableColumnDataState, arr);
+    }
+  };
+
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
       <Table
@@ -139,10 +175,14 @@ export default function LeftFeesTable({
               Late Fee
             </TableCell>
             <TableCell sx={{ textTransform: 'none' }} align="right">
-              Paid Amount
+              Prev. Discount
             </TableCell>
             <TableCell sx={{ textTransform: 'none' }} align="right">
-              Discount
+              Paid Amount
+            </TableCell>
+
+            <TableCell sx={{ textTransform: 'none' }} align="right">
+              Curr. Discount
             </TableCell>
             <TableCell sx={{ textTransform: 'none' }} align="right">
               Due
@@ -166,8 +206,31 @@ export default function LeftFeesTable({
               </TableCell>
               <TableCell align="right">{row.amount}</TableCell>
               <TableCell align="right">{row.late_fee}</TableCell>
-              <TableCell align="right">{row.paidAmount}</TableCell>
               <TableCell align="right">{row.discount}</TableCell>
+              <TableCell align="right">{row.paidAmount}</TableCell>
+
+              <TableCell>
+                <TextFieldWrapper
+                  disabled={
+                    selectedRows.find((item) => item === row.feeId)
+                      ? false
+                      : true
+                  }
+                  label="Amount"
+                  name=""
+                  type="number"
+                  touched={undefined}
+                  errors={undefined}
+                  // value={currDiscount || ''}
+                  value={currDiscount[row.feeId] || ''}
+                  handleChange={(e) => {
+                    const int_value = parseInt(e.target.value);
+                    const value = Math.abs(int_value);
+                    handleCurrDiscountChange(row.feeId, value);
+                  }}
+                  handleBlur={undefined}
+                />
+              </TableCell>
               <TableCell align="right">{row.dueAmount}</TableCell>
             </TableRow>
           ))}
@@ -191,12 +254,17 @@ export default function LeftFeesTable({
               </TableCell>
               <TableCell align="right">
                 {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.paidAmount}
+                  leftFeesTableTotalCalculation.discount}
               </TableCell>
               <TableCell align="right">
                 {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.discount}
+                  leftFeesTableTotalCalculation.paidAmount}
               </TableCell>
+              <TableCell align="center">
+                {leftFeesTableTotalCalculation &&
+                  leftFeesTableTotalCalculation.currDiscount}
+              </TableCell>
+
               <TableCell align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.dueAmount}

@@ -9,6 +9,7 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  totalDueValue,
   collectionDate,
   handleStudentPaymentCollect,
   setPrintFees,
@@ -130,8 +131,8 @@ const PaymentOptions = ({
     const copy_dueAmount_arr = dueAmount;
     let remaining_due_value = null;
     if (!amount && !totalFeesCalculate) {
-      showNotification('please fill out amount field.', 'error');
-      return;
+      // showNotification('please fill out amount field.', 'error');
+      // return;
     } else if (parseInt(amount) > parseInt(total_amount)) {
       showNotification(
         'The amount is less than or equal to the due amount.',
@@ -201,7 +202,8 @@ const PaymentOptions = ({
           collect_filter_data.push({
             id: finalArray[j].id,
             collected_amount: finalArray[j].due,
-            total_payable: parseInt(tableData[i].dueAmount)
+            total_payable: parseInt(tableData[i].dueAmount),
+            on_time_discount: parseInt(tableData[i].on_time_discount)
           });
         }
       }
@@ -265,6 +267,9 @@ const PaymentOptions = ({
             const today = new Date(collectionDate).getTime();
 
             return {
+              on_time_discount: item?.on_time_discount
+                ? item?.on_time_discount
+                : 0,
               fee_id: item?.fee_id ? item?.fee_id : '',
               paidAmount: item?.collect_amount,
               tracking_number: item?.tracking_number,
@@ -369,9 +374,16 @@ const PaymentOptions = ({
         errors={undefined}
         value={amount || ''}
         handleChange={(e) => {
-          const int_value = parseInt(e.target.value);
-          const value = Math.abs(int_value);
-          setAmount(value);
+          if (!e.target.value) {
+            setAmount('');
+            return;
+          }
+
+          if (parseInt(e.target.value) < parseInt(totalDueValue)) {
+            const int_value = parseInt(e.target.value);
+            const value = Math.abs(int_value);
+            setAmount(value);
+          }
         }}
         handleBlur={undefined}
       />

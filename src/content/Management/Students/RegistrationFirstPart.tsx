@@ -39,6 +39,7 @@ function RegistrationFirstPart({
           first_name: student ? (student?.first_name || student?.student_info?.first_name || '') : undefined,
           middle_name: student ? (student?.middle_name || student?.student_info?.middle_name || '') : '',
           last_name: student ? (student?.middle_name || student?.student_info?.last_name || '') : '',
+          student_id: student ? (student?.student_id || student?.student_info?.student_id) : '',
           admission_no: student ? (student?.admission_no || student?.student_info?.admission_no) : '',
           admission_date: student ? (student?.admission_date || student?.student_info?.admission_date) : null,
           date_of_birth: student ? (student?.date_of_birth || student?.student_info?.date_of_birth) : null,
@@ -63,7 +64,7 @@ function RegistrationFirstPart({
           religion: Yup.string().nullable(true),
           phone: Yup.string().required(t('Phone number is required!'))
             .min(11, 'Phone number must be greater then or equals 11 character'),
-    
+
         })}
         onSubmit={async (
           _values,
@@ -73,7 +74,7 @@ function RegistrationFirstPart({
             const { number, err } = handleConvBanNum(_values.phone);
             if (err) return showNotification(err, 'error');
             _values.phone = number;
-            
+
             setTotalFormData((values: any) => ({ ...values, ..._values }));
             setActiveStep(1);
           } catch (err) {
@@ -173,7 +174,7 @@ function RegistrationFirstPart({
                     </Grid>
 
                     {/* admission_no   */}
-                    <Grid item xs={12}>
+                    <Grid item xs={12} display={"grid"} gridTemplateColumns={{md:"1fr 1fr"}} gap={2}>
                       <TextField
                         // required
                         size="small"
@@ -192,6 +193,27 @@ function RegistrationFirstPart({
                         onBlur={handleBlur}
                         onChange={handleChange}
                         value={values.admission_no}
+                        variant="outlined"
+                      />
+
+                      <TextField
+                        // required
+                        size="small"
+                        sx={{
+                          '& fieldset': {
+                            borderRadius: '3px'
+                          }
+                        }}
+                        error={Boolean(
+                          touched.student_id && errors.student_id
+                        )}
+                        fullWidth
+                        helperText={touched.student_id && errors.student_id}
+                        label={t('Student Id')}
+                        name="student_id"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        value={values.student_id}
                         variant="outlined"
                       />
                     </Grid>

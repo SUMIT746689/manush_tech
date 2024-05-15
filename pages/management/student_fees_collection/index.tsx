@@ -30,6 +30,7 @@ import PaymentOptions from '@/content/FeesCollect/PaymentOptions';
 import Reset_Sent_SMS_Collect_Invoice from '@/content/FeesCollect/Reset_Sent_SMS_Collect_Invoice';
 import dayjs from 'dayjs';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import { monthList } from '@/utils/getDay';
 
 // updated searching code start
 
@@ -47,20 +48,7 @@ import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 //   { label: 'November', id: 11 },
 //   { label: 'December', id: 12 }
 // ];
-const monthData = [
-  'january',
-  'february',
-  'march',
-  'april',
-  'may',
-  'june',
-  'july',
-  'august',
-  'september',
-  'october',
-  'november',
-  'december'
-].map((month) => ({ label: month, value: month }));
+const monthData = monthList.map((month) => ({ label: month, value: month }));
 
 // updated searching code end
 
@@ -110,12 +98,13 @@ function Managementschools() {
             return {
               label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
               id: item.id,
-              student_id: item.student_id
+              student_id: item.student_id,
+              student_table_id: item.student_table_id
             };
           });
           setSearchOptionData(userInfoArr);
         })
-        .catch((error) => {});
+        .catch((error) => { });
     } else if (value?.length < 3) {
       setSearchOptionData([]);
     } else if (!value) {
@@ -185,16 +174,16 @@ function Managementschools() {
           item.status === 'paid'
             ? 0
             : item.amount -
-              (item.paidAmount || 0) -
-              (item.on_time_discount || 0);
+            (item.paidAmount || 0) -
+            (item.on_time_discount || 0);
       } else if (late_fee_value > 0) {
         due_fee_value =
           item.status === 'paid'
             ? 0
             : item.amount +
-              item.late_fee -
-              (item.paidAmount || 0) -
-              (item.on_time_discount || 0);
+            item.late_fee -
+            (item.paidAmount || 0) -
+            (item.on_time_discount || 0);
       }
 
       // check  paidAmount
@@ -207,6 +196,7 @@ function Managementschools() {
       return {
         feeId: item.id,
         title: item.title,
+        head_title: item?.fees_head?.title,
         amount: item.amount ? item.amount : 0,
         late_fee: late_fee_value,
         paidAmount: paid_amount_value,
@@ -333,7 +323,7 @@ function Managementschools() {
       );
       if (res?.data?.length > 0) {
         const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
+          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
         );
         // set search level code
         setSearchValue(
@@ -341,14 +331,14 @@ function Managementschools() {
         );
 
         setLeftFeesTableColumnDataState(response?.data?.data);
-        leftFeesTableColumnData(response?.data?.data);
+        leftFeesTableColumnData({ ...response?.data?.data });
       } else {
         setSearchValue('');
         return showNotification('student_id not founds', 'error');
       }
     } else if (searchValue?.id && academicYear?.id) {
       const res = await axios.get(
-        `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
+        `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
       );
 
       setLeftFeesTableColumnDataState(res?.data?.data);
@@ -369,7 +359,7 @@ function Managementschools() {
           setLeftFeesTableColumnDataState(res?.data?.data);
           leftFeesTableColumnData(res?.data?.data);
         }
-      } catch (error) {}
+      } catch (error) { }
     };
 
     fetchData();
@@ -451,8 +441,8 @@ function Managementschools() {
           (fee_.paidAmount
             ? fee_.paidAmount
             : fee_?.status == 'unpaid'
-            ? 0
-            : fee_?.amount);
+              ? 0
+              : fee_?.amount);
 
         // console.log(fee.title, 'due__', due, today < last_date);
 

@@ -168,6 +168,7 @@ export default function LeftFeesTable({
               />
             </TableCell>
             <TableCell sx={{ textTransform: 'none' }}>Fees Head</TableCell>
+            <TableCell sx={{ textTransform: 'none' }}>Fees</TableCell>
             <TableCell sx={{ textTransform: 'none' }} align="right">
               Amount
             </TableCell>
@@ -200,6 +201,9 @@ export default function LeftFeesTable({
                   checked={selectedRows.indexOf(row.feeId) !== -1}
                   onChange={(event) => handleClick(event, row.feeId)}
                 />
+              </TableCell>
+              <TableCell component="th" scope="row">
+                {row.head_title}
               </TableCell>
               <TableCell component="th" scope="row">
                 {row.title}

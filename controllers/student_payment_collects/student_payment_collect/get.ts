@@ -1,13 +1,17 @@
 import prisma from '@/lib/prisma_client';
+import { monthList } from '@/utils/getDay';
 import dayjs from 'dayjs';
 import { logFile } from 'utilities_api/handleLogFile';
 
 export const get = async (req, res) => {
   try {
     let on_time_discount_total_arr = [];
-    const { id, fromDate, toDate, academic_year_id } = req.query;
+    const { id, selected_month, fromDate, toDate, academic_year_id } = req.query;
 
     if (!id) throw new Error('provide student_id');
+
+    const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
+    if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error("provide a valid month");
 
     const dateFilter = {},
       query = {};
@@ -38,6 +42,7 @@ export const get = async (req, res) => {
     const all_fees = await prisma.student.findFirst({
       where: { id: Number(id) },
       select: {
+        id: true,
         class_registration_no: true,
         class_roll_no: true,
         discount: true,
@@ -46,7 +51,7 @@ export const get = async (req, res) => {
         section_id: true,
         student_info: {
           select: {
-            id: true,
+            // id: true,
             first_name: true,
             middle_name: true,
             last_name: true,
@@ -66,7 +71,13 @@ export const get = async (req, res) => {
                 name: true,
                 fees: {
                   where: {
-                    academic_year_id: Number(academic_year_id)
+                    AND: [
+                      { academic_year_id: Number(academic_year_id) },
+                      { fees_month: lowerCaseMonth }
+                    ]
+                  },
+                  include: {
+                    fees_head: true
                   }
                 }
               }
@@ -233,6 +244,7 @@ export const get = async (req, res) => {
 
     const data = {
       ...all_fees.student_info,
+      id: all_fees.id,
       section_id: all_fees.section_id,
       student_photo: all_fees.student_photo,
       class_name: all_fees.section.class.name,

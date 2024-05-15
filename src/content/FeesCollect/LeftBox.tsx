@@ -173,7 +173,7 @@ const LeftBox = ({
             <SearchingButtonWrapper
               isLoading={false}
               handleClick={btnHandleClick}
-              disabled={false}
+              disabled={!selected_month}
               children={'Search'}
             />
           </Grid>

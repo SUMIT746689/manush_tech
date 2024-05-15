@@ -9,7 +9,7 @@ services:
       - "3000:3000"
     restart: unless-stopped
     environment:
-      - DATABASE_URL=mysql://root:password@192.168.10.181:3306/school?parseTime=true
+      - DATABASE_URL=mysql://root:password@10.0.0.107:3306/school?parseTime=true
       - SALTROUNDS=${SALTROUNDS}
       - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
       - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}

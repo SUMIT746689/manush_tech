@@ -354,7 +354,7 @@ function Managementschools() {
           academicYear?.id
         ) {
           const res = await axios.get(
-            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
+            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
           );
           setLeftFeesTableColumnDataState(res?.data?.data);
           leftFeesTableColumnData(res?.data?.data);

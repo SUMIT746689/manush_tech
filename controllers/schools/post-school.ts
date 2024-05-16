@@ -119,7 +119,19 @@ const postSchool = async (req, res, authenticate_user) => {
     //   // ]
     // });
 
-    await prisma.accounts.create({ data: { title: "Demo", account_number: "0001", description: " this is a demo bank accdount", balance: 0, school_id: response.school_id } })
+    await prisma.accounts.create({
+      data: {
+        title: "Default", account_number: "0001", description: "This is a default bank accdount", balance: 0, school_id: response.school_id, is_dafault: true,
+        payment_method: {
+          createMany: {
+            data: [
+              { title: "cash" },
+              { title: "card" }
+            ]
+          }
+        }
+      }
+    })
 
     if (!response) throw new Error('Failed to create school');
     res.status(200).json({ success: true, message: 'Successfully created school' });

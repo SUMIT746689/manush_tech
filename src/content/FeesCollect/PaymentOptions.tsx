@@ -161,10 +161,8 @@ const PaymentOptions = ({
       } else if (parseInt(amount) < parseInt(total_amount_without_last_item)) {
         // error message because now amount is less than selected first 2 items but user already select 3rd items.
         showNotification(
-          `The amount is less than the total number of selected items (${
-            error_row_count + 1
-          }) but the user has selected (${
-            selectedRows.length
+          `The amount is less than the total number of selected items (${error_row_count + 1
+          }) but the user has selected (${selectedRows.length
           }) items. Please adjust the amount or deselect some items.`,
           'error'
         );
@@ -352,19 +350,22 @@ const PaymentOptions = ({
           setSelectedGateway(value);
         }}
       />
-      <TextFieldWrapper
-        label="trans ID"
-        name=""
-        value={transID}
-        touched={undefined}
-        errors={undefined}
-        handleChange={(e) => {
-          setTransID(e.target.value);
-        }}
-        handleBlur={undefined}
-        required={selectedGateway?.label !== 'Cash' ? true : false}
-        // type
-      />
+      {
+        (selectedGateway?.label && selectedGateway?.label !== 'Cash') &&
+        <TextFieldWrapper
+          label="trans ID"
+          name=""
+          value={transID}
+          touched={undefined}
+          errors={undefined}
+          handleChange={(e) => {
+            setTransID(e.target.value);
+          }}
+          handleBlur={undefined}
+          required={selectedGateway?.label !== 'Cash' ? true : false}
+        />
+      }
+      
       <TextFieldWrapper
         // disabled={selectedRows.length > 1 ? true : false}
         label="Amount"
@@ -396,7 +397,7 @@ const PaymentOptions = ({
         touched={undefined}
         errors={undefined}
         value={totalFeesCalculate || ''}
-        handleChange={() => {}}
+        handleChange={() => { }}
         handleBlur={undefined}
       />
       <Grid>
@@ -404,7 +405,7 @@ const PaymentOptions = ({
           variant="contained"
           disabled={
             (selectedRows.length > 0 || totalFeesCalculate > 0) &&
-            feesUserData?.id
+              feesUserData?.id
               ? false
               : true
           }

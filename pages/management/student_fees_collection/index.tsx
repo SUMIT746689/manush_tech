@@ -323,7 +323,7 @@ function Managementschools() {
       );
       if (res?.data?.length > 0) {
         const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selectd_month=${selected_month}`
+          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
         );
         // set search level code
         setSearchValue(
@@ -345,25 +345,26 @@ function Managementschools() {
       leftFeesTableColumnData(res?.data?.data);
     }
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (
-          trackingCollectButton === true &&
-          searchValue?.id &&
-          academicYear?.id
-        ) {
-          const res = await axios.get(
-            `/api/student_payment_collect/${searchValue.id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
-          );
-          setLeftFeesTableColumnDataState(res?.data?.data);
-          leftFeesTableColumnData(res?.data?.data);
-        }
-      } catch (error) { }
-    };
 
-    fetchData();
-  }, [trackingCollectButton]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (
+  //         trackingCollectButton === true &&
+  //         searchValue?.id &&
+  //         academicYear?.id
+  //       ) {
+  //         const res = await axios.get(
+  //           `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+  //         );
+  //         setLeftFeesTableColumnDataState(res?.data?.data);
+  //         leftFeesTableColumnData(res?.data?.data);
+  //       }
+  //     } catch (error) { }
+  //   };
+
+  //   fetchData();
+  // }, [trackingCollectButton]);
 
   const deSelectAllCheckbox = () => {
     setSelectAll(false);

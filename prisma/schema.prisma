@@ -500,7 +500,7 @@ model Fee {
 }
 
 model StudentFee {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   student_id        Int
   fee_id            Int?
   collected_amount  Float
@@ -509,13 +509,13 @@ model StudentFee {
   account_id        Int?
   payment_method_id Int?
   collected_by      Int?
-  created_at        DateTime @default(now())
-  transaction_id    Int?     @unique
+  created_at        DateTime  @default(now())
+  transaction_id    Int?      @unique
   status            String?
   total_payable     Float?
   other_fee_name    String?
   collection_date   DateTime?
-  on_time_discount    Int?
+  on_time_discount  Int?
 
   transaction         Transaction?    @relation(fields: [transaction_id], references: [id])
   account             Accounts?       @relation(fields: [account_id], references: [id])
@@ -1058,13 +1058,15 @@ model payment_method {
 }
 
 model Accounts {
-  id                         Int                          @id @default(autoincrement())
-  title                      String
-  created_at                 DateTime                     @default(now())
-  account_number             String
-  description                String                       @db.Text
-  balance                    Float
-  school_id                  Int
+  id             Int      @id @default(autoincrement())
+  title          String
+  account_number String
+  description    String   @db.Text
+  balance        Float
+  school_id      Int
+  is_dafault     Boolean  @default(false)
+  created_at     DateTime @default(now())
+
   school                     School                       @relation(fields: [school_id], references: [id])
   Transaction                Transaction[]
   payment_method             payment_method[]

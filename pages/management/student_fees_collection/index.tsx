@@ -144,7 +144,7 @@ function Managementschools() {
     };
 
     // fees array
-    let feesData = data?.fees.map((item) => {
+    let feesData = data?.fees?.map((item) => {
       const last_trnsaction_time = new Date(item?.last_payment_date).getTime();
       const last_date_time = new Date(item?.last_date).getTime();
       // old code
@@ -317,6 +317,7 @@ function Managementschools() {
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     setCurrDiscount({});
+    setLeftFeesTableData(()=>[]);
     if (student_id) {
       const res = await axios.get(
         `/api/student/search-students?student_id=${student_id?.toLowerCase()}`
@@ -832,7 +833,8 @@ function Managementschools() {
           accountsOption={
             accounts?.map((i) => ({
               label: i.title,
-              id: i.id
+              id: i.id,
+              is_dafault:i.is_dafault
             })) || []
           }
           btnHandleClick={btnHandleClick}

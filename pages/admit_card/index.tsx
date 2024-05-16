@@ -27,8 +27,10 @@ import Image from 'next/image';
 import { getFile } from '@/utils/utilitY-functions';
 import { useReactToPrint } from 'react-to-print';
 import { Translate } from '@mui/icons-material';
+import useNotistick from '@/hooks/useNotistick';
 
 const AdmitCard = () => {
+  const { showNotification } = useNotistick();
   const { data: classData, error: classError } = useClientFetch('/api/class');
   const [sections, setSections] = useState<Array<any>>([]);
   const [classes, setClasses] = useState<Array<any>>([]);
@@ -40,7 +42,7 @@ const AdmitCard = () => {
   const [initExamInfo, setInitExamInfo] = useState<Array<any>>([]);
   const [studentInfo, setStudentInfo] = useState<Array<any>>([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [displayStudent, setDisplayStudent] = useState(null);
+  const [displayStudent, setDisplayStudent] = useState<Array<any>>([]);
   const [showPrint, setShowPrint] = useState<Boolean>(false);
   const [schoolInformation, setSchoolInformation] = useState(null);
   const { user } = useAuth();
@@ -195,15 +197,36 @@ const AdmitCard = () => {
   });
 
   const handleClickStudentInfo = debounce(() => {
+    if (!selectedClass) {
+      showNotification('Please select a class before proceeding', 'error');
+      return;
+    }
+    if (!selectedSection) {
+      showNotification('Please select a section before proceeding', 'error');
+      return;
+    }
+    if (!selectedExam) {
+      showNotification('Please select an exam before proceeding.', 'error');
+      return;
+    }
+
     if (selectedStudent?.id && studentInfo.length > 0) {
       const singleUser = studentInfo?.find(
         (item) => item?.id === selectedStudent?.id
       );
 
       if (singleUser) {
-        setDisplayStudent(singleUser);
+        setDisplayStudent([{ ...singleUser }]);
         setShowPrint(true);
       }
+    } else if (!selectedStudent && studentInfo.length > 0) {
+      setDisplayStudent([...studentInfo]);
+      setShowPrint(true);
+    } else {
+      setDisplayStudent([]);
+      setShowPrint(false);
+      showNotification('There are no students included in this exam.', 'error');
+      return;
     }
   }, 1000);
 
@@ -237,22 +260,6 @@ const AdmitCard = () => {
     return studentInfo;
   };
 
-  // console.log('displayStudent');
-  // console.log(displayStudent);
-  // console.log('student photo');
-  // console.log(displayStudent?.student_photo);
-
-  // useEffect(() => {
-  //   const isEmptyObject = (obj) => {
-  //     return Object.entries(obj).length === 0;
-  //   };
-
-  //   if (showPrint && !isEmptyObject(displayStudent)) {
-  //     handlePrint();
-  //     setShowPrint(false);
-  //   }
-  // }, [showPrint]);
-
   // school logo
   useEffect(() => {
     axios
@@ -263,12 +270,12 @@ const AdmitCard = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const isEmptyObject = (obj) => {
-    return Object.entries(obj).length === 0;
-  };
+  // const isEmptyObject = (obj) => {
+  //   return Object.entries(obj).length === 0;
+  // };
 
   const handleClickPrint = (event: ChangeEvent<HTMLInputElement>, newValue) => {
-    if (showPrint && !isEmptyObject(displayStudent)) {
+    if (showPrint && displayStudent?.length > 0) {
       handlePrint();
       // setShowPrint(false);
     }
@@ -442,7 +449,7 @@ const AdmitCard = () => {
                     isLoading={false}
                     handleClick={handleClickPrint}
                     disabled={
-                      showPrint && !isEmptyObject(displayStudent) ? false : true
+                      showPrint && displayStudent.length > 0 ? false : true
                     }
                     children={'Print'}
                   />
@@ -463,258 +470,243 @@ const AdmitCard = () => {
         px={4}
         minHeight="fit-content"
         mt={1}
-        sx={{ backgroundColor: '#fff', position: 'relative' }}
+        sx={{
+          backgroundColor: '#fff',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4vh',
+          mt: '10px'
+          // py: '4vh'
+        }}
         ref={printPageRef}
       >
-        <Grid sx={{ border: '7px solid #f50519' }}>
-          <Grid sx={{ border: '7px solid #03fc13' }}>
+        {displayStudent?.map((item) => {
+          return (
             <Grid
-              px={3}
-              mt={3}
-              width={'100%'}
-              display="grid"
-              height="120px"
-              gridTemplateColumns="120px 1fr 120px"
+              sx={{ border: '7px solid #f50519', height: '44vh', my: '1vh' }}
             >
-              {/* school logo */}
-              <Grid alignSelf="end">
-                {schoolInformation?.header_image ? (
-                  <Image
-                    src={getFile(schoolInformation?.header_image)}
-                    width={100}
-                    height={100}
-                    alt="school logo"
-                    style={{ position: 'relative', bottom: 0 }}
-                  />
-                ) : (
-                  ''
-                )}
-              </Grid>
+              <Grid
+                sx={{
+                  border: '7px solid #03fc13',
+                  height: '100%',
+                  my: 'auto',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Grid sx={{ width: '100%' }}>
+                  <Grid
+                    px={3}
+                    mt={3}
+                    width={'100%'}
+                    display="grid"
+                    height="120px"
+                    gridTemplateColumns="120px 1fr 120px"
+                  >
+                    {/* school logo */}
+                    <Grid alignSelf="end">
+                      {schoolInformation?.header_image ? (
+                        <Image
+                          src={getFile(schoolInformation?.header_image)}
+                          width={100}
+                          height={100}
+                          alt="school logo"
+                          style={{ position: 'relative', bottom: 0 }}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </Grid>
 
-              {/* info */}
-              <Grid width="100%">
-                <Typography variant="h3" textAlign={'center'}>
-                  {user?.school?.name}
-                </Typography>
+                    {/* info */}
+                    <Grid width="100%">
+                      <Typography variant="h3" textAlign={'center'}>
+                        {user?.school?.name}
+                      </Typography>
 
-                <Typography variant="body1" textAlign={'center'}>
-                  {user?.school?.address}
-                </Typography>
+                      <Typography variant="body1" textAlign={'center'}>
+                        {user?.school?.address}
+                      </Typography>
 
-                <Grid
-                  mt={1}
-                  mx="auto"
-                  sx={{
-                    backgroundColor: '#0a696e',
-                    color: '#fff',
-                    padding: '5px 50px',
-                    textTransform: 'uppercase',
-                    borderRadius: '20px',
-                    width: 'fit-content',
-                    border: '1px solid #000'
-                  }}
-                >
-                  Admit Card
+                      <Grid
+                        mt={1}
+                        mx="auto"
+                        sx={{
+                          backgroundColor: '#0a696e',
+                          color: '#fff',
+                          padding: '5px 50px',
+                          textTransform: 'uppercase',
+                          borderRadius: '20px',
+                          width: 'fit-content',
+                          border: '1px solid #000'
+                        }}
+                      >
+                        Admit Card
+                      </Grid>
+                    </Grid>
+
+                    {/* student photo */}
+                    <Grid alignSelf="end">
+                      {item?.student_photo ? (
+                        <Image
+                          src={getFile(item?.student_photo)}
+                          width={100}
+                          height={100}
+                          alt="user photo"
+                        />
+                      ) : (
+                        <Image
+                          src={'/default_user_photo.jpg'}
+                          width={100}
+                          height={100}
+                          alt="user photo"
+                        />
+                      )}
+                    </Grid>
+                  </Grid>
+
+                  {/* Table */}
+                  <Grid mt={3} mb={4} mx={1}>
+                    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+                      <Table
+                        sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }}
+                        size="small"
+                        aria-label="a dense table"
+                      >
+                        <TableHead>
+                          <TableRow>
+                            <TableCell
+                              colSpan={2}
+                              style={{
+                                border: '1px solid black',
+                                textTransform: 'capitalize'
+                              }}
+                            >
+                              Name: {userName(item)}
+                            </TableCell>
+                            <TableCell
+                              colSpan={2}
+                              style={{
+                                border: '1px solid black',
+                                textTransform: 'capitalize'
+                              }}
+                            >
+                              Exam/Assesment Name:{' '}
+                              {selectedExam?.label && item
+                                ? selectedExam?.label
+                                : ''}
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': { border: 0 }
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Student Id:{' '}
+                              {item?.student_info?.student_id
+                                ? item?.student_info?.student_id
+                                : ''}
+                            </TableCell>
+
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Class: {item?.section?.class?.name}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Section: {item?.section?.name}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Group: {item?.group?.title}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow
+                            sx={{
+                              '&:last-child td, &:last-child th': { border: 0 }
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Shift:{' '}
+                            </TableCell>
+
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Roll:{' '}
+                              {item?.class_roll_no ? item?.class_roll_no : ''}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Year: {item?.academic_year?.title}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ border: '1px solid black' }}
+                            >
+                              Mobile: {item?.student_info?.phone}
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
+                  <Grid
+                    mb={3}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '0 160px'
+                    }}
+                  >
+                    <Grid>
+                      <Typography variant="body1" textAlign="center">
+                        ................................
+                      </Typography>
+
+                      <Typography variant="body1" textAlign="center">
+                        Principle
+                      </Typography>
+                    </Grid>
+                    <Grid>
+                      <Typography variant="body1" textAlign="center">
+                        ................................
+                      </Typography>
+
+                      <Typography variant="body1" textAlign="center">
+                        Class Teacher
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
-
-              {/* student photo */}
-              <Grid alignSelf="end">
-                {displayStudent?.student_photo ? (
-                  <Image
-                    src={getFile(displayStudent?.student_photo)}
-                    width={100}
-                    height={100}
-                    alt="user photo"
-                  />
-                ) : (
-                  <Image
-                    src={'/default_user_photo.jpg'}
-                    width={100}
-                    height={100}
-                    alt="user photo"
-                  />
-                )}
-              </Grid>
             </Grid>
-
-            {/* <Grid sx={{ height: '50px' }}></Grid> */}
-
-            {/* <Grid
-              my={2}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-              px={6}
-            >
-              <Grid>
-                {schoolInformation?.header_image ? (
-                  <Image
-                    src={getFile(schoolInformation?.header_image)}
-                    width={100}
-                    height={100}
-                    alt="school logo"
-                  />
-                ) : (
-                  ''
-                )}
-              </Grid>
-
-              <Grid>
-                {displayStudent?.student_photo ? (
-                  <Image
-                    src={getFile(displayStudent?.student_photo)}
-                    width={100}
-                    height={100}
-                    alt="user photo"
-                  />
-                ) : (
-                  <Image
-                    src={'/default_user_photo.jpg'}
-                    width={100}
-                    height={100}
-                    alt="user photo"
-                  />
-                )}
-              </Grid>
-            </Grid> */}
-            {/* Table */}
-            <Grid mt={3} mb={4} px={2}>
-              <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
-                <Table
-                  sx={{ minWidth: 650 }}
-                  size="small"
-                  aria-label="a dense table"
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        colSpan={2}
-                        style={{
-                          border: '1px solid black',
-                          textTransform: 'capitalize'
-                        }}
-                      >
-                        Name: {userName(displayStudent)}
-                      </TableCell>
-                      <TableCell
-                        colSpan={2}
-                        style={{
-                          border: '1px solid black',
-                          textTransform: 'capitalize'
-                        }}
-                      >
-                        Exam/Assesment Name:{' '}
-                        {selectedExam?.label && displayStudent
-                          ? selectedExam?.label
-                          : ''}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Student Id:{' '}
-                        {displayStudent?.student_info?.student_id
-                          ? displayStudent?.student_info?.student_id
-                          : ''}
-                      </TableCell>
-
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Class: {displayStudent?.section?.class?.name}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Section: {displayStudent?.section?.name}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Group: {displayStudent?.group?.title}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Shift:{' '}
-                      </TableCell>
-
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Roll:{' '}
-                        {displayStudent?.class_roll_no
-                          ? displayStudent?.class_roll_no
-                          : ''}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Year: {displayStudent?.academic_year?.title}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        style={{ border: '1px solid black' }}
-                      >
-                        Mobile: {displayStudent?.student_info?.phone}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-            <Grid
-              mb={3}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '0 160px'
-              }}
-            >
-              <Grid>
-                <Typography variant="body1" textAlign="center">
-                  ................................
-                </Typography>
-
-                <Typography variant="body1" textAlign="center">
-                  Principle
-                </Typography>
-              </Grid>
-              <Grid>
-                <Typography variant="body1" textAlign="center">
-                  ................................
-                </Typography>
-
-                <Typography variant="body1" textAlign="center">
-                  Class Teacher
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
+          );
+        })}
       </Grid>
       {/* Admit Card desing code part end */}
     </>
@@ -722,7 +714,7 @@ const AdmitCard = () => {
 };
 
 AdmitCard.getLayout = (page) => (
-  <Authenticated requiredPermissions={["create_admit_card", "show_admit_card"]}>
+  <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );

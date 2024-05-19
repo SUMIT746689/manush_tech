@@ -26,6 +26,18 @@ const rows = [
   createData('Total', 262, 100, 16.0, 24, 6.0)
 ];
 
+const TableCellWrapper = ({ children, ...parmas }) => {
+  return (
+    <TableCell sx={{ py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+  )
+}
+
+const TableFooterCellWrapper = ({ children, ...parmas }) => {
+  return (
+    <TableCell sx={{ py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+  )
+}
+
 export default function LeftFeesTable({
   leftFeesTableData,
   leftFeesTableColumnDataState,
@@ -152,13 +164,14 @@ export default function LeftFeesTable({
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
       <Table
-        sx={{ minWidth: 650, height: tableData.length === 0 ? 250 : '' }}
+        // sx={{ minWidth: 650, height: tableData.length === 0 ? 250 : '' }}
         aria-label="simple table"
       >
         <TableHead>
           <TableRow>
-            <TableCell>
+            <TableCellWrapper>
               <Checkbox
+                size='small'
                 indeterminate={
                   selectedRows.length > 0 &&
                   selectedRows.length < tableData.length
@@ -166,28 +179,28 @@ export default function LeftFeesTable({
                 checked={selectAll}
                 onChange={handleSelectAllClick}
               />
-            </TableCell>
-            <TableCell sx={{ textTransform: 'none' }}>Fees Head</TableCell>
-            <TableCell sx={{ textTransform: 'none' }}>Fees</TableCell>
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            </TableCellWrapper>
+            <TableCellWrapper>Fees Head</TableCellWrapper>
+            <TableCellWrapper>Fees</TableCellWrapper>
+            <TableCellWrapper align="right">
               Amount
-            </TableCell>
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            </TableCellWrapper>
+            <TableCellWrapper align="right">
               Late Fee
-            </TableCell>
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            </TableCellWrapper>
+            <TableCellWrapper align="right">
               Prev. Discount
-            </TableCell>
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            </TableCellWrapper>
+            <TableCellWrapper align="right">
               Paid Amount
-            </TableCell>
+            </TableCellWrapper>
 
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            <TableCellWrapper align="right">
               Curr. Discount
-            </TableCell>
-            <TableCell sx={{ textTransform: 'none' }} align="right">
+            </TableCellWrapper>
+            <TableCellWrapper align="right">
               Due
-            </TableCell>
+            </TableCellWrapper>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -196,25 +209,27 @@ export default function LeftFeesTable({
               key={row.title}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell>
+              <TableCellWrapper>
                 <Checkbox
+                  size='small'
                   checked={selectedRows.indexOf(row.feeId) !== -1}
                   onChange={(event) => handleClick(event, row.feeId)}
                 />
-              </TableCell>
-              <TableCell component="th" scope="row">
+              </TableCellWrapper>
+              <TableCellWrapper component="th" scope="row">
                 {row.head_title}
-              </TableCell>
-              <TableCell component="th" scope="row">
+              </TableCellWrapper>
+              <TableCellWrapper component="th" scope="row">
                 {row.title}
-              </TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
-              <TableCell align="right">{row.late_fee}</TableCell>
-              <TableCell align="right">{row.discount}</TableCell>
-              <TableCell align="right">{row.paidAmount}</TableCell>
+              </TableCellWrapper>
+              <TableCellWrapper align="right">{row.amount}</TableCellWrapper>
+              <TableCellWrapper align="right">{row.late_fee}</TableCellWrapper>
+              <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
+              <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
 
-              <TableCell>
+              <TableCellWrapper>
                 <TextFieldWrapper
+                  pb={0}
                   disabled={
                     selectedRows.find((item) => item === row.feeId)
                       ? false
@@ -234,45 +249,46 @@ export default function LeftFeesTable({
                   }}
                   handleBlur={undefined}
                 />
-              </TableCell>
-              <TableCell align="right">{row.dueAmount}</TableCell>
+              </TableCellWrapper>
+              <TableCellWrapper align="right">{row.dueAmount}</TableCellWrapper>
             </TableRow>
           ))}
           {tableData.length === 0 ? (
             ''
           ) : (
             <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 },py:1 }}
             >
-              <TableCell component="th" scope="row"></TableCell>
-              <TableCell component="th" scope="row">
+              <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">
                 {leftFeesTableTotalCalculation && 'Total'}
-              </TableCell>
-              <TableCell align="right">
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.amount}
-              </TableCell>
-              <TableCell align="right">
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.late_fee}
-              </TableCell>
-              <TableCell align="right">
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.discount}
-              </TableCell>
-              <TableCell align="right">
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.paidAmount}
-              </TableCell>
-              <TableCell align="center">
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="center">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.currDiscount}
-              </TableCell>
+              </TableFooterCellWrapper>
 
-              <TableCell align="right">
+              <TableFooterCellWrapper align="right">
                 {leftFeesTableTotalCalculation &&
                   leftFeesTableTotalCalculation.dueAmount}
-              </TableCell>
+              </TableFooterCellWrapper>
             </TableRow>
           )}
         </TableBody>

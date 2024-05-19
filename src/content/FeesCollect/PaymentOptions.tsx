@@ -1,6 +1,6 @@
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { useTranslation } from 'react-i18next';
-import { Grid, Button, Box } from '@mui/material';
+import { Grid, Button, Box, Paper } from '@mui/material';
 import { TextFieldWrapper } from '@/components/TextFields';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +9,7 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  children,
   totalDueValue,
   collectionDate,
   handleStudentPaymentCollect,
@@ -36,11 +37,12 @@ const PaymentOptions = ({
   selectedRows,
   accountsOption,
   accounts,
-  btnHandleClick
+  btnHandleClick,
+  gatewayOption, 
+  setGatewayOption
 }) => {
   const { t }: { t: any } = useTranslation();
   // const [selectedAccount, setSelectedAccount] = useState(null);
-  const [gatewayOption, setGatewayOption] = useState([]);
   // const [selectedGateway, setSelectedGateway] = useState(null);
   // const [transID, setTransID] = useState(null);
   // const [amount, setAmount] = useState(null);
@@ -304,119 +306,137 @@ const PaymentOptions = ({
   };
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#fff',
-        padding: '18px',
-        display: 'grid',
-        gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(6, 150px)' },
-        gap: 1,
-        justifyContent: 'center'
-      }}
-    >
-      <AutoCompleteWrapper
-        label={t('Account')}
-        placeholder={t('Select account...')}
-        options={accountsOption}
-        value={selectedAccount}
-        handleChange={(e, v) => {
-          if (v) {
-            const temp = accounts
-              ?.find((i) => i.id === v?.id)
-              ?.payment_method?.map((j) => ({
-                label: j.title,
-                id: j.id
-              }));
-
-            setGatewayOption(temp);
-          } else {
-            setGatewayOption([]);
-          }
-
-          setSelectedAccount(v);
-          setSelectedGateway(null);
+    <>
+      <Box
+        component={Paper}
+        sx={{
+          boxShadow:"10 10 10",
+          backgroundColor: '#fff',
+          padding: 1,
+          // py:"auto"
+          display:"flex",
+          flexDirection:"column",
+          justifyContent:"space-evenly",
+          borderRadius:0.5
         }}
-      />
-      <AutoCompleteWrapper
-        label={t('Pay via')}
-        placeholder={t('Select Pay via...')}
-        options={gatewayOption}
-        value={selectedGateway}
-        handleChange={(e, value) => {
-          if (value == 'Cash') {
-            setTransID(null);
-          }
-
-          setSelectedGateway(value);
+      >
+        <Grid sx={{
+          display: 'grid',
+          gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(4,1fr)', xl: 'repeat(5, 1fr)' },
+          gap: 1,
+          // justifyContent: 'center',
         }}
-      />
-      {
-        (selectedGateway?.label && selectedGateway?.label !== 'Cash') &&
-        <TextFieldWrapper
-          label="trans ID"
-          name=""
-          value={transID}
-          touched={undefined}
-          errors={undefined}
-          handleChange={(e) => {
-            setTransID(e.target.value);
-          }}
-          handleBlur={undefined}
-          required={selectedGateway?.label !== 'Cash' ? true : false}
-        />
-      }
-      
-      <TextFieldWrapper
-        // disabled={selectedRows.length > 1 ? true : false}
-        label="Amount"
-        name=""
-        type="number"
-        touched={undefined}
-        errors={undefined}
-        value={amount || ''}
-        handleChange={(e) => {
-          if (!e.target.value) {
-            setAmount('');
-            return;
-          }
-
-          if (parseInt(e.target.value) < parseInt(totalDueValue)) {
-            const int_value = parseInt(e.target.value);
-            const value = Math.abs(int_value);
-            setAmount(value);
-          }
-        }}
-        handleBlur={undefined}
-      />
-
-      <TextFieldWrapper
-        disabled={true}
-        label="Total Amount"
-        name=""
-        type="number"
-        touched={undefined}
-        errors={undefined}
-        value={totalFeesCalculate || ''}
-        handleChange={() => { }}
-        handleBlur={undefined}
-      />
-      <Grid>
-        <Button
-          variant="contained"
-          disabled={
-            (selectedRows.length > 0 || totalFeesCalculate > 0) &&
-              feesUserData?.id
-              ? false
-              : true
-          }
-          //disabled={feesUserData?.id ? false : true}
-          onClick={handleCollect}
-          sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
         >
-          Collect
-        </Button>
-      </Grid>
-    </Box>
+          <AutoCompleteWrapper
+            label={t('Account')}
+            placeholder={t('Select account...')}
+            options={accountsOption}
+            value={selectedAccount}
+            handleChange={(e, v) => {
+              if (v) {
+                const temp = accounts
+                  ?.find((i) => i.id === v?.id)
+                  ?.payment_method?.map((j) => ({
+                    label: j.title,
+                    id: j.id
+                  }));
+
+                setGatewayOption(temp);
+              } else {
+                setGatewayOption([]);
+              }
+
+              setSelectedAccount(v);
+              setSelectedGateway(null);
+            }}
+          />
+          <AutoCompleteWrapper
+            label={t('Pay via')}
+            placeholder={t('Select Pay via...')}
+            options={gatewayOption}
+            value={selectedGateway}
+            handleChange={(e, value) => {
+              if (value == 'Cash') {
+                setTransID(null);
+              }
+
+              setSelectedGateway(value);
+            }}
+          />
+          {
+            (selectedGateway?.label && selectedGateway?.label !== 'Cash') &&
+            <TextFieldWrapper
+              label="trans ID"
+              name=""
+              value={transID}
+              touched={undefined}
+              errors={undefined}
+              handleChange={(e) => {
+                setTransID(e.target.value);
+              }}
+              handleBlur={undefined}
+              required={selectedGateway?.label !== 'Cash' ? true : false}
+            />
+          }
+
+          <TextFieldWrapper
+            // disabled={selectedRows.length > 1 ? true : false}
+            label="Amount"
+            name=""
+            type="number"
+            touched={undefined}
+            errors={undefined}
+            value={amount || ''}
+            handleChange={(e) => {
+              if (!e.target.value) {
+                setAmount('');
+                return;
+              }
+
+              if (parseInt(e.target.value) < parseInt(totalDueValue)) {
+                const int_value = parseInt(e.target.value);
+                const value = Math.abs(int_value);
+                setAmount(value);
+              }
+            }}
+            handleBlur={undefined}
+          />
+
+          <TextFieldWrapper
+            disabled={true}
+            label="Total Amount"
+            name=""
+            type="number"
+            touched={undefined}
+            errors={undefined}
+            value={totalFeesCalculate || ''}
+            handleChange={() => { }}
+            handleBlur={undefined}
+          />
+        </Grid>
+
+        <Grid item display="grid" gridTemplateColumns={{sm:"3fr 1fr"}} gridAutoFlow="dense" gap={1} width="100%" height="auto">
+          <Grid item display={{xs:'none',sm:"grid"}}>{children}</Grid>
+          <Button
+            variant="contained"
+            disabled={
+              (selectedRows.length > 0 || totalFeesCalculate > 0) &&
+                feesUserData?.id
+                ? false
+                : true
+            }
+            //disabled={feesUserData?.id ? false : true}
+            onClick={handleCollect}
+            sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
+          >
+            Collect
+          </Button>
+          <Grid display={{sm:'none'}}>{children}</Grid>
+        </Grid>
+
+      </Box>
+
+    </>
   );
 };
 

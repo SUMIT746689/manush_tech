@@ -26,15 +26,21 @@ const rows = [
   createData('Total', 262, 100, 16.0, 24, 6.0)
 ];
 
+const TableHeaderCellWrapper = ({ children, ...parmas }) => {
+  return (
+    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 0, fontSize: { xs: 9, md: 10, xl: 11 } }} {...parmas}> {children} </TableCell>
+  )
+}
+
 const TableCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
   )
 }
 
 const TableFooterCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
   )
 }
 
@@ -162,14 +168,14 @@ export default function LeftFeesTable({
   };
 
   return (
-    <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
+    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
       <Table
         // sx={{ minWidth: 650, height: tableData.length === 0 ? 250 : '' }}
         aria-label="simple table"
       >
         <TableHead>
           <TableRow>
-            <TableCellWrapper>
+            <TableHeaderCellWrapper align="center" >
               <Checkbox
                 size='small'
                 indeterminate={
@@ -179,28 +185,15 @@ export default function LeftFeesTable({
                 checked={selectAll}
                 onChange={handleSelectAllClick}
               />
-            </TableCellWrapper>
-            <TableCellWrapper>Fees Head</TableCellWrapper>
-            <TableCellWrapper>Fees</TableCellWrapper>
-            <TableCellWrapper align="right">
-              Amount
-            </TableCellWrapper>
-            <TableCellWrapper align="right">
-              Late Fee
-            </TableCellWrapper>
-            <TableCellWrapper align="right">
-              Prev. Discount
-            </TableCellWrapper>
-            <TableCellWrapper align="right">
-              Paid Amount
-            </TableCellWrapper>
-
-            <TableCellWrapper align="right">
-              Curr. Discount
-            </TableCellWrapper>
-            <TableCellWrapper align="right">
-              Due
-            </TableCellWrapper>
+            </TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Fees Head</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Fees</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right"> Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right"> Late Fee</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right"> Prev. Discount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right">Paid Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right">Curr. Discount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right">Due</TableHeaderCellWrapper>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -209,7 +202,7 @@ export default function LeftFeesTable({
               key={row.title}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCellWrapper>
+              <TableCellWrapper align="center">
                 <Checkbox
                   size='small'
                   checked={selectedRows.indexOf(row.feeId) !== -1}
@@ -227,7 +220,7 @@ export default function LeftFeesTable({
               <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
               <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
 
-              <TableCellWrapper>
+              <TableCellWrapper >
                 <TextFieldWrapper
                   pb={0}
                   disabled={
@@ -248,6 +241,13 @@ export default function LeftFeesTable({
                     handleCurrDiscountChange(row.feeId, value);
                   }}
                   handleBlur={undefined}
+                  inputProps={{
+                    style: {
+                      px: 2,
+                      py: 2,
+                      fontSize: { xs: 10,sm:11, md: 12 }
+                    }
+                  }}
                 />
               </TableCellWrapper>
               <TableCellWrapper align="right">{row.dueAmount}</TableCellWrapper>
@@ -257,38 +257,17 @@ export default function LeftFeesTable({
             ''
           ) : (
             <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 },py:1 }}
+            // sx={{ '&:last-child td, &:last-child th': { border: 0 }, py: 1 }}
             >
               <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
               <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
-              <TableFooterCellWrapper component="th" scope="row">
-                {leftFeesTableTotalCalculation && 'Total'}
-              </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.amount}
-              </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.late_fee}
-              </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.discount}
-              </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.paidAmount}
-              </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="center">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.currDiscount}
-              </TableFooterCellWrapper>
-
-              <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.dueAmount}
-              </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">{leftFeesTableTotalCalculation && 'Total'}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right"> {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.amount}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.late_fee}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.discount}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="center">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount}</TableFooterCellWrapper>
             </TableRow>
           )}
         </TableBody>

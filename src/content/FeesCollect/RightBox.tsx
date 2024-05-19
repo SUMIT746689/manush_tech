@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Avatar, Grid, Typography } from '@mui/material';
 import Image from 'next/image';
 import { getFile } from '@/utils/utilitY-functions';
 
@@ -27,25 +27,26 @@ const RightBox = ({ userInformation }) => {
       </Grid>
       <Grid
         sx={{
-          display: 'flex',
-          gap: '20px',
-          padding: '18px'
+          display: 'Grid',
+          gridTemplateColumns:"20vh auto",
+          columnGap:1,
+          padding: 1,
         }}
       >
         {/* user profile image */}
-        <Grid
+        {/* <Grid
           sx={{
             flexBasis: '30%'
           }}
-        >
+        > */}
           <Grid
             sx={{
-              width: '150px',
-              height: '150px',
-              backgroundColor: '#ccc'
+              // width: '150px',
+              // height: '150px',
+              backgroundColor: 'white'
             }}
           >
-            {userInformation?.student_photo ? (
+            {/* {userInformation?.student_photo ? (
               <Image
                 src={getFile(userInformation?.student_photo)}
                 height={100}
@@ -56,9 +57,10 @@ const RightBox = ({ userInformation }) => {
               />
             ) : (
               ''
-            )}
+            )} */}
+            <Avatar src={getFile(userInformation?.student_photo)} sx={{height:'100%', maxHeight:100,width:"auto",objectFit:"contain"}} />
           </Grid>
-        </Grid>
+        {/* </Grid> */}
 
         <Grid
           sx={{

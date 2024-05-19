@@ -3,6 +3,7 @@ import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrappe
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { ChangeEvent } from 'react';
+import { TextFieldWrapper } from '@/components/TextFields';
 
 const LeftBox = ({
   selected_month,
@@ -38,7 +39,7 @@ const LeftBox = ({
         backgroundColor: '#fff'
       }}
     >
-      <Grid
+      {/* <Grid
         sx={{
           borderRadious: 0,
           background: (themes) => themes.colors.primary.dark,
@@ -50,13 +51,9 @@ const LeftBox = ({
         }}
       >
         Search
-      </Grid>
+      </Grid> */}
       <form>
-        <Grid
-          sx={{
-            p: 2
-          }}
-        >
+        <Grid sx={{ px: 1, pt: 2 }}>
           <AutoCompleteWrapperWithDebounce
             debounceTimeout={debounceTimeout}
             handleDebounce={handleDebounce}
@@ -64,15 +61,15 @@ const LeftBox = ({
             options={searchData}
             value={searchValue}
             handleChange={searchHandleChange}
-            label=""
+            label="Search Student Id-Name-Roll-Class-Section-G"
             placeholder="Search Student Id - Name - Roll - Class - Section - G"
           />
           <Grid
             sx={{
-              paddingBottom: '9px'
+              paddingBottom: 0.5
             }}
           >
-            <Typography
+            {/* <Typography
               component="label"
               sx={{
                 color: '#223354b3',
@@ -85,25 +82,25 @@ const LeftBox = ({
               <Typography component="span" sx={{ color: '#fc0303' }}>
                 *
               </Typography>
-            </Typography>
+            </Typography> */}
 
-            <TextField
-              size="small"
-              sx={{
-                m: 0
-              }}
-              placeholder="Student Id"
-              fullWidth
+            <TextFieldWrapper
+              label="Student Id *"
+              name="student_id"
+              placeholder="type student id"
               variant="outlined"
-              onChange={handleChangeStudentId}
+              handleChange={handleChangeStudentId}
               value={student_id}
+              touched={undefined}
+              errors={undefined}
+              handleBlur={undefined}
             />
           </Grid>
           <Grid
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
-              gap: '20px'
+              gap: 1
             }}
           >
             <Grid
@@ -112,7 +109,7 @@ const LeftBox = ({
                 flexGrow: 1
               }}
             >
-              <Typography
+              {/* <Typography
                 component="label"
                 sx={{
                   color: '#223354b3',
@@ -125,9 +122,9 @@ const LeftBox = ({
                 <Typography component="span" sx={{ color: '#fc0303' }}>
                   *
                 </Typography>
-              </Typography>
+              </Typography> */}
               <DatePickerWrapper
-                label={''}
+                label={'Collection Date *'}
                 date={collectionDate}
                 handleChange={datePickerHandleChange}
               />
@@ -138,7 +135,7 @@ const LeftBox = ({
                 flexGrow: 1
               }}
             >
-              <Typography
+              {/* <Typography
                 component="label"
                 sx={{
                   color: '#223354b3',
@@ -151,7 +148,7 @@ const LeftBox = ({
                 <Typography component="span" sx={{ color: '#fc0303' }}>
                   *
                 </Typography>
-              </Typography>
+              </Typography> */}
 
               <AutoCompleteWrapperWithDebounce
                 debounceTimeout=""
@@ -159,17 +156,13 @@ const LeftBox = ({
                 value={selected_month}
                 // value={undefined}
                 handleChange={monthHandleChange}
-                label=""
+                label="Select Month *"
                 placeholder="Month To"
               />
             </Grid>
           </Grid>
 
-          <Grid
-            sx={{
-              paddingTop: '9px'
-            }}
-          >
+          <Grid>
             <SearchingButtonWrapper
               isLoading={false}
               handleClick={btnHandleClick}

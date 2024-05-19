@@ -317,7 +317,7 @@ function Managementschools() {
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     setCurrDiscount({});
-    setLeftFeesTableData(()=>[]);
+    setLeftFeesTableData(() => []);
     if (student_id) {
       const res = await axios.get(
         `/api/student/search-students?student_id=${student_id?.toLowerCase()}`
@@ -634,7 +634,7 @@ function Managementschools() {
 
     setSelectedAccount({ label: defaultAcc.title, id: defaultAcc.id });
     const getCashGateway = defaultAcc.payment_method.find(method => method.title.toLowerCase() === 'cash');
-    
+
     if (!getCashGateway) return;
     setGatewayOption(defaultAcc.payment_method.map((j) => ({
       label: j.title,
@@ -743,7 +743,7 @@ function Managementschools() {
 
         </Grid>
 
-        <Grid display="grid" gridTemplateColumns={{md:"30vh 1fr"}} px={1} mt={1} gap={1}>
+        <Grid display="grid" gridTemplateColumns={{ md: "30vh 1fr" }} px={1} mt={1} gap={1}>
           <RightFeesTable
             collect_other_fees_btn={collect_other_fees_btn}
             setCollect_other_fees_btn={setCollect_other_fees_btn}
@@ -804,138 +804,6 @@ function Managementschools() {
             />
           </PaymentOptions>
         </Grid>
-        {/* fees collection code end*/}
-        {/* <Grid px={1} mt={1} >
-
-        {/* <Grid ref={printSelectedPageRef}>
-          <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
-          <PaymentInvoice printFees={selectedFees} student={selectedStudent} />
-        </Grid>
-
-        <Grid ref={printAllPageARef}>
-          <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
-          <PaymentInvoice printFees={filteredFees} student={selectedStudent} />
-        </Grid> */}
-      </Grid>
-      {/* updated searching code start */}
-      <Grid
-        px={4}
-        mt={1}
-        display="grid"
-        gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
-        columnGap={2}
-        rowGap={{ xs: 1, md: 0 }}
-        mx={1}
-        minHeight="fit-content"
-      >
-        <LeftBox
-          selected_month={selected_month}
-          setSelectMonth={setSelectMonth}
-          debounceTimeout={500}
-          handleDebounce={handleDebounce}
-          searchHandleUpdate={searchHandleUpdate}
-          searchData={searchOptionData}
-          searchValue={searchValue}
-          searchHandleChange={searchHandleChange}
-          datePickerHandleChange={datePickerHandleChange}
-          monthData={monthData}
-          btnHandleClick={btnHandleClick}
-          setStudentId={setStudentId}
-          student_id={student_id}
-          collectionDate={collectionDate}
-          setCollectionDate={setCollectionDate}
-        />
-        <RightBox userInformation={userInformation} />
-      </Grid>
-      {/* updated searching code end */}
-      {/* fees collection code start*/}
-      <Grid
-        px={4}
-        mt={1}
-        display="grid"
-        gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
-        columnGap={2}
-        rowGap={{ xs: 1, md: 0 }}
-        mx={1}
-        minHeight="fit-content"
-      >
-        <LeftFeesTable
-          leftFeesTableData={leftFeesTableData}
-          leftFeesTableColumnDataState={leftFeesTableColumnDataState}
-          leftFeesTableColumnData={leftFeesTableColumnData}
-          currDiscount={currDiscount}
-          setCurrDiscount={setCurrDiscount}
-          selectAll={selectAll}
-          setSelectAll={setSelectAll}
-          leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
-          tableData={leftFeesTableData}
-          feesUserData={feesUserData}
-          selectedRows={selectedRowsFeesTable}
-          setSelectedRows={setSelectedRowsFeesTable}
-        />
-
-        <RightFeesTable
-          collect_other_fees_btn={collect_other_fees_btn}
-          setCollect_other_fees_btn={setCollect_other_fees_btn}
-          feesName={feesName}
-          setFeesName={setFeesName}
-          feesAmount={feesAmount}
-          setFeesAmount={setFeesAmount}
-          transID={transID}
-          feesUserData={feesUserData}
-          selectedAccount={selectedAccount}
-          selectedGateway={selectedGateway}
-        />
-      </Grid>
-
-      <Grid px={4} mt={1} mx={1}>
-        <PaymentOptions
-          totalDueValue={totalDueValue}
-          collectionDate={collectionDate}
-          handleStudentPaymentCollect={handleStudentPaymentCollect}
-          setPrintFees={setPrintFees}
-          amount={amount}
-          setAmount={setAmount}
-          totalFeesCalculate={totalFeesCalculate}
-          setTotalFeesCalculate={setTotalFeesCalculate}
-          setFeesAmount={setFeesAmount}
-          setFeesName={setFeesName}
-          collect_other_fees_btn={collect_other_fees_btn}
-          feesName={feesName}
-          feesAmount={feesAmount}
-          transID={transID}
-          setTransID={setTransID}
-          selectedGateway={selectedGateway}
-          setSelectedGateway={setSelectedGateway}
-          selectedAccount={selectedAccount}
-          setSelectedAccount={setSelectedAccount}
-          deSelectAllCheckbox={deSelectAllCheckbox}
-          trackingCollectButton={trackingCollectButton}
-          setTrackingCollectButton={setTrackingCollectButton}
-          tableData={leftFeesTableData}
-          feesUserData={feesUserData}
-          selectedRows={selectedRowsFeesTable}
-          accounts={accounts}
-          accountsOption={
-            accounts?.map((i) => ({
-              label: i.title,
-              id: i.id,
-              is_dafault:i.is_dafault
-            })) || []
-          }
-          btnHandleClick={btnHandleClick}
-        />
-      </Grid>
-      {/* fees collection code end*/}
-      <Grid px={4} mt={1} mx={1}>
-        <Reset_Sent_SMS_Collect_Invoice
-          handlePrint={handlePrint}
-          prinCollectedtFees={prinCollectedtFees}
-          printFees={printFees}
-          handleSentSms={handleSentSms}
-          isSentSmsLoading={isSentSmsLoading}
-          resetBtnHandleClick={resetBtnHandleClick}
-        />
       </Grid>
       <Footer />
     </>

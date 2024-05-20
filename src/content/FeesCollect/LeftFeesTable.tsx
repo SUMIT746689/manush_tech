@@ -9,14 +9,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { TextFieldWrapper } from '@/components/TextFields';
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-  due: number
-) {
+function createData(name: string, calories: number, fat: number, carbs: number, protein: number, due: number) {
   return { name, calories, fat, carbs, protein, due };
 }
 
@@ -66,10 +59,7 @@ export default function LeftFeesTable({
 
       for (let i = 0; i < newSelectedRows.length; i++) {
         for (let j = 0; j < tableData.length; j++) {
-          if (
-            tableData[j].feeId === newSelectedRows[i] &&
-            tableData[j].dueAmount > 0
-          ) {
+          if (tableData[j].feeId === newSelectedRows[i] && tableData[j].dueAmount > 0) {
             newArrSelectedRow.push(newSelectedRows[i]);
           }
         }
@@ -99,10 +89,7 @@ export default function LeftFeesTable({
     } else if (selectedIndex === selectedRows.length - 1) {
       newSelected = newSelected.concat(selectedRows.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1)
-      );
+      newSelected = newSelected.concat(selectedRows.slice(0, selectedIndex), selectedRows.slice(selectedIndex + 1));
     }
 
     // check if dueAmount is 0 or greater than
@@ -117,10 +104,7 @@ export default function LeftFeesTable({
 
     for (let i = 0; i < newSelected.length; i++) {
       for (let j = 0; j < tableData.length; j++) {
-        if (
-          tableData[j].feeId === newSelected[i] &&
-          tableData[j].dueAmount > 0
-        ) {
+        if (tableData[j].feeId === newSelected[i] && tableData[j].dueAmount > 0) {
           newSelectedRow.push(newSelected[i]);
         }
       }

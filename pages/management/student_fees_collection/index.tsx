@@ -1,12 +1,5 @@
 import Head from 'next/head';
-import {
-  useState,
-  useEffect,
-  useRef,
-  ChangeEvent,
-  MouseEvent,
-  useContext
-} from 'react';
+import { useState, useEffect, useRef, ChangeEvent, MouseEvent, useContext } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
@@ -15,11 +8,9 @@ import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/StudentFeesCollection/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
+import DesignPaymentInvoice from '@/content/Management/StudentFeesCollection/DesignPaymentInvoice';
 import { useReactToPrint } from 'react-to-print';
-import {
-  ButtonWrapper,
-  SearchingButtonWrapper
-} from '@/components/ButtonWrapper';
+import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import LeftBox from '@/content/FeesCollect/LeftBox';
@@ -62,26 +53,20 @@ function Managementschools() {
   const [totalDueValue, setTotalDueValue] = useState<string>('0');
   const [feesUserData, setFeesUserData] = useState<object>({});
   const [selectedRowsFeesTable, setSelectedRowsFeesTable] = useState([]);
-  const [leftFeesTableTotalCalculation, setLeftFeesTableTotalCalculation] =
-    useState<object | null>(null);
-  const [trackingCollectButton, setTrackingCollectButton] =
-    useState<Boolean>(false);
+  const [leftFeesTableTotalCalculation, setLeftFeesTableTotalCalculation] = useState<object | null>(null);
+  const [trackingCollectButton, setTrackingCollectButton] = useState<Boolean>(false);
   const [selectAll, setSelectAll] = useState<Boolean>(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedGateway, setSelectedGateway] = useState(null);
   const [transID, setTransID] = useState<string | null>(null);
   const [feesName, setFeesName] = useState<any>(null);
   const [feesAmount, setFeesAmount] = useState<string | null>(null);
-  const [collect_other_fees_btn, setCollect_other_fees_btn] =
-    useState<boolean>(false);
-  const [totalFeesCalculate, setTotalFeesCalculate] = useState<string | null>(
-    null
-  );
+  const [collect_other_fees_btn, setCollect_other_fees_btn] = useState<boolean>(false);
+  const [totalFeesCalculate, setTotalFeesCalculate] = useState<string | null>(null);
   const [amount, setAmount] = useState(null);
   const [student_id, setStudentId] = useState<string>('');
   const [collectionDate, setCollectionDate] = useState<any>(dayjs(Date.now()));
-  const [leftFeesTableColumnDataState, setLeftFeesTableColumnDataState] =
-    useState<any>();
+  const [leftFeesTableColumnDataState, setLeftFeesTableColumnDataState] = useState<any>();
   //const [currDiscount, setCurrDiscount] = useState<string | null>(null);
   const [currDiscount, setCurrDiscount] = useState({});
   const [selected_month, setSelectMonth] = useState<string | null>(null);
@@ -90,9 +75,7 @@ function Managementschools() {
   const handleDebounce = (value) => {
     if (value?.length >= 3) {
       axios
-        .get(
-          `/api/student/search-students?search_value=${value?.toLowerCase()}`
-        )
+        .get(`/api/student/search-students?search_value=${value?.toLowerCase()}`)
         .then((res) => {
           const userInfoArr = res.data.map((item) => {
             return {
@@ -112,22 +95,14 @@ function Managementschools() {
     }
   };
 
-  const searchHandleChange = async (
-    event: ChangeEvent<HTMLInputElement>,
-    v
-  ) => {
+  const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
     setSearchValue(v);
   };
-  const searchHandleUpdate = async (
-    event: ChangeEvent<HTMLInputElement>,
-    v
-  ) => {
+  const searchHandleUpdate = async (event: ChangeEvent<HTMLInputElement>, v) => {
     setStudentId(v?.student_id || '');
     setSearchValue(v || null);
   };
-  const datePickerHandleChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ): void => {
+  const datePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setCollectionDate(event);
   };
 
@@ -170,20 +145,9 @@ function Managementschools() {
 
       // check duevalue
       if (late_fee_value === 0) {
-        due_fee_value =
-          item.status === 'paid'
-            ? 0
-            : item.amount -
-            (item.paidAmount || 0) -
-            (item.on_time_discount || 0);
+        due_fee_value = item.status === 'paid' ? 0 : item.amount - (item.paidAmount || 0) - (item.on_time_discount || 0);
       } else if (late_fee_value > 0) {
-        due_fee_value =
-          item.status === 'paid'
-            ? 0
-            : item.amount +
-            item.late_fee -
-            (item.paidAmount || 0) -
-            (item.on_time_discount || 0);
+        due_fee_value = item.status === 'paid' ? 0 : item.amount + item.late_fee - (item.paidAmount || 0) - (item.on_time_discount || 0);
       }
 
       // check  paidAmount
@@ -211,12 +175,9 @@ function Managementschools() {
       for (let j = 0; j < data?.discount.length; j++) {
         if (feesData[i].feeId === data?.discount[j].fee_id) {
           if (data?.discount[j].type === 'flat') {
-            feesData[i].discount =
-              feesData[i].discount + parseInt(data.discount[j].amt); // 100
+            feesData[i].discount = feesData[i].discount + parseInt(data.discount[j].amt); // 100
           } else if (data?.discount[j].type === 'percent') {
-            feesData[i].discount =
-              feesData[i].discount +
-              parseInt(feesData[i].amount) / parseInt(data.discount[j].amt);
+            feesData[i].discount = feesData[i].discount + parseInt(feesData[i].amount) / parseInt(data.discount[j].amt);
           }
         }
       }
@@ -253,19 +214,12 @@ function Managementschools() {
     if (default_current_discount.length > 0) {
       for (let i = 0; i < default_current_discount.length; i++) {
         for (let j = 0; j < feesData.length; j++) {
-          if (
-            default_current_discount[i].id === feesData[j].feeId &&
-            !Number.isNaN(default_current_discount[i].value)
-          ) {
-            feesData[j].dueAmount =
-              parseInt(feesData[j].dueAmount) -
-              parseInt(default_current_discount[i].value);
+          if (default_current_discount[i].id === feesData[j].feeId && !Number.isNaN(default_current_discount[i].value)) {
+            feesData[j].dueAmount = parseInt(feesData[j].dueAmount) - parseInt(default_current_discount[i].value);
             // feesData[j].currDiscount = parseInt(
             //   default_current_discount[i].value
             // );
-            feesData[j].on_time_discount = parseInt(
-              default_current_discount[i].value
-            );
+            feesData[j].on_time_discount = parseInt(default_current_discount[i].value);
           }
         }
       }
@@ -318,18 +272,15 @@ function Managementschools() {
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
+    setLeftFeesTableData(() => []);
     if (student_id) {
-      const res = await axios.get(
-        `/api/student/search-students?student_id=${student_id?.toLowerCase()}`
-      );
+      const res = await axios.get(`/api/student/search-students?student_id=${student_id?.toLowerCase()}`);
       if (res?.data?.length > 0) {
         const response = await axios.get(
           `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
         );
         // set search level code
-        setSearchValue(
-          `${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`
-        );
+        setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
 
         setLeftFeesTableColumnDataState(response?.data?.data);
         leftFeesTableColumnData({ ...response?.data?.data });
@@ -395,8 +346,7 @@ function Managementschools() {
   // updated reset button code end
   function handleStudentPaymentCollect(res_arr) {
     const calculate_arr = res_arr?.map((fee_, index) => {
-      const last_payment_date =
-        fee_?.status !== 'unpaid' ? fee_?.last_payment_date : '';
+      const last_payment_date = fee_?.status !== 'unpaid' ? fee_?.last_payment_date : '';
 
       // old code
       // const last_date = new Date(fee.last_date);
@@ -419,16 +369,11 @@ function Managementschools() {
         const late_fee = fee_.late_fee ? fee_.late_fee : 0;
         if (late_fee && today > last_date) {
           // due fee part start
-          due =
-            Number(fee_?.amount) +
-            Number(fee_?.late_fee) -
-            (fee_?.paidAmount ? Number(fee_?.paidAmount) : 0);
+          due = Number(fee_?.amount) + Number(fee_?.late_fee) - (fee_?.paidAmount ? Number(fee_?.paidAmount) : 0);
 
           // due fee part end
           payableAmount = Number(fee_?.amount) + Number(fee_?.late_fee);
-          total_payable_amt = `${Number(fee_?.amount).toFixed(1)} + ${Number(
-            fee_?.late_fee
-          ).toFixed(1)} = ${payableAmount.toFixed(2)}`;
+          total_payable_amt = `${Number(fee_?.amount).toFixed(1)} + ${Number(fee_?.late_fee).toFixed(1)} = ${payableAmount.toFixed(2)}`;
         } else {
           total_payable_amt = '';
         }
@@ -437,14 +382,7 @@ function Managementschools() {
 
         // updated due calculation end
 
-        due =
-          fee_?.amount +
-          late_fee -
-          (fee_.paidAmount
-            ? fee_.paidAmount
-            : fee_?.status == 'unpaid'
-              ? 0
-              : fee_?.amount);
+        due = fee_?.amount + late_fee - (fee_.paidAmount ? fee_.paidAmount : fee_?.status == 'unpaid' ? 0 : fee_?.amount);
 
         // console.log(fee.title, 'due__', due, today < last_date);
 
@@ -491,9 +429,7 @@ function Managementschools() {
 
   useEffect(() => {
     const temp = datas.filter((i) => {
-      const got = printFees.find(
-        (j) => j.fee_id === i.fee_id && i.fee_id !== ''
-      );
+      const got = printFees.find((j) => j.fee_id === i.fee_id && i.fee_id !== '');
 
       if (got) {
         for (const index in got) {
@@ -568,9 +504,7 @@ function Managementschools() {
 
   const handleSentSms = async () => {
     // updated code start
-    const student_list = await axios.get(
-      `/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${userInformation?.section_id}`
-    );
+    const student_list = await axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${userInformation?.section_id}`);
 
     const singleUser = student_list.data.find((item, i) => {
       return item.student_information_id === userInformation.id;
@@ -578,8 +512,7 @@ function Managementschools() {
 
     // updated code end
 
-    if (!singleUser?.student_info?.phone)
-      return showNotification('phone number not founds', 'error');
+    if (!singleUser?.student_info?.phone) return showNotification('phone number not founds', 'error');
 
     setIsSentSmsLoading(true);
 
@@ -657,7 +590,7 @@ function Managementschools() {
       </Head>
 
       <Grid minHeight={'calc(100vh - 223px)'}>
-        <Grid sx={{ display: 'none' }}>
+        {/* <Grid sx={{ display: 'none' }}>
           <Grid ref={printPageRef}>
             <PaymentInvoice
               collectionDate={collectionDate}
@@ -670,6 +603,22 @@ function Managementschools() {
               student={selectedStudent}
             />
             <PaymentInvoice
+              collectionDate={collectionDate}
+              leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
+              feesUserData={feesUserData}
+              totalDueValue={totalDueValue}
+              leftFeesTableData={leftFeesTableData}
+              setShowPrint={setShowPrint}
+              printFees={prinCollectedtFees}
+              student={selectedStudent}
+            />
+          </Grid>
+        </Grid> */}
+
+        <Grid sx={{ display: 'none' }}>
+          <Grid px={4} sx={{ backgroundColor: '#fff' }} ref={printPageRef}>
+            <DesignPaymentInvoice
+              student_id={student_id}
               collectionDate={collectionDate}
               leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
               feesUserData={feesUserData}

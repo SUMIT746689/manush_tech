@@ -8,6 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { TextFieldWrapper } from '@/components/TextFields';
+import { Grid } from '@mui/material';
 
 function createData(name: string, calories: number, fat: number, carbs: number, protein: number, due: number) {
   return { name, calories, fat, carbs, protein, due };
@@ -21,21 +22,30 @@ const rows = [
 
 const TableHeaderCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 9, md: 10, xl: 11 } }} {...parmas}> {children} </TableCell>
-  )
-}
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 9, md: 10, xl: 11 } }} {...parmas}>
+      {' '}
+      {children}{' '}
+    </TableCell>
+  );
+};
 
 const TableCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
-  )
-}
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}>
+      {' '}
+      {children}{' '}
+    </TableCell>
+  );
+};
 
 const TableFooterCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
-  )
-}
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}>
+      {' '}
+      {children}{' '}
+    </TableCell>
+  );
+};
 
 export default function LeftFeesTable({
   leftFeesTableData,
@@ -159,13 +169,10 @@ export default function LeftFeesTable({
       >
         <TableHead>
           <TableRow>
-            <TableHeaderCellWrapper align="center" >
+            <TableHeaderCellWrapper align="center">
               <Checkbox
-                size='small'
-                indeterminate={
-                  selectedRows.length > 0 &&
-                  selectedRows.length < tableData.length
-                }
+                size="small"
+                indeterminate={selectedRows.length > 0 && selectedRows.length < tableData.length}
                 checked={selectAll}
                 onChange={handleSelectAllClick}
               />
@@ -177,21 +184,16 @@ export default function LeftFeesTable({
             <TableHeaderCellWrapper align="right"> Prev. Discount</TableHeaderCellWrapper>
             <TableHeaderCellWrapper align="right">Paid Amount</TableHeaderCellWrapper>
             <TableHeaderCellWrapper align="right">Curr. Discount</TableHeaderCellWrapper>
-            <TableHeaderCellWrapper align="right">Due</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper align="right" pr={5}>
+              <Grid pr={1}>Due</Grid>
+            </TableHeaderCellWrapper>
           </TableRow>
         </TableHead>
         <TableBody>
           {tableData.map((row) => (
-            <TableRow
-              key={row.title}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCellWrapper align="center">
-                <Checkbox
-                  size='small'
-                  checked={selectedRows.indexOf(row.feeId) !== -1}
-                  onChange={(event) => handleClick(event, row.feeId)}
-                />
+            <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableCellWrapper align="center" width={10}>
+                <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
               </TableCellWrapper>
               <TableCellWrapper component="th" scope="row">
                 {row.head_title}
@@ -204,14 +206,10 @@ export default function LeftFeesTable({
               <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
               <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
 
-              <TableCellWrapper >
+              <TableCellWrapper>
                 <TextFieldWrapper
                   pb={0}
-                  disabled={
-                    selectedRows.find((item) => item === row.feeId)
-                      ? false
-                      : true
-                  }
+                  disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
                   label="Amount"
                   name=""
                   type="number"
@@ -229,12 +227,14 @@ export default function LeftFeesTable({
                     style: {
                       px: 2,
                       py: 2,
-                      fontSize: { xs: 10,sm:11, md: 12 }
+                      fontSize: { xs: 10, sm: 11, md: 12 }
                     }
                   }}
                 />
               </TableCellWrapper>
-              <TableCellWrapper align="right">{row.dueAmount}</TableCellWrapper>
+              <TableCellWrapper align="right">
+                <Grid pr={1}>{row.dueAmount}</Grid>
+              </TableCellWrapper>
             </TableRow>
           ))}
           {tableData.length === 0 ? (
@@ -243,15 +243,27 @@ export default function LeftFeesTable({
             <TableRow
             // sx={{ '&:last-child td, &:last-child th': { border: 0 }, py: 1 }}
             >
-              <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
-              <TableFooterCellWrapper component="th" scope="row"> </TableFooterCellWrapper>
-              <TableFooterCellWrapper component="th" scope="row">{leftFeesTableTotalCalculation && 'Total'}</TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">
+                {' '}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">
+                {' '}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">
+                {leftFeesTableTotalCalculation && 'Total'}
+              </TableFooterCellWrapper>
               <TableFooterCellWrapper align="right"> {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.amount}</TableFooterCellWrapper>
               <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.late_fee}</TableFooterCellWrapper>
               <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.discount}</TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount}</TableFooterCellWrapper>
-              <TableFooterCellWrapper align="center">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount}</TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount}</TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="center">
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
+                <Grid pr={1}>{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount}</Grid>
+              </TableFooterCellWrapper>
             </TableRow>
           )}
         </TableBody>

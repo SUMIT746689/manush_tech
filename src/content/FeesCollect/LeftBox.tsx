@@ -6,6 +6,7 @@ import { ChangeEvent } from 'react';
 import { TextFieldWrapper } from '@/components/TextFields';
 
 const LeftBox = ({
+  setSelectAll,
   selected_month,
   setSelectMonth,
   debounceTimeout,
@@ -123,11 +124,7 @@ const LeftBox = ({
                   *
                 </Typography>
               </Typography> */}
-              <DatePickerWrapper
-                label={'Collection Date *'}
-                date={collectionDate}
-                handleChange={datePickerHandleChange}
-              />
+              <DatePickerWrapper label={'Collection Date *'} date={collectionDate} handleChange={datePickerHandleChange} />
             </Grid>
             <Grid
               sx={{
@@ -163,12 +160,7 @@ const LeftBox = ({
           </Grid>
 
           <Grid>
-            <SearchingButtonWrapper
-              isLoading={false}
-              handleClick={btnHandleClick}
-              disabled={!selected_month}
-              children={'Search'}
-            />
+            <SearchingButtonWrapper isLoading={false} handleClick={btnHandleClick} disabled={!selected_month} children={'Search'} />
           </Grid>
         </Grid>
       </form>

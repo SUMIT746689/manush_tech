@@ -87,7 +87,7 @@ function Managementschools() {
           });
           setSearchOptionData(userInfoArr);
         })
-        .catch((error) => { });
+        .catch((error) => {});
     } else if (value?.length < 3) {
       setSearchOptionData([]);
     } else if (!value) {
@@ -270,6 +270,8 @@ function Managementschools() {
     // student information code end
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    setSelectedRowsFeesTable([]);
+    setSelectAll(false);
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
@@ -562,26 +564,27 @@ function Managementschools() {
     // label: i.title,
     // id: i.id,
     // is_dafault: i.is_dafault
-    const defaultAcc = accounts?.find(acc => acc.is_dafault);
+    const defaultAcc = accounts?.find((acc) => acc.is_dafault);
     if (!defaultAcc) return;
 
     setSelectedAccount({ label: defaultAcc.title, id: defaultAcc.id });
-    const getCashGateway = defaultAcc.payment_method.find(method => method.title.toLowerCase() === 'cash');
+    const getCashGateway = defaultAcc.payment_method.find((method) => method.title.toLowerCase() === 'cash');
 
     if (!getCashGateway) return;
-    setGatewayOption(defaultAcc.payment_method.map((j) => ({
-      label: j.title,
-      id: j.id
-    })));
-    const customizeSelectedGateway = { label: getCashGateway.title, id: getCashGateway.id }
-    console.log({ customizeSelectedGateway })
-    setSelectedGateway(customizeSelectedGateway)
-
-  }, [accounts])
+    setGatewayOption(
+      defaultAcc.payment_method.map((j) => ({
+        label: j.title,
+        id: j.id
+      }))
+    );
+    const customizeSelectedGateway = { label: getCashGateway.title, id: getCashGateway.id };
+    console.log({ customizeSelectedGateway });
+    setSelectedGateway(customizeSelectedGateway);
+  }, [accounts]);
 
   useEffect(() => {
     console.log({ accounts, selectedAccount, selectedGateway });
-  }, [selectedGateway])
+  }, [selectedGateway]);
 
   return (
     <>
@@ -642,6 +645,7 @@ function Managementschools() {
           minHeight="fit-content"
         >
           <LeftBox
+            setSelectAll={setSelectAll}
             selected_month={selected_month}
             setSelectMonth={setSelectMonth}
             debounceTimeout={500}
@@ -667,12 +671,12 @@ function Managementschools() {
           mt={1}
           display="grid"
           gridTemplateColumns={{
-            xs: '1fr',
-            // md: '1fr 1fr' 
+            xs: '1fr'
+            // md: '1fr 1fr'
           }}
           columnGap={1}
           gap={{ xs: 1 }}
-        // minHeight="fit-content"
+          // minHeight="fit-content"
         >
           <LeftFeesTable
             leftFeesTableData={leftFeesTableData}
@@ -688,11 +692,9 @@ function Managementschools() {
             selectedRows={selectedRowsFeesTable}
             setSelectedRows={setSelectedRowsFeesTable}
           />
-
-
         </Grid>
 
-        <Grid display="grid" gridTemplateColumns={{ md: "30vh 1fr" }} px={1} mt={1} gap={1}>
+        <Grid display="grid" gridTemplateColumns={{ md: '30vh 1fr' }} px={1} mt={1} gap={1}>
           <RightFeesTable
             collect_other_fees_btn={collect_other_fees_btn}
             setCollect_other_fees_btn={setCollect_other_fees_btn}

@@ -179,7 +179,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
           onSubmit={handleSubmit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-            console.log({ values, errors })
+            // console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent

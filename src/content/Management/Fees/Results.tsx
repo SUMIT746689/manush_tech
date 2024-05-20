@@ -112,14 +112,19 @@ const applyFilters = (
     let matches = true;
 
     if (query) {
-      const properties = ['title', 'id', 'amount'];
-      const nestedProperties = "fees_head"
+      const properties = ['name', 'title', 'id', 'amount'];
+      const nestedProperties = ["fees_head", "class"]
       let containsQuery = false;
 
       properties.forEach((property) => {
-        if (project[property]?.toString().toLowerCase().includes(query.toLowerCase()) || (project[nestedProperties] && project[nestedProperties][property]?.toString().toLowerCase().includes(query.toLowerCase()))) {
-          containsQuery = true;
+        if (project[property]?.toString().toLowerCase().includes(query.toLowerCase())) {
+          return containsQuery = true;
         }
+        nestedProperties.forEach(nestedProperty => {
+          if (project[nestedProperty] && project[nestedProperty][property]?.toString().toLowerCase().includes(query.toLowerCase())) {
+            containsQuery = true
+          }
+        })
       });
 
       if (filters.status && project.status !== filters.status) {
@@ -161,7 +166,7 @@ const Results: FC<ResultsProps> = ({
   const { showNotification } = useNotistick();
 
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(5);
+  const [limit, setLimit] = useState<number>(12);
   const [searchValue, setSearchValue] = useState<string | null>(null)
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
@@ -237,7 +242,7 @@ const Results: FC<ResultsProps> = ({
       showNotification(err?.response?.data?.message, 'error');
     }
   };
-  console.log({page})
+  console.log({ page })
   return (
     <>
       <Card
@@ -298,7 +303,7 @@ const Results: FC<ResultsProps> = ({
               onRowsPerPageChange={handleLimitChange}
               page={page}
               rowsPerPage={limit}
-              rowsPerPageOptions={[50, 5, 10, 15]}
+              rowsPerPageOptions={[12, 24, 36, 50]}
             />
           </Box>
         )}

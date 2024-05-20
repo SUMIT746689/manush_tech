@@ -9,7 +9,7 @@ const userHandler = (req, res, refresh_token, dcryptAcademicYear) => {
 
   switch (method) {
     case 'GET':
-      get(req, res, refresh_token);
+      get(req, res, refresh_token, dcryptAcademicYear);
       break;
     case 'POST':
       post(req, res, refresh_token, dcryptAcademicYear);

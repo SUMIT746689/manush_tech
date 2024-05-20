@@ -1,17 +1,18 @@
 import prisma from "@/lib/prisma_client";
 import { logFile } from "utilities_api/handleLogFile";
 
-export default async function get(req: any, res: any, refresh_token) {
+export default async function get(req: any, res: any, refresh_token, dcryptAcademicYear) {
   try {
-
+    const { id: academic_year_id } = dcryptAcademicYear;
     if (!refresh_token.school_id) throw new Error('invalid user');
     const where = {
       school_id: refresh_token.school_id,
-      deleted_at: null
+      deleted_at: null,
+      academic_year_id
     }
-    if (req.query.academic_year_id) {
-      where['academic_year_id'] = Number(req.query.academic_year_id)
-    }
+    // if (req.query.academic_year_id) {
+    //   where['academic_year_id'] = Number(req.query.academic_year_id)
+    // }
     if (req.query.class_id) {
       where['class_id'] = Number(req.query.class_id)
     }

@@ -62,7 +62,7 @@ function ManagementFees() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results sessions={datas} setEditData={setEditData} />
+          <Results sessions={datas} setEditData={setEditData} reFetchData={reFetchData} />
         </Grid>
       </Grid>
       <Footer />

@@ -49,6 +49,9 @@ import { formatNumber } from '@/utils/numberFormat';
 import { useAuth } from '@/hooks/useAuth';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
 import { DebounceInput } from '@/components/DebounceInput';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
+import { DialogActionWrapper } from '@/components/DialogWrapper';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -85,6 +88,7 @@ const ButtonError = styled(Button)(
 interface ResultsProps {
   sessions: Project[];
   setEditData: Function;
+  reFetchData: Function;
 }
 
 interface Filters {
@@ -109,10 +113,11 @@ const applyFilters = (
 
     if (query) {
       const properties = ['title', 'id', 'amount'];
+      const nestedProperties = "fees_head"
       let containsQuery = false;
 
       properties.forEach((property) => {
-        if (project[property]?.toString().toLowerCase().includes(query.toLowerCase())) {
+        if (project[property]?.toString().toLowerCase().includes(query.toLowerCase()) || (project[nestedProperties] && project[nestedProperties][property]?.toString().toLowerCase().includes(query.toLowerCase()))) {
           containsQuery = true;
         }
       });
@@ -148,7 +153,8 @@ const applyPagination = (
 
 const Results: FC<ResultsProps> = ({
   sessions,
-  setEditData
+  setEditData,
+  reFetchData
 }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
@@ -221,17 +227,17 @@ const Results: FC<ResultsProps> = ({
 
   const handleDeleteCompleted = async () => {
     try {
-      const result = await axios.delete(`/api/fees/${deleteSchoolId}`);
+      const result = await axios.delete(`/api/fee/${deleteSchoolId}`);
       setOpenConfirmDelete(false);
       if (!result.data?.success) throw new Error('unsuccessful delete');
       showNotification('The fees has been deleted successfully');
-
+      reFetchData()
     } catch (err) {
       setOpenConfirmDelete(false);
       showNotification(err?.response?.data?.message, 'error');
     }
   };
-
+  console.log({page})
   return (
     <>
       <Card
@@ -247,7 +253,10 @@ const Results: FC<ResultsProps> = ({
                 debounceTimeout={500}
                 handleDebounce={(v) => setQuery(v)}
                 value={searchValue}
-                handleChange={(v) => setSearchValue(v.target?.value)}
+                handleChange={(v) => {
+                  setSearchValue(v.target?.value);
+                  setPage(0)
+                }}
                 label={'Search by fees title, id or amount......'}
                 InputProps={{
                   startAdornment: (
@@ -262,7 +271,7 @@ const Results: FC<ResultsProps> = ({
         </Grid>
       </Card>
 
-      <Card sx={{ minHeight: 'calc(100vh - 438px) !important' }}>
+      <Card sx={{ minHeight: 'calc(100vh - 438px) !important', borderRadius: 0 }}>
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />
@@ -270,25 +279,26 @@ const Results: FC<ResultsProps> = ({
         )}
         {!selectedBulkActions && (
           <Box
-            p={2}
+            borderRadius={0}
+            px={2}
             display="flex"
             alignItems="center"
             justifyContent="space-between"
           >
-            <Box>
-              <Typography component="span" variant="subtitle1">
+            <Box fontSize={12}>
+              <Typography component="span" variant="subtitle1" fontSize={12}>
                 {t('Showing')}:
               </Typography>{' '}
               <b>{paginatedFees.length}</b> <b>{t('fees')}</b>
             </Box>
             <TablePagination
-              component="div"
+              sx={{ fontSize: 11, ':root': { fontSize: 10 } }}
               count={filteredschools.length}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleLimitChange}
               page={page}
               rowsPerPage={limit}
-              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPageOptions={[50, 5, 10, 15]}
             />
           </Box>
         )}
@@ -304,22 +314,22 @@ const Results: FC<ResultsProps> = ({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell padding="checkbox">
+                      <TableHeaderCellWrapper padding="checkbox">
                         {/* <Checkbox
                         checked={selectedAllschools}
                         indeterminate={selectedSomeschools}
                         onChange={handleSelectAllschools}
                       /> */}
-                        <TableCell align="center">{t('ID')}</TableCell>
-                      </TableCell>
-                      <TableCell>{t('Title')}</TableCell>
-                      <TableCell>{t('Fee for')}</TableCell>
-                      <TableCell>{t('Amount')}</TableCell>
-                      <TableCell>{t('Class')}</TableCell>
-                      <TableCell>{t('Last date')}</TableCell>
-                      <TableCell>{t('Late fee Fine')}</TableCell>
-
-                      <TableCell align="center">{t('Actions')}</TableCell>
+                        <Grid>{t('ID')}</Grid>
+                      </TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Fee Head')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Fee')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Fee for')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Amount')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Last date')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper>{t('Late fee')}</TableHeaderCellWrapper>
+                      <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -334,7 +344,7 @@ const Results: FC<ResultsProps> = ({
                           key={fee.id}
                           selected={isschoolselected}
                         >
-                          <TableCell padding="checkbox">
+                          <TableBodyCellWrapper padding="checkbox">
                             {/* <Checkbox
                             checked={isschoolselected}
                             onChange={(event) =>
@@ -342,65 +352,42 @@ const Results: FC<ResultsProps> = ({
                             }
                             value={isschoolselected}
                           /> */}
-                            <Typography noWrap align="center" variant="h5">
+                            {/* <Typography noWrap align="center" variant="h5"> */}
+                            <Grid>
                               {fee.id}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5">
-                              {fee.title}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5">
-                              {fee?.for}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5">
-                              {formatNumber(fee.amount)} {currency}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5">
-                              {fee.class?.name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5" sx={{
-                              color: 'green'
-                            }}>
-                              {dayjs(fee?.last_date).format('YYYY-MM-DD , HH:mm')}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography noWrap variant="h5">
-                              {fee?.late_fee ? formatNumber(fee?.late_fee?.toFixed(2)) : 0} {currency}
-                            </Typography>
-                          </TableCell>
+                            </Grid>
+                            {/* </Typography> */}
+                          </TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{fee?.fees_head?.title}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{fee?.title}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{fee?.for}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{formatNumber(fee.amount)} {currency}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{fee.class?.name}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper color='green'>{dayjs(fee?.last_date).format('YYYY-MM-DD , HH:mm')}</TableBodyCellWrapper>
+                          <TableBodyCellWrapper>{fee?.late_fee ? formatNumber(fee?.late_fee?.toFixed(2)) : 0} {currency}</TableBodyCellWrapper>
 
-                          <TableCell align="center">
-                            <Typography noWrap>
+                          <TableBodyCellWrapper align="center" width={60}>
+                            <Typography noWrap py={0.25} display="flex" justifyContent="center" columnGap={0.5}>
                               <Tooltip title={t('Edit')} arrow>
                                 <IconButton
+                                  size='small'
                                   onClick={() => setEditData(fee)}
                                   color="primary"
                                 >
-                                  <LaunchTwoToneIcon fontSize="small" />
+                                  <LaunchTwoToneIcon sx={{ fontSize: 14 }} fontSize="small" />
                                 </IconButton>
                               </Tooltip>
-                              {/* <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={() =>
-                                  handleConfirmDelete(fee.id)
-                                }
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip> */}
+                              <Tooltip title={t('Delete')} arrow>
+                                <IconButton
+                                  size='small'
+                                  onClick={() => handleConfirmDelete(fee.id)}
+                                  color="primary"
+                                >
+                                  <DeleteTwoToneIcon sx={{ fontSize: 14, color: "red" }} fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </Typography>
-                          </TableCell>
+                          </TableBodyCellWrapper>
                         </TableRow>
                       );
                     })}
@@ -415,7 +402,7 @@ const Results: FC<ResultsProps> = ({
 
       <DialogWrapper
         open={openConfirmDelete}
-        maxWidth="sm"
+        maxWidth="xs"
         fullWidth
         TransitionComponent={Transition}
         keepMounted
@@ -426,10 +413,10 @@ const Results: FC<ResultsProps> = ({
           alignItems="center"
           justifyContent="center"
           flexDirection="column"
-          p={5}
+          p={1}
         >
-          <AvatarError>
-            <CloseIcon />
+          <AvatarError sx={{ width: 50, height: 50 }}>
+            <CloseIcon sx={{ p: 1 }} />
           </AvatarError>
 
           <Typography
@@ -438,9 +425,9 @@ const Results: FC<ResultsProps> = ({
               pt: 4,
               px: 6
             }}
-            variant="h3"
+            variant="h5"
           >
-            {t('Do you really want to delete this project')}?
+            {t('Do you really want to delete this fee')}?
           </Typography>
 
           <Typography
@@ -457,28 +444,14 @@ const Results: FC<ResultsProps> = ({
             {t("You won't be able to revert after deletion")}
           </Typography>
 
-          <Box>
-            <Button
-              variant="text"
-              size="large"
-              sx={{
-                mx: 1
-              }}
-              onClick={closeConfirmDelete}
-            >
+          <Box display="flex" columnGap={2}>
+            <ButtonWrapper handleClick={closeConfirmDelete} color="error">
               {t('Cancel')}
-            </Button>
-            <ButtonError
-              onClick={handleDeleteCompleted}
-              size="large"
-              sx={{
-                mx: 1,
-                px: 3
-              }}
-              variant="contained"
-            >
+            </ButtonWrapper>
+
+            <ButtonWrapper variant="outlined" handleClick={handleDeleteCompleted}>
               {t('Delete')}
-            </ButtonError>
+            </ButtonWrapper>
           </Box>
         </Box>
       </DialogWrapper>

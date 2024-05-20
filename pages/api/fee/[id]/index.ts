@@ -1,22 +1,23 @@
+import deleteFee from "controllers/fee/single_fee/delete";
 import patchFee from "controllers/fee/single_fee/patch";
+import { academicYearVerify, authenticate } from "middleware/authenticate";
 import { logFile } from "utilities_api/handleLogFile";
 
-export default function userHandler(req, res) {
+function userHandler(req, res, refresh_token, dcryptAcademicYear) {
   const { method } = req;
 
   switch (method) {
-    // case 'GET':
-    //   // get(req, res);
-    //   break;
-    // case 'POST':
-    //   // post(req, res);
-    //   break;
     case 'PATCH':
       patchFee(req, res);
       break;
+    case 'DELETE':
+      deleteFee(req, res, refresh_token, dcryptAcademicYear);
+      break;
     default:
-      res.setHeader('Allow', ['PATCH']);
+      res.setHeader('Allow', ['PATCH', 'DELETE']);
       logFile.error(`Method ${method} Not Allowed`);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
+
+export default authenticate(academicYearVerify(userHandler))

@@ -169,7 +169,7 @@ export default function LeftFeesTable({
       >
         <TableHead>
           <TableRow>
-            <TableHeaderCellWrapper align="center">
+            <TableHeaderCellWrapper align="center" width={10}>
               <Checkbox
                 size="small"
                 indeterminate={selectedRows.length > 0 && selectedRows.length < tableData.length}

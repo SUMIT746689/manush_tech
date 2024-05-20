@@ -4,9 +4,8 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 export default async function post(req, res, refresh_token, dcryptAcademicYear) {
   try {
-    console.log({ dcryptAcademicYear })
     const { id: academic_year_id } = dcryptAcademicYear;
-    const { fees_head_id, frequency, amount, last_date, class_id, school_id, late_fee, months } = req.body;
+    const { fees_head_id, amount, last_date, class_id, school_id, late_fee, months } = req.body;
 
     if (!fees_head_id || !amount || !last_date || !academic_year_id || !class_id || !school_id) throw new Error('provide all valid information');
     const data = { fees_head_id, amount, last_date: new Date(last_date), academic_year_id, class_id, school_id };
@@ -24,6 +23,24 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
     // const lastDateOfMonth = (date = new Date()) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
     // console.log(lastDateOfMonth())
     const today = new Date();
+
+    const resAlreadyCreatedFees = await prisma.fee.findMany({
+      where: {
+        AND: [
+          { fees_head_id },
+          { academic_year_id },
+          { class_id },
+          { fees_month: { in: months } },
+          { deleted_at: null }
+        ]
+      },
+      select: { fees_month: true }
+    });
+
+    if (resAlreadyCreatedFees.length !== 0) {
+      const alreadyCreatedFeesMonths = resAlreadyCreatedFees.map(fee => fee.fees_month).join(',');
+      throw new Error(`month: ${alreadyCreatedFeesMonths} fees already created...`)
+    }
 
     for (const month of months) {
       const monthIndex = monthList.indexOf(month);
@@ -49,11 +66,9 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
         }
       });
     }
-
     res.status(200).json({ success: true });
   } catch (err) {
     logFile.error(err.message);
-    console.log(err.message);
-    res.status(404).json({ err: err.message });
+    res.status(404).json({ error: err.message });
   }
 }

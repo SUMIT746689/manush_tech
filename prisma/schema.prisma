@@ -487,6 +487,7 @@ model Fee {
   class_id         Int
   school_id        Int
   fees_head_id     Int?
+  deleted_at       DateTime?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
@@ -496,7 +497,7 @@ model Fee {
   Discount            Discount[]
   waiverFeesToStudent Student[]    @relation("WaiverFeesToStudent")
 
-  @@unique([fees_month, fees_head_id, class_id, academic_year_id])
+  // @@unique([fees_month, fees_head_id, class_id, academic_year_id])
   @@map("fees")
 }
 

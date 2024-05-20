@@ -63,9 +63,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
 
   const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
     try {
-
-      console.log("submit");
-
       const successResponse = (message) => {
         showNotification('fees ' + message + ' successfully');
         resetForm();
@@ -76,21 +73,19 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       };
       _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
       _values['late_fee'] = parseFloat(_values.late_fee)
-      _values['months'] = _values.months.map(month => month.value)
+      const customMonths = _values.months.map(month => month.value);
       // dayjs(_values.last_date).format('YYYY-MM-DD')
 
       if (editData) {
-        const res = await axios.patch(`/api/fee/${editData.id}`, _values);
+        const res = await axios.patch(`/api/fee/${editData.id}`, { ..._values, months: customMonths });
         successResponse('updated');
       } else {
         _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
-        const res = await axios.post(`/api/fee`, _values);
+        const res = await axios.post(`/api/fee`, { ..._values, months: customMonths });
         successResponse('created');
       }
     } catch (err) {
-      handleShowErrMsg(err,showNotification);
-      console.error(err);
-      showNotification(err?.response?.data?.message, 'error')
+      handleShowErrMsg(err, showNotification);
       setStatus({ success: false });
       //@ts-ignore
       setErrors({ submit: err.message });
@@ -184,7 +179,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
           onSubmit={handleSubmit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-            // console.log({ values, errors })
+            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -247,7 +242,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       // @ts-ignore
                       handleChange={(e, value: any) => setFieldValue('class_id', value?.value || 0)}
                     />
-                    
+
                     <Grid></Grid>
 
                     {/* <Grid item minWidth="100%">
@@ -346,7 +341,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     !editData && <Grid item columnGap={1} pt={1}>
                       <AutoCompleteWrapperWithoutRenderInput
                         minWidth="100%"
-                        label="Select multiple month"
+                        label="Select Month"
                         placeholder="Month..."
                         multiple
                         value={values.months}
@@ -367,51 +362,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       }
 
                     </Grid>
-                  }
-
-
-                  {
-                    // !editData && checked && <Grid pt={1}>
-
-                    //   {
-                    //     values?.months?.map((option, index) => {
-                    //       const onKeyDown = (e) => {
-                    //         e.preventDefault();
-                    //       };
-
-                    //       return <>
-                    //         <DatePicker
-                    //           label={`${option.label} Last Date`}
-                    //           inputFormat='dd/MM/yyyy'
-                    //           value={option.last_date || null}
-                    //           onChange={(n: any) => {
-                    //             const temp = [...values.months];
-                    //             temp[index].last_date = n;
-                    //             console.log(temp);
-                    //             setFieldValue('months', temp);
-                    //           }}
-                    //           renderInput={(params) => (
-                    //             <TextField
-                    //               required
-                    //               size='small'
-                    //               sx={{
-                    //                 [`& fieldset`]: {
-                    //                   borderRadius: 0.6,
-                    //                 },
-                    //                 mb: 1
-                    //               }}
-                    //               {...params}
-                    //               onKeyDown={onKeyDown}
-                    //               fullWidth
-                    //             />
-                    //           )}
-                    //         />
-                    //       </>
-                    //     })
-                    //   }
-
-
-                    // </Grid>
                   }
 
                 </DialogContent>

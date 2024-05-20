@@ -7,6 +7,7 @@ export default async function get(req: any, res: any, refresh_token) {
     if (!refresh_token.school_id) throw new Error('invalid user');
     const where = {
       school_id: refresh_token.school_id,
+      deleted_at: null
     }
     if (req.query.academic_year_id) {
       where['academic_year_id'] = Number(req.query.academic_year_id)
@@ -24,9 +25,10 @@ export default async function get(req: any, res: any, refresh_token) {
             id: true,
             name: true
           }
-        }
+        },
+        fees_head: true
       },
-      orderBy:{
+      orderBy: {
         id: "desc"
       }
     });

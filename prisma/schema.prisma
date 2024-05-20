@@ -479,7 +479,7 @@ model Fee {
   for        String?
   amount     Float
   last_date  DateTime
-  late_fee   Float?
+  late_fee   Float?     @default(0)
   frequency  Frequency?
   fees_month AllMonths?
 
@@ -496,6 +496,7 @@ model Fee {
   Discount            Discount[]
   waiverFeesToStudent Student[]    @relation("WaiverFeesToStudent")
 
+  @@unique([fees_month, fees_head_id, class_id, academic_year_id])
   @@map("fees")
 }
 

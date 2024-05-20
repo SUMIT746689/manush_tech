@@ -30,6 +30,7 @@ import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/co
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
 import { DropDownSelectWrapper } from '@/components/DropDown';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i.toLocaleLowerCase() }))
 
@@ -87,6 +88,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
         successResponse('created');
       }
     } catch (err) {
+      handleShowErrMsg(err,showNotification);
       console.error(err);
       showNotification(err?.response?.data?.message, 'error')
       setStatus({ success: false });
@@ -152,7 +154,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
             _for: editData?.for || undefined,
             academic_year_id: editData?.academic_year_id || academicYear?.id || undefined,
             class_id: editData?.class_id || undefined,
-            frequency: editData?.frequency || undefined,
+            // frequency: editData?.frequency || undefined,
             months: [],
             late_fee: editData?.late_fee || 0,
             submit: null
@@ -182,7 +184,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
           onSubmit={handleSubmit}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-            console.log({ values, errors })
+            // console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -245,8 +247,10 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       // @ts-ignore
                       handleChange={(e, value: any) => setFieldValue('class_id', value?.value || 0)}
                     />
+                    
+                    <Grid></Grid>
 
-                    <Grid item minWidth="100%">
+                    {/* <Grid item minWidth="100%">
                       <DropDownSelectWrapper
                         value={values.frequency}
                         name='frequency'
@@ -254,7 +258,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                         handleChange={handleChange}
                         menuItems={['on_demand', 'half_yearly', 'monthly', 'annual']}
                       />
-                    </Grid>
+                    </Grid> */}
 
                     {/* Amount */}
                     <TextFieldWrapper

@@ -13,7 +13,7 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
 
     if (req.body.for) data['for'] = req.body.for;
     if (late_fee) data['late_fee'] = late_fee;
-    console.log({ months })
+    // console.log({ months })
 
     if (months?.length === 0) throw new Error('provide valid month field information');
     // if (months && months.length) {

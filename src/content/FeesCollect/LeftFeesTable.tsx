@@ -28,19 +28,19 @@ const rows = [
 
 const TableHeaderCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 0, fontSize: { xs: 9, md: 10, xl: 11 } }} {...parmas}> {children} </TableCell>
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 9, md: 10, xl: 11 } }} {...parmas}> {children} </TableCell>
   )
 }
 
 const TableCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 0, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
   )
 }
 
 const TableFooterCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 1, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}> {children} </TableCell>
   )
 }
 

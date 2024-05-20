@@ -9,14 +9,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { TextFieldWrapper } from '@/components/TextFields';
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-  due: number
-) {
+function createData(name: string, calories: number, fat: number, carbs: number, protein: number, due: number) {
   return { name, calories, fat, carbs, protein, due };
 }
 
@@ -48,10 +41,7 @@ export default function LeftFeesTable({
 
       for (let i = 0; i < newSelectedRows.length; i++) {
         for (let j = 0; j < tableData.length; j++) {
-          if (
-            tableData[j].feeId === newSelectedRows[i] &&
-            tableData[j].dueAmount > 0
-          ) {
+          if (tableData[j].feeId === newSelectedRows[i] && tableData[j].dueAmount > 0) {
             newArrSelectedRow.push(newSelectedRows[i]);
           }
         }
@@ -81,10 +71,7 @@ export default function LeftFeesTable({
     } else if (selectedIndex === selectedRows.length - 1) {
       newSelected = newSelected.concat(selectedRows.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1)
-      );
+      newSelected = newSelected.concat(selectedRows.slice(0, selectedIndex), selectedRows.slice(selectedIndex + 1));
     }
 
     // check if dueAmount is 0 or greater than
@@ -99,10 +86,7 @@ export default function LeftFeesTable({
 
     for (let i = 0; i < newSelected.length; i++) {
       for (let j = 0; j < tableData.length; j++) {
-        if (
-          tableData[j].feeId === newSelected[i] &&
-          tableData[j].dueAmount > 0
-        ) {
+        if (tableData[j].feeId === newSelected[i] && tableData[j].dueAmount > 0) {
           newSelectedRow.push(newSelected[i]);
         }
       }
@@ -151,18 +135,12 @@ export default function LeftFeesTable({
 
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0.5 }}>
-      <Table
-        sx={{ minWidth: 650, height: tableData.length === 0 ? 250 : '' }}
-        aria-label="simple table"
-      >
+      <Table sx={{ minWidth: 650, height: tableData.length === 0 ? 250 : '' }} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>
               <Checkbox
-                indeterminate={
-                  selectedRows.length > 0 &&
-                  selectedRows.length < tableData.length
-                }
+                indeterminate={selectedRows.length > 0 && selectedRows.length < tableData.length}
                 checked={selectAll}
                 onChange={handleSelectAllClick}
               />
@@ -192,15 +170,9 @@ export default function LeftFeesTable({
         </TableHead>
         <TableBody>
           {tableData.map((row) => (
-            <TableRow
-              key={row.title}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
+            <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell>
-                <Checkbox
-                  checked={selectedRows.indexOf(row.feeId) !== -1}
-                  onChange={(event) => handleClick(event, row.feeId)}
-                />
+                <Checkbox checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
               </TableCell>
               <TableCell component="th" scope="row">
                 {row.head_title}
@@ -215,11 +187,7 @@ export default function LeftFeesTable({
 
               <TableCell>
                 <TextFieldWrapper
-                  disabled={
-                    selectedRows.find((item) => item === row.feeId)
-                      ? false
-                      : true
-                  }
+                  disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
                   label="Amount"
                   name=""
                   type="number"
@@ -241,38 +209,18 @@ export default function LeftFeesTable({
           {tableData.length === 0 ? (
             ''
           ) : (
-            <TableRow
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
+            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row"></TableCell>
               <TableCell component="th" scope="row">
                 {leftFeesTableTotalCalculation && 'Total'}
               </TableCell>
-              <TableCell align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.amount}
-              </TableCell>
-              <TableCell align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.late_fee}
-              </TableCell>
-              <TableCell align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.discount}
-              </TableCell>
-              <TableCell align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.paidAmount}
-              </TableCell>
-              <TableCell align="center">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.currDiscount}
-              </TableCell>
+              <TableCell align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.amount}</TableCell>
+              <TableCell align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.late_fee}</TableCell>
+              <TableCell align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.discount}</TableCell>
+              <TableCell align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount}</TableCell>
+              <TableCell align="center">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount}</TableCell>
 
-              <TableCell align="right">
-                {leftFeesTableTotalCalculation &&
-                  leftFeesTableTotalCalculation.dueAmount}
-              </TableCell>
+              <TableCell align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount}</TableCell>
             </TableRow>
           )}
         </TableBody>

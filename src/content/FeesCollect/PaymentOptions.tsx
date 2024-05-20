@@ -80,9 +80,7 @@ const PaymentOptions = ({
   }, [selectedRows, tableData]);
 
   // handleCollectFunction
-  const handleCollect = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleCollect = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const dueAmount = [];
 
     for (let i = 0; i < selectedRows.length; i++) {
@@ -92,10 +90,7 @@ const PaymentOptions = ({
         }
       }
     }
-    const totalDueAmount = dueAmount.reduce(
-      (accumulator, currentValue) => accumulator + currentValue,
-      0
-    );
+    const totalDueAmount = dueAmount.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
     if (!selectedAccount?.id) {
       showNotification('please select bank account.', 'error');
@@ -134,43 +129,33 @@ const PaymentOptions = ({
       // showNotification('please fill out amount field.', 'error');
       // return;
     } else if (parseInt(amount) > parseInt(total_amount)) {
-      showNotification(
-        'The amount is less than or equal to the due amount.',
-        'error'
-      );
+      showNotification('The amount is less than or equal to the due amount.', 'error');
       return;
     } else if (total_amount === amount) {
     } else if (amount < total_amount) {
       // amount = 35000
       copy_dueAmount_arr.pop();
-      const total_amount_without_last_item = copy_dueAmount_arr.reduce(
-        (accumulator, currentValue) => {
-          // 30000 user input is 31000 selected item 3
-          return accumulator + currentValue;
-        },
-        0
-      );
+      const total_amount_without_last_item = copy_dueAmount_arr.reduce((accumulator, currentValue) => {
+        // 30000 user input is 31000 selected item 3
+        return accumulator + currentValue;
+      }, 0);
 
       if (parseInt(total_amount_without_last_item) === parseInt(amount)) {
         // error message because now have no remaining value for last item
-        showNotification(
-          'please deselect the last row in the table as it does not contain any remaining values.',
-          'error'
-        );
+        showNotification('please deselect the last row in the table as it does not contain any remaining values.', 'error');
         return;
       } else if (parseInt(amount) < parseInt(total_amount_without_last_item)) {
         // error message because now amount is less than selected first 2 items but user already select 3rd items.
         showNotification(
-          `The amount is less than the total number of selected items (${error_row_count + 1
-          }) but the user has selected (${selectedRows.length
+          `The amount is less than the total number of selected items (${error_row_count + 1}) but the user has selected (${
+            selectedRows.length
           }) items. Please adjust the amount or deselect some items.`,
           'error'
         );
         return;
       } else if (parseInt(amount) > parseInt(total_amount_without_last_item)) {
         // user select 3 items andd amount is 31000 so first 2 items total value is 30000 now remaining value is 1000. So this value will be added for next item that means 3rd items
-        remaining_due_value =
-          parseInt(amount) - parseInt(total_amount_without_last_item); // amount = 31000, total_amount_without_lat_item = 30000 , result = 1000
+        remaining_due_value = parseInt(amount) - parseInt(total_amount_without_last_item); // amount = 31000, total_amount_without_lat_item = 30000 , result = 1000
         copy_dueAmount_arr.push(remaining_due_value);
       }
     }
@@ -217,24 +202,14 @@ const PaymentOptions = ({
         //  fee_id: selectedRows,  // optional
         account_id: selectedAccount?.id,
         payment_method_id: selectedGateway?.id,
-        collected_amount: amount
-          ? parseInt(totalFeesCalculate) - parseInt(amount)
-          : parseInt(totalFeesCalculate),
+        collected_amount: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate),
         transID: transID ? transID : null,
-        total_payable: [
-          amount
-            ? parseInt(totalFeesCalculate) - parseInt(amount)
-            : parseInt(totalFeesCalculate)
-        ],
+        total_payable: [amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate)],
         sent_sms: false,
         collect_filter_data: [
           {
-            collected_amount: amount
-              ? parseInt(totalFeesCalculate) - parseInt(amount)
-              : parseInt(totalFeesCalculate),
-            total_payable: amount
-              ? parseInt(totalFeesCalculate) - parseInt(amount)
-              : parseInt(totalFeesCalculate)
+            collected_amount: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate),
+            total_payable: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate)
           }
         ],
         fees_name: feesName
@@ -259,15 +234,11 @@ const PaymentOptions = ({
       .then((res) => {
         if (res.data.success) {
           const printResult = res?.data?.result.map((item, i) => {
-            const last_date = new Date(
-              item?.last_date ? item?.last_date : ''
-            ).getTime();
+            const last_date = new Date(item?.last_date ? item?.last_date : '').getTime();
             const today = new Date(collectionDate).getTime();
 
             return {
-              on_time_discount: item?.on_time_discount
-                ? item?.on_time_discount
-                : 0,
+              on_time_discount: item?.on_time_discount ? item?.on_time_discount : 0,
               fee_id: item?.fee_id ? item?.fee_id : '',
               paidAmount: item?.collect_amount,
               tracking_number: item?.tracking_number,
@@ -292,10 +263,7 @@ const PaymentOptions = ({
           deSelectAllCheckbox();
           setFeesAmount('');
           setFeesName('');
-          showNotification(
-            `Congratulations! Payment Successfully Processed`,
-            'success'
-          );
+          showNotification(`Congratulations! Payment Successfully Processed`, 'success');
         }
       })
       .catch((error) => {
@@ -350,8 +318,7 @@ const PaymentOptions = ({
           setSelectedGateway(value);
         }}
       />
-      {
-        (selectedGateway?.label && selectedGateway?.label !== 'Cash') &&
+      {selectedGateway?.label && selectedGateway?.label !== 'Cash' && (
         <TextFieldWrapper
           label="trans ID"
           name=""
@@ -364,8 +331,8 @@ const PaymentOptions = ({
           handleBlur={undefined}
           required={selectedGateway?.label !== 'Cash' ? true : false}
         />
-      }
-      
+      )}
+
       <TextFieldWrapper
         // disabled={selectedRows.length > 1 ? true : false}
         label="Amount"
@@ -397,18 +364,13 @@ const PaymentOptions = ({
         touched={undefined}
         errors={undefined}
         value={totalFeesCalculate || ''}
-        handleChange={() => { }}
+        handleChange={() => {}}
         handleBlur={undefined}
       />
       <Grid>
         <Button
           variant="contained"
-          disabled={
-            (selectedRows.length > 0 || totalFeesCalculate > 0) &&
-              feesUserData?.id
-              ? false
-              : true
-          }
+          disabled={(selectedRows.length > 0 || totalFeesCalculate > 0) && feesUserData?.id ? false : true}
           //disabled={feesUserData?.id ? false : true}
           onClick={handleCollect}
           sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}

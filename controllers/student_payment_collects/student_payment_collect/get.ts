@@ -11,16 +11,12 @@ export const get = async (req, res) => {
     if (!id) throw new Error('provide student_id');
 
     const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
-    if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error("provide a valid month");
+    if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error('provide a valid month');
 
     const dateFilter = {},
       query = {};
-    if (fromDate)
-      dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0));
-    if (toDate)
-      dateFilter['lte'] = new Date(
-        new Date(toDate).setUTCHours(23, 59, 59, 999)
-      );
+    if (fromDate) dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0));
+    if (toDate) dateFilter['lte'] = new Date(new Date(toDate).setUTCHours(23, 59, 59, 999));
 
     if (fromDate || toDate) query['created_at'] = dateFilter;
 
@@ -71,10 +67,7 @@ export const get = async (req, res) => {
                 name: true,
                 fees: {
                   where: {
-                    AND: [
-                      { academic_year_id: Number(academic_year_id) },
-                      { fees_month: lowerCaseMonth }
-                    ]
+                    AND: [{ academic_year_id: Number(academic_year_id) }, { fees_month: lowerCaseMonth }]
                   },
                   include: {
                     fees_head: true
@@ -87,17 +80,12 @@ export const get = async (req, res) => {
       }
     });
 
-    const waiver_fee =
-      all_fees?.waiver_fees?.length > 0
-        ? all_fees?.waiver_fees?.map((i) => i.id)
-        : [];
+    const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map((i) => i.id) : [];
 
     const fees = all_fees.section.class.fees
       ?.filter((i) => !waiver_fee.includes(i.id))
       ?.map((fee) => {
-        const findStudentFee: any = student_fee.filter(
-          (pay_fee) => pay_fee.fee?.id === fee.id
-        );
+        const findStudentFee: any = student_fee.filter((pay_fee) => pay_fee.fee?.id === fee.id);
 
         // updated on_time_discount calculation code start
         if (findStudentFee.length > 0) {
@@ -123,9 +111,7 @@ export const get = async (req, res) => {
         if (findStudentFeeSize) {
           // console.log("findStudentFee__",findStudentFee);
 
-          const discount = all_fees?.discount?.filter(
-            (i) => i.fee_id == fee.id
-          );
+          const discount = all_fees?.discount?.filter((i) => i.fee_id == fee.id);
           // console.log("discount1__", discount);
 
           const totalDiscount = discount.reduce((a, c) => {
@@ -133,93 +119,64 @@ export const get = async (req, res) => {
             else return a + c.amt;
           }, 0);
           const feeAmount = fee.amount - totalDiscount;
-          fee['amount'] = feeAmount;
-          const paidAmount = findStudentFee.reduce(
-            (a, c) => a + c.collected_amount,
-            0
-          );
+          // old
+          //  fee['amount'] = feeAmount;
+          fee['amount'] = fee.amount;
+          const paidAmount = findStudentFee.reduce((a, c) => a + c.collected_amount, 0);
 
           const last_date = new Date(fee.last_date);
-          const last_trnsation_date = new Date(
-            findStudentFee[findStudentFeeSize - 1].created_at
-          );
+          const last_trnsation_date = new Date(findStudentFee[findStudentFeeSize - 1].created_at);
 
-          if (
-            last_trnsation_date > last_date &&
-            paidAmount >= feeAmount + late_fee
-          ) {
+          if (last_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) {
             return {
               ...fee,
-              last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
-              on_time_discount:
-                findStudentFee[findStudentFeeSize - 1].on_time_discount,
+              last_payment_date: findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount: findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'paid late',
               paidAmount,
-              collected_by_user:
-                findStudentFee[findStudentFeeSize - 1]?.collected_by_user
-                  ?.username
+              collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
             };
-          } else if (
-            last_trnsation_date > last_date &&
-            feeAmount == paidAmount &&
-            late_fee > 0
-          ) {
+          } else if (last_trnsation_date > last_date && feeAmount == paidAmount && late_fee > 0) {
             return {
               ...fee,
-              last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
-              on_time_discount:
-                findStudentFee[findStudentFeeSize - 1].on_time_discount,
+              last_payment_date: findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount: findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'fine unpaid',
               paidAmount,
-              collected_by_user:
-                findStudentFee[findStudentFeeSize - 1]?.collected_by_user
-                  ?.username
+              collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
             };
-          } else if (
-            last_date >= last_trnsation_date &&
-            feeAmount == paidAmount
-          ) {
+          } else if (last_date >= last_trnsation_date && feeAmount == paidAmount) {
             return {
               ...fee,
-              last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
-              on_time_discount:
-                findStudentFee[findStudentFeeSize - 1].on_time_discount,
+              last_payment_date: findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount: findStudentFee[findStudentFeeSize - 1].on_time_discount,
               status: 'paid',
-              collected_by_user:
-                findStudentFee[findStudentFeeSize - 1]?.collected_by_user
-                  ?.username
+              collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
             };
           } else if (paidAmount > 0) {
             return {
               ...fee,
-              last_payment_date:
-                findStudentFee[findStudentFeeSize - 1].collection_date,
-              on_time_discount:
-                findStudentFee[findStudentFeeSize - 1].on_time_discount,
+              last_payment_date: findStudentFee[findStudentFeeSize - 1].collection_date,
+              on_time_discount: findStudentFee[findStudentFeeSize - 1].on_time_discount,
               paidAmount: paidAmount,
               status: 'partial paid',
-              collected_by_user:
-                findStudentFee[findStudentFeeSize - 1]?.collected_by_user
-                  ?.username
+              collected_by_user: findStudentFee[findStudentFeeSize - 1]?.collected_by_user?.username
             };
           } else {
             return { ...fee, status: 'unpaid', on_time_discoun: 0 };
           }
         } else {
-          const discount = all_fees?.discount?.filter(
-            (i) => i.fee_id == fee.id
-          );
+          const discount = all_fees?.discount?.filter((i) => i.fee_id == fee.id);
           // console.log("discount1__", discount);
 
           const totalDiscount = discount.reduce((a, c) => {
             if (c.type == 'percent') return a + (c.amt * fee.amount) / 100;
             else return a + c.amt;
           }, 0);
-          const feeAmount = fee.amount - totalDiscount;
-          fee['amount'] = feeAmount;
+          // old
+          // const feeAmount = fee.amount - totalDiscount;
+          // fee['amount'] = feeAmount;
+          fee['amount'] = fee.amount;
           return { ...fee, status: 'unpaid', on_time_discount: 0 };
         }
       });
@@ -235,8 +192,7 @@ export const get = async (req, res) => {
       for (let i = 0; i < on_time_discount_total_arr.length; i++) {
         for (let j = 0; j < newFees.length; j++) {
           if (on_time_discount_total_arr[i].fee_id === newFees[j].id) {
-            newFees[j].on_time_discount =
-              on_time_discount_total_arr[i].on_time_discount;
+            newFees[j].on_time_discount = on_time_discount_total_arr[i].on_time_discount;
           }
         }
       }

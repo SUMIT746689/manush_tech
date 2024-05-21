@@ -59,7 +59,7 @@ function ManagementFees() {
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        spacing={3}
+        // spacing={3}
       >
         <Grid item xs={12}>
           <Results sessions={datas} setEditData={setEditData} reFetchData={reFetchData} />

@@ -5,23 +5,29 @@ import { logFile } from 'utilities_api/handleLogFile';
 export default async function post(req, res, refresh_token, dcryptAcademicYear) {
   try {
     const { id: academic_year_id } = dcryptAcademicYear;
-    const { fees_head_id, amount, last_date, class_id, school_id, late_fee, months } = req.body;
+    const { fees_head_id, amount, last_date, class_ids, school_id, late_fee, months } = req.body;
 
-    if (!fees_head_id || !amount || !last_date || !academic_year_id || !class_id || !school_id) throw new Error('provide all valid information');
-    const data = { fees_head_id, amount, last_date: new Date(last_date), academic_year_id, class_id, school_id };
+    if (!fees_head_id || !amount || !last_date || !academic_year_id || !class_ids || !school_id) throw new Error('provide all valid information');
+    if (!Array.isArray(class_ids)) throw new Error("invalid class ids field");
+
+    const data = { fees_head_id, amount, last_date: new Date(last_date), academic_year_id, school_id };
 
     if (req.body.for) data['for'] = req.body.for;
     if (late_fee) data['late_fee'] = late_fee;
-    // console.log({ months })
+
+    let haveInvalidClsId = false;
+
+    class_ids.forEach(cls_id => {
+      if (typeof cls_id !== "number") haveInvalidClsId = true;
+    })
+
+    if (haveInvalidClsId) throw new Error("provide number on class_ids field");
 
     if (months?.length === 0) throw new Error('provide valid month field information');
-    // if (months && months.length) {
+
     for (const month of months) {
-      // if (!month.value || !month.last_date)
       if (!monthList.includes(month)) throw new Error('provide valid months !');
     }
-    // const lastDateOfMonth = (date = new Date()) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    // console.log(lastDateOfMonth())
     const today = new Date();
 
     const resAlreadyCreatedFees = await prisma.fee.findMany({
@@ -29,7 +35,7 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
         AND: [
           { fees_head_id },
           { academic_year_id },
-          { class_id },
+          { class_id: { in: class_ids } },
           { fees_month: { in: months } },
           { deleted_at: null }
         ]
@@ -41,30 +47,33 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
       const alreadyCreatedFeesMonths = resAlreadyCreatedFees.map(fee => fee.fees_month).join(',');
       throw new Error(`month: ${alreadyCreatedFeesMonths} fees already created...`)
     }
+    for (const class_id of class_ids) {
 
-    for (const month of months) {
-      const monthIndex = monthList.indexOf(month);
-      const last_date = lastDateOfMonth({ monthInt: monthIndex, date: today })
-      const fee = await prisma.fee.create({
-        data: {
-          ...data,
-          title: month,
-          last_date,
-          fees_month: month
-        }
-      });
-      await prisma.voucher.create({
-        data: {
-          title: `${month} fee`,
-          description: month,
-          amount: data.amount,
-          reference: `${refresh_token.name}, ${refresh_token.role.title.toUpperCase()}`,
-          type: 'credit',
-          resource_type: 'fee',
-          resource_id: fee.id,
-          school_id: refresh_token.school_id
-        }
-      });
+      for (const month of months) {
+        const monthIndex = monthList.indexOf(month);
+        const last_date = lastDateOfMonth({ monthInt: monthIndex, date: today })
+        const fee = await prisma.fee.create({
+          data: {
+            ...data,
+            class_id,
+            title: month,
+            last_date,
+            fees_month: month
+          }
+        });
+        await prisma.voucher.create({
+          data: {
+            title: `${month} fee`,
+            description: month,
+            amount: data.amount,
+            reference: `${refresh_token.name}, ${refresh_token.role.title.toUpperCase()}`,
+            type: 'credit',
+            resource_type: 'fee',
+            resource_id: fee.id,
+            school_id: refresh_token.school_id
+          }
+        });
+      }
     }
     res.status(200).json({ success: true });
   } catch (err) {

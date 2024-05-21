@@ -258,7 +258,6 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
             values,
             setFieldValue
           }) => {
-            console.log({ values, errors })
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -293,10 +292,6 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
                           setSelectedClass(value)
                           setFieldValue('class_id', value)
                         }
-                        // setFieldValue('class_id', value?.value || null);
-                        // setFieldValue('group_id', null);
-                        // if (value) getSelectedClassGroup(value.value);
-                        // else setSelectedClassGroup(null);
                       }}
                     />
 
@@ -376,14 +371,12 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
                     <TimePickerWrapper
                       label="Student Entry Time"
                       value={values.std_entry_time}
-                      // handleChange={(value)=>{console.log({value})}}
                       handleChange={(value) => setFieldValue("std_entry_time", value)}
                     />
 
                     <TimePickerWrapper
                       label="Student Exit Time"
                       value={values.std_exit_time}
-                      // handleChange={handleChange}
                       handleChange={(value) => setFieldValue("std_exit_time", value)}
                     />
 

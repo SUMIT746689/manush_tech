@@ -16,7 +16,6 @@ import Image from 'next/image';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 
 function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
-  console.log({editSchool});
   
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -56,8 +55,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
         reFetchData();
         handleCreateProjectClose();
       };
-
-      console.log("_values__", _values);
 
       if (editSchool) {
         _values['subscription_id'] = editSchool?.subscription[0]?.id
@@ -182,7 +179,6 @@ function PageHeader({ editSchool, setEditSchool, reFetchData }): any {
             values,
             setFieldValue
           }) => {
-            console.log("values__",values);
             
             return (
               <form onSubmit={handleSubmit}>

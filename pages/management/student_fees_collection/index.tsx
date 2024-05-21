@@ -39,6 +39,10 @@ import { monthList } from '@/utils/getDay';
 //   { label: 'November', id: 11 },
 //   { label: 'December', id: 12 }
 // ];
+const currentDate = new Date();
+const monthIndex = currentDate.getMonth();
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const currentMonthName = monthNames[monthIndex];
 const monthData = monthList.map((month) => ({ label: month, value: month }));
 
 // updated searching code end
@@ -69,44 +73,79 @@ function Managementschools() {
   const [leftFeesTableColumnDataState, setLeftFeesTableColumnDataState] = useState<any>();
   //const [currDiscount, setCurrDiscount] = useState<string | null>(null);
   const [currDiscount, setCurrDiscount] = useState({});
-  const [selected_month, setSelectMonth] = useState<string | null>(null);
+  const [onTimeDiscountArr, setOnTimeDiscountArr] = useState<Array<any>>([]);
+  const [selected_month, setSelectMonth] = useState<string | null>(currentMonthName);
   // handleDebounce function
 
-  const handleDebounce = (value) => {
-    if (value?.length >= 3) {
-      axios
-        .get(`/api/student/search-students?search_value=${value?.toLowerCase()}`)
-        .then((res) => {
-          const userInfoArr = res.data.map((item) => {
-            return {
-              label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
-              id: item.id,
-              student_id: item.student_id,
-              student_table_id: item.student_table_id
-            };
-          });
-          setSearchOptionData(userInfoArr);
-        })
-        .catch((error) => {});
-    } else if (value?.length < 3) {
-      setSearchOptionData([]);
-    } else if (!value) {
-      setSearchOptionData([]);
-    }
+  const handleDebounce = async (value) => {
+    try {
+      if (value?.length >= 2) {
+        const res = await axios.get(`/api/student/search-students?search_value=${value?.toLowerCase()}`);
+        const userInfoArr = res?.data?.map((item) => {
+          return {
+            label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
+            id: item.id,
+            student_id: item.student_id,
+            student_table_id: item.student_table_id
+          };
+        });
+        setSearchOptionData(userInfoArr);
+      } else if (value?.length < 2) {
+        setSearchOptionData([]);
+      } else if (!value) {
+        setSearchOptionData([]);
+      }
+    } catch (error) {}
   };
 
   const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
     setSearchValue(v);
   };
   const searchHandleUpdate = async (event: ChangeEvent<HTMLInputElement>, v) => {
+    setUserInformation({});
     setStudentId(v?.student_id || '');
     setSearchValue(v || null);
+
+    // updated code start
+    setSelectedRowsFeesTable([]);
+    setSelectAll(false);
+    setCurrDiscount({});
+    setLeftFeesTableData(() => []);
+    setLeftFeesTableData(() => []);
+
+    if (v?.student_id) {
+      const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
+      if (res?.data?.length > 0) {
+        const response = await axios.get(
+          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+        );
+        // set search level code
+        setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
+
+        setLeftFeesTableColumnDataState(response?.data?.data);
+        leftFeesTableColumnData({ ...response?.data?.data });
+      } else {
+        setSearchValue('');
+        return showNotification('student_id not founds', 'error');
+      }
+    } else if (v?.id && academicYear?.id) {
+      const res = await axios.get(
+        `/api/student_payment_collect/${v.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+      );
+
+      setLeftFeesTableColumnDataState(res?.data?.data);
+      leftFeesTableColumnData(res?.data?.data);
+    }
+    // updated code end
   };
   const datePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setCollectionDate(event);
   };
 
   const leftFeesTableColumnData = (data, default_current_discount = []) => {
+    // console.log('all data is here ******************************************* #################');
+    // console.log(default_current_discount);
+    console.log(data?.fees);
     let totalDue = 0,
       totalCurrentDue = 0;
     let totalObj = {
@@ -189,7 +228,6 @@ function Managementschools() {
         ...item,
         dueAmount: parseInt(item.dueAmount) - parseInt(item.discount),
         mainDueAmount: parseInt(item.dueAmount) - parseInt(item.discount)
-        // on_time_discount: 0
       };
     });
 
@@ -248,14 +286,8 @@ function Managementschools() {
       totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
     });
 
-    // console.log('feesData');
-    // console.log(feesData);
-    // console.log('total Due');
-    // console.log(totalDue);
-    // console.log('total object');
-    // console.log(totalObj);
-
     setLeftFeesTableData(feesData);
+    // setLeftFeesTableData(updated_feesData);
     setTotalDueValue(totalDue.toString());
     setFeesUserData(data);
     setLeftFeesTableTotalCalculation({
@@ -275,6 +307,7 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
+
     if (student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${student_id?.toLowerCase()}`);
       if (res?.data?.length > 0) {
@@ -333,8 +366,8 @@ function Managementschools() {
     setLeftFeesTableData([]);
     setFeesName('');
     setFeesAmount('');
-    setSelectedAccount(null);
-    setSelectedGateway(null);
+    // setSelectedAccount(null);
+    // setSelectedGateway(null);
     setTransID('');
     setAmount(null);
     setUserInformation({});
@@ -578,12 +611,12 @@ function Managementschools() {
       }))
     );
     const customizeSelectedGateway = { label: getCashGateway.title, id: getCashGateway.id };
-    console.log({ customizeSelectedGateway });
+    // console.log({ customizeSelectedGateway });
     setSelectedGateway(customizeSelectedGateway);
   }, [accounts]);
 
   useEffect(() => {
-    console.log({ accounts, selectedAccount, selectedGateway });
+    // console.log({ accounts, selectedAccount, selectedGateway });
   }, [selectedGateway]);
 
   return (
@@ -679,6 +712,8 @@ function Managementschools() {
           // minHeight="fit-content"
         >
           <LeftFeesTable
+            onTimeDiscountArr={onTimeDiscountArr}
+            setOnTimeDiscountArr={setOnTimeDiscountArr}
             leftFeesTableData={leftFeesTableData}
             leftFeesTableColumnDataState={leftFeesTableColumnDataState}
             leftFeesTableColumnData={leftFeesTableColumnData}
@@ -708,6 +743,8 @@ function Managementschools() {
             selectedGateway={selectedGateway}
           />
           <PaymentOptions
+            onTimeDiscountArr={onTimeDiscountArr}
+            setOnTimeDiscountArr={setOnTimeDiscountArr}
             totalDueValue={totalDueValue}
             collectionDate={collectionDate}
             handleStudentPaymentCollect={handleStudentPaymentCollect}

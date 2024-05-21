@@ -9,6 +9,8 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  onTimeDiscountArr,
+  setOnTimeDiscountArr,
   children,
   totalDueValue,
   collectionDate,
@@ -38,7 +40,7 @@ const PaymentOptions = ({
   accountsOption,
   accounts,
   btnHandleClick,
-  gatewayOption, 
+  gatewayOption,
   setGatewayOption
 }) => {
   const { t }: { t: any } = useTranslation();
@@ -188,11 +190,21 @@ const PaymentOptions = ({
             id: finalArray[j].id,
             collected_amount: finalArray[j].due,
             total_payable: parseInt(tableData[i].dueAmount),
-            on_time_discount: parseInt(tableData[i].on_time_discount)
+            on_time_discount: 0
           });
         }
       }
     }
+
+    // on time discount code start
+    for (let i = 0; i < onTimeDiscountArr.length; i++) {
+      for (let j = 0; j < collect_filter_data.length; j++) {
+        if (onTimeDiscountArr[i].id == collect_filter_data[j].id) {
+          collect_filter_data[j].on_time_discount = onTimeDiscountArr[i].value;
+        }
+      }
+    }
+    // on time discount code end
 
     // amount calculation part end
 
@@ -259,6 +271,14 @@ const PaymentOptions = ({
             };
           });
 
+          for (let i = 0; i < printResult?.length; i++) {
+            for (let j = 0; j < tableData?.length; j++) {
+              if (printResult[i]?.fee_id === tableData[j]?.feeId) {
+                printResult[i].head_title = tableData[j].head_title;
+              }
+            }
+          }
+          setOnTimeDiscountArr([]);
           setPrintFees(printResult);
           handleStudentPaymentCollect(printResult);
           btnHandleClick();
@@ -278,22 +298,23 @@ const PaymentOptions = ({
       <Box
         component={Paper}
         sx={{
-          boxShadow:"10 10 10",
+          boxShadow: '10 10 10',
           backgroundColor: '#fff',
           padding: 1,
           // py:"auto"
-          display:"flex",
-          flexDirection:"column",
-          justifyContent:"space-evenly",
-          borderRadius:0.5
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-evenly',
+          borderRadius: 0.5
         }}
       >
-        <Grid sx={{
-          display: 'grid',
-          gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(4,1fr)', xl: 'repeat(5, 1fr)' },
-          gap: 1,
-          // justifyContent: 'center',
-        }}
+        <Grid
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(4,1fr)', xl: 'repeat(5, 1fr)' },
+            gap: 1
+            // justifyContent: 'center',
+          }}
         >
           <AutoCompleteWrapper
             label={t('Account')}
@@ -331,8 +352,7 @@ const PaymentOptions = ({
               setSelectedGateway(value);
             }}
           />
-          {
-            (selectedGateway?.label && selectedGateway?.label !== 'Cash') &&
+          {selectedGateway?.label && selectedGateway?.label !== 'Cash' && (
             <TextFieldWrapper
               label="trans ID"
               name=""
@@ -345,7 +365,7 @@ const PaymentOptions = ({
               handleBlur={undefined}
               required={selectedGateway?.label !== 'Cash' ? true : false}
             />
-          }
+          )}
 
           <TextFieldWrapper
             // disabled={selectedRows.length > 1 ? true : false}
@@ -378,32 +398,27 @@ const PaymentOptions = ({
             touched={undefined}
             errors={undefined}
             value={totalFeesCalculate || ''}
-            handleChange={() => { }}
+            handleChange={() => {}}
             handleBlur={undefined}
           />
         </Grid>
 
-        <Grid item display="grid" gridTemplateColumns={{sm:"3fr 1fr"}} gridAutoFlow="dense" gap={1} width="100%" height="auto">
-          <Grid item display={{xs:'none',sm:"grid"}}>{children}</Grid>
+        <Grid item display="grid" gridTemplateColumns={{ sm: '3fr 1fr' }} gridAutoFlow="dense" gap={1} width="100%" height="auto">
+          <Grid item display={{ xs: 'none', sm: 'grid' }}>
+            {children}
+          </Grid>
           <Button
             variant="contained"
-            disabled={
-              (selectedRows.length > 0 || totalFeesCalculate > 0) &&
-                feesUserData?.id
-                ? false
-                : true
-            }
+            disabled={(selectedRows.length > 0 || totalFeesCalculate > 0) && feesUserData?.id ? false : true}
             //disabled={feesUserData?.id ? false : true}
             onClick={handleCollect}
             sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
           >
             Collect
           </Button>
-          <Grid display={{sm:'none'}}>{children}</Grid>
+          <Grid display={{ sm: 'none' }}>{children}</Grid>
         </Grid>
-
       </Box>
-
     </>
   );
 };

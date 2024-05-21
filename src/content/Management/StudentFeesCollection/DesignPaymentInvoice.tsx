@@ -62,25 +62,10 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
         payment['created_at'] = payment.created_at;
       }
 
-      // console.log('jdkfkdfkdf');
-      // console.log(payment);
-      // console.log(payment.prevAmount);
-
       return {
         ...payment
-        // prevAmount: 0
       };
     });
-
-    const newTempObj = {
-      prevAmount: 0,
-      due: 0,
-      head_title: '',
-      prev_disount: 0,
-      payableAmount: 0,
-      fee_id: null
-    };
-    const oneTempArr = [];
 
     // update printFees data start
     for (let i = 0; i < temp.length; i++) {
@@ -93,24 +78,14 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
               parseInt(temp[i].paidAmount) +
               parseInt(leftFeesTableData[j].on_time_discount + leftFeesTableData[j].discount));
 
-          //  10500 - 0 +  10500 +0
           temp[i].prevAmount = sum;
           temp[i].due = leftFeesTableData[j].dueAmount;
-          temp[i].head_title = leftFeesTableData[j].head_title;
+          // temp[i].head_title = leftFeesTableData[j].head_title;
           temp[i].prev_disount = leftFeesTableData[j].discount + (leftFeesTableData[j].on_time_discount - temp[i].on_time_discount);
           temp[i].payableAmount = temp[i].payableAmount - leftFeesTableData[j].discount;
-          // newTempObj.prevAmount = sum;
-          // newTempObj.due = leftFeesTableData[j].dueAmount;
-          // newTempObj.head_title = leftFeesTableData[j].head_title;
-          // newTempObj.prev_disount = leftFeesTableData[j].discount + (leftFeesTableData[j].on_time_discount - temp[i].on_time_discount);
-          // newTempObj.payableAmount = temp[i].payableAmount - leftFeesTableData[j].discount;
-          // newTempObj.fee_id = temp[i].fee_id;
-          // oneTempArr.push({ ...newTempObj });
         }
       }
     }
-    // console.log('newTempObj');
-    // console.log(oneTempArr);
 
     // update printFees data end
     const totalCurrentDiscountValue = temp.reduce((prev, curr) => prev + Number(curr.on_time_discount), 0) || 0;
@@ -131,8 +106,6 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     //   for (let j = 0; j < leftFeesTableData.length; j++) {
     //     if (temp[i].fee_id === leftFeesTableData[j].feeId) {
     //       temp[i].head_title = leftFeesTableData[j].head_title;
-    //       temp[i].prev_disount = leftFeesTableData[j].discount + (leftFeesTableData[j].on_time_discount - temp[i].on_time_discount);
-    //       temp[i].payableAmount = temp[i].payableAmount - leftFeesTableData[j].discount;
     //     }
     //   }
     // }

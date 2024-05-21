@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -48,6 +48,8 @@ const TableFooterCellWrapper = ({ children, ...parmas }) => {
 };
 
 export default function LeftFeesTable({
+  onTimeDiscountArr,
+  setOnTimeDiscountArr,
   leftFeesTableData,
   leftFeesTableColumnDataState,
   leftFeesTableColumnData,
@@ -149,17 +151,74 @@ export default function LeftFeesTable({
           delete obj[key];
         }
       }
-
+      setOnTimeDiscountArr(arr);
       setCurrDiscount(obj);
       leftFeesTableColumnData(leftFeesTableColumnDataState, arr);
       return;
     }
 
     if (parseInt(value) < parseInt(singleFeeInfo?.mainDueAmount)) {
+      setOnTimeDiscountArr(arr);
       setCurrDiscount(obj);
       leftFeesTableColumnData(leftFeesTableColumnDataState, arr);
     }
   };
+
+  function DisplayTable(DataArr) {
+    const filterArr = DataArr.filter((row) => {
+      return row.dueAmount > 0;
+    });
+
+    return filterArr.map((row) => {
+      return (
+        <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          <TableCellWrapper align="center" width={10}>
+            <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
+          </TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">
+            {row.head_title}
+          </TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">
+            {row.title}
+          </TableCellWrapper>
+          <TableCellWrapper align="right">{row.amount}</TableCellWrapper>
+          <TableCellWrapper align="right">{row.late_fee}</TableCellWrapper>
+          <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
+          <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
+
+          <TableCellWrapper>
+            <TextFieldWrapper
+              pb={0}
+              disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
+              label="Amount"
+              name=""
+              type="number"
+              touched={undefined}
+              errors={undefined}
+              // value={currDiscount || ''}
+              value={currDiscount[row.feeId] || ''}
+              handleChange={(e) => {
+                const int_value = parseInt(e.target.value);
+                const value = Math.abs(int_value);
+                handleCurrDiscountChange(row.feeId, value);
+              }}
+              handleBlur={undefined}
+              inputProps={{
+                style: {
+                  px: 2,
+                  py: 2,
+                  fontSize: { xs: 10, sm: 11, md: 12 }
+                }
+              }}
+            />
+          </TableCellWrapper>
+          <TableCellWrapper align="right">
+            <Grid pr={1}>{row.dueAmount}</Grid>
+          </TableCellWrapper>
+        </TableRow>
+      );
+    });
+  }
 
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
@@ -190,7 +249,8 @@ export default function LeftFeesTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {tableData.map((row) => (
+          {DisplayTable(tableData)}
+          {/* {tableData.map((row) => (
             <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCellWrapper align="center" width={10}>
                 <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
@@ -236,8 +296,8 @@ export default function LeftFeesTable({
                 <Grid pr={1}>{row.dueAmount}</Grid>
               </TableCellWrapper>
             </TableRow>
-          ))}
-          {tableData.length === 0 ? (
+          ))} */}
+          {DisplayTable(tableData).length === 0 ? (
             ''
           ) : (
             <TableRow

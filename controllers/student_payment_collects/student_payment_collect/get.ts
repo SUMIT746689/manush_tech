@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma_client';
-import { monthList } from '@/utils/getDay';
+import { monthList, monthListType } from '@/utils/getDay';
 import dayjs from 'dayjs';
 import { logFile } from 'utilities_api/handleLogFile';
 
@@ -12,6 +12,12 @@ export const get = async (req, res) => {
 
     const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
     if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error('provide a valid month');
+
+    // multiple month related code start
+    const selectedIndex = monthList.indexOf(lowerCaseMonth);
+    const monthsBeforeSelected: monthListType[] = monthList.slice(0, selectedIndex + 1);
+    // monthsBeforeSelected.push(selected_month.toLocaleLowerCase());
+    // multiple month related code end
 
     const dateFilter = {},
       query = {};
@@ -67,11 +73,18 @@ export const get = async (req, res) => {
                 name: true,
                 fees: {
                   where: {
-                    AND: [{ academic_year_id: Number(academic_year_id) }, { fees_month: lowerCaseMonth }]
+                    // old  AND: [{ academic_year_id: Number(academic_year_id) }, { fees_month: lowerCaseMonth }]
+                    AND: [
+                      { academic_year_id: Number(academic_year_id) },
+                      {
+                        fees_month: { in: monthsBeforeSelected }
+                      }
+                    ]
                   },
                   include: {
                     fees_head: true
-                  }
+                  },
+                  orderBy: { fees_month: 'asc' }
                 }
               }
             }
@@ -88,9 +101,11 @@ export const get = async (req, res) => {
         const findStudentFee: any = student_fee.filter((pay_fee) => pay_fee.fee?.id === fee.id);
 
         // updated on_time_discount calculation code start
+        //  const findStudentFeeWithoutLastOne: any = student_fee.filter((pay_fee) => pay_fee.fee?.id === fee.id);
         if (findStudentFee.length > 0) {
           let discount_sum = 0;
           let fee_id;
+
           for (let i = 0; i < findStudentFee.length; i++) {
             discount_sum += Number(findStudentFee[i].on_time_discount);
             fee_id = findStudentFee[i].fee_id;
@@ -100,6 +115,7 @@ export const get = async (req, res) => {
             on_time_discount: discount_sum
           });
         }
+
         // updated on_time_discount calculation code end
 
         const late_fee = fee.late_fee ? fee.late_fee : 0;
@@ -210,6 +226,9 @@ export const get = async (req, res) => {
       class_roll_no: all_fees.class_roll_no,
       discount: all_fees.discount,
       fees: newFees
+      // fees: newFees.filter((item) => {
+      //   return item.status !== 'paid' && item.status !== 'paid late';
+      // })
     };
 
     res.status(200).json({ data, success: true });

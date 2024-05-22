@@ -2,16 +2,7 @@ import { customBorder } from '@/utils/mui_style';
 import { Autocomplete, Grid, TextField } from '@mui/material';
 import { useEffect } from 'react';
 
-export const AutoCompleteWrapper = ({
-  minWidth = null,
-  required = false,
-  options,
-  value,
-  handleChange,
-  label,
-  placeholder,
-  ...params
-}) => {
+export const AutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
   return (
     <Grid
       item
@@ -31,16 +22,7 @@ export const AutoCompleteWrapper = ({
         options={options}
         value={value}
         filterSelectedOptions
-        renderInput={(rnParams) => (
-          <TextField
-            size="small"
-            fullWidth
-            required={required}
-            {...rnParams}
-            label={label}
-            placeholder={placeholder}
-          />
-        )}
+        renderInput={(rnParams) => <TextField size="small" fullWidth required={required} {...rnParams} label={label} placeholder={placeholder} />}
         onChange={handleChange}
       />
     </Grid>
@@ -98,14 +80,7 @@ export const AutoCompleteWrapperWithoutRenderInput = ({
   );
 };
 
-export const EmptyAutoCompleteWrapper = ({
-  minWidth = null,
-  options,
-  value,
-  label,
-  placeholder,
-  ...params
-}) => {
+export const EmptyAutoCompleteWrapper = ({ minWidth = null, options, value, label, placeholder, ...params }) => {
   return (
     <Grid
       item
@@ -125,15 +100,7 @@ export const EmptyAutoCompleteWrapper = ({
         options={options}
         value={value}
         filterSelectedOptions
-        renderInput={(params) => (
-          <TextField
-            size="small"
-            fullWidth
-            {...params}
-            label={label}
-            placeholder={placeholder}
-          />
-        )}
+        renderInput={(params) => <TextField size="small" fullWidth {...params} label={label} placeholder={placeholder} />}
       />
     </Grid>
   );
@@ -160,9 +127,7 @@ export const AutoCompleteWrapperWithDebounce = ({
     return () => clearTimeout(getData);
   }, [value]);
 
-  const WarningMessage =
-    (value && (value.length < 3 ? 'Minimum 3 character required' : '')) ||
-    'No options available';
+  const WarningMessage = (value && (value.length < 3 ? 'Minimum 2 character required' : '')) || 'No options available';
 
   return (
     <Grid
@@ -183,16 +148,7 @@ export const AutoCompleteWrapperWithDebounce = ({
         options={options}
         value={value}
         filterSelectedOptions
-        renderInput={(rnParams) => (
-          <TextField
-            size="small"
-            fullWidth
-            required={required}
-            {...rnParams}
-            label={label}
-            placeholder={placeholder}
-          />
-        )}
+        renderInput={(rnParams) => <TextField size="small" fullWidth required={required} {...rnParams} label={label} placeholder={placeholder} />}
         onInputChange={handleChange}
         onChange={searchHandleUpdate}
         noOptionsText={WarningMessage}

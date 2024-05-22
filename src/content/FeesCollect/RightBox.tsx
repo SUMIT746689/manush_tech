@@ -28,9 +28,9 @@ const RightBox = ({ userInformation }) => {
       <Grid
         sx={{
           display: 'Grid',
-          gridTemplateColumns:"20vh auto",
-          columnGap:1,
-          padding: 1,
+          gridTemplateColumns: '20vh auto',
+          columnGap: 1,
+          padding: 1
         }}
       >
         {/* user profile image */}
@@ -39,14 +39,14 @@ const RightBox = ({ userInformation }) => {
             flexBasis: '30%'
           }}
         > */}
-          <Grid
-            sx={{
-              // width: '150px',
-              // height: '150px',
-              backgroundColor: 'white'
-            }}
-          >
-            {/* {userInformation?.student_photo ? (
+        <Grid
+          sx={{
+            width: '100px',
+            height: '100px',
+            backgroundColor: 'white'
+          }}
+        >
+          {/* {userInformation?.student_photo ? (
               <Image
                 src={getFile(userInformation?.student_photo)}
                 height={100}
@@ -58,8 +58,28 @@ const RightBox = ({ userInformation }) => {
             ) : (
               ''
             )} */}
-            <Avatar src={getFile(userInformation?.student_photo)} sx={{height:'100%', maxHeight:100,width:"auto",objectFit:"contain"}} />
-          </Grid>
+          <Avatar
+            src="#"
+            sx={{
+              height: '100%',
+              maxHeight: 100,
+              width: 'auto',
+              backgroundColor: userInformation?.student_photo && 'transparent',
+              boxShadow: '-2px 0px 20px 0px rgba(173,173,173,1)',
+              border: '2px solid white'
+            }}
+          >
+            {userInformation?.student_photo && (
+              <Image
+                src={getFile(userInformation?.student_photo)}
+                alt="photo"
+                height={80}
+                width={80}
+                style={{ width: '100% ', height: '100%', objectFit: 'contain' }}
+              />
+            )}
+          </Avatar>
+        </Grid>
         {/* </Grid> */}
 
         <Grid
@@ -179,15 +199,9 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                {`${
-                  userInformation?.first_name ? userInformation?.first_name : ''
-                } ${
-                  userInformation?.middle_name
-                    ? userInformation?.middle_name
-                    : ''
-                } ${
-                  userInformation?.last_name ? userInformation?.last_name : ''
-                }`}
+                {`${userInformation?.first_name ? userInformation?.first_name : ''} ${
+                  userInformation?.middle_name ? userInformation?.middle_name : ''
+                } ${userInformation?.last_name ? userInformation?.last_name : ''}`}
               </Typography>
               <Typography
                 component="p"
@@ -196,9 +210,7 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                {userInformation?.father_name
-                  ? userInformation?.father_name
-                  : ''}
+                {userInformation?.father_name ? userInformation?.father_name : ''}
               </Typography>
               <Typography
                 component="p"
@@ -216,9 +228,7 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                {userInformation?.group_title
-                  ? userInformation?.group_title
-                  : ''}
+                {userInformation?.group_title ? userInformation?.group_title : ''}
               </Typography>
               {/* <Typography
                 component="p"
@@ -236,9 +246,7 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                {userInformation?.section_name
-                  ? userInformation?.section_name
-                  : ''}
+                {userInformation?.section_name ? userInformation?.section_name : ''}
               </Typography>
               <Typography
                 component="p"
@@ -247,9 +255,7 @@ const RightBox = ({ userInformation }) => {
                   fontSize: '14px'
                 }}
               >
-                {userInformation?.class_roll_no
-                  ? userInformation.class_roll_no
-                  : ''}
+                {userInformation?.class_roll_no ? userInformation.class_roll_no : ''}
               </Typography>
               {/* <Typography
                 component="p"

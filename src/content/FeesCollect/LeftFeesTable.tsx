@@ -9,6 +9,20 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { Grid } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(even)': {
+    backgroundColor: 'rgba(0, 0, 0, 0.03)'
+  },
+  ':hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.10)'
+  }
+  // hide last border
+  // '&:last-child td, &:last-child th': {
+  //   border: 0
+  // }
+}));
 
 function createData(name: string, calories: number, fat: number, carbs: number, protein: number, due: number) {
   return { name, calories, fat, carbs, protein, due };
@@ -171,7 +185,8 @@ export default function LeftFeesTable({
 
     return filterArr.map((row) => {
       return (
-        <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <StyledTableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          {/* <TableRow key={row.title} sx={{ '&:last-child td, &:last-child th': { border: 0 }}}> */}
           <TableCellWrapper align="center" width={10}>
             <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
           </TableCellWrapper>
@@ -215,7 +230,8 @@ export default function LeftFeesTable({
           <TableCellWrapper align="right">
             <Grid pr={1}>{row.dueAmount}</Grid>
           </TableCellWrapper>
-        </TableRow>
+          {/* </TableRow> */}
+        </StyledTableRow>
       );
     });
   }

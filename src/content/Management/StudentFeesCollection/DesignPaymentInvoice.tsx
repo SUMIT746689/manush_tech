@@ -1,9 +1,12 @@
-import { Grid, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { Grid, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Avatar } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { useAuth } from '@/hooks/useAuth';
 import { useState, useEffect, FC, useRef } from 'react';
 import { formatNumber } from '@/utils/numberFormat';
 import dayjs from 'dayjs';
+import { Data } from '@/models/front_end';
+import Image from 'next/image';
+import { getFile } from '@/utils/utilitY-functions';
 
 type PaymentInvoiceType = {
   collectionDate: any;
@@ -15,9 +18,16 @@ type PaymentInvoiceType = {
   printFees: any[];
   student: any;
   student_id: any;
+  printAndCollect: Boolean;
+  setPrintAndCollect?: (arg: boolean) => void;
+  setIsCompleteUpdate: (arg: boolean) => void;
+  schoolData: Data;
 };
 
 const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
+  schoolData,
+  printAndCollect,
+  setPrintAndCollect,
   student_id,
   collectionDate,
   leftFeesTableTotalCalculation,
@@ -26,7 +36,8 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   leftFeesTableData,
   setShowPrint,
   printFees,
-  student
+  student,
+  setIsCompleteUpdate
 }) => {
   const dueRef = useRef(0);
   const { user } = useAuth();
@@ -45,7 +56,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   let formattedDate = date.format('DD-MM-YYYY');
 
   useEffect(() => {
-    const temp = printFees.map((payment: any) => {
+    let temp = printFees.map((payment: any) => {
       const last_date = new Date(payment.last_date);
       // @ts-ignore
       const today = payment?.last_payment_date ? new Date(payment?.last_payment_date) : new Date(collectionDate);
@@ -116,7 +127,12 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     setTotalFeeamount(totalAmount);
 
     setSelectedFees(temp);
-    if (printFees.length > 0) setShowPrint(true);
+    if (printFees.length > 0) {
+      setShowPrint(true);
+      // setTimeout(() => setIsCompleteUpdate(true), 1);
+
+      // setPrintAndCollect(true);
+    }
   }, [printFees, leftFeesTableData]);
 
   return (
@@ -124,19 +140,46 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
       {/* part 1 */}
       <Grid pt={2} height={`${selectedFees.length <= 2 ? '50vh' : '100vh'}`}>
         {/* school information */}
-        <Grid sx={{ borderBottom: '1px solid #000' }} pb={1} mb={0.5}>
-          <Typography variant="h4" sx={{ textAlign: 'center' }}>
-            {user?.school?.name}
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center' }}>
-            {user?.school?.address}
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Student Payment Receipt
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Office Copy
-          </Typography>
+
+        <Grid sx={{ borderBottom: '1px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} pb={1} mb={0.5}>
+          <Grid width="80px" height="80px">
+            {schoolData?.header_image && (
+              <Avatar
+                variant="rounded"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  boxShadow: '-2px 0px 20px 0px rgba(173,173,173,1)',
+                  border: '2px solid white'
+                }}
+              >
+                <Image
+                  src={getFile(schoolData?.header_image)}
+                  alt="photo"
+                  height={80}
+                  width={80}
+                  style={{ width: '100% ', height: '100%', objectFit: 'contain' }}
+                />
+              </Avatar>
+            )}
+          </Grid>
+          <Grid>
+            {' '}
+            <Typography variant="h4" sx={{ textAlign: 'center' }}>
+              {user?.school?.name}
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center' }}>
+              {user?.school?.address}
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Student Payment Receipt
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Office Copy
+            </Typography>
+          </Grid>
+          <Grid></Grid>
         </Grid>
 
         {/* student information */}
@@ -202,7 +245,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       border: '1px solid black',
                       textTransform: 'capitalize',
                       fontWeight: 'bold',
-                      width: '20%',
+                      width: '25%',
                       paddingLeft: '5px',
                       paddingRight: '5px',
                       paddingTop: '2px',
@@ -306,7 +349,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment?.head_title ? payment?.head_title : payment?.title}
+                        {payment?.head_title && payment?.fee_id ? `${payment?.head_title} (${payment?.title})` : payment?.title}
                       </TableCell>
 
                       <TableCell
@@ -337,7 +380,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.on_time_discount ? formatNumber(payment.on_time_discount) : 0}
+                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
@@ -662,7 +705,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount + totalCurrentDisountAmount}
+                    {totalPreAmount + totalPaidAmount}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -743,21 +786,46 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
       {/* part 2 */}
       <Grid pt={2} height="50vh">
         {/* school information */}
-        <Grid sx={{ borderBottom: '1px solid #000' }} pb={1} mb={0.5}>
-          <Typography variant="h4" sx={{ textAlign: 'center' }}>
-            {user?.school?.name}
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center' }}>
-            {user?.school?.address}
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Student Payment Receipt
-          </Typography>
-          <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-            Student Copy
-          </Typography>
+        <Grid sx={{ borderBottom: '1px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} pb={1} mb={0.5}>
+          <Grid width="80px" height="80px">
+            {schoolData?.header_image && (
+              <Avatar
+                variant="rounded"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  boxShadow: '-2px 0px 20px 0px rgba(173,173,173,1)',
+                  border: '2px solid white'
+                }}
+              >
+                <Image
+                  src={getFile(schoolData?.header_image)}
+                  alt="photo"
+                  height={80}
+                  width={80}
+                  style={{ width: '100% ', height: '100%', objectFit: 'contain' }}
+                />
+              </Avatar>
+            )}
+          </Grid>
+          <Grid>
+            {' '}
+            <Typography variant="h4" sx={{ textAlign: 'center' }}>
+              {user?.school?.name}
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center' }}>
+              {user?.school?.address}
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Student Payment Receipt
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Office Copy
+            </Typography>
+          </Grid>
+          <Grid></Grid>
         </Grid>
-
         {/* student information */}
         <Grid sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Grid sx={{ display: 'flex', gap: '20px' }}>
@@ -821,7 +889,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       border: '1px solid black',
                       textTransform: 'capitalize',
                       fontWeight: 'bold',
-                      width: '20%',
+                      width: '25%',
                       paddingLeft: '5px',
                       paddingRight: '5px',
                       paddingTop: '2px',
@@ -925,7 +993,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment?.head_title ? payment?.head_title : payment?.title}
+                        {payment?.head_title && payment?.fee_id ? `${payment?.head_title} (${payment?.title})` : payment?.title}
                       </TableCell>
 
                       <TableCell
@@ -956,7 +1024,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.on_time_discount ? formatNumber(payment.on_time_discount) : 0}
+                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
@@ -1281,7 +1349,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount + totalCurrentDisountAmount}
+                    {totalPreAmount + totalPaidAmount}
                   </TableCell>
                 </TableRow>
                 <TableRow

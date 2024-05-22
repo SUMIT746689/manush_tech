@@ -1,8 +1,5 @@
 import prisma from '@/lib/prisma_client';
-import {
-  new_unique_tracking_number,
-  unique_tracking_number
-} from '@/utils/utilitY-functions';
+import { new_unique_tracking_number, unique_tracking_number } from '@/utils/utilitY-functions';
 import { logFile } from 'utilities_api/handleLogFile';
 import { post_other_fees } from './other_fees';
 
@@ -53,17 +50,7 @@ const handleAccounts = async (resultsArr) => {
 };
 // accounts table update code end
 
-const handleTransaction = ({
-  collection_date,
-  data,
-  status,
-  account,
-  voucher,
-  refresh_token,
-  sent_sms,
-  tracking_number,
-  fee
-}) => {
+const handleTransaction = ({ collection_date, data, status, account, voucher, refresh_token, sent_sms, tracking_number, fee }) => {
   return new Promise(async (resolve, reject) => {
     try {
       await prisma.$transaction(async (trans) => {
@@ -153,18 +140,9 @@ export const post = async (req, res, refresh_token) => {
     }: any = req.body;
 
     // create a single trancking_number
-    let tracking_number = await new_unique_tracking_number(
-      `st-${user_id}-${student_id}`,
-      school_id
-    );
+    let tracking_number = await new_unique_tracking_number(`st-${user_id}-${student_id}`, school_id);
 
-    if (
-      student_id &&
-      fee_id.length > 0 &&
-      account_id &&
-      payment_method_id &&
-      collected_by_user
-    ) {
+    if (student_id && fee_id.length > 0 && account_id && payment_method_id && collected_by_user) {
       const promises = collect_filter_data.map(async (item) => {
         try {
           let collected_amount = null;
@@ -178,11 +156,7 @@ export const post = async (req, res, refresh_token) => {
             collected_amount = Number(item.collected_amount);
           }
 
-          if (
-            !student_id ||
-            !fee_id ||
-            (typeof collected_amount !== 'number' && collected_amount < 0)
-          ) {
+          if (!student_id || !fee_id || (typeof collected_amount !== 'number' && collected_amount < 0)) {
             throw new Error('provide valid informations');
           }
 
@@ -219,9 +193,7 @@ export const post = async (req, res, refresh_token) => {
             }
           });
 
-          const discount = AllDiscount?.discount?.filter(
-            (i) => i.fee_id == fee_id
-          );
+          const discount = AllDiscount?.discount?.filter((i) => i.fee_id == fee_id);
 
           const totalDiscount = discount.reduce((a, c) => {
             if (c.type == 'percent') return a + (c.amt * fee.amount) / 100;
@@ -258,16 +230,12 @@ export const post = async (req, res, refresh_token) => {
 
           const last_date = new Date(fee.last_date);
 
-          const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount
-            ? isAlreadyAvaliable._sum.collected_amount
-            : 0;
+          const totalPaidAmount = isAlreadyAvaliable._sum.collected_amount ? isAlreadyAvaliable._sum.collected_amount : 0;
           // old
           // const last_trnsation_date = isAlreadyAvaliable._max.created_at
           //   ? new Date(isAlreadyAvaliable._max.created_at)
           //   : new Date();
-          const last_trnsation_date = isAlreadyAvaliable._max.created_at
-            ? new Date(isAlreadyAvaliable._max.created_at)
-            : new Date(collection_date);
+          const last_trnsation_date = isAlreadyAvaliable._max.created_at ? new Date(isAlreadyAvaliable._max.created_at) : new Date(collection_date);
 
           const late_fee = fee.late_fee ? fee.late_fee : 0;
 
@@ -275,28 +243,15 @@ export const post = async (req, res, refresh_token) => {
 
           let status;
 
-          if (
-            isAlreadyAvaliable._sum.collected_amount &&
-            isAlreadyAvaliable._sum.collected_amount > 0
-          ) {
+          if (isAlreadyAvaliable._sum.collected_amount && isAlreadyAvaliable._sum.collected_amount > 0) {
             const last_date = new Date(fee.last_date);
             // old
             // const new_trnsation_date = new Date();
             const new_trnsation_date = new Date(collection_date);
 
-            if (
-              new_trnsation_date > last_date &&
-              paidAmount >= feeAmount + late_fee
-            )
-              status = 'paid late';
-            else if (
-              new_trnsation_date > last_date &&
-              feeAmount == paidAmount &&
-              late_fee > 0
-            )
-              status = 'fine unpaid';
-            else if (last_date >= new_trnsation_date && feeAmount == paidAmount)
-              status = 'paid';
+            if (new_trnsation_date > last_date && paidAmount >= feeAmount + late_fee) status = 'paid late';
+            else if (new_trnsation_date > last_date && feeAmount == paidAmount && late_fee > 0) status = 'fine unpaid';
+            else if (last_date >= new_trnsation_date && feeAmount == paidAmount) status = 'paid';
             else if (paidAmount > 0) {
               status = 'partial paid';
             } else status = 'unpaid';
@@ -315,9 +270,7 @@ export const post = async (req, res, refresh_token) => {
               throw new Error('Already Paid in Late');
             } else if (totalPaidAmount < feeAmount + late_fee) {
               if (collected_amount + totalPaidAmount > feeAmount + late_fee) {
-                throw new Error(
-                  `Only pay ${feeAmount + late_fee - totalPaidAmount} !`
-                );
+                throw new Error(`Only pay ${feeAmount + late_fee - totalPaidAmount} !`);
               } else {
                 return await handleTransaction({
                   collection_date,
@@ -337,11 +290,7 @@ export const post = async (req, res, refresh_token) => {
             if (totalPaidAmount === feeAmount) {
               throw new Error('Already Paid !');
             } else if (totalPaidAmount + collected_amount > feeAmount) {
-              throw new Error(
-                `you paid ${totalPaidAmount},now pay ${
-                  feeAmount - totalPaidAmount
-                } amount !`
-              );
+              throw new Error(`you paid ${totalPaidAmount},now pay ${feeAmount - totalPaidAmount} amount !`);
             } else {
               return await handleTransaction({
                 collection_date,
@@ -373,13 +322,7 @@ export const post = async (req, res, refresh_token) => {
         }
 
         if (req.body?.other_fees_data !== null) {
-          const post_other_fees_res = await post_other_fees(
-            collection_date,
-            req.body.other_fees_data,
-            res,
-            refresh_token,
-            tracking_number
-          );
+          const post_other_fees_res = await post_other_fees(collection_date, req.body.other_fees_data, res, refresh_token, tracking_number);
 
           if (Object.keys(post_other_fees_res).length === 0) {
             // console.log("Object is empty");
@@ -416,13 +359,7 @@ export const post = async (req, res, refresh_token) => {
         throw new Error('failed to insert student fees');
       }
     } else if (req.body?.other_fees_data !== null) {
-      const post_other_fees_res = await post_other_fees(
-        collection_date,
-        req.body.other_fees_data,
-        res,
-        refresh_token,
-        tracking_number
-      );
+      const post_other_fees_res = await post_other_fees(collection_date, req.body.other_fees_data, res, refresh_token, tracking_number);
 
       if (Object.keys(post_other_fees_res).length === 0) {
         // console.log("Object is empty");

@@ -13,7 +13,6 @@ const index = async (req, res) => {
         break;
       case 'POST':
         post(req, res);
-        
         break;
       default:
         res.setHeader('Allow', ['GET','POST']);

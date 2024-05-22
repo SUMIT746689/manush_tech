@@ -1472,23 +1472,6 @@ enum payment_gateway_title {
   sslcommerz
 }
 
-model AutoAttendanceSentSms {
-  id                Int                  @id @default(autoincrement())
-  body              String?
-  body_format       body_format
-  use_system_type   use_system_type_enum @default(automatic)
-  is_active         Boolean              @default(false)
-  every_hit         Boolean              @default(false)
-  external_api_info Json?
-  school_id         Int                  @unique
-  // academic_year_id Int?
-
-  school School @relation(fields: [school_id], references: [id])
-  // academicYear AcademicYear? @relation(fields: [academic_year_id], references: [id])
-
-  @@map("auto_attendance_sent_sms")
-}
-
 enum use_system_type_enum {
   automatic
   external_api
@@ -1498,6 +1481,61 @@ enum body_format {
   text
   unicode
 }
+
+enum default_sms_template_enum {
+  present
+  late
+  absence
+}
+
+model AutoAttendanceSentSms {
+  id                    Int          @id @default(autoincrement())
+  // body                  String?
+  // body_format           body_format
+  present_body          String?
+  present_body_format   body_format?
+  late_body             String?
+  late_body_format      body_format?
+  absence_body          String?
+  absence_body_format   body_format?
+  admission_body        String?
+  admission_body_format body_format?
+  is_active             Boolean      @default(false)
+  is_auto_admission_sms Boolean      @default(false)
+  every_hit             Boolean      @default(false)
+  external_api_info     Json?
+
+  default_sms_template default_sms_template_enum @default(present)
+  use_system_type      use_system_type_enum      @default(automatic)
+  school_id            Int                       @unique
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("auto_attendance_sent_sms")
+}
+
+// model StdSentSmsSettings {
+//   id                    Int          @id @default(autoincrement())
+//   present_body          String?
+//   present_body_format   body_format?
+//   late_body             String?
+//   late_body_format      body_format?
+//   leave_body            String?
+//   leave_body_format     body_format?
+//   admission_body        String?
+//   admission_body_format body_format?
+//   is_active             Boolean      @default(false)
+//   every_hit             Boolean      @default(false)
+//   external_api_info     Json?
+
+//   default_attendance_sms_template default_sms_template_enum @default(present)
+//   use_system_type                 use_system_type_enum      @default(automatic)
+//   school_id                       Int                       @unique
+
+//   school School @relation(fields: [school_id], references: [id])
+
+//   @@map("std_sent_sms_settings")
+// }
 
 model OtherUsersInfo {
   id                Int       @id @default(autoincrement())

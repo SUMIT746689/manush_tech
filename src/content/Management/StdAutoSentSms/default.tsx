@@ -1,11 +1,11 @@
 import { Authenticated } from '@/components/Authenticated';
 import ExtendedSidebarLayout from '@/layouts/ExtendedSidebarLayout';
 import { Formik } from 'formik';
-import { Button, Card, Chip, CircularProgress, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { Card, Chip, CircularProgress, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'next-i18next';
 import * as Yup from 'yup';
-import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
+import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
 import { TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Footer from '@/components/Footer';
@@ -13,8 +13,8 @@ import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { CustomSwitch } from '@/components/Switch/Switch';
 import React, { useState } from 'react';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { DropDownSelectWrapper } from '@/components/DropDown';
 
 const dynamicStudentDataKeys = [
     'first_name',
@@ -55,11 +55,14 @@ const dynamicStudentDataKeys = [
     // 'relation_with_guardian',
     'student_present_address',
     'submission_time',
-    'attendance_status'
-    // 'created_at'
+    'attendance_status',
+    // 'created_at',
+    'admission_status'
 ];
 
 const useSystemtypeOptions = [{ label: "automatic", id: "automatic" }, { label: "external api", id: "external_api" }]
+
+const smsTemplateType = ["present", "late", "absence", "admission"]
 
 const StudentAutoSentSms = () => {
     const { t }: { t: any } = useTranslation();
@@ -67,6 +70,7 @@ const StudentAutoSentSms = () => {
     const { data, reFetchData } = useClientFetch('/api/automatic_attendances');
     // const { data: academicYears } = useClientDataFetch('/api/academic_years');
     const { showNotification } = useNotistick();
+    const [selectTemplateType, setSelectTemplateType] = useState("present");
 
     const handleChangeSystemType = (v, setFieldValue) => {
         setFieldValue("use_system_type", v)
@@ -113,10 +117,16 @@ const StudentAutoSentSms = () => {
                 <Formik
                     enableReinitialize
                     initialValues={{
-                        body: data?.body || undefined,
+                        // template_type: "present",
+                        present_body: data?.present_body || undefined,
+                        late_body: data?.late_body || undefined,
+                        absence_body: data?.absence_body || undefined,
+                        admission_body: data?.admission_body || undefined,
+
                         use_system_type: data?.use_system_type ? useSystemtypeOptions.find(option => option.id === data.use_system_type) : null,
                         is_active: data?.is_active || false,
                         every_hit: data?.every_hit || false,
+                        is_auto_admission_sms: data?.is_auto_admission_sms || false,
                         auth_user: data?.auth_user || undefined,
                         auth_code: data?.auth_code || undefined,
                         url: data?.external_api_info?.url || undefined,
@@ -135,7 +145,6 @@ const StudentAutoSentSms = () => {
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-                        console.log({ errors, values, isSubmitting })
                         return (
                             <Card sx={{
                                 maxWidth: '700px',
@@ -144,6 +153,7 @@ const StudentAutoSentSms = () => {
                             }} >
                                 <form onSubmit={handleSubmit}>
                                     <Grid container direction={'column'} alignItems={'center'} gap={1} marginTop={3}>
+
                                         <DialogTitle width='100%' sx={{ p: 3, borderBottom: 1, borderColor: "lightgray" }} >
                                             <Typography variant="h4" gutterBottom>
                                                 Sent Sms for Student Autometic Attendence
@@ -154,6 +164,37 @@ const StudentAutoSentSms = () => {
                                         </DialogTitle>
 
                                         <DialogContent sx={{ minWidth: '100%', display: "grid", gap: 2 }} >
+
+                                            <Grid item pt={1}>
+                                                <DropDownSelectWrapper
+                                                    value={selectTemplateType}
+                                                    name='template_type'
+                                                    label='Select Template Type'
+                                                    handleChange={(e, v) => setSelectTemplateType(e.target.value)}
+                                                    menuItems={smsTemplateType}
+                                                />
+                                            </Grid>
+
+                                            {
+                                                smsTemplateType?.map((templateT, index) => (
+                                                    <React.Fragment key={index}>
+                                                        {
+                                                            selectTemplateType === templateT &&
+
+                                                            <SmsBodies
+                                                                name={`${templateT}_body`}
+                                                                values={values}
+                                                                handleBlur={handleBlur}
+                                                                touched={touched}
+                                                                errors={errors}
+                                                                handleChange={handleChange}
+                                                                setFieldValue={setFieldValue}
+                                                            />
+                                                        }
+                                                    </React.Fragment>
+                                                ))
+                                            }
+                                            {/* 
                                             <Grid item container display={"flex"} flexWrap={"wrap"} gap={0.5}>
                                                 {dynamicStudentDataKeys.map((value, index) => (<Chip
                                                     key={index}
@@ -166,8 +207,9 @@ const StudentAutoSentSms = () => {
                                                     clickable
                                                     size="small"
                                                 />))}
-                                            </Grid>
-                                            <Grid item pt={1}>
+                                            </Grid> */}
+
+                                            {/* <Grid item pt={1}>
                                                 <TextAreaWrapper
                                                     sx={{ pb: 0 }}
                                                     name="body"
@@ -190,7 +232,7 @@ const StudentAutoSentSms = () => {
                                                             values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
                                                     `}
                                                 </Grid>
-                                            </Grid>
+                                            </Grid> */}
 
 
                                             {/* <TextFieldWrapper
@@ -321,7 +363,7 @@ const StudentAutoSentSms = () => {
                                                         // color="secondary" 
                                                         />
                                                     }
-                                                    label="Is Active"
+                                                    label="System Active"
                                                     labelPlacement="start"
                                                     sx={{ pl: 0, ml: 0 }}
                                                 />
@@ -370,6 +412,22 @@ const StudentAutoSentSms = () => {
                                                 </>
                                             }
 
+                                            <Grid item>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            name="is_auto_admission_sms"
+                                                            checked={values.is_auto_admission_sms || false}
+                                                            onChange={handleChange}
+                                                            inputProps={{ 'aria-label': 'controlled' }}
+                                                            size="medium"
+                                                        />
+                                                    }
+                                                    label="Auto Admission Sms Active"
+                                                    labelPlacement="start"
+                                                    sx={{ pl: 0, ml: 0 }}
+                                                />
+                                            </Grid>
 
                                         </DialogContent>
 
@@ -415,3 +473,50 @@ StudentAutoSentSms.getLayout = (page) => {
 };
 
 export default StudentAutoSentSms;
+
+
+const SmsBodies = ({ name, handleChange, setFieldValue, values, touched, errors, handleBlur }) => {
+    return (
+        <>
+            <Grid item container display={"flex"} flexWrap={"wrap"} gap={0.5}>
+                {dynamicStudentDataKeys.map((value, index) => (<Chip
+                    key={index}
+                    color="primary"
+                    onClick={(e) => {
+                        setFieldValue(name, (values[name] || '') + ` #${value}#`)
+                    }}
+                    sx={{ m: 0, p: 0, b: 0, borderRadius: 0.5, fontSize: 11, fontWeight: 700 }}
+                    label={`#${value}#`}
+                    clickable
+                    size="small"
+                />))}
+            </Grid>
+
+            <Grid item pt={1}>
+                <TextAreaWrapper
+                    label={name.split('_').join(' ')}
+                    sx={{ pb: 0 }}
+                    name={name}
+                    value={values[name] || ''}
+                    touched={touched[name]}
+                    errors={errors[name]}
+                    handleChange={(v) => {
+                        if (v.target.value.length > 1000) return;
+                        handleChange(v)
+                    }}
+                    handleBlur={handleBlur}
+                />
+                <Grid item sx={{ ml: 'auto' }}>
+                    {`
+                    ${values[name]?.length ?? 0} characters | 
+                    ${1000 - (values[name]?.length ?? 0)} characters left |
+                    ${!values[name]?.length || values[name]?.length === 0 ?
+                            0
+                            :
+                            values[name]?.length <= 160 ? 1 : Math.ceil(values[name]?.length / 153)} SMS
+                `}
+                </Grid>
+            </Grid>
+        </>
+    )
+}

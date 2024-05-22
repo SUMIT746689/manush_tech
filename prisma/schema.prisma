@@ -1489,21 +1489,26 @@ enum default_sms_template_enum {
 }
 
 model AutoAttendanceSentSms {
-  id                    Int          @id @default(autoincrement())
+  id                      Int          @id @default(autoincrement())
   // body                  String?
   // body_format           body_format
-  present_body          String?
-  present_body_format   body_format?
-  late_body             String?
-  late_body_format      body_format?
-  absence_body          String?
-  absence_body_format   body_format?
-  admission_body        String?
-  admission_body_format body_format?
-  is_active             Boolean      @default(false)
-  is_auto_admission_sms Boolean      @default(false)
-  every_hit             Boolean      @default(false)
-  external_api_info     Json?
+  present_body            String?
+  present_body_format     body_format?
+  late_body               String?
+  late_body_format        body_format?
+  absence_body            String?
+  absence_body_format     body_format?
+  admission_body          String?
+  admission_body_format   body_format?
+  every_hit               Boolean      @default(false)
+  external_api_info       Json?
+  is_attendence_active    Boolean      @default(false)
+  is_sms_active           Boolean      @default(false)
+  is_present_sms_active   Boolean      @default(false)
+  is_late_sms_active      Boolean      @default(false)
+  is_absence_sms_active   Boolean      @default(false)
+  is_admission_sms_active Boolean      @default(false)
+  updated_by              Json?        @default("[]")
 
   default_sms_template default_sms_template_enum @default(present)
   use_system_type      use_system_type_enum      @default(automatic)

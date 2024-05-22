@@ -9,7 +9,7 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
 import { TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
 import Footer from '@/components/Footer';
-import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { CustomSwitch } from '@/components/Switch/Switch';
 import React, { useState } from 'react';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
@@ -77,7 +77,7 @@ const StudentAutoSentSms = () => {
     }
 
     const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
-
+        setIsLoading(true)
         if (_values.use_system_type) _values.use_system_type = _values.use_system_type.id
         // if (_values.is_active && !_values.academic_year_id) return showNotification('academic year field is required', 'error')
 
@@ -95,6 +95,9 @@ const StudentAutoSentSms = () => {
             .catch(err => {
                 handleShowErrMsg(err, showNotification)
                 console.log(err);
+            })
+            .finally(() => {
+                setIsLoading(false)
             })
     }
 
@@ -117,34 +120,37 @@ const StudentAutoSentSms = () => {
                 <Formik
                     enableReinitialize
                     initialValues={{
-                        // template_type: "present",
                         present_body: data?.present_body || undefined,
                         late_body: data?.late_body || undefined,
                         absence_body: data?.absence_body || undefined,
                         admission_body: data?.admission_body || undefined,
 
                         use_system_type: data?.use_system_type ? useSystemtypeOptions.find(option => option.id === data.use_system_type) : null,
-                        is_active: data?.is_active || false,
                         every_hit: data?.every_hit || false,
-                        is_auto_admission_sms: data?.is_auto_admission_sms || false,
+
+                        is_attendence_active: data?.is_attendence_active || false,
+                        is_sms_active: data?.is_sms_active || false,
+                        is_present_sms_active: data?.is_present_sms_active || false,
+                        is_late_sms_active: data?.is_late_sms_active || false,
+                        is_absence_sms_active: data?.is_absence_sms_active || false,
+                        is_admission_sms_active: data?.is_admission_sms_active || false,
+
                         auth_user: data?.auth_user || undefined,
                         auth_code: data?.auth_code || undefined,
                         url: data?.external_api_info?.url || undefined,
                         url_params: data?.external_api_info?.url_params || [{ key: "auth_user", value: "" }, { key: "auth_code", value: "" }],
-                        // academic_year: data?.academicYear ? { label: data.academicYear.title, id: data.academicYear.id } : undefined,
-                        // academic_year_id: data?.academic_year_id || undefined,
                         submit: null
                     }}
                     validationSchema={Yup.object().shape({
-                        is_active: Yup.boolean().required(t('This is active field is required')),
+                        // is_active: Yup.boolean().required(t('This is active field is required')),
                         every_hit: Yup.boolean().required(t('This every field is required')),
                         url: Yup.string().trim()
                             .matches(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/, 'Is not in correct format')
-                        // academic_year:
                     })}
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
+                        console.log({ values, errors })
                         return (
                             <Card sx={{
                                 maxWidth: '700px',
@@ -194,52 +200,9 @@ const StudentAutoSentSms = () => {
                                                     </React.Fragment>
                                                 ))
                                             }
-                                            {/* 
-                                            <Grid item container display={"flex"} flexWrap={"wrap"} gap={0.5}>
-                                                {dynamicStudentDataKeys.map((value, index) => (<Chip
-                                                    key={index}
-                                                    color="primary"
-                                                    onClick={(e) => {
-                                                        setFieldValue("body", (values.body || '') + ` #${value}#`)
-                                                    }}
-                                                    sx={{ m: 0, p: 0, b: 0, borderRadius: 0.5, fontSize: 11, fontWeight: 700 }}
-                                                    label={`#${value}#`}
-                                                    clickable
-                                                    size="small"
-                                                />))}
-                                            </Grid> */}
-
-                                            {/* <Grid item pt={1}>
-                                                <TextAreaWrapper
-                                                    sx={{ pb: 0 }}
-                                                    name="body"
-                                                    value={values.body || ''}
-                                                    touched={touched.body}
-                                                    errors={errors.body}
-                                                    handleChange={(v) => {
-                                                        if (v.target.value.length > 1000) return;
-                                                        handleChange(v)
-                                                    }}
-                                                    handleBlur={handleBlur}
-                                                />
-                                                <Grid item sx={{ ml: 'auto' }}>
-                                                    {`
-                                                        ${values.body?.length ?? 0} characters | 
-                                                        ${1000 - (values.body?.length ?? 0)} characters left |
-                                                        ${!values.body?.length || values.body?.length === 0 ?
-                                                            0
-                                                            :
-                                                            values.body?.length <= 160 ? 1 : Math.ceil(values.body?.length / 153)} SMS
-                                                    `}
-                                                </Grid>
-                                            </Grid> */}
-
-
-                                            {/* <TextFieldWrapper
-                                             /> */}
                                             <AutoCompleteWrapper
                                                 minWidth="100%"
-                                                label='Select System Type'
+                                                label='Select Attendence System Type'
                                                 placeholder='select a use system type...'
                                                 options={useSystemtypeOptions}
                                                 value={values.use_system_type}
@@ -248,20 +211,8 @@ const StudentAutoSentSms = () => {
 
                                             {
                                                 values.use_system_type?.id === "external_api"
-                                                // && values.is_active
                                                 && <Grid container columnSpacing={0.5} rowSpacing={1}>
-                                                    {/* <Grid item xs={12}>
-                                                        <TextFieldWrapper
-                                                            name="url"
-                                                            label={<b>URL:</b>}
-                                                            errors={errors.url}
-                                                            touched={touched.url}
-                                                            handleBlur={handleBlur}
-                                                            handleChange={handleChange}
-                                                            value={values.url}
-                                                        />
-                                                        <Grid >example: <span style={{ color: "darkgoldenrod" }}>www.dummy.com</span></Grid>
-                                                    </Grid> */}
+
                                                     {
                                                         values?.url_params?.map((value, index) => (
                                                             <React.Fragment key={value.index + 1}>
@@ -296,58 +247,10 @@ const StudentAutoSentSms = () => {
                                                                         value={value.value}
                                                                     />
                                                                 </Grid>
-                                                                {/* <Grid item xs={1} >
-                                                                    <Button onClick={() => handleDeleteApiKeyValues(index, values.url_params, setFieldValue)} variant="outlined" size='small' sx={{ borderRadius: 0.5 }}>
-                                                                        <DeleteIcon sx={{ color: "red" }} />
-                                                                    </Button>
-                                                                </Grid> */}
+
                                                             </React.Fragment>
                                                         ))
                                                     }
-                                                    <Grid item mx="auto">
-                                                        {/* <ButtonWrapper handleClick={() => setFieldValue("url_params", [...values?.url_params, { key: "", value: "" }])}> + Add Key Values </ButtonWrapper> */}
-                                                    </Grid>
-                                                    {/* <Grid item sm={6}>
-                                                        <TextFieldWrapper
-                                                            name="auth_user"
-                                                            label={t('Auth User')}
-                                                            errors={errors.auth_user}
-                                                            touched={touched.auth_user}
-                                                            handleBlur={handleBlur}
-                                                            handleChange={handleChange}
-                                                            value={values.auth_user}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item sm={6}>
-                                                        <TextFieldWrapper
-                                                            name="auth_code"
-                                                            label={t('Auth Code')}
-                                                            errors={errors.auth_code}
-                                                            touched={touched.auth_code}
-                                                            handleBlur={handleBlur}
-                                                            handleChange={handleChange}
-                                                            value={values.auth_code}
-                                                        />
-                                                    </Grid> */}
-                                                    {/* <AutoCompleteWrapper
-                                                        minWidth="100%"
-                                                        label={t('Academic Year')}
-                                                        placeholder={t('select a academic year')}
-                                                        limitTags={2}
-                                                        // getOptionLabel={(option) => option.id}
-                                                        options={
-                                                            academicYears.map(i => {
-                                                                return {
-                                                                    label: i.title,
-                                                                    id: i.id,
-                                                                }
-                                                            })}
-                                                        value={values.academic_year}
-                                                        handleChange={(e, v) => {
-                                                            setFieldValue('academic_year', v)
-                                                            setFieldValue('academic_year_id', v?.id)
-                                                        }}
-                                                    /> */}
                                                 </Grid>
                                             }
 
@@ -355,25 +258,25 @@ const StudentAutoSentSms = () => {
                                                 <FormControlLabel
                                                     control={
                                                         <Switch
-                                                            name="is_active"
-                                                            checked={values.is_active || false}
+                                                            name="is_attendence_active"
+                                                            checked={values.is_attendence_active || false}
                                                             onChange={handleChange}
                                                             inputProps={{ 'aria-label': 'controlled' }}
                                                             size="medium"
                                                         // color="secondary" 
                                                         />
                                                     }
-                                                    label="System Active"
+                                                    label="Attendence System Active"
                                                     labelPlacement="start"
                                                     sx={{ pl: 0, ml: 0 }}
                                                 />
                                             </Grid>
 
                                             {
-                                                values.is_active
+                                                values.is_attendence_active
                                                 &&
                                                 <>
-                                                    <Grid item>
+                                                    <Grid item px={4}>
                                                         <Stack direction="row" spacing={1} alignItems="center">
                                                             <Tooltip title="when student first time punch the attendance machine" placement="top">
                                                                 <Typography color={!values.every_hit ? "#c026d3" : "lightgray"} fontWeight={'600'}>Only Entry Time</Typography>
@@ -390,25 +293,74 @@ const StudentAutoSentSms = () => {
                                                             </Tooltip>
                                                         </Stack>
                                                     </Grid>
-                                                    {/* <AutoCompleteWrapper
-                                                        minWidth="100%"
-                                                        label={t('Academic Year')}
-                                                        placeholder={t('select a academic year')}
-                                                        limitTags={2}
-                                                        // getOptionLabel={(option) => option.id}
-                                                        options={
-                                                            academicYears.map(i => {
-                                                                return {
-                                                                    label: i.title,
-                                                                    id: i.id,
+
+                                                    <Grid item px={4}>
+                                                        <FormControlLabel
+                                                            control={
+                                                                <Switch
+                                                                    name="is_sms_active"
+                                                                    checked={values.is_sms_active || false}
+                                                                    onChange={handleChange}
+                                                                    inputProps={{ 'aria-label': 'controlled' }}
+                                                                    size="medium"
+                                                                // color="secondary" 
+                                                                />
+                                                            }
+                                                            label="Sms System Active"
+                                                            labelPlacement="start"
+                                                            sx={{ pl: 0, ml: 0 }}
+                                                        />
+                                                    </Grid>
+
+                                                    {
+                                                        values.is_sms_active &&
+                                                        <Grid item pl={8} display="grid" justifyContent="start" columnGap={2} flexWrap="wrap">
+                                                            <FormControlLabel
+                                                                control={
+                                                                    <Switch
+                                                                        name="is_present_sms_active"
+                                                                        checked={values.is_present_sms_active || false}
+                                                                        onChange={handleChange}
+                                                                        inputProps={{ 'aria-label': 'controlled' }}
+                                                                        size="medium"
+                                                                    />
                                                                 }
-                                                            })}
-                                                        value={values.academic_year}
-                                                        handleChange={(e, v) => {
-                                                            setFieldValue('academic_year', v)
-                                                            setFieldValue('academic_year_id', v?.id)
-                                                        }}
-                                                    /> */}
+                                                                label="Present Active"
+                                                                labelPlacement="end"
+                                                                sx={{ pl: 0, ml: 0 }}
+                                                            />
+
+                                                            <FormControlLabel
+                                                                control={
+                                                                    <Switch
+                                                                        name="is_late_sms_active"
+                                                                        checked={values.is_late_sms_active || false}
+                                                                        onChange={handleChange}
+                                                                        inputProps={{ 'aria-label': 'controlled' }}
+                                                                        size="medium"
+                                                                    />
+                                                                }
+                                                                label="Late Sms Active"
+                                                                labelPlacement="end"
+                                                                sx={{ pl: 0, ml: 0 }}
+                                                            />
+
+                                                            <FormControlLabel
+                                                                control={
+                                                                    <Switch
+                                                                        name="is_absence_sms_active"
+                                                                        checked={values.is_absence_sms_active || false}
+                                                                        onChange={handleChange}
+                                                                        inputProps={{ 'aria-label': 'controlled' }}
+                                                                        size="medium"
+                                                                    />
+                                                                }
+                                                                label="Absence Sms Active"
+                                                                labelPlacement="end"
+                                                                sx={{ pl: 0, ml: 0 }}
+                                                            />
+                                                        </Grid>
+                                                    }
                                                 </>
                                             }
 
@@ -416,14 +368,14 @@ const StudentAutoSentSms = () => {
                                                 <FormControlLabel
                                                     control={
                                                         <Switch
-                                                            name="is_auto_admission_sms"
-                                                            checked={values.is_auto_admission_sms || false}
+                                                            name="is_admission_sms_active"
+                                                            checked={values.is_admission_sms_active || false}
                                                             onChange={handleChange}
                                                             inputProps={{ 'aria-label': 'controlled' }}
                                                             size="medium"
                                                         />
                                                     }
-                                                    label="Auto Admission Sms Active"
+                                                    label="Admission Automatice Sms Active"
                                                     labelPlacement="start"
                                                     sx={{ pl: 0, ml: 0 }}
                                                 />
@@ -438,16 +390,17 @@ const StudentAutoSentSms = () => {
                                             px: 3,
                                             pt: 3
                                         }}>
-                                            <ButtonWrapper
+                                            <SearchingButtonWrapper
+                                                isLoading={isLoading}
                                                 handleClick={undefined}
                                                 type="submit"
                                                 startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
                                                 //@ts-ignore
-                                                disabled={Boolean(errors.submit) || isSubmitting}
+                                                disabled={ isLoading || Boolean(errors.submit) || isSubmitting}
                                                 variant="contained"
                                             >
                                                 {t('Submit')}
-                                            </ButtonWrapper>
+                                            </SearchingButtonWrapper>
                                         </DialogActions>
 
                                     </Grid>

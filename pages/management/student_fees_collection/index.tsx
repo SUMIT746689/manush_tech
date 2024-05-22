@@ -22,23 +22,10 @@ import Reset_Sent_SMS_Collect_Invoice from '@/content/FeesCollect/Reset_Sent_SMS
 import dayjs from 'dayjs';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { monthList } from '@/utils/getDay';
+import { Data } from '@/models/front_end';
 
 // updated searching code start
 
-// const monthData = [
-//   { label: 'January', id: 1 },
-//   { label: 'February', id: 2 },
-//   { label: 'March', id: 3 },
-//   { label: 'April', id: 4 },
-//   { label: 'May', id: 5 },
-//   { label: 'June', id: 6 },
-//   { label: 'July', id: 7 },
-//   { label: 'August', id: 8 },
-//   { label: 'September', id: 9 },
-//   { label: 'October', id: 10 },
-//   { label: 'November', id: 11 },
-//   { label: 'December', id: 12 }
-// ];
 const currentDate = new Date();
 const monthIndex = currentDate.getMonth();
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -49,6 +36,7 @@ const monthData = monthList.map((month) => ({ label: month, value: month }));
 
 function Managementschools() {
   // updated code start
+
   const [searchValue, setSearchValue] = useState<any>(null);
   const [searchOptionData, setSearchOptionData] = useState<Array<any>>([]);
   const [userInformation, setUserInformation] = useState<any>(null);
@@ -75,6 +63,12 @@ function Managementschools() {
   const [currDiscount, setCurrDiscount] = useState({});
   const [onTimeDiscountArr, setOnTimeDiscountArr] = useState<Array<any>>([]);
   const [selected_month, setSelectMonth] = useState<string | null>(currentMonthName);
+  const [printAndCollect, setPrintAndCollect] = useState<Boolean>(false);
+  // Fetch school related data code start
+  const { data: schoolData }: { data: Data } = useClientFetch('/api/front_end');
+
+  // Fetch school related data code end
+
   // handleDebounce function
 
   const handleDebounce = async (value) => {
@@ -143,9 +137,6 @@ function Managementschools() {
   };
 
   const leftFeesTableColumnData = (data, default_current_discount = []) => {
-    // console.log('all data is here ******************************************* #################');
-    // console.log(default_current_discount);
-    console.log(data?.fees);
     let totalDue = 0,
       totalCurrentDue = 0;
     let totalObj = {
@@ -278,12 +269,14 @@ function Managementschools() {
     // total (amount , Late Fee,  Paid Amount, Discount, Due)  functionality
 
     feesData.forEach((item) => {
-      totalObj.amount = totalObj.amount + item.amount;
-      totalObj.late_fee = totalObj.late_fee + item.late_fee;
-      totalObj.paidAmount = totalObj.paidAmount + item.paidAmount;
-      totalObj.discount = totalObj.discount + item.discount;
-      totalObj.currDiscount = totalCurrentDue ? totalCurrentDue : 0;
-      totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
+      if (item.dueAmount !== 0) {
+        totalObj.amount = totalObj.amount + item.amount;
+        totalObj.late_fee = totalObj.late_fee + item.late_fee;
+        totalObj.paidAmount = totalObj.paidAmount + item.paidAmount;
+        totalObj.discount = totalObj.discount + item.discount;
+        totalObj.currDiscount = totalCurrentDue ? totalCurrentDue : 0;
+        totalObj.dueAmount = totalObj.dueAmount + item.dueAmount;
+      }
     });
 
     setLeftFeesTableData(feesData);
@@ -302,6 +295,8 @@ function Managementschools() {
     // student information code end
   };
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    // setPrintAndCollect(false);
+    // setShowPrint(false);
     setSelectedRowsFeesTable([]);
     setSelectAll(false);
     setCurrDiscount({});
@@ -461,6 +456,7 @@ function Managementschools() {
   const { data: classData, error: classError } = useClientFetch('/api/class');
   const [gatewayOption, setGatewayOption] = useState([]);
   const [showPrint, setShowPrint] = useState(false);
+  const [isCompleteUpdate, setIsCompleteUpdate] = useState(false);
 
   useEffect(() => {
     const temp = datas.filter((i) => {
@@ -485,7 +481,7 @@ function Managementschools() {
     if (lastOne) {
       temp.push({
         ...temp[0],
-
+        on_time_discount: 0,
         amount: lastOne.paidAmount,
         late_fee: 0,
         account: lastOne.account,
@@ -586,12 +582,18 @@ function Managementschools() {
         setIsSentSmsLoading(false);
       });
   };
-
+  // old code
   // useEffect(() => {
-  //   if (!showPrint || prinCollectedtFees.length === 0) return;
+  //   if (!showPrint || prinCollectedtFees.length === 0) return; // !false = true   || !true == false
   //   handlePrint();
   //   setShowPrint(false);
   // }, [showPrint]);
+
+  // useEffect(() => {
+  //   if (printAndCollect === false || prinCollectedtFees.length === 0) return; // false
+  //   handlePrint();
+  //   setPrintAndCollect(false);
+  // }, [printAndCollect, printFees]);
 
   useEffect(() => {
     // label: i.title,
@@ -654,6 +656,9 @@ function Managementschools() {
         <Grid sx={{ display: 'none' }}>
           <Grid px={4} sx={{ backgroundColor: '#fff' }} ref={printPageRef}>
             <DesignPaymentInvoice
+              schoolData={schoolData}
+              printAndCollect={printAndCollect}
+              setPrintAndCollect={setPrintAndCollect}
               student_id={student_id}
               collectionDate={collectionDate}
               leftFeesTableTotalCalculation={leftFeesTableTotalCalculation}
@@ -663,6 +668,7 @@ function Managementschools() {
               setShowPrint={setShowPrint}
               printFees={prinCollectedtFees}
               student={selectedStudent}
+              setIsCompleteUpdate={setIsCompleteUpdate}
             />
           </Grid>
         </Grid>
@@ -742,7 +748,10 @@ function Managementschools() {
             selectedAccount={selectedAccount}
             selectedGateway={selectedGateway}
           />
+
           <PaymentOptions
+            printAndCollect={printAndCollect}
+            setPrintAndCollect={setPrintAndCollect}
             onTimeDiscountArr={onTimeDiscountArr}
             setOnTimeDiscountArr={setOnTimeDiscountArr}
             totalDueValue={totalDueValue}

@@ -9,6 +9,8 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  printAndCollect,
+  setPrintAndCollect,
   onTimeDiscountArr,
   setOnTimeDiscountArr,
   children,
@@ -84,7 +86,7 @@ const PaymentOptions = ({
   }, [selectedRows, tableData]);
 
   // handleCollectFunction
-  const handleCollect = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleCollect = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, v) => {
     const dueAmount = [];
 
     for (let i = 0; i < selectedRows.length; i++) {
@@ -278,6 +280,7 @@ const PaymentOptions = ({
               }
             }
           }
+
           setOnTimeDiscountArr([]);
           setPrintFees(printResult);
           handleStudentPaymentCollect(printResult);
@@ -285,6 +288,12 @@ const PaymentOptions = ({
           deSelectAllCheckbox();
           setFeesAmount('');
           setFeesName('');
+
+          // check print and collect functionality code start
+          if (v === 'print and collect') {
+            setPrintAndCollect(true);
+          }
+          // check print and collect functionality code end
           showNotification(`Congratulations! Payment Successfully Processed`, 'success');
         }
       })
@@ -352,7 +361,7 @@ const PaymentOptions = ({
               setSelectedGateway(value);
             }}
           />
-          {selectedGateway?.label && selectedGateway?.label !== 'Cash' && (
+          {selectedGateway?.label && selectedGateway?.label?.toLowerCase() !== 'cash' && (
             <TextFieldWrapper
               label="trans ID"
               name=""
@@ -411,11 +420,22 @@ const PaymentOptions = ({
             variant="contained"
             disabled={(selectedRows.length > 0 || totalFeesCalculate > 0) && feesUserData?.id ? false : true}
             //disabled={feesUserData?.id ? false : true}
-            onClick={handleCollect}
+            onClick={(e) => handleCollect(e, 'collect')}
             sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
           >
             Collect
           </Button>
+
+          {/* <Button
+            variant="contained"
+            disabled={(selectedRows.length > 0 || totalFeesCalculate > 0) && feesUserData?.id ? false : true}
+            //disabled={feesUserData?.id ? false : true}
+            onClick={(e) => handleCollect(e, 'print and collect')}
+            sx={{ borderRadius: 0.5, padding: '6px', width: '100%' }}
+          >
+            Print and Collect
+          </Button> */}
+
           <Grid display={{ sm: 'none' }}>{children}</Grid>
         </Grid>
       </Box>

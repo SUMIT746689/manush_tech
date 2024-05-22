@@ -19,8 +19,7 @@ const index = async (req, res, refresh_token, academic_year) => {
 
         const query = {};
 
-        if (!search_value && !student_id)
-          throw new Error('search value field is empty ');
+        if (!search_value && !student_id) throw new Error('search value field is empty ');
 
         if (student_id) {
           students = await prisma.$queryRaw`SELECT 
@@ -94,7 +93,8 @@ const index = async (req, res, refresh_token, academic_year) => {
         //         }
         //     }
         // })
-        res.status(200).json(students);
+
+        res.status(200).json(students.slice(0, 50));
         break;
 
       default:

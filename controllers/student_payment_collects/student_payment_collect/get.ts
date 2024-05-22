@@ -197,7 +197,13 @@ export const get = async (req, res) => {
         }
       });
 
-    let newFees = fees.map((item) => {
+    // remove deleted fees
+
+    let filterDeletedFees = fees?.filter((item) => {
+      return item.deleted_at === null;
+    });
+
+    let newFees = filterDeletedFees?.map((item) => {
       return {
         ...item,
         on_time_discount: 0

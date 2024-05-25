@@ -21,7 +21,7 @@ async function post(req, res, refresh_token) {
       }
     })
 
-    return res.json({ message: "successfully sending messages...", success: true });
+    return res.json({ message: "process sending messages...", success: true });
 
   } catch (err) {
     logFile.error(err.message)

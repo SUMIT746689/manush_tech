@@ -234,6 +234,8 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
             // group_id: editSection?.group_id || null,
             class_teacher_id: editSection?.class_teacher_id || null,
             std_entry_time: editSection?.std_entry_time || '',
+            std_late_time: editSection?.std_late_time || '',
+            std_absence_time: editSection?.std_absence_time || '',
             std_exit_time: editSection?.std_exit_time || '',
           }}
           validationSchema={Yup.object().shape({
@@ -372,6 +374,18 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
                       label="Student Entry Time"
                       value={values.std_entry_time}
                       handleChange={(value) => setFieldValue("std_entry_time", value)}
+                    />
+
+                    <TimePickerWrapper
+                      label="Student Late Time"
+                      value={values.std_late_time}
+                      handleChange={(value) => setFieldValue("std_late_time", value)}
+                    />
+
+                    <TimePickerWrapper
+                      label="Student Absence Time"
+                      value={values.std_absence_time}
+                      handleChange={(value) => setFieldValue("std_absence_time", value)}
                     />
 
                     <TimePickerWrapper

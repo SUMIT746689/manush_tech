@@ -6,11 +6,11 @@ import { logFile } from 'utilities_api/handleLogFile';
 // @ts-ignore
 const post = async (req, res, refresh_token) => {
   try {
-    let { name, class_ids, std_entry_time, std_exit_time } = req.body;
+    let { name, class_ids, std_entry_time, std_late_time, std_absence_time, std_exit_time } = req.body;
     // console.log({ class_ids })
     for (const cls of class_ids) {
       const class_id = cls.id;
-      console.log({class_id })
+      console.log({ class_id })
 
       let query = {
         name,
@@ -18,6 +18,8 @@ const post = async (req, res, refresh_token) => {
       };
 
       if (std_entry_time) query["std_entry_time"] = new Date(std_entry_time)
+      if (std_late_time) query["std_late_time"] = new Date(std_late_time)
+      if (std_absence_time) query["std_absence_time"] = new Date(std_absence_time)
       if (std_exit_time) query["std_exit_time"] = new Date(std_exit_time)
 
       const class_ = await prisma.class.findUnique({

@@ -35,8 +35,8 @@ export const updateAttendance = async ({ user_id, id, exit_time }) => {
 }
 
 export const createAttendance = async (datas) => {
+    const { student_id, status, section_id, school_id, first_name, middle_name, last_name, section_name, class_name, class_roll_no, entry_time, exit_time } = datas;
     try {
-        const { student_id, status, section_id, school_id, first_name, middle_name, last_name, section_name, class_name, class_roll_no, entry_time, exit_time } = datas;
         if (!student_id || !status || !school_id || !first_name || !section_id || !section_name || !class_name || !class_roll_no || !entry_time) {
             return { error: `student_id(${student_id}) create attendance table failed ` }
         }

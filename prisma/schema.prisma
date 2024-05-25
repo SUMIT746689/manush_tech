@@ -225,7 +225,10 @@ model Section {
   class_teacher_id Int?
   is_class         Boolean   @default(true)
   std_entry_time   DateTime? @db.Time()
+  std_late_time    DateTime? @db.Time()
+  std_absence_time DateTime? @db.Time()
   std_exit_time    DateTime? @db.Time()
+  updated_by       Json?     @default("{}")
 
   class                      Class                        @relation(fields: [class_id], references: [id])
   class_teacher              Teacher?                     @relation("class_teacher", fields: [class_teacher_id], references: [id])
@@ -663,7 +666,7 @@ model Attendance {
 
 enum AttendenceStatus {
   present
-  absent
+  absence
   late
   bunk
   holiday

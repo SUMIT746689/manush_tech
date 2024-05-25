@@ -16,8 +16,9 @@ export function DropDownSelectWrapper({ value, name = '', label, handleChange, m
           value={value}
           label={required ? label + ' *' : label}
           onChange={handleChange}
+          sx={{textTransform:"capitalize"}}
         >
-          {menuItems.map((menuItem, index) => <MenuItem key={index} value={menuItem}>{menuItem}</MenuItem>)}
+          {menuItems.map((menuItem, index) => <MenuItem key={index} value={menuItem} sx={{textTransform:"capitalize"}}>{menuItem.split('_').join(' ')}</MenuItem>)}
         </Select>
       </FormControl>
     </Grid>

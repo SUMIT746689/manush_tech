@@ -12,9 +12,11 @@ import { fetchData } from '@/utils/post';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import useNotistick from '@/hooks/useNotistick';
+import { DropDownSelectWrapper } from '@/components/DropDown';
 function Attendence() {
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [selectStudentAttendType, setSelectStudentAttendType] = useState('all_Student');
   const [academicYear,] = useContext(AcademicYearContext);
   const { showNotification } = useNotistick();
 
@@ -29,8 +31,9 @@ function Attendence() {
 
     fetchData(url, "post", {})
       .then(([err, data]) => {
-        console.log({data}) 
-         err ? showNotification(err, 'error') : showNotification(data?.message || 'successfully sending...', 'success') })
+        console.log({ data })
+        err ? showNotification(err, 'error') : showNotification(data?.message || 'successfully sending...', 'success')
+      })
       .catch(err => showNotification(err?.response?.data?.message || " failed to sending sms", 'error'))
   }
 
@@ -44,13 +47,22 @@ function Attendence() {
           name="Student Attendence"
           handleCreateClassOpen={true}
           actionButton={
-            <Grid item minWidth={200} pt={1} >
-              {
-                selectedClass ?
-                  <ButtonWrapper handleClick={handleSendSms}> + Send Sms (Selected Student) </ButtonWrapper>
-                  :
-                  <DisableButtonWrapper > + Send Sms (Selected Student) </DisableButtonWrapper>
-              }
+            <Grid item pt={1} display="flex" flexDirection={{xs:'column',sm:"row"}} gap={0.5} >
+              <DropDownSelectWrapper
+                name= 'Sms Send For' 
+                label='Sms Send For'
+                value={selectStudentAttendType}
+                handleChange={(e) => { setSelectStudentAttendType(e.target.value); console.log({ e: e.target.value }) }}
+                menuItems={["all_type", "present", "late", "absence"]}
+              />
+              <Grid sx={{minWidth:{sm:235}}}>
+                {
+                  selectedClass ?
+                    <ButtonWrapper handleClick={handleSendSms}> + Send Sms (Selected Student) </ButtonWrapper>
+                    :
+                    <DisableButtonWrapper > + Send Sms (Selected Student) </DisableButtonWrapper>
+                }
+              </Grid>
             </Grid>
           }
         />
@@ -59,12 +71,12 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 4 }}
+        sx={{ px: 2 }}
         container
         direction="row"
         justifyContent="center"
         alignItems="stretch"
-        spacing={3}
+        spacing={2}
       >
         <Grid item xs={12}>
           <Results selectedClass={selectedClass} setSelectedClass={setSelectedClass} selectedSection={selectedSection} setSelectedSection={setSelectedSection} />

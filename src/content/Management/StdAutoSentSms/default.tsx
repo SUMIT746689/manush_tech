@@ -25,6 +25,7 @@ const dynamicStudentDataKeys = [
     'date_of_birth',
     // 'admission_status',
     'gender',
+    'relation_with_guardian',
     'religion',
     'phone',
     'email',
@@ -55,7 +56,7 @@ const dynamicStudentDataKeys = [
     // 'relation_with_guardian',
     'student_present_address',
     'submission_time',
-    'attendance_status',
+    // 'attendance_status',
     // 'created_at',
     'admission_status'
 ];
@@ -396,7 +397,7 @@ const StudentAutoSentSms = () => {
                                                 type="submit"
                                                 startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
                                                 //@ts-ignore
-                                                disabled={ isLoading || Boolean(errors.submit) || isSubmitting}
+                                                disabled={isLoading || Boolean(errors.submit) || isSubmitting}
                                                 variant="contained"
                                             >
                                                 {t('Submit')}

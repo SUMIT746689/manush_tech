@@ -19,6 +19,8 @@ export const handleResStdInfo = async ({ user_id }) => {
                         id: true,
                         name: true,
                         std_entry_time: true,
+                        std_late_time: true,
+                        std_absence_time: true,
                         std_exit_time: true,
                         class: {
                             select:
@@ -34,6 +36,7 @@ export const handleResStdInfo = async ({ user_id }) => {
                         last_name: true,
                         school_id: true,
                         phone: true,
+                        gender:true,
                         school: {
                             select: {
                                 name: true,

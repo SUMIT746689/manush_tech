@@ -55,15 +55,16 @@ export const deleteTblAttendanceQueues = async ({ ids }) => {
     }
 }
 
-export const userWiseAttendanceQueuesWithStatus = async ({ user_id, entry_time, min_attend_datetime, max_attend_datetime }) => {
+export const userWiseAttendanceQueuesWithStatus = async ({ user_id, entry_time, late_time, absence_time, min_attend_datetime, max_attend_datetime }) => {
     try {
         const res = await prisma.$queryRaw`
         SELECT
             id,
             (
                 CASE 
-                WHEN TIME(MIN(submission_time) OVER()) < TIME(${entry_time}) THEN "present"
-                ELSE "late"
+                WHEN TIME(MIN(submission_time) OVER()) <= TIME(${late_time}) THEN "present"
+                WHEN TIME(MIN(submission_time) OVER()) <= TIME(${absence_time}) THEN "late"
+                ELSE "absence"
                 END
             ) AS status,
             MIN(submission_time) OVER() AS entry_time,

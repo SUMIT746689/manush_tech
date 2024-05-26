@@ -57,7 +57,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
                     entry_time = stdAttendanceQ[0].entry_time;
                     exit_time = stdAttendanceQ.length > 1 ? stdAttendanceQ[0].exit_time : undefined;
                 };
-                if(!stdAttendanceQ.length === 0 ) return logFile.error(`today student user_id(${user_id}) attendence list not founds `)
+                if (!stdAttendanceQ.length === 0) return logFile.error(`today student user_id(${user_id}) attendence list not founds `)
                 const createAttendanceDatas = {
                     student_id: id,
                     status: stdAttendanceQ[0].status,
@@ -81,6 +81,7 @@ export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }
                 if (errorDeletetblAttQueues) return logFile.error(errorDeletetblAttQueues);
                 logFile.info("tbl_attendance_queue delete successfull");
 
+                if (!resAutoAttendanceSentSms?.is_sms_active) return logFile.info(`school id(${student_info.school_id}) "is_sms_active" is false for sent sms student_id(${id})  `)
                 // sent sms
                 // const resAutoAttendanceSentSms = Array.isArray((resStudent.student_info.school.AutoAttendanceSentSms)) && resStudent.student_info.school.AutoAttendanceSentSms.length > 0 ? resStudent.student_info.school.AutoAttendanceSentSms[0] : {};
                 sentSms(resAutoAttendanceSentSms, isAlreadyAttendanceEntry, resStudent, user_id, stdAttendanceQ[0].exit_time, stdAttendanceQ[0].status);

@@ -14,6 +14,7 @@ import { MobileDatePicker } from '@mui/lab';
 import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper';
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { TextFieldWrapper } from '@/components/TextFields';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 
 
@@ -38,8 +39,8 @@ const columns = [
   },
   {
     width: 30,
-    label: 'Guardian Phone',
-    dataKey: 'guardian_phone',
+    label: 'Phone Number',
+    dataKey: 'phone_number',
 
   },
 ];
@@ -194,7 +195,7 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
         }}
       >
         <FormControlLabel value="present" control={<Radio />} label="Present" />
-        <FormControlLabel value="absent" control={<Radio />} label="Absent" />
+        <FormControlLabel value="absence" control={<Radio />} label="absence" />
         <FormControlLabel value="late" control={<Radio />} label="Late" />
         <FormControlLabel value="bunk" control={<Radio />} label="Bunk" />
         <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
@@ -221,7 +222,7 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
 const allAttandenceOptions = [
   { label: 'Not Taken', id: 'notTaken' },
   { label: 'All Present', id: 'present' },
-  { label: 'All Absent', id: 'absent' },
+  { label: 'All Absence', id: 'absence' },
   { label: 'All Late', id: 'late' },
   { label: 'All Bunk', id: 'bunk' },
   { label: 'All Holiday', id: 'holiday' }
@@ -233,7 +234,7 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
   const [targetsectionStudents, setTargetsectionStudents] = useState([]);
   const [students, setStudents] = useState(null);
   const [classes, setClasses] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
 
 
   const [sectionAttendence, setSectionAttendence] = useState([])
@@ -288,7 +289,7 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
               id: i.id,
               name: `${i.student_info.first_name} ${i.student_info.middle_name ? i.student_info.middle_name : ''} ${i.student_info.last_name ? i.student_info.last_name : ''}`,
               class_roll_no: i.class_roll_no,
-              guardian_phone: i.guardian_phone,
+              phone_number: i?.student_info?.phone,
               attendence: attendance,
               remark: remark
             }
@@ -318,8 +319,11 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
           handleAttendenceFind()
           setSelectedForAll(null)
           setSectionAttendence([])
+          showNotification("updated successfully")
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          handleShowErrMsg(err, showNotification);
+        })
     }
     else {
       axios.post(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}`, {
@@ -334,8 +338,13 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
           handleAttendenceFind()
           setSelectedForAll(null)
           setSectionAttendence([])
+          showNotification("updated successfully")
+
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          handleShowErrMsg(err, showNotification)
+        }
+        )
     }
   }
 

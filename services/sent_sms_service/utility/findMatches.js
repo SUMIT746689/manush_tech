@@ -3,6 +3,5 @@ export const findMatches = (inputString) => {
 
     const allMatches = [...inputString.matchAll(pattern)].map(v => v[1]);
     const allUniqueMatches = [...new Set(allMatches)]
-    console.log({ allUniqueMatches })
     return allUniqueMatches;
 }

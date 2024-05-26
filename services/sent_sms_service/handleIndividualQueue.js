@@ -89,8 +89,8 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         student["relation_with_guardian"] = gender ? gender === "male" ? 'son' : 'daughter' : ''
 
         let select_sent_sms_status = attendance_status || "absence";
-        if (sent_sms_std_status !== "all_type") select_sent_sms_status = select_sent_sms_status;
-
+        if (sent_sms_std_status !== "all_type" && sent_sms_std_status !== attendance_status) return logFile.info(`student_id(${student.id}) attendence status(${attendance_status}), sent_sms_status(${sent_sms_std_status}) `)
+        // if (sent_sms_std_status !== "all_type") select_sent_sms_status = select_sent_sms_status;
         // select sms body 
         let sms_text = resAutoAttendanceSentSms[`${select_sent_sms_status}_body`];
         if (!sms_text) return logFile.error(`${select_sent_sms_status}_body is not founds`);

@@ -66,8 +66,8 @@ const study_materials = [
 ]
 const sms = [
     { color: quickLinksColors[0], linkUrl: "/bulk_sms_and_email/send_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Send Sms" },
-    { color: quickLinksColors[1], linkUrl: "/bulk_sms_and_email/send_voice_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Send Voice Sms" },
-    { color: quickLinksColors[2], linkUrl: "/settings/student_autometic_sent_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Sms Setting" },
+    { color: quickLinksColors[1], linkUrl: "/voice_msg/send_voice_msg", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Send Voice Sms" },
+    { color: quickLinksColors[2], linkUrl: "/settings/sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Sms Setting" },
     { color: quickLinksColors[1], linkUrl: "/settings/student_autometic_sent_sms", icon: <SmsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Auto Attendence Sms Setting" },
 
 ]

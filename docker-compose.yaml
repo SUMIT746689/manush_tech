@@ -1,6 +1,6 @@
 services:
   admin:
-    image: ridoy235/elitbuzz:school_admin_v19
+    image: ridoy235/elitbuzz:school_admin_v20
     pull_policy: always
     volumes: 
       - AllFiles:/app/AllFiles

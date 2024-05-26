@@ -11,7 +11,7 @@ import { handleNumberOfSmsParts } from "./utility/handleNoOfSmsParts.js";
 
 export const handleIndividualQueue = async ({ student_attendace_queue, std_min_attend_date_wise, std_max_attend_date_wise }) => {
   try {
-    const { id, class_id, section_id, school_id, academic_year_id, created_at } = student_attendace_queue;
+    const { id, class_id, section_id, school_id, academic_year_id, sent_sms_std_status, created_at } = student_attendace_queue;
 
     // verify sms gateway
     const { error, data: smsGatewayData } = await handleSmsGateWay({ school_id });
@@ -43,10 +43,6 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
 
     if (AutoAttendanceSentSms.length === 0) return logFile.error(`error school_id(${school_id}) auto_attendance_sent_sms table datas not founds  `);
 
-    // sms type verify  
-    const isUnicode = verifyIsUnicode(AutoAttendanceSentSms[0].body);
-    const sms_type = isUnicode ? 'unicode' : 'text';
-
     // delete queue
     prisma.tbl_student_sent_sms_queue.delete({ where: { id } }).catch(err => { logFile.error("error delete tbl_manual_student_attendace_queue", err) });
 
@@ -64,11 +60,12 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         const haveAttendance = await stdAlreadyAttendance({ student_id: student.id, gte: std_min_attend_date_wise, lte: std_max_attend_date_wise })
         const { id: attedanceId, status: attendance_status } = haveAttendance || {}
         logFile.info(JSON.stringify(haveAttendance));
+
         if (!attedanceId) {
           const createAttendaceDatas = {
             student_id: student.id,
             date: new Date(Date.now()),
-            status: 'late',
+            status: 'absence',
             school_id,
             first_name,
             middle_name,
@@ -88,12 +85,25 @@ export const handleIndividualQueue = async ({ student_attendace_queue, std_min_a
         // get sent sms configurations
         const resAutoAttendanceSentSms = Array.isArray((AutoAttendanceSentSms)) && AutoAttendanceSentSms.length > 0 ? AutoAttendanceSentSms[0] : {};
 
+        // add custom kwy values 
+        student["relation_with_guardian"] = gender ? gender === "male" ? 'son' : 'daughter' : ''
+
+        let select_sent_sms_status = attendance_status || "absence";
+        if (sent_sms_std_status !== "all_type") select_sent_sms_status = select_sent_sms_status;
+
+        // select sms body 
+        let sms_text = resAutoAttendanceSentSms[`${select_sent_sms_status}_body`];
+        if (!sms_text) return logFile.error(`${select_sent_sms_status}_body is not founds`);
+
         //dynamic values replace
-        let sms_text = resAutoAttendanceSentSms.body;
-        const allMatchesArray = findMatches(resAutoAttendanceSentSms.body);
+        const allMatchesArray = findMatches(sms_text);
         for (const element of allMatchesArray) {
-          sms_text = sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || (element === 'attendance_status' && (attendance_status || 'late')) || element === 'submission_time' && customizeDateWithTime(created_at) || '')
+          sms_text = sms_text.replaceAll(`#${element}#`, student[element] || student_info[element] || (element === 'attendance_status' && (attendance_status || 'absence')) || element === 'submission_time' && customizeDateWithTime(created_at) || '')
         }
+
+        // sms type verify
+        const isUnicode = verifyIsUnicode(sms_text);
+        const sms_type = isUnicode ? 'unicode' : 'text';
 
         // remove extra spaces
         sms_text = sms_text.replace(/ +(?= )/g, '');

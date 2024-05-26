@@ -21,7 +21,7 @@ async function post(req, res, refresh_token) {
         academic_year_id: parseInt(academic_year_id),
         sent_sms_std_status
       }
-    })
+    }).then((res)=>{console.log({res})})
 
     return res.json({ message: "process sending messages...", success: true });
 

@@ -70,10 +70,9 @@ const postSchool = async (req, res, authenticate_user) => {
             admins: { connect: admins },
             AutoAttendanceSentSms: {
               create: {
-                body: 'dear parents, your child #first_name# #middle_name# #last_name# is punch time #submission_time#',
-                is_active: false,
-                every_hit: false,
-                body_format: 'text'
+                present_body: 'Dear parents, your #relation_with_guardian# #first_name# #middle_name# #last_name# is present today. Punch time #submission_time#',
+                absence_body: 'Dear parents, your #relation_with_guardian# #first_name# #middle_name# #last_name# is absence todday. Punch time #submission_time#',
+                late_body: 'Dear parents, your #relation_with_guardian# #first_name# #middle_name# #last_name# is late today. Punch time #submission_time#',
               }
             },
             admin_panel: {

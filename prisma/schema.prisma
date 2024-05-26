@@ -1186,13 +1186,21 @@ enum DiscountType {
   flat
 }
 
+enum SelectedStatusType {
+  all_type
+  present
+  late
+  absence
+}
+
 model tbl_student_sent_sms_queue {
-  id               Int      @id @default(autoincrement())
-  class_id         Int
-  section_id       Int?
-  school_id        Int
-  academic_year_id Int
-  created_at       DateTime @default(now())
+  id                  Int                @id @default(autoincrement())
+  class_id            Int
+  section_id          Int?
+  school_id           Int
+  academic_year_id    Int
+  sent_sms_std_status SelectedStatusType?
+  created_at          DateTime           @default(now())
 
   class        Class        @relation(fields: [class_id], references: [id])
   sections     Section?     @relation(fields: [section_id], references: [id])

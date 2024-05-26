@@ -16,7 +16,7 @@ import { DropDownSelectWrapper } from '@/components/DropDown';
 function Attendence() {
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [selectStudentAttendType, setSelectStudentAttendType] = useState('all_Student');
+  const [selectStudentAttendType, setSelectStudentAttendType] = useState('all_type');
   const [academicYear,] = useContext(AcademicYearContext);
   const { showNotification } = useNotistick();
 
@@ -26,7 +26,7 @@ function Attendence() {
     // if(selectedSection?.id) url.searchParams.set("section_id", selectedSection.id);
     if (!selectedClass?.id || !academicYear?.id) return showNotification("class or academic year not selected", 'error');
 
-    let url = `/api/attendance/machine/send_sms_student?academic_year_id=${academicYear.id}&class_id=${selectedClass.id}&`;
+    let url = `/api/attendance/machine/send_sms_student?academic_year_id=${academicYear.id}&class_id=${selectedClass.id}&sent_sms_std_status=${selectStudentAttendType}&`;
     if (selectedSection?.id) url += `section_id=${selectedSection.id}`
 
     fetchData(url, "post", {})
@@ -47,15 +47,15 @@ function Attendence() {
           name="Student Attendence"
           handleCreateClassOpen={true}
           actionButton={
-            <Grid item pt={1} display="flex" flexDirection={{xs:'column',sm:"row"}} gap={0.5} >
+            <Grid item pt={1} display="flex" flexDirection={{ xs: 'column', sm: "row" }} gap={0.5} >
               <DropDownSelectWrapper
-                name= 'Sms Send For' 
+                name='Sms Send For'
                 label='Sms Send For'
                 value={selectStudentAttendType}
                 handleChange={(e) => { setSelectStudentAttendType(e.target.value); console.log({ e: e.target.value }) }}
                 menuItems={["all_type", "present", "late", "absence"]}
               />
-              <Grid sx={{minWidth:{sm:235}}}>
+              <Grid sx={{ minWidth: { sm: 235 } }}>
                 {
                   selectedClass ?
                     <ButtonWrapper handleClick={handleSendSms}> + Send Sms (Selected Student) </ButtonWrapper>

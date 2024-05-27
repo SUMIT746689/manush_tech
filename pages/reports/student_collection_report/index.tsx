@@ -1,0 +1,416 @@
+import Head from 'next/head';
+import { Authenticated } from 'src/components/Authenticated';
+import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
+import { Typography, Grid } from '@mui/material';
+import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { DatePickerWrapper } from '@/components/DatePickerWrapper';
+import TableContainer from '@mui/material/TableContainer';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableBody from '@mui/material/TableBody';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
+import { useState, ChangeEvent } from 'react';
+import dayjs from 'dayjs';
+import { useClientFetch } from 'src/hooks/useClientFetch';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import Footer from '@/components/Footer';
+
+import { styled } from '@mui/material/styles';
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(even)': {
+    backgroundColor: 'rgba(0, 0, 0, 0.03)'
+  },
+  ':hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.10)'
+  }
+  // hide last border
+  // '&:last-child td, &:last-child th': {
+  //   border: 0
+  // }
+}));
+
+const StudentCollectionReport = () => {
+  const { showNotification } = useNotistick();
+  const { data: classData, error: classError } = useClientFetch('/api/class');
+  const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
+  const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [sections, setSections] = useState<Array<any>>([]);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [groups, setGroups] = useState<Array<any>>([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [studentFees, setStudentFees] = useState<Array<any>>([]);
+
+  const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setStartDate(event);
+  };
+  const endDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setEndDate(event);
+  };
+
+  const handleGroupSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    setSelectedGroup(newValue);
+  };
+  const handleSectionSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    setSelectedSection(newValue);
+  };
+
+  const handleClassSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    if (newValue) {
+      const targetClassSections = classData.find((i) => i.id == newValue.id);
+      setSelectedClass(newValue);
+
+      const setTargetSection = targetClassSections?.sections?.map((i) => {
+        return {
+          label: i.name,
+          id: i.id
+        };
+      });
+      setSections([
+        {
+          label: 'Select all',
+          id: null
+        },
+        ...setTargetSection
+      ]);
+      const setTargetGroup = targetClassSections?.Group?.map((i) => {
+        return {
+          label: i.title,
+          id: i.id
+        };
+      });
+
+      setGroups([
+        {
+          label: 'Select all',
+          id: null
+        },
+        ...setTargetGroup
+      ]);
+      if (!newValue.has_section) {
+        setSelectedSection({
+          label: targetClassSections?.sections[0]?.name,
+          id: targetClassSections?.sections[0]?.id
+        });
+      } else {
+        setSelectedSection(null);
+      }
+    } else {
+      setSections([]);
+      setSelectedSection(null);
+      setGroups([]);
+      setSelectedGroup(null);
+    }
+  };
+
+  // fetch student related data code start
+  const getStudentInfo = () => {
+    let groupSectionArr = [selectedSection?.id];
+    let groupQueryArr = [selectedGroup?.id];
+    if (!selectedSection?.id) {
+      groupSectionArr = sections
+        ?.map((item) => {
+          return item.id;
+        })
+        ?.filter((item) => {
+          return item !== null;
+        });
+    }
+    if (!selectedGroup?.id) {
+      groupQueryArr = [];
+    }
+
+    return axios.get(
+      `/api/reports/student_collections?start_date=${startDate}&end_date=${endDate}&selected_class=${selectedClass?.id}&selected_group=${
+        groupQueryArr?.length > 0 ? groupQueryArr : ''
+      }&selected_section=${groupSectionArr}`
+    );
+  };
+  // fetch student related data code end
+  // Debounce function
+  const debounce = (func, delay) => {
+    let timerId;
+    return function (...args) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+  const handleClickStudentInfo = debounce(async () => {
+    try {
+      if (!selectedClass) {
+        showNotification('Please select a class before proceeding', 'error');
+        return;
+      }
+      const res = await getStudentInfo();
+
+      setStudentFees(res?.data?.result);
+    } catch (error) {
+      // console.log(error);
+    }
+  }, 1000);
+
+  return (
+    <>
+      <Head>
+        <title>Student Collection_Report</title>
+      </Head>
+      <Typography
+        variant="h4"
+        textTransform="uppercase"
+        py={{
+          md: 3,
+          xs: 2
+        }}
+        px={2}
+      >
+        Student Collection Report
+      </Typography>
+      {/* searching part code start */}
+      <Grid display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} px={1} mt={1} minHeight="fit-content">
+        {/* split your code start */}
+        <Grid
+          sx={{
+            overflow: 'hidden',
+            backgroundColor: '#fff'
+          }}
+        >
+          <Grid px={1} pt="9px">
+            <Grid
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                columnGap: '20px',
+                rowGap: '0',
+                flexWrap: 'wrap'
+              }}
+            >
+              {/* Start date field */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1
+                }}
+              >
+                <DatePickerWrapper label={'Start Date *'} date={startDate} handleChange={startDatePickerHandleChange} />
+              </Grid>
+              {/* End date field */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1
+                }}
+              >
+                <DatePickerWrapper label={'End Date *'} date={endDate} handleChange={endDatePickerHandleChange} />
+              </Grid>
+              {/* Class field */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1
+                }}
+              >
+                <AutoCompleteWrapper
+                  options={
+                    classData?.map((i) => {
+                      return {
+                        label: i.name,
+                        id: i.id,
+                        has_section: i.has_section
+                      };
+                    }) || []
+                  }
+                  value={selectedClass}
+                  label="Select Class *"
+                  placeholder="Select a Class"
+                  handleChange={handleClassSelect}
+                />
+              </Grid>
+
+              {/* Group field */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1
+                }}
+              >
+                <AutoCompleteWrapper
+                  options={groups}
+                  value={selectedGroup}
+                  label="Select Group"
+                  placeholder="Select a Group"
+                  handleChange={handleGroupSelect}
+                />
+              </Grid>
+
+              {/* Section field */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1
+                }}
+              >
+                <AutoCompleteWrapper
+                  options={sections}
+                  value={selectedSection}
+                  label="Select Section"
+                  placeholder="Select a Section"
+                  handleChange={handleSectionSelect}
+                />
+              </Grid>
+
+              {/* Search button */}
+              <Grid
+                sx={{
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '30%',
+                    xl: '15%'
+                  },
+                  flexGrow: 1,
+                  position: 'relative',
+                  display: 'flex',
+                  gap: 1
+                }}
+              >
+                <Grid
+                  sx={{
+                    flexGrow: 1
+                  }}
+                >
+                  <SearchingButtonWrapper isLoading={false} handleClick={handleClickStudentInfo} disabled={false} children={'Search'} />
+                </Grid>
+                <Grid
+                  sx={{
+                    flexGrow: 1
+                  }}
+                >
+                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        {/* split your code end */}
+      </Grid>
+      {/* searching part code end */}
+
+      {/* table code part start */}
+
+      <Grid
+        mt={3}
+        mb={4}
+        px={1}
+        sx={{
+          width: {
+            xs: '100vw',
+            md: '100%'
+          },
+          minHeight: {
+            xs: 150,
+            md: 'calc(100dvh - 378px)'
+          }
+        }}
+      >
+        <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+          <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Previous Amount</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Payment</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Total Due Amount</TableHeaderCellWrapper>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {studentFees?.map((item, i) => {
+                return (
+                  <StyledTableRow
+                    key={i}
+                    sx={
+                      {
+                        //   '&:last-child td, &:last-child th': { border: 0 }
+                      }
+                    }
+                  >
+                    <TableBodyCellWrapper>
+                      <Grid py={0.5}>{i + 1}</Grid>{' '}
+                    </TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student.student_info.student_id}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{`${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}${
+                      item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''
+                    }${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student.group}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student.section.name}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student.class_roll_no}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>0.00</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>500.00</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.total_payable - item.collected_amount}</TableBodyCellWrapper>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
+      {/* table code part end */}
+      {/* footer */}
+      <Footer />
+    </>
+  );
+};
+
+StudentCollectionReport.getLayout = (page) => (
+  <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>
+    <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
+  </Authenticated>
+);
+
+export default StudentCollectionReport;

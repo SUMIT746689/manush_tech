@@ -3,7 +3,7 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import Head from 'next/head';
 import { Typography, Grid } from '@mui/material';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
+import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/components/AutoCompleteWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
@@ -16,6 +16,11 @@ import { useState, ChangeEvent } from 'react';
 import dayjs from 'dayjs';
 import { styled } from '@mui/material/styles';
 import Footer from '@/components/Footer';
+import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { formatNumber } from '@/utils/numberFormat';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -33,13 +38,43 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const ClassWiseIncome = () => {
   const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
   const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
+  const [reports, setReports] = useState([]);
+  const [total, setTotal] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: classes, muiMenuList: muiClassLists, _ } = useClientFetch(`/api/class`);
+  const [selectedCls, setSelectedCls] = useState([]);
+  const { showNotification } = useNotistick();
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
   };
   const endDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setEndDate(event);
-  };
+  }
+
+  const handleSearch = () => {
+    setIsLoading(true)
+    const class_ids = selectedCls?.map((cls) => cls.id);
+    axios.get(`/api/reports/class_wise_incomes?from_date=${startDate}&to_date=${endDate}&class_ids=${class_ids}`)
+      .then(({ data }) => {
+        let total_collected_amt = 0;
+
+        const customData = data.map(cls_wise_fees => {
+          total_collected_amt += cls_wise_fees.total_collected_amt;
+          const cls_name = classes?.find(cls => cls.id === cls_wise_fees.class_id)?.name;
+          return ({ ...cls_wise_fees, class_name: cls_name })
+        })
+        setReports(customData);
+        setTotal({ total_collected_amt })
+      })
+      .catch(err => {
+        handleShowErrMsg(err, showNotification)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
   return (
     <>
       <Head>
@@ -113,7 +148,32 @@ const ClassWiseIncome = () => {
                   flexGrow: 1
                 }}
               >
-                <AutoCompleteWrapper options={[]} value={''} label="Select Class" placeholder="Select a Class" handleChange={() => {}} />
+                <AutoCompleteWrapper
+                  label="Select Classes"
+                  placeholder="select classes..."
+                  name="class"
+                  multiple={true}
+                  value={selectedCls}
+                  options={[{ label: "Select All", id: "select_all" }, ...muiClassLists] || []}
+                  error={undefined}
+                  touched={undefined}
+                  handleChange={(_, value) => {
+                    const lastselectVal = value[value.length - 1]
+                    if (lastselectVal?.id === "select_all") return setSelectedCls(muiClassLists);
+                    setSelectedCls(value)
+                  }}
+                />
+
+                {/* <AutoCompleteWrapper
+                  multiple={true}
+                  minWidth="100%"
+                  label="Class"
+                  placeholder="select a class..."
+                  value={classes?.map(cls => ({ label: cls.name, id: cls.id })) || []}
+                  options={muiClassLists}
+                  // @ts-ignore
+                  handleChange={(event, value) => {}}
+                /> */}
               </Grid>
 
               {/* Search button */}
@@ -135,14 +195,14 @@ const ClassWiseIncome = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Search'} />
+                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handleSearch} disabled={isLoading || selectedCls.length === 0 || !endDate || !startDate} children={'Search'} />
                 </Grid>
                 <Grid
                   sx={{
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={false} handleClick={() => { }} disabled={false} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
@@ -179,13 +239,18 @@ const ClassWiseIncome = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <StyledTableRow>
-                <TableBodyCellWrapper>
-                  <Grid py={0.5}>1</Grid>{' '}
-                </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-              </StyledTableRow>
+              {
+                reports?.map(((report, index) => (
+                  <StyledTableRow key={report.class_id}>
+                    <TableBodyCellWrapper>
+                      <Grid py={0.5}>{index}</Grid>{' '}
+                    </TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{classes?.find(cls => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+                  </StyledTableRow>
+                )))
+              }
+
               <TableRow>
                 <TableBodyCellWrapper colspan={2}>
                   <Grid py={0.5} textAlign={'right'}>
@@ -193,7 +258,7 @@ const ClassWiseIncome = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{formatNumber(total?.total_collected_amt || 0)}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>

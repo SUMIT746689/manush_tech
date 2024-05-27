@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const useClientFetch = (url, method = 'GET', body) => {
   const [data, setData] = useState(null);
+  const [muiMenuList, setMuiMenuList] = useState([]);
   const [error, setError] = useState(null);
 
   let options = {
@@ -19,6 +20,10 @@ export const useClientFetch = (url, method = 'GET', body) => {
     try {
       const response = await axios.get(url, options);
       setData(response.data);
+      const menuLists = response.data?.map(menu => ({ label: menu.title || menu.name, id: menu.id }));
+      console.log({ menuLists });
+      setMuiMenuList(menuLists);
+
     } catch (err) {
       setError(err.message);
     }
@@ -28,11 +33,12 @@ export const useClientFetch = (url, method = 'GET', body) => {
     fetchData();
   }, [url]);
 
-  return { data, setData, error, reFetchData: fetchData };
+  return { data, setData, muiMenuList, error, reFetchData: fetchData };
 };
 
 export const useClientDataFetch = (url, method = 'GET', body, initial_value) => {
   const [data, setData] = useState([]);
+  const [muiMenuList, setMuiMenuList] = useState([]);
   const [error, setError] = useState(null);
 
   let options = {
@@ -48,7 +54,12 @@ export const useClientDataFetch = (url, method = 'GET', body, initial_value) => 
   const fetchData = async () => {
     try {
       const response = await axios.get(url, options);
-      if (response.data?.success) setData(response.data.data);
+      if (response.data?.success) {
+        setData(response.data.data);
+        const menuLists = response.data?.data?.map(menu => ({ label: menu.title || menu.name, id: menu.id }));
+        console.log({ menuLists })
+        setMuiMenuList(menuLists);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -65,5 +76,5 @@ export const useClientDataFetch = (url, method = 'GET', body, initial_value) => 
     return [data.error.message, null];
   }
 
-  return { data, setData, error, reFetchData: fetchData, post };
+  return { data, setData, muiMenuList, error, reFetchData: fetchData, post };
 };

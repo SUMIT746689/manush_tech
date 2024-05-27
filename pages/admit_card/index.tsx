@@ -6,13 +6,7 @@ import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrappe
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { useClientFetch } from 'src/hooks/useClientFetch';
-import React, {
-  ChangeEvent,
-  useState,
-  useContext,
-  useEffect,
-  useRef
-} from 'react';
+import React, { ChangeEvent, useState, useContext, useEffect, useRef } from 'react';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
@@ -51,9 +45,7 @@ const AdmitCard = () => {
   // fetch exam related data code start
   const getExam = () => {
     axios
-      .get(
-        `/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`
-      )
+      .get(`/api/exam?school_id=${user?.school_id}&academic_year=${academicYear?.id}`)
       .then((res) => {
         setInitExamInfo(res.data);
       })
@@ -95,10 +87,7 @@ const AdmitCard = () => {
     }
   };
 
-  const handleClassSelect = (
-    event: ChangeEvent<HTMLInputElement>,
-    newValue
-  ) => {
+  const handleClassSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
     if (newValue) {
       const targetClassSections = classData.find((i) => i.id == newValue.id);
       setSelectedClass(newValue);
@@ -129,16 +118,11 @@ const AdmitCard = () => {
     }
   };
 
-  const handleSectionSelect = (
-    event: ChangeEvent<HTMLInputElement>,
-    newValue
-  ) => {
+  const handleSectionSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
     setSelectedSection(newValue);
 
     if (newValue) {
-      const targetExams = initExamInfo.filter(
-        (i) => i.section_id == newValue.id
-      );
+      const targetExams = initExamInfo.filter((i) => i.section_id == newValue.id);
 
       if (targetExams.length > 0) {
         setExams(
@@ -163,10 +147,7 @@ const AdmitCard = () => {
     }
   };
 
-  const handleStudentSelect = (
-    event: ChangeEvent<HTMLInputElement>,
-    newValue
-  ) => {
+  const handleStudentSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
     // setSelectedStudent
 
     if (newValue) {
@@ -211,9 +192,7 @@ const AdmitCard = () => {
     }
 
     if (selectedStudent?.id && studentInfo.length > 0) {
-      const singleUser = studentInfo?.find(
-        (item) => item?.id === selectedStudent?.id
-      );
+      const singleUser = studentInfo?.find((item) => item?.id === selectedStudent?.id);
 
       if (singleUser) {
         setDisplayStudent([{ ...singleUser }]);
@@ -288,15 +267,7 @@ const AdmitCard = () => {
       </Head>
 
       {/* searching part code start */}
-      <Grid
-        px={4}
-        mt={3}
-        display="grid"
-        gridTemplateColumns="1fr"
-        rowGap={{ xs: 1, md: 0 }}
-        mx={1}
-        minHeight="fit-content"
-      >
+      <Grid px={4} mt={3} display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} mx={1} minHeight="fit-content">
         {/* split your code start */}
         <Grid
           sx={{
@@ -433,12 +404,7 @@ const AdmitCard = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper
-                    isLoading={false}
-                    handleClick={handleClickStudentInfo}
-                    disabled={false}
-                    children={'Search'}
-                  />
+                  <SearchingButtonWrapper isLoading={false} handleClick={handleClickStudentInfo} disabled={false} children={'Search'} />
                 </Grid>
                 <Grid
                   sx={{
@@ -448,9 +414,7 @@ const AdmitCard = () => {
                   <SearchingButtonWrapper
                     isLoading={false}
                     handleClick={handleClickPrint}
-                    disabled={
-                      showPrint && displayStudent.length > 0 ? false : true
-                    }
+                    disabled={showPrint && displayStudent.length > 0 ? false : true}
                     children={'Print'}
                   />
                 </Grid>
@@ -483,9 +447,7 @@ const AdmitCard = () => {
       >
         {displayStudent?.map((item) => {
           return (
-            <Grid
-              sx={{ border: '7px solid #f50519', height: '44vh', my: '1vh' }}
-            >
+            <Grid sx={{ border: '7px solid #f50519', height: '44vh', my: '1vh' }}>
               <Grid
                 sx={{
                   border: '7px solid #03fc13',
@@ -497,16 +459,9 @@ const AdmitCard = () => {
                 }}
               >
                 <Grid sx={{ width: '100%' }}>
-                  <Grid
-                    px={3}
-                    mt={3}
-                    width={'100%'}
-                    display="grid"
-                    height="120px"
-                    gridTemplateColumns="120px 1fr 120px"
-                  >
+                  <Grid px={3} mt={3} width={'100%'} display="grid" height="120px" gridTemplateColumns="120px 1fr 120px">
                     {/* school logo */}
-                    <Grid alignSelf="end">
+                    <Grid alignSelf="end" width="80px">
                       {schoolInformation?.header_image ? (
                         <Image
                           src={getFile(schoolInformation?.header_image)}
@@ -548,21 +503,11 @@ const AdmitCard = () => {
                     </Grid>
 
                     {/* student photo */}
-                    <Grid alignSelf="end">
+                    <Grid alignSelf="end" width="80px">
                       {item?.student_photo ? (
-                        <Image
-                          src={getFile(item?.student_photo)}
-                          width={100}
-                          height={100}
-                          alt="user photo"
-                        />
+                        <Image src={getFile(item?.student_photo)} width={100} height={100} alt="user photo" />
                       ) : (
-                        <Image
-                          src={'/default_user_photo.jpg'}
-                          width={100}
-                          height={100}
-                          alt="user photo"
-                        />
+                        <Image src={'/default_user_photo.jpg'} width={100} height={100} alt="user photo" />
                       )}
                     </Grid>
                   </Grid>
@@ -570,11 +515,7 @@ const AdmitCard = () => {
                   {/* Table */}
                   <Grid mt={3} mb={4} mx={1}>
                     <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
-                      <Table
-                        sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }}
-                        size="small"
-                        aria-label="a dense table"
-                      >
+                      <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
                         <TableHead>
                           <TableRow>
                             <TableCell
@@ -593,10 +534,7 @@ const AdmitCard = () => {
                                 textTransform: 'capitalize'
                               }}
                             >
-                              Exam/Assesment Name:{' '}
-                              {selectedExam?.label && item
-                                ? selectedExam?.label
-                                : ''}
+                              Exam/Assesment Name: {selectedExam?.label && item ? selectedExam?.label : ''}
                             </TableCell>
                           </TableRow>
                         </TableHead>
@@ -606,34 +544,17 @@ const AdmitCard = () => {
                               '&:last-child td, &:last-child th': { border: 0 }
                             }}
                           >
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
-                              Student Id:{' '}
-                              {item?.student_info?.student_id
-                                ? item?.student_info?.student_id
-                                : ''}
+                            <TableCell component="th" scope="row" align="left" style={{ border: '1px solid black' }}>
+                              Student Id: {item?.student_info?.student_id ? item?.student_info?.student_id : ''}
                             </TableCell>
 
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
                               Class: {item?.section?.class?.name}
                             </TableCell>
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
                               Section: {item?.section?.name}
                             </TableCell>
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
                               Group: {item?.group?.title}
                             </TableCell>
                           </TableRow>
@@ -642,32 +563,17 @@ const AdmitCard = () => {
                               '&:last-child td, &:last-child th': { border: 0 }
                             }}
                           >
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell component="th" scope="row" align="left" style={{ border: '1px solid black' }}>
                               Shift:{' '}
                             </TableCell>
 
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
-                              Roll:{' '}
-                              {item?.class_roll_no ? item?.class_roll_no : ''}
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
+                              Roll: {item?.class_roll_no ? item?.class_roll_no : ''}
                             </TableCell>
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
                               Year: {item?.academic_year?.title}
                             </TableCell>
-                            <TableCell
-                              align="left"
-                              style={{ border: '1px solid black' }}
-                            >
+                            <TableCell align="left" style={{ border: '1px solid black' }}>
                               Mobile: {item?.student_info?.phone}
                             </TableCell>
                           </TableRow>

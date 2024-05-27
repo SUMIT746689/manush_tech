@@ -8,23 +8,15 @@ import {
   Grid,
   Dialog,
   DialogTitle,
-  DialogActions,
   DialogContent,
   Typography,
   TextField,
-  CircularProgress,
-  Button,
-  Switch,
-  Checkbox
 } from '@mui/material';
-import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { DialogActionWrapper } from '@/components/DialogWrapper';
 import { FileUploadFieldWrapper, TextAreaWrapper, TextFieldWrapper } from '@/components/TextFields';
-import { TimePickerWrapper } from '@/components/DatePickerWrapper';
-import { CheckBox } from '@mui/icons-material';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import MobileDateTimePicker from '@mui/lab/MobileDateTimePicker';
 
@@ -66,7 +58,7 @@ function PageHeader({ accounts, accountsOption, editClass, setEditClass, voucher
     try {
       const formData = new FormData();
       for (const index in _values) {
-        formData.append(index, _values[index])
+        _values[index] && formData.append(index, _values[index])
       }
       await axios.post(`/api/transaction/deposit`, formData)
       resetForm();

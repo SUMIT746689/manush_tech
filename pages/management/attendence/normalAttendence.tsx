@@ -71,7 +71,7 @@ function Attendence() {
       </PageTitleWrapper>
 
       <Grid
-        sx={{ px: 2 }}
+        sx={{ px: { xs: 1, xl: 2 } }}
         container
         direction="row"
         justifyContent="center"

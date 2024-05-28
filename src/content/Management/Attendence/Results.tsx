@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import { Card, Grid, TableHead, TextField, Paper, RadioGroup, FormControlLabel, Radio, Table } from '@mui/material';
+import { Card, Grid, TableHead, TextField, Paper, RadioGroup, FormControlLabel, Radio, Table, TableBody, TableRow } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { forwardRef, useContext, useEffect, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
@@ -15,6 +15,7 @@ import { ButtonWrapper, DisableButtonWrapper } from '@/components/ButtonWrapper'
 import { AutoCompleteWrapper, EmptyAutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { TextFieldWrapper } from '@/components/TextFields';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 
 
@@ -176,45 +177,41 @@ const AttendenceSwitch = ({ attendence, remark, student_id, setSectionAttendence
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'nowrap',
-      // border:'1px solid red',
-      justifyContent: 'center'
-    }}>
-      {/* <Switch checked={value} onChange={handleUpdate} /> */}
-      <RadioGroup
-        row
-        name="attendance"
-        value={attendenceValue}
-        onChange={handleUpdate}
-        sx={{
-          display: 'flex',
-          flexWrap: 'nowrap',
-        }}
-      >
-        <FormControlLabel value="present" control={<Radio />} label="Present" />
-        <FormControlLabel value="absence" control={<Radio />} label="absence" />
-        <FormControlLabel value="late" control={<Radio />} label="Late" />
-        <FormControlLabel value="bunk" control={<Radio />} label="Bunk" />
-        <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
-      </RadioGroup>
+    <>
+      <TableBodyCellWrapper>
+        <RadioGroup
+          row
+          name="attendance"
+          value={attendenceValue}
+          onChange={handleUpdate}
+          sx={{
+            display: 'flex',
+            flexWrap: 'nowrap'
+          }}
+        >
+          <FormControlLabel value="present" control={<Radio />} label="Present" />
+          <FormControlLabel value="absence" control={<Radio />} label="absence" />
+          <FormControlLabel value="late" control={<Radio />} label="Late" />
+          <FormControlLabel value="bunk" control={<Radio />} label="Bunk" />
+          <FormControlLabel value="holiday" control={<Radio />} label="Holiday" />
+        </RadioGroup>
+      </TableBodyCellWrapper>
 
-      <Grid minWidth={200} pt={1}>
-        <TextFieldWrapper
-          label="Remarks"
-          name={"remarks"}
-          value={remarkValue}
-          handleChange={(e) => { setRemarkValue(e.target.value) }}
-          handleBlur={(e) => { if (attendenceValue && remarkValue !== '') { handleUpdateApi(attendenceValue) } }}
-          touched={undefined}
-          errors={undefined}
-        />
-      </Grid>
-
-
-    </div>
+      <TableBodyCellWrapper minWidth={200}>
+        <Grid pt={0.5}>
+          <TextFieldWrapper
+            label=""
+            name={"remarks"}
+            value={remarkValue}
+            handleChange={(e) => { setRemarkValue(e.target.value) }}
+            handleBlur={(e) => { if (attendenceValue && remarkValue !== '') { handleUpdateApi(attendenceValue) } }}
+            touched={undefined}
+            errors={undefined}
+            pb={0.5}
+          />
+        </Grid>
+      </TableBodyCellWrapper>
+    </>
   );
 };
 
@@ -270,7 +267,6 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
       setStudents(null)
       const date_ = selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : '';
       const date = new Date(date_);
-      console.log({ date })
 
       axios.get(`/api/attendance/student?school_id=${user?.school_id}&section_id=${selectedSection?.id}&date=${date}`)
         .then(response => {
@@ -440,14 +436,41 @@ const Results = ({ selectedClass, setSelectedClass, selectedSection, setSelected
       </Card>
 
       <Grid container spacing={0} justifyContent={'flex-end'} >
-        <Paper style={{ height: '55vh', width: '100%' }}>
-          <TableVirtuoso
+        <Paper sx={{ height: '55vh', width: '100%', borderRadius: 0.5, overflow: "auto" }}>
+          {/* <TableVirtuoso
             data={students || []}
             // @ts-ignore
             components={VirtuosoTableComponents}
             fixedHeaderContent={fixedHeaderContent}
             itemContent={(_index, row) => rowContent(_index, row, setSectionAttendence)}
-          />
+          /> */}
+          <Table >
+            <TableHead>
+              <TableRow sx={{ position: "sticky", background: "white", top: -1,zIndex:10, width: "100%", height: "100%" }} >
+                <TableHeaderCellWrapper><Grid py={0.5}>Name</Grid></TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Roll no</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Attendence</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Remarks</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper>Phone Number</TableHeaderCellWrapper>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* < */}
+              {
+                students?.map(std => {
+                  return (
+                    <TableRow key={std.id}>
+                      <TableBodyCellWrapper><Grid textTransform="capitalize">{std?.name}</Grid> </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>{std.class_roll_no} </TableBodyCellWrapper>
+                      {/* attendence with remarks components */}
+                      <AttendenceSwitch attendence={std.attendence} remark={std.remark} student_id={std.id} setSectionAttendence={setSectionAttendence} />
+                      <TableBodyCellWrapper>{std.phone_number} </TableBodyCellWrapper>
+                    </TableRow>
+                  )
+                })
+              }
+            </TableBody>
+          </Table>
         </Paper>
       </Grid>
       <Grid item justifyContent="flex-end" pt={1}>

@@ -12,15 +12,17 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef } from 'react';
 import dayjs from 'dayjs';
 import { styled } from '@mui/material/styles';
 import Footer from '@/components/Footer';
-import { useClientDataFetch, useClientFetch } from '@/hooks/useClientFetch';
+import { useClientFetch } from '@/hooks/useClientFetch';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { formatNumber } from '@/utils/numberFormat';
+import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '@/hooks/useAuth';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -44,13 +46,19 @@ const ClassWiseIncome = () => {
   const { data: classes, muiMenuList: muiClassLists, _ } = useClientFetch(`/api/class`);
   const [selectedCls, setSelectedCls] = useState([]);
   const { showNotification } = useNotistick();
+  const componentRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
   };
+
   const endDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setEndDate(event);
-  }
+  };
 
   const handleSearch = () => {
     setIsLoading(true)
@@ -73,13 +81,22 @@ const ClassWiseIncome = () => {
       .finally(() => {
         setIsLoading(false)
       })
-  }
+  };
+
 
   return (
     <>
       <Head>
-        <title>Class_Wise_Income</title>
+        <title>Class Wise Income</title>
       </Head>
+
+      {/* print datas */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData startDate={startDate} endDate={endDate} reports={reports} classes={classes} total={total} />
+        </Grid>
+      </Grid>
+
       <Typography
         variant="h4"
         textTransform="uppercase"
@@ -94,6 +111,7 @@ const ClassWiseIncome = () => {
       {/* searching part code start */}
       <Grid container display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} px={1} mt={1} minHeight="fit-content">
         {/* split your code start */}
+
         <Grid
           sx={{
             overflow: 'hidden',
@@ -163,17 +181,6 @@ const ClassWiseIncome = () => {
                     setSelectedCls(value)
                   }}
                 />
-
-                {/* <AutoCompleteWrapper
-                  multiple={true}
-                  minWidth="100%"
-                  label="Class"
-                  placeholder="select a class..."
-                  value={classes?.map(cls => ({ label: cls.name, id: cls.id })) || []}
-                  options={muiClassLists}
-                  // @ts-ignore
-                  handleChange={(event, value) => {}}
-                /> */}
               </Grid>
 
               {/* Search button */}
@@ -202,13 +209,12 @@ const ClassWiseIncome = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => { }} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={false} handleClick={() => handlePrint()} disabled={false} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-
         {/* split your code end */}
       </Grid>
       {/* searching part code end */}
@@ -235,7 +241,7 @@ const ClassWiseIncome = () => {
               <TableRow>
                 <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
                 <TableHeaderCellWrapper style={{ width: '60%' }}>Class Name</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper style={{ width: '38%' }}>Fees</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper style={{ width: '38%' }} align="right">Fees</TableHeaderCellWrapper>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -246,7 +252,7 @@ const ClassWiseIncome = () => {
                       <Grid py={0.5}>{index}</Grid>{' '}
                     </TableBodyCellWrapper>
                     <TableBodyCellWrapper>{classes?.find(cls => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right" >{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
                   </StyledTableRow>
                 )))
               }
@@ -258,7 +264,7 @@ const ClassWiseIncome = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>{formatNumber(total?.total_collected_amt || 0)}</TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">{formatNumber(total?.total_collected_amt || 0)}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>
@@ -271,6 +277,58 @@ const ClassWiseIncome = () => {
     </>
   );
 };
+
+const PrintData = ({ startDate, endDate, reports, classes, total }) => {
+  const { user } = useAuth()
+  const { school } = user || {};
+  const { name, address } = school || {};
+
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <h4>{address}</h4>
+        <Typography variant='h4'>Class Wise Income</Typography>
+        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+      </Grid>
+
+      <TableContainer component={Paper} sx={{ borderRadius: 0, mt: 2 }}>
+        <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper style={{ width: '60%' }}>Class Name</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper style={{ width: '38%' }} align="right">Fees</TableHeaderCellWrapper>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              reports?.map(((report, index) => (
+                <StyledTableRow key={report.class_id}>
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{index}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{classes?.find(cls => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right" >{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              )))
+            }
+
+            <TableRow>
+              <TableBodyCellWrapper colspan={2}>
+                <Grid py={0.5} textAlign={'right'}>
+                  {' '}
+                  Total
+                </Grid>{' '}
+              </TableBodyCellWrapper>
+              <TableBodyCellWrapper align="right">{formatNumber(total?.total_collected_amt || 0)}</TableBodyCellWrapper>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Grid>
+  )
+}
 
 ClassWiseIncome.getLayout = (page) => (
   <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>

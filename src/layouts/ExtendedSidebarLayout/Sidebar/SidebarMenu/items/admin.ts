@@ -152,6 +152,11 @@ const students: MenuItems[] = [
         icon: RecordVoiceOverIcon
       },
       {
+        name: 'Multiple Image Updates',
+        link: '/multiple_student_photo_upload',
+        icon: RecordVoiceOverIcon
+      },
+      {
         name: 'Rooms',
         link: '/management/rooms',
         icon: RoomPreferencesIcon

@@ -526,7 +526,7 @@ const MultipleStudentPhotoUpload = () => {
                   <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
                     <TableHead>
                       <TableRow>
-                        <TableHeaderCellWrapper style={{ width: '1%' }}>SL</TableHeaderCellWrapper>
+                        <TableHeaderCellWrapper style={{ width: '1%',py:0.5 }}>SL</TableHeaderCellWrapper>
                         <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
                         {selectedPerson && <TableHeaderCellWrapper style={{ width: { xs: '40%', md: '25%' } }}>Action</TableHeaderCellWrapper>}
                         {selectedPerson && <TableHeaderCellWrapper>{selectedPerson}</TableHeaderCellWrapper>}

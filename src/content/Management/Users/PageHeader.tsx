@@ -20,12 +20,7 @@ import {
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import {
-  FileUploadFieldWrapper,
-  NewFileUploadFieldWrapper,
-  PreviewImageCard,
-  TextFieldWrapper
-} from '@/components/TextFields';
+import { FileUploadFieldWrapper, NewFileUploadFieldWrapper, PreviewImageCard, TextFieldWrapper } from '@/components/TextFields';
 import Image from 'next/image';
 import { PageHeaderTitleWrapper } from '@/components/PageHeaderTitle';
 import { getFile } from '@/utils/utilitY-functions';
@@ -58,12 +53,8 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       value: 'create_receptionist'
     }
   ];
-  const available_permissions = user?.permissions?.map(
-    (permission) => permission.value
-  );
-  const userPrermissionRoles = permissons.filter((role) =>
-    available_permissions?.includes(role.value)
-  );
+  const available_permissions = user?.permissions?.map((permission) => permission.value);
+  const userPrermissionRoles = permissons.filter((role) => available_permissions?.includes(role.value));
 
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -104,6 +95,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           formData.append(`${i}`, _values[i]);
         }
       }
+
       if (editUser) {
         await axios.patch(`/api/user/${editUser.id}`, formData);
         handleResponseSuccess('The user account was edited successfully');
@@ -122,13 +114,10 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
     }
   };
 
-  const temp = userPrermissionRoles.find(
-    (i) => i.role == editUser?.user_role?.title
-  );
+  const temp = userPrermissionRoles.find((i) => i.role == editUser?.user_role?.title);
 
   const handleDebounce = (value) => {
-    if (editUser?.username?.toLowerCase() === value?.toLowerCase())
-      return setIsAvailableUsername(null);
+    if (editUser?.username?.toLowerCase() === value?.toLowerCase()) return setIsAvailableUsername(null);
     if (value) {
       axios
         .get(`/api/user/is_available?username=${value}`)
@@ -168,20 +157,10 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
       <PageHeaderTitleWrapper
         name={'User'}
         handleCreateClassOpen={handleCreateUserOpen}
-        actionButton={
-          user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-            user?.role?.title !== 'SUPER_ADMIN'
-            ? true
-            : false
-        }
+        actionButton={user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN' ? true : false}
       />
 
-      <Dialog
-        fullWidth
-        maxWidth="sm"
-        open={open}
-        onClose={handleCreateUserClose}
-      >
+      <Dialog fullWidth maxWidth="sm" open={open} onClose={handleCreateUserClose}>
         <DialogTitle
           sx={{
             p: 3
@@ -190,12 +169,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
           <Typography variant="h4" gutterBottom>
             {t(editUser ? 'Edit user' : 'Add new user')}
           </Typography>
-          <Typography variant="subtitle2">
-            {t(
-              `Fill in the fields below to ${editUser ? 'edit' : 'create a'
-              } user to the site`
-            )}
-          </Typography>
+          <Typography variant="subtitle2">{t(`Fill in the fields below to ${editUser ? 'edit' : 'create a'} user to the site`)}</Typography>
         </DialogTitle>
         <Formik
           initialValues={{
@@ -206,9 +180,9 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             preview_user_photo: [],
             role: temp
               ? {
-                role_title: temp?.role,
-                permission: temp?.value
-              }
+                  role_title: temp?.role,
+                  permission: temp?.value
+                }
               : undefined,
             domain: editUser?.adminPanel?.domain || '',
             copy_right_txt: editUser?.adminPanel?.copy_right_txt,
@@ -219,21 +193,14 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             username: Yup.string()
               .max(255)
               .when('role', (role, schema) => {
-                if (!role)
-                  return schema.required(t('The username field is required'));
+                if (!role) return schema.required(t('The username field is required'));
                 return schema;
               }),
 
             password: Yup.string()
               .max(255)
               .when('role', (role, schema) => {
-                if (!role)
-                  return schema
-                    .required(t('The password field is required'))
-                    .min(
-                      8,
-                      'Password is too short - should be 8 chars minimum.'
-                    );
+                if (!role) return schema.required(t('The password field is required')).min(8, 'Password is too short - should be 8 chars minimum.');
                 return schema;
               }),
 
@@ -242,29 +209,14 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
             confirm_password: Yup.string()
               .max(255)
               .when('role', (role, schema) => {
-                if (!role)
-                  return schema
-                    .required(t('confirm_password field is required'))
-                    .oneOf([Yup.ref('password'), null], 'Passwords must match');
+                if (!role) return schema.required(t('confirm_password field is required')).oneOf([Yup.ref('password'), null], 'Passwords must match');
                 return schema;
               }),
             role: Yup.object().required(t('Role field is required'))
           })}
-          onSubmit={(_values, getValue: any) =>
-            handleFormSubmit(_values, getValue)
-          }
+          onSubmit={(_values, getValue: any) => handleFormSubmit(_values, getValue)}
         >
-          {({
-            errors,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            isSubmitting,
-            touched,
-            values,
-            setFieldValue,
-            setErrors
-          }) => {
+          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue, setErrors }) => {
             return (
               <form onSubmit={handleSubmit}>
                 <DialogContent
@@ -318,16 +270,9 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                           disablePortal
                           size="small"
                           // @ts-ignore
-                          value={
-                            userPrermissionRoles.find(
-                              (permRole) =>
-                                permRole.value === values?.role?.permission
-                            ) || null
-                          }
+                          value={userPrermissionRoles.find((permRole) => permRole.value === values?.role?.permission) || null}
                           options={userPrermissionRoles}
-                          isOptionEqualToValue={(option: any, value: any) =>
-                            option.value === value.value
-                          }
+                          isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
                           getOptionLabel={(option) => option?.label}
                           renderInput={(params) => (
                             <TextField
@@ -383,14 +328,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                           <NewFileUploadFieldWrapper
                             htmlFor="logo"
                             accept="image/*"
-                            handleChangeFile={(e) =>
-                              handleFileChange(
-                                e,
-                                setFieldValue,
-                                'logo',
-                                'preview_logo'
-                              )
-                            }
+                            handleChangeFile={(e) => handleFileChange(e, setFieldValue, 'logo', 'preview_logo')}
                             label="Logo"
                           />
                         </Grid>
@@ -401,26 +339,14 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                                 data={image}
                                 index={index}
                                 key={index}
-                                handleRemove={() =>
-                                  handleRemove(
-                                    setFieldValue,
-                                    'logo',
-                                    'preview_logo'
-                                  )
-                                }
+                                handleRemove={() => handleRemove(setFieldValue, 'logo', 'preview_logo')}
                               />
                             </>
                           ))}
                         </Grid>
                         <Grid item>
                           {editUser?.adminPanel?.logo && (
-                            <Image
-                              src={getFile(editUser?.adminPanel?.logo)}
-                              height={150}
-                              width={150}
-                              alt="Logo"
-                              loading="lazy"
-                            />
+                            <Image src={getFile(editUser?.adminPanel?.logo)} height={150} width={150} alt="Logo" loading="lazy" />
                           )}
                         </Grid>
                       </>
@@ -430,14 +356,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                       <NewFileUploadFieldWrapper
                         htmlFor="user_photo"
                         accept="image/*"
-                        handleChangeFile={(e) =>
-                          handleFileChange(
-                            e,
-                            setFieldValue,
-                            'user_photo',
-                            'preview_user_photo'
-                          )
-                        }
+                        handleChangeFile={(e) => handleFileChange(e, setFieldValue, 'user_photo', 'preview_user_photo')}
                         label="Upload User Photo"
                       />
                     </Grid>
@@ -448,13 +367,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                             data={image}
                             index={index}
                             key={index}
-                            handleRemove={() =>
-                              handleRemove(
-                                setFieldValue,
-                                'user_photo',
-                                'preview_user_photo'
-                              )
-                            }
+                            handleRemove={() => handleRemove(setFieldValue, 'user_photo', 'preview_user_photo')}
                           />
                         </>
                       ))}
@@ -463,11 +376,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                     <Grid item>
                       {(user_photo || editUser?.user_photo) && (
                         <Image
-                          src={
-                            user_photo
-                              ? user_photo
-                              : getFile(editUser?.user_photo)
-                          }
+                          src={user_photo ? user_photo : getFile(editUser?.user_photo)}
                           height={150}
                           width={150}
                           alt="User photo"
@@ -488,9 +397,7 @@ function PageHeader({ editUser, setEditUser, reFetchData }) {
                   </Button>
                   <Button
                     type="submit"
-                    startIcon={
-                      isSubmitting ? <CircularProgress size="1rem" /> : null
-                    }
+                    startIcon={isSubmitting ? <CircularProgress size="1rem" /> : null}
                     // @ts-ignore
                     disabled={Boolean(isAvailableUsername) || Boolean(errors.submit) || isSubmitting}
                     variant="contained"

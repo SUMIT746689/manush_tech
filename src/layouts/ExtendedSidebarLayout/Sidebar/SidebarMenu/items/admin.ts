@@ -427,7 +427,21 @@ const accounting: MenuItems[] = [
             link: '/reports/fees/recipt_report',
             icon: HistoryIcon
           },
-
+          {
+            name: 'Income',
+            link: '/reports/income_report',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Expense',
+            link: '/reports/expense_report',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Class Wise Income',
+            link: '/reports/class_wise_income',
+            icon: HistoryIcon
+          },
         ]
       },
       {

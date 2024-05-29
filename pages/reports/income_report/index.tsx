@@ -220,7 +220,7 @@ const PrintData = ({ startDate, endDate, total, reports }) => {
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
         <Typography variant="h3" fontWeight={500}>{name}</Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Class Wise Income</Typography>
+        <Typography variant='h4'>Income Report</Typography>
         <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
       </Grid>
 

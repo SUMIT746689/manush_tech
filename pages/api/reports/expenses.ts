@@ -21,7 +21,7 @@ const index = async (req, res, refresh_token, dcrypt_academic_year) => {
                     voucher_id, MIN(voucher_name) as voucher_name, SUM(amount) as total_amount, 
                     GROUP_CONCAT(DISTINCT(payment_method)) as payment_methods, max(created_at) as created_at
                     FROM transactions
-                    WHERE voucher_type = "credit" AND school_id=${school_id} AND created_at >= ${isoFromDate} AND created_at <= ${isoToDate}
+                    WHERE voucher_type = "debit" AND school_id=${school_id} AND created_at >= ${isoFromDate} AND created_at <= ${isoToDate}
                     GROUP BY voucher_id
                     ORDER BY max(created_at) DESC
                 `;

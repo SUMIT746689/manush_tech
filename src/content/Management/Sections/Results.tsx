@@ -40,6 +40,9 @@ import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { DebounceInput } from '@/components/DebounceInput';
 import { accessNestedProperty } from '@/utils/utilitY-functions';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -76,6 +79,7 @@ const ButtonError = styled(Button)(
 interface ResultsProps {
   users: User[];
   setEditSection: Function;
+  reFetchData: Function
 }
 
 interface Filters {
@@ -128,7 +132,7 @@ const applyPagination = (users, page, limit) => {
   return users.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
+const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
   const [selectedItems, setSelectedUsers] = useState<string[]>([]);
   const { t }: { t: any } = useTranslation();
 
@@ -139,7 +143,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
   const [filters, setFilters] = useState<Filters>({
     role: null
   });
-
+  const { showNotification } = useNotistick();
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
     setQuery(event.target.value);
@@ -178,9 +182,10 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
   const selectedAllUsers = selectedItems.length === users.length;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-
-  const handleConfirmDelete = () => {
+  const [deleteId, setDeleteId] = useState();
+  const handleConfirmDelete = (id) => {
     setOpenConfirmDelete(true);
+    setDeleteId(id);
   };
 
   const closeConfirmDelete = () => {
@@ -188,6 +193,14 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
   };
 
   const handleDeleteCompleted = () => {
+    axios.delete(`/api/section/${deleteId}`)
+      .then(res => {
+        reFetchData();
+        showNotification("successfully deleted")
+      })
+      .catch(err => {
+        handleShowErrMsg(err, showNotification)
+      })
     setOpenConfirmDelete(false);
   };
 
@@ -284,7 +297,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
 
                             <Tooltip title={t('Delete')} arrow>
                               <IconButton
-                                onClick={handleConfirmDelete}
+                                onClick={() => handleConfirmDelete(i?.id)}
                                 color="primary"
                               >
                                 <DeleteTwoToneIcon fontSize="small" />

@@ -98,7 +98,7 @@ const IncomeReport = () => {
         }}
         px={2}
       >
-        Expense Report
+        Expense Report ( all academic Wise )
       </Typography>
 
 

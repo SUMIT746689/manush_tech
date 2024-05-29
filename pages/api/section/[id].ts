@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma_client";
+import { academicYearVerify, authenticate } from "middleware/authenticate";
 import { logFile } from "utilities_api/handleLogFile";
 
-const section = async (req, res) => {
+const section = async (req, res, refresh_token, academicYearVerify) => {
   try {
     const { method } = req;
     const id = parseInt(req.query.id);
@@ -48,11 +49,53 @@ const section = async (req, res) => {
         break;
 
       case 'DELETE':
-        await prisma.section.delete({
-          where: {
-            id: id
+        const { school_id } = refresh_token;
+        const haveAlreadySection = await prisma.section.findFirst({
+          where: { class: { school_id } },
+          select: {
+            students: {
+              select: {
+                id: true
+              },
+              take: 1
+            },
+            class: {
+              select: {
+                name: true,
+                sections: {
+                  select: { id: true }
+                }
+              }
+            }
           }
         });
+        if (!Array.isArray(haveAlreadySection?.class?.sections) || haveAlreadySection?.class?.sections.length === 0) throw new Error(' invalid section...')
+
+        if (haveAlreadySection?.class?.sections.length > 1) {
+          await prisma.section.delete({
+            where: {
+              id: id
+            }
+          });
+          return res.status(200).json({ success: 'successfully deleted' })
+        }
+
+        if (haveAlreadySection?.students.length > 0) throw new Error('This section has dependencies')
+
+        await prisma.section.update({
+          where: {
+            id: id
+          },
+          data: {
+            name: `dafault-${haveAlreadySection.class.name}`,
+            class: {
+              update: {
+                has_section: false
+              }
+            }
+          }
+        });
+        return res.status(200).json({ success: 'successfully deleted' })
         break;
 
       default:
@@ -63,8 +106,10 @@ const section = async (req, res) => {
   } catch (err) {
     console.log(err);
     logFile.error(err.message)
+    if (err.message.includes('Foreign key constraint')) return res.status(404).json({ message: "this section has dependencies" });
+
     res.status(500).json({ message: err.message });
   }
 };
 
-export default section;
+export default authenticate(academicYearVerify(section));

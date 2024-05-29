@@ -44,7 +44,7 @@ function ManagementClasses() {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Results setEditSection={setEditSection} users={sections || []} />
+          <Results setEditSection={setEditSection} users={sections || []} reFetchData={reFetchData} />
         </Grid>
       </Grid>
       <Footer />

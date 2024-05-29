@@ -23,6 +23,7 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 import useNotistick from '@/hooks/useNotistick';
 import { useReactToPrint } from 'react-to-print';
 import { formatNumber } from '@/utils/numberFormat';
+import { useAuth } from '@/hooks/useAuth';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -78,6 +79,13 @@ const IncomeReport = () => {
 
   return (
     <>
+      {/* print datas */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData startDate={startDate} endDate={endDate} reports={reports} total={total} />
+        </Grid>
+      </Grid>
+
       <Head>
         <title>Income_Report</title>
       </Head>
@@ -92,6 +100,7 @@ const IncomeReport = () => {
       >
         Income Report
       </Typography>
+
 
       {/* searching part code start */}
       <Grid display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} px={1} mt={1} minHeight="fit-content">
@@ -132,7 +141,7 @@ const IncomeReport = () => {
                   <SearchingButtonWrapper isLoading={isLoading} handleClick={handleSearch} disabled={isLoading || !endDate || !startDate} children={'Search'} />
                 </Grid>
                 <Grid sx={{ flexGrow: 1 }}>
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => { }} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={false} handleClick={handlePrint} disabled={false} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
@@ -179,19 +188,13 @@ const IncomeReport = () => {
                     <TableBodyCellWrapper>
                       <Grid py={0.5}>{index + 1}</Grid>{' '}
                     </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{report.voucher_name}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper><Grid textTransform="capitalize">{report.voucher_name}</Grid></TableBodyCellWrapper>
                     <TableBodyCellWrapper><Grid textTransform="capitalize">{report.payment_methods}</Grid></TableBodyCellWrapper>
                     <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
                     <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
                   </StyledTableRow>
                 ))
               }
-
-              {/* <TableRow>
-                <TableBodyCellWrapper colspan={9}>
-                  <Grid py={0.5}> In Words: Zero Taka Only</Grid>{' '}
-                </TableBodyCellWrapper>
-              </TableRow> */}
             </TableBody>
 
             <TableFooter>
@@ -207,6 +210,57 @@ const IncomeReport = () => {
     </>
   );
 };
+
+const PrintData = ({ startDate, endDate, total, reports }) => {
+  const { user } = useAuth()
+  const { school } = user || {};
+  const { name, address } = school || {};
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <h4>{address}</h4>
+        <Typography variant='h4'>Class Wise Income</Typography>
+        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+      </Grid>
+
+      <TableContainer component={Paper} sx={{ borderRadius: 0,pt:2 }}>
+        <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper>Voucher Name</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper>Payment Methods</TableHeaderCellWrapper>
+              {/* <TableHeaderCellWrapper>Description</TableHeaderCellWrapper> */}
+              <TableHeaderCellWrapper>Last Collected Date</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper align="right">Amount</TableHeaderCellWrapper>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              reports?.map((report, index) => (
+                <StyledTableRow key={report.voicher_id}>
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{index + 1}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper><Grid textTransform="capitalize">{report.voucher_name}</Grid></TableBodyCellWrapper>
+                  <TableBodyCellWrapper><Grid textTransform="capitalize">{report.payment_methods}</Grid></TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              ))
+            }
+          </TableBody>
+
+          <TableFooter>
+            <TableFooterCellWrapper colSpan={4} align="right">Total</TableFooterCellWrapper>
+            <TableFooterCellWrapper align="right">{formatNumber(total)}</TableFooterCellWrapper>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </Grid>
+  )
+}
 
 IncomeReport.getLayout = (page) => (
   <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>

@@ -44,7 +44,7 @@ export const TableBodyCellWrapper = ({ children, ...parmas }) => {
 
 export const TableFooterCellWrapper = ({ children, ...parmas }) => {
   return (
-    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 1, fontSize: { xs: 10, md: 11, xl: 12 } }} {...parmas}>
+    <TableCell sx={{ border: '1px solid lightgray', px: 0.6, py: 1, fontSize: { xs: 10, md: 11, xl: 12 },color:"black" }} {...parmas}>
       {children}
     </TableCell>
   );

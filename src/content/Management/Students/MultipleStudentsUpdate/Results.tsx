@@ -1,13 +1,4 @@
-import {
-  ChangeEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef,
-  useEffect,
-  FC,
-  useCallback,
-} from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef, useEffect, FC, useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import {
@@ -31,7 +22,7 @@ import {
   styled,
   TablePagination,
   Grid,
-  Switch,
+  Switch
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -87,23 +78,16 @@ const ButtonError = styled(Button)(
 
 const ActionStyle: object = {
   height: '20px'
-}
+};
 interface Filters {
   role?: string;
 }
 
-const Transition = forwardRef(function Transition(
-  props: TransitionProps & { children: ReactElement<any, any> },
-  ref: Ref<unknown>
-) {
+const Transition = forwardRef(function Transition(props: TransitionProps & { children: ReactElement<any, any> }, ref: Ref<unknown>) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-const applyFilters = (
-  users,
-  query,
-  filters
-) => {
+const applyFilters = (users, query, filters) => {
   return users?.filter((user) => {
     let matches = true;
 
@@ -141,16 +125,11 @@ const applyFilters = (
   });
 };
 
-const applyPagination = (
-  users: User[],
-  page: number,
-  limit: number
-): User[] => {
+const applyPagination = (users: User[], page: number, limit: number): User[] => {
   return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns: any[] }> = ({ students, refetch, selectedUpdateColumns }) => {
-
+const Results: FC<{ students: any[]; refetch: () => void; selectedUpdateColumns: any[] }> = ({ students, refetch, selectedUpdateColumns }) => {
   const [selectedItems, setSelectedUsers] = useState([]);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
@@ -164,7 +143,9 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
   const [loading, setLoading] = useState(false);
 
   const [allStudents, setAllStudents] = useState([]);
-  useEffect(() => { setAllStudents(students) }, [students]);
+  useEffect(() => {
+    setAllStudents(students);
+  }, [students]);
 
   // const fetchById = useCallback(() => {
   //   //   console.log({students})
@@ -181,90 +162,75 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
     setLimit(parseInt(event.target.value));
   };
 
-
   const handleSelectAllUsers = (event: ChangeEvent<HTMLInputElement>): void => {
     setSelectedUsers(event.target.checked ? students.map((user) => user.id) : []);
   };
 
-  const handleSelectOneUser = (
-    _event: ChangeEvent<HTMLInputElement>,
-    userId: string
-  ): void => {
+  const handleSelectOneUser = (_event: ChangeEvent<HTMLInputElement>, userId: string): void => {
     if (!selectedItems.includes(userId)) {
       setSelectedUsers((prevSelected) => [...prevSelected, userId]);
     } else {
-      setSelectedUsers((prevSelected) =>
-        prevSelected.filter((id) => id !== userId)
-      );
+      setSelectedUsers((prevSelected) => prevSelected.filter((id) => id !== userId));
     }
   };
 
   const filteredClasses = applyFilters(students, query, filters);
   const paginatedClasses = applyPagination(filteredClasses, page, limit);
   const selectedBulkActions = selectedItems.length > 0;
-  const selectedSomeUsers =
-    selectedItems.length > 0 && selectedItems.length < students.length;
+  const selectedSomeUsers = selectedItems.length > 0 && selectedItems.length < students.length;
   const selectedAllUsers = selectedItems.length === students.length;
 
-
   const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
-
 
   const closeConfirmDelete = () => {
     setOpenConfirmDelete(null);
   };
 
   const handleDeleteCompleted = () => {
-
-    axios.delete(`/api/student/${openConfirmDelete}`)
-      .then(res => {
+    axios
+      .delete(`/api/student/${openConfirmDelete}`)
+      .then((res) => {
         setOpenConfirmDelete(null);
         refetch();
         showNotification('The student has been removed');
       })
-      .catch(err => {
+      .catch((err) => {
         setOpenConfirmDelete(null);
         showNotification('Student deletion failed !', 'error');
-      })
+      });
   };
   const handleConfirmDelete = (id) => {
-    setOpenConfirmDelete(id)
-  }
+    setOpenConfirmDelete(id);
+  };
 
   const handleSubmit = () => {
-    setLoading(true)
-    axios.post(`/api/student/multiple_std_updates`, { students_datas: allStudents, update_fields: selectedUpdateColumns })
-      .then(res => {
+    setLoading(true);
+    axios
+      .post(`/api/student/multiple_std_updates`, { students_datas: allStudents, update_fields: selectedUpdateColumns })
+      .then((res) => {
         setOpenConfirmDelete(null);
         refetch();
         showNotification(res.data.message);
       })
-      .catch(err => {
+      .catch((err) => {
         setLoading(false);
         setOpenConfirmDelete(null);
-        handleShowErrMsg(err, showNotification)
+        handleShowErrMsg(err, showNotification);
       })
-      .finally(() =>{
-        setLoading(false)
-      } 
-    )
-  }
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   return (
     <>
       <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
-
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />
           </Box>
         )}
         {!selectedBulkActions && (
-          <Box
-            p={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
+          <Box p={2} display="flex" alignItems="center" justifyContent="space-between">
             {/* <Box>
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:
@@ -300,7 +266,7 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
           </>
         ) : (
           <TableContainer>
-            <Table size='small'>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   {/* <TableCell padding="checkbox">
@@ -311,7 +277,11 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
                     />
                   </TableCell> */}
                   <TableCell>{t('ID')}</TableCell>
-                  {selectedUpdateColumns?.map(field => <TableCell key={field} sx={{ p: 0.25 }}>{t(field)}</TableCell>)}
+                  {selectedUpdateColumns?.map((field) => (
+                    <TableCell key={field} sx={{ p: 0.25 }}>
+                      {t(field)}
+                    </TableCell>
+                  ))}
                   {/* <TableCell align="center">{t('Actions')}</TableCell> */}
                 </TableRow>
               </TableHead>
@@ -330,24 +300,31 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
                           value={isUserSelected}
                         />
                       </TableCell> */}
-                      <TableCell sx={{ minWidth:50}}>
-                          <Typography variant="h5">
-                            {i.id}
-                          </Typography>
-                        </TableCell>
-                      
+                      <TableCell sx={{ minWidth: 50 }}>
+                        <Typography variant="h5">{i.id}</Typography>
+                      </TableCell>
+
                       {selectedUpdateColumns?.map((field, index) => (
                         <TableCell key={field} sx={{ minWidth: 200, px: 0.25 }}>
                           <Typography variant="h5">
-                            <TextFieldWrapper label='' pb={0} name={field} value={i[field] || ''} touched={undefined} errors={undefined} handleBlur={undefined} handleChange={(event) => {
-                              setAllStudents((students => {
-                                return students?.map((std) => {
-                                  if (std.id !== i.id) return std;
-                                  std[field] = event.target.value;
-                                  return std;
-                                })
-                              }))
-                            }} />
+                            <TextFieldWrapper
+                              label=""
+                              pb={0}
+                              name={field}
+                              value={i[field] || ''}
+                              touched={undefined}
+                              errors={undefined}
+                              handleBlur={undefined}
+                              handleChange={(event) => {
+                                setAllStudents((students) => {
+                                  return students?.map((std) => {
+                                    if (std.id !== i.id) return std;
+                                    std[field] = event.target.value;
+                                    return std;
+                                  });
+                                });
+                              }}
+                            />
                           </Typography>
                         </TableCell>
                       ))}
@@ -359,7 +336,10 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
           </TableContainer>
         )}
       </Card>
-      <SearchingButtonWrapper sx={{mt:2}} isLoading={loading} handleClick={handleSubmit}> Submit</SearchingButtonWrapper>
+      <SearchingButtonWrapper sx={{ mt: 2 }} isLoading={loading} handleClick={handleSubmit}>
+        {' '}
+        Submit
+      </SearchingButtonWrapper>
       <DialogWrapper
         open={openConfirmDelete ? true : false}
         maxWidth="sm"
@@ -368,13 +348,7 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
         keepMounted
         onClose={closeConfirmDelete}
       >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-          p={5}
-        >
+        <Box display="flex" alignItems="center" justifyContent="center" flexDirection="column" p={5}>
           <AvatarError>
             <CloseIcon />
           </AvatarError>
@@ -387,8 +361,7 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
             }}
             variant="h3"
           >
-            {t('Are you sure you want to permanently delete this student')}
-            ?
+            {t('Are you sure you want to permanently delete this student')}?
           </Typography>
 
           <Box>
@@ -419,7 +392,6 @@ const Results: FC<{ students: any[], refetch: () => void, selectedUpdateColumns:
     </>
   );
 };
-
 
 Results.propTypes = {
   students: PropTypes.array.isRequired

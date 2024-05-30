@@ -20,6 +20,7 @@ import useNotistick from '@/hooks/useNotistick';
 import Footer from '@/components/Footer';
 
 import { styled } from '@mui/material/styles';
+import { formatNumber } from '@/utils/numberFormat';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -126,8 +127,7 @@ const StudentCollectionReport = () => {
     }
 
     return axios.get(
-      `/api/reports/student_collections?start_date=${startDate}&end_date=${endDate}&selected_class=${selectedClass?.id}&selected_group=${
-        groupQueryArr?.length > 0 ? groupQueryArr : ''
+      `/api/reports/student_collections?start_date=${startDate}&end_date=${endDate}&selected_class=${selectedClass?.id}&selected_group=${groupQueryArr?.length > 0 ? groupQueryArr : ''
       }&selected_section=${groupSectionArr}`
     );
   };
@@ -151,7 +151,7 @@ const StudentCollectionReport = () => {
         return;
       }
       const res = await getStudentInfo();
-
+      console.log({ res })
       setStudentFees(res?.data?.result);
     } catch (error) {
       // console.log(error);
@@ -320,7 +320,7 @@ const StudentCollectionReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={false} handleClick={() => { }} disabled={false} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
@@ -380,19 +380,21 @@ const StudentCollectionReport = () => {
                     <TableBodyCellWrapper>
                       <Grid py={0.5}>{i + 1}</Grid>{' '}
                     </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student.student_info.student_id}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{`${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}${
-                      item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''
-                    }${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student?.student_info?.student_id}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{
+                      `${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}
+                      ${item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''}
+                      ${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`
+                    }</TableBodyCellWrapper>
                     <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student.group}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student.section.name}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student.class_roll_no}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>0.00</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>500.00</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.total_payable - item.collected_amount}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student?.group?.title}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student.section?.name}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student?.class_roll_no}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right">{formatNumber(item.total_payable || 0)}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
+                    <TableBodyCellWrapper align="right">{formatNumber(item.total_payable - item.collected_amount)}</TableBodyCellWrapper>
                   </StyledTableRow>
                 );
               })}

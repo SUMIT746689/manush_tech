@@ -10,17 +10,12 @@ const index = async (req, res) => {
       case 'GET':
         const { start_date, end_date, selected_class, selected_group, selected_section } = req.query;
 
+        if (!start_date || !end_date || !selected_section) throw new Error("provide required information")
+
         // date formating code start
-        let start_date_ = new Date(start_date);
-        start_date_.setHours(0);
-        start_date_.setMinutes(0);
-        start_date_.setSeconds(0);
-        start_date_.setMilliseconds(1);
-        let end_date_ = new Date(end_date);
-        end_date_.setHours(23);
-        end_date_.setMinutes(59);
-        end_date_.setSeconds(59);
-        end_date_.setMilliseconds(999);
+        let start_date_ = new Date(new Date(start_date).setHours(0, 0, 0, 0));
+        let end_date_ = new Date(new Date(end_date).setHours(23, 59, 59, 999));
+        
         // let hoursToSubtract = 6;
         // let new_start_date = subtractHours(start_date_, hoursToSubtract);
         // let new_end_date = subtractHours(end_date_, hoursToSubtract);

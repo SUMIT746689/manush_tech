@@ -75,11 +75,24 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 const keys = Object.keys(res[0])
                 if (keys.length === 0) return;
                 for (const student of res) {
+                    if (!student['Students ID'] || !student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) continue;
 
-                    if (!student['Students ID'] || !student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) return;
+                    // gender vefiry
+                    let gender = student.Gender ? student.Gender.trim().toLowerCase() : undefined;
+                    if (gender) {
+                        if (!["male", "female"].includes(gender)) {
+                            logFile.error(`invalid gender field, provide data ${gender} `)
+                            continue;
+                        }
+                    }
+
+
                     // verify and convert number to 13 digits
                     const { number, err } = handleConvBanNum(String(student['Mobile (SMS)']));
-                    if (err) return;
+                    if (err) {
+                        logFile.error(err);
+                        continue
+                    }
 
                     const hashPassword = await bcrypt.hash(number, Number(process.env.SALTROUNDS));
 
@@ -93,7 +106,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                         phone: number,
                         admission_date: new Date(Date.now()),
                         admission_status: "approved",
-                        gender: student.Gender,
+                        gender,
                         school: {
                             connect: { id: school_id }
                         },
@@ -169,7 +182,6 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                     })
                 })
                     .then(res => {
-                        console.log({ tran: res })
                         succesCreateStd.push(customStudentInfo.student_id);
                         // resolve({ isSuccess: true, student_id: customStudentInfo.student_id });
                         resolve(true);
@@ -191,13 +203,11 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
         Promise
             .all(allPromise)
             .then(resp => {
-                console.log({ resp })
                 if (resp.includes(true)) return res.status(200).json({ message: 'students data inserted', faildedCreateStd, succesCreateStd });
                 // if (resp[0].isSuccess) return res.status(200).json({ message: 'students data inserted', faildedCreateStd, succesCreateStd });
                 res.status(404).json({ error: 'failed insert all students' });
             })
             .catch(err => {
-                console.log({ "promise All error": err })
                 res.status(404).json({ error: err.message });
             })
     } catch (err) {

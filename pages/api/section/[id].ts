@@ -51,7 +51,7 @@ const section = async (req, res, refresh_token, academicYearVerify) => {
       case 'DELETE':
         const { school_id } = refresh_token;
         const haveAlreadySection = await prisma.section.findFirst({
-          where: { class: { school_id } },
+          where: { id, class: { school_id } },
           select: {
             students: {
               select: {

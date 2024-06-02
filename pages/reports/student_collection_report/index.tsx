@@ -106,7 +106,7 @@ const PrintData = ({ startDate, endDate, studentFees, selectedClass }) => {
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
         <Typography variant="h3" fontWeight={500}>{name}</Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Income Report</Typography>
+        <Typography variant='h4'>Student Collections Report</Typography>
         <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
       </Grid>
 
@@ -271,7 +271,7 @@ const StudentCollectionReport = () => {
         }}
         px={2}
       >
-        Student Collection Report
+        Student Collection Report (ALL ACADEMIC)
       </Typography>
       {/* searching part code start */}
       <Grid display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} px={1} mt={1} minHeight="fit-content">

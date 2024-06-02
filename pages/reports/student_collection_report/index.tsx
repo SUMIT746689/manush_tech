@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { Authenticated } from 'src/components/Authenticated';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
-import { Typography, Grid } from '@mui/material';
+import { Typography, Grid, selectClasses } from '@mui/material';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { DatePickerWrapper } from '@/components/DatePickerWrapper';
@@ -12,7 +12,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import axios from 'axios';
@@ -21,6 +21,8 @@ import Footer from '@/components/Footer';
 
 import { styled } from '@mui/material/styles';
 import { formatNumber } from '@/utils/numberFormat';
+import { useAuth } from '@/hooks/useAuth';
+import { useReactToPrint } from 'react-to-print';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -35,6 +37,84 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   // }
 }));
 
+const TableContent = ({ studentFees, selectedClass }) => {
+
+  return (
+    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+      <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Previous Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Payment</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Total Due Amount</TableHeaderCellWrapper>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {
+            studentFees?.map((item, i) => {
+              return (
+                <StyledTableRow
+                  key={i}
+                  sx={
+                    {
+                      //   '&:last-child td, &:last-child th': { border: 0 }
+                    }
+                  }
+                >
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{i + 1}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{item.student?.student_info?.student_id}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{
+                    `${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}
+                ${item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''}
+                ${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`
+                  }</TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{item.student?.group?.title}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{item.student.section?.name}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{item.student?.class_roll_no}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(item.total_payable || 0)}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(item.total_payable - item.collected_amount)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              );
+            })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
+}
+
+const PrintData = ({ startDate, endDate, studentFees, selectedClass }) => {
+  const { user } = useAuth()
+  const { school } = user || {};
+  const { name, address } = school || {};
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <h4>{address}</h4>
+        <Typography variant='h4'>Income Report</Typography>
+        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+      </Grid>
+
+      <TableContent studentFees={studentFees} selectedClass={selectedClass} />
+    </Grid>
+  )
+}
+
 const StudentCollectionReport = () => {
   const { showNotification } = useNotistick();
   const { data: classData, error: classError } = useClientFetch('/api/class');
@@ -46,6 +126,13 @@ const StudentCollectionReport = () => {
   const [groups, setGroups] = useState<Array<any>>([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [studentFees, setStudentFees] = useState<Array<any>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const componentRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  })
+
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
@@ -144,24 +231,36 @@ const StudentCollectionReport = () => {
       }, delay);
     };
   };
-  const handleClickStudentInfo = debounce(async () => {
+  const handleClickStudentInfo = async () => {
     try {
       if (!selectedClass) {
         showNotification('Please select a class before proceeding', 'error');
         return;
       }
+      setIsLoading(true)
       const res = await getStudentInfo();
       console.log({ res })
       setStudentFees(res?.data?.result);
     } catch (error) {
       // console.log(error);
     }
-  }, 1000);
+    finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
+
+      {/*  print report */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData startDate={startDate} endDate={endDate} selectedClass={selectedClass} studentFees={studentFees} />
+        </Grid>
+      </Grid>
+
       <Head>
-        <title>Student Collection_Report</title>
+        <title>Student Collection Report</title>
       </Head>
       <Typography
         variant="h4"
@@ -313,14 +412,14 @@ const StudentCollectionReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={handleClickStudentInfo} disabled={false} children={'Search'} />
+                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handleClickStudentInfo} disabled={isLoading} children={'Search'} />
                 </Grid>
                 <Grid
                   sx={{
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => { }} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={false} handleClick={handlePrint} disabled={false} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
@@ -348,59 +447,7 @@ const StudentCollectionReport = () => {
           }
         }}
       >
-        <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
-          <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Previous Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Payment</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Total Due Amount</TableHeaderCellWrapper>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {studentFees?.map((item, i) => {
-                return (
-                  <StyledTableRow
-                    key={i}
-                    sx={
-                      {
-                        //   '&:last-child td, &:last-child th': { border: 0 }
-                      }
-                    }
-                  >
-                    <TableBodyCellWrapper>
-                      <Grid py={0.5}>{i + 1}</Grid>{' '}
-                    </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student?.student_info?.student_id}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{
-                      `${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}
-                      ${item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''}
-                      ${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`
-                    }</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student?.group?.title}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student.section?.name}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student?.class_roll_no}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right">{formatNumber(item.total_payable || 0)}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right">{formatNumber(item.total_payable - item.collected_amount)}</TableBodyCellWrapper>
-                  </StyledTableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <TableContent studentFees={studentFees} selectedClass={selectedClass} />
       </Grid>
       {/* table code part end */}
       {/* footer */}

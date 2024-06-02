@@ -443,6 +443,16 @@ const accounting: MenuItems[] = [
             icon: HistoryIcon
           },
           {
+            name: 'Student Collections',
+            link: '/reports/student_collection_report',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Head Wise Collercion',
+            link: '/reports/head_wise_collection_report',
+            icon: HistoryIcon
+          },
+          {
             name: 'Class Wise Income',
             link: '/reports/class_wise_income',
             icon: HistoryIcon

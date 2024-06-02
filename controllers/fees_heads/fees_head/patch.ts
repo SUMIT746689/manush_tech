@@ -4,7 +4,7 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 
 // @ts-ignore
-const post = async (req, res, refresh_token) => {
+const patch = async (req, res, refresh_token) => {
   try {
     const { school_id } = refresh_token;
     const { title, frequency } = req.body;
@@ -33,4 +33,4 @@ const post = async (req, res, refresh_token) => {
   }
 };
 
-export default authenticate(post);
+export default authenticate(patch);

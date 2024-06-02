@@ -17,6 +17,9 @@ import dayjs from 'dayjs';
 import { styled } from '@mui/material/styles';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import Footer from '@/components/Footer';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -41,6 +44,9 @@ const ExpenseSummary = () => {
   const [hideStartAndEndDate, setHideStartAndEndDate] = useState<boolean>(true);
   const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
   const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalExpense, setTotalExpense] = useState<number>(0);
+  const { showNotification } = useNotistick();
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
@@ -49,13 +55,52 @@ const ExpenseSummary = () => {
     setEndDate(event);
   };
 
+  const getFormattedDate = (date) => {
+    return date.format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ [(Bangladesh Standard Time)]');
+  };
+
   const periodHandleChange = (event: ChangeEvent<HTMLInputElement>, v): void => {
+    const today = dayjs(Date.now());
+    let start;
+
     setSelectPeriod(v);
     if (v === 'Date Range') {
       setHideStartAndEndDate(false);
-    } else {
-      setHideStartAndEndDate(true);
+      return;
+    } else if (v === 'Today') {
+      start = today;
+    } else if (v === 'Last 7 Days') {
+      start = today.subtract(7, 'day');
+    } else if (v === 'Last 30 Days') {
+      start = today.subtract(1, 'month');
+    } else if (v === 'Last 3 Months') {
+      start = today.subtract(3, 'month');
+    } else if (v === 'Last 6 Months') {
+      start = today.subtract(6, 'month');
     }
+
+    setHideStartAndEndDate(true);
+    setStartDate(getFormattedDate(start));
+    setEndDate(getFormattedDate(today));
+  };
+
+  const handleSearch = () => {
+    setIsLoading(true);
+    axios
+      .get(`/api/reports/expense_summary?from_date=${startDate}&to_date=${endDate}`)
+      .then(({ data }) => {
+        if (data?.total) {
+          setTotalExpense(data?.total);
+        } else {
+          setTotalExpense(0);
+        }
+      })
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -175,7 +220,12 @@ const ExpenseSummary = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Search'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handleSearch}
+                    disabled={isLoading || !endDate || !startDate}
+                    children={'Search'}
+                  />
                 </Grid>
                 <Grid
                   sx={{
@@ -224,8 +274,8 @@ const ExpenseSummary = () => {
                 <TableBodyCellWrapper>
                   <Grid py={0.5}>1</Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>Fees</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>Expense</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{`TK.${totalExpense}`}</TableBodyCellWrapper>
               </StyledTableRow>
               <TableRow>
                 <TableBodyCellWrapper colspan={2}>
@@ -234,7 +284,7 @@ const ExpenseSummary = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{`TK.${totalExpense}`}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>

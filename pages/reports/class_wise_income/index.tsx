@@ -49,7 +49,7 @@ const ClassWiseIncome = () => {
   const componentRef = useRef();
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => componentRef.current
   });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -61,28 +61,28 @@ const ClassWiseIncome = () => {
   };
 
   const handleSearch = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const class_ids = selectedCls?.map((cls) => cls.id);
-    axios.get(`/api/reports/class_wise_incomes?from_date=${startDate}&to_date=${endDate}&class_ids=${class_ids}`)
+    axios
+      .get(`/api/reports/class_wise_incomes?from_date=${startDate}&to_date=${endDate}&class_ids=${class_ids}`)
       .then(({ data }) => {
         let total_collected_amt = 0;
 
-        const customData = data.map(cls_wise_fees => {
+        const customData = data.map((cls_wise_fees) => {
           total_collected_amt += cls_wise_fees.total_collected_amt;
-          const cls_name = classes?.find(cls => cls.id === cls_wise_fees.class_id)?.name;
-          return ({ ...cls_wise_fees, class_name: cls_name })
-        })
+          const cls_name = classes?.find((cls) => cls.id === cls_wise_fees.class_id)?.name;
+          return { ...cls_wise_fees, class_name: cls_name };
+        });
         setReports(customData);
-        setTotal({ total_collected_amt })
+        setTotal({ total_collected_amt });
       })
-      .catch(err => {
-        handleShowErrMsg(err, showNotification)
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
       })
       .finally(() => {
-        setIsLoading(false)
-      })
+        setIsLoading(false);
+      });
   };
-
 
   return (
     <>
@@ -172,13 +172,13 @@ const ClassWiseIncome = () => {
                   name="class"
                   multiple={true}
                   value={selectedCls}
-                  options={[{ label: "Select All", id: "select_all" }, ...muiClassLists] || []}
+                  options={[{ label: 'Select All', id: 'select_all' }, ...muiClassLists] || []}
                   error={undefined}
                   touched={undefined}
                   handleChange={(_, value) => {
-                    const lastselectVal = value[value.length - 1]
-                    if (lastselectVal?.id === "select_all") return setSelectedCls(muiClassLists);
-                    setSelectedCls(value)
+                    const lastselectVal = value[value.length - 1];
+                    if (lastselectVal?.id === 'select_all') return setSelectedCls(muiClassLists);
+                    setSelectedCls(value);
                   }}
                 />
               </Grid>
@@ -202,7 +202,12 @@ const ClassWiseIncome = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handleSearch} disabled={isLoading || selectedCls.length === 0 || !endDate || !startDate} children={'Search'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handleSearch}
+                    disabled={isLoading || selectedCls.length === 0 || !endDate || !startDate}
+                    children={'Search'}
+                  />
                 </Grid>
                 <Grid
                   sx={{
@@ -241,21 +246,21 @@ const ClassWiseIncome = () => {
               <TableRow>
                 <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
                 <TableHeaderCellWrapper style={{ width: '60%' }}>Class Name</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper style={{ width: '38%' }} align="right">Fees</TableHeaderCellWrapper>
+                <TableHeaderCellWrapper style={{ width: '38%' }} align="right">
+                  Fees
+                </TableHeaderCellWrapper>
               </TableRow>
             </TableHead>
             <TableBody>
-              {
-                reports?.map(((report, index) => (
-                  <StyledTableRow key={report.class_id}>
-                    <TableBodyCellWrapper>
-                      <Grid py={0.5}>{index}</Grid>{' '}
-                    </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{classes?.find(cls => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right" >{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
-                  </StyledTableRow>
-                )))
-              }
+              {reports?.map((report, index) => (
+                <StyledTableRow key={report.class_id}>
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{index}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{classes?.find((cls) => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              ))}
 
               <TableRow>
                 <TableBodyCellWrapper colspan={2}>
@@ -279,17 +284,21 @@ const ClassWiseIncome = () => {
 };
 
 const PrintData = ({ startDate, endDate, reports, classes, total }) => {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const { school } = user || {};
   const { name, address } = school || {};
 
   return (
     <Grid mx={1}>
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
-        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Class Wise Income</Typography>
-        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+        <Typography variant="h4">Class Wise Income</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
       </Grid>
 
       <TableContainer component={Paper} sx={{ borderRadius: 0, mt: 2 }}>
@@ -298,21 +307,21 @@ const PrintData = ({ startDate, endDate, reports, classes, total }) => {
             <TableRow>
               <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
               <TableHeaderCellWrapper style={{ width: '60%' }}>Class Name</TableHeaderCellWrapper>
-              <TableHeaderCellWrapper style={{ width: '38%' }} align="right">Fees</TableHeaderCellWrapper>
+              <TableHeaderCellWrapper style={{ width: '38%' }} align="right">
+                Fees
+              </TableHeaderCellWrapper>
             </TableRow>
           </TableHead>
           <TableBody>
-            {
-              reports?.map(((report, index) => (
-                <StyledTableRow key={report.class_id}>
-                  <TableBodyCellWrapper>
-                    <Grid py={0.5}>{index}</Grid>{' '}
-                  </TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{classes?.find(cls => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right" >{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
-                </StyledTableRow>
-              )))
-            }
+            {reports?.map((report, index) => (
+              <StyledTableRow key={report.class_id}>
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>{index}</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>{classes?.find((cls) => cls.id === report.class_id)?.name}</TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+              </StyledTableRow>
+            ))}
 
             <TableRow>
               <TableBodyCellWrapper colspan={2}>
@@ -327,8 +336,8 @@ const PrintData = ({ startDate, endDate, reports, classes, total }) => {
         </Table>
       </TableContainer>
     </Grid>
-  )
-}
+  );
+};
 
 ClassWiseIncome.getLayout = (page) => (
   <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>

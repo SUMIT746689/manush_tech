@@ -12,7 +12,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef } from 'react';
 import dayjs from 'dayjs';
 import { styled } from '@mui/material/styles';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
@@ -20,6 +20,8 @@ import Footer from '@/components/Footer';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '@/hooks/useAuth';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -39,6 +41,62 @@ const periodNames = ['Today', 'Last 7 Days', 'Last 30 Days', 'Last 3 Months', 'L
 const currentPeriodName = periodNames[0];
 // period related code end
 
+const TableContent = ({ totalExpense }) => {
+  return (
+    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+      <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper style={{ width: '60%' }}>Particulars</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper style={{ width: '38%' }}> Amount</TableHeaderCellWrapper>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <StyledTableRow>
+            <TableBodyCellWrapper>
+              <Grid py={0.5}>1</Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper>Expense</TableBodyCellWrapper>
+            <TableBodyCellWrapper>{`TK.${totalExpense}`}</TableBodyCellWrapper>
+          </StyledTableRow>
+          <TableRow>
+            <TableBodyCellWrapper colspan={2}>
+              <Grid py={0.5} textAlign={'right'}>
+                {' '}
+                Total
+              </Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper>{`TK.${totalExpense}`}</TableBodyCellWrapper>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+const PrintData = ({ startDate, endDate, totalExpense }) => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  const { name, address } = school || {};
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
+        <h4>{address}</h4>
+        <Typography variant="h4">EXPENSE SUMMARY</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
+      </Grid>
+
+      <TableContent totalExpense={totalExpense} />
+    </Grid>
+  );
+};
+
 const ExpenseSummary = () => {
   const [selected_period, setSelectPeriod] = useState<string | null>(currentPeriodName);
   const [hideStartAndEndDate, setHideStartAndEndDate] = useState<boolean>(true);
@@ -47,6 +105,11 @@ const ExpenseSummary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalExpense, setTotalExpense] = useState<number>(0);
   const { showNotification } = useNotistick();
+  const componentRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current
+  });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
@@ -105,6 +168,13 @@ const ExpenseSummary = () => {
 
   return (
     <>
+      {/*  print report */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData startDate={startDate} endDate={endDate} totalExpense={totalExpense} />
+        </Grid>
+      </Grid>
+
       <Head>
         <title>Expense_Summary</title>
       </Head>
@@ -232,7 +302,7 @@ const ExpenseSummary = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handlePrint} disabled={isLoading} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>

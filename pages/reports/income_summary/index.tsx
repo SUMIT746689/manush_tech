@@ -12,11 +12,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef } from 'react';
 import dayjs from 'dayjs';
 import { styled } from '@mui/material/styles';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import Footer from '@/components/Footer';
+import axios from 'axios';
+import useNotistick from '@/hooks/useNotistick';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '@/hooks/useAuth';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -36,12 +41,84 @@ const periodNames = ['Today', 'Last 7 Days', 'Last 30 Days', 'Last 3 Months', 'L
 const currentPeriodName = periodNames[0];
 // period related code end
 
+const TableContent = ({ totalFees, totalOtherFees, total }) => {
+  return (
+    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+      <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableHeaderCellWrapper style={{ width: '2%' }}>SL</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper style={{ width: '60%' }}>Particulars</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper style={{ width: '38%' }}> Amount</TableHeaderCellWrapper>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <StyledTableRow>
+            <TableBodyCellWrapper>
+              <Grid py={0.5}>1</Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper>Fees</TableBodyCellWrapper>
+            <TableBodyCellWrapper>TK.{totalFees}</TableBodyCellWrapper>
+          </StyledTableRow>
+          <StyledTableRow>
+            <TableBodyCellWrapper>
+              <Grid py={0.5}>2</Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper>Others Income</TableBodyCellWrapper>
+            <TableBodyCellWrapper>TK.{totalOtherFees}</TableBodyCellWrapper>
+          </StyledTableRow>
+          <TableRow>
+            <TableBodyCellWrapper colspan={2}>
+              <Grid py={0.5} textAlign={'right'}>
+                {' '}
+                Total
+              </Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper>{total}</TableBodyCellWrapper>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+const PrintData = ({ startDate, endDate, totalFees, totalOtherFees, total }) => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  const { name, address } = school || {};
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
+        <h4>{address}</h4>
+        <Typography variant="h4">INCOME SUMMARY</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
+      </Grid>
+
+      <TableContent totalFees={totalFees} totalOtherFees={totalOtherFees} total={total} />
+    </Grid>
+  );
+};
+
 const IncomeSummary = () => {
   const [selected_period, setSelectPeriod] = useState<string | null>(currentPeriodName);
   const [hideStartAndEndDate, setHideStartAndEndDate] = useState<boolean>(true);
   const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
   const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalFees, setTotalFees] = useState<number>(0);
+  const [totalOtherFees, setTotalOtherFees] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
+  const { showNotification } = useNotistick();
+  const componentRef = useRef();
 
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current
+  });
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
   };
@@ -49,17 +126,67 @@ const IncomeSummary = () => {
     setEndDate(event);
   };
 
+  const getFormattedDate = (date) => {
+    return date.format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ [(Bangladesh Standard Time)]');
+  };
+
   const periodHandleChange = (event: ChangeEvent<HTMLInputElement>, v): void => {
+    const today = dayjs(Date.now());
+    let start;
+
     setSelectPeriod(v);
     if (v === 'Date Range') {
       setHideStartAndEndDate(false);
-    } else {
-      setHideStartAndEndDate(true);
+      return;
+    } else if (v === 'Today') {
+      start = today;
+    } else if (v === 'Last 7 Days') {
+      start = today.subtract(7, 'day');
+    } else if (v === 'Last 30 Days') {
+      start = today.subtract(1, 'month');
+    } else if (v === 'Last 3 Months') {
+      start = today.subtract(3, 'month');
+    } else if (v === 'Last 6 Months') {
+      start = today.subtract(6, 'month');
     }
+
+    setHideStartAndEndDate(true);
+    setStartDate(getFormattedDate(start));
+    setEndDate(getFormattedDate(today));
+  };
+
+  const handleSearch = () => {
+    setIsLoading(true);
+    axios
+      .get(`/api/reports/income_summary?from_date=${startDate}&to_date=${endDate}`)
+      .then(({ data }) => {
+        if (data?.result) {
+          setTotalFees(data?.result?.fees);
+          setTotalOtherFees(data?.result?.other_fees);
+          setTotal(parseInt(data?.result?.fees) + parseInt(data?.result?.other_fees));
+        } else {
+          setTotalFees(0);
+          setTotalOtherFees(0);
+          setTotal(0);
+        }
+      })
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
     <>
+      {/*  print report */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData startDate={startDate} endDate={endDate} totalFees={totalFees} totalOtherFees={totalOtherFees} total={total} />
+        </Grid>
+      </Grid>
+
       <Head>
         <title>Income_Summary</title>
       </Head>
@@ -175,14 +302,19 @@ const IncomeSummary = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Search'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handleSearch}
+                    disabled={isLoading || !endDate || !startDate}
+                    children={'Search'}
+                  />
                 </Grid>
                 <Grid
                   sx={{
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handlePrint} disabled={isLoading} children={'Print'} />
                 </Grid>
               </Grid>
             </Grid>
@@ -225,7 +357,14 @@ const IncomeSummary = () => {
                   <Grid py={0.5}>1</Grid>{' '}
                 </TableBodyCellWrapper>
                 <TableBodyCellWrapper>Fees</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>TK.{totalFees}</TableBodyCellWrapper>
+              </StyledTableRow>
+              <StyledTableRow>
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>2</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>Others Income</TableBodyCellWrapper>
+                <TableBodyCellWrapper>TK.{totalOtherFees}</TableBodyCellWrapper>
               </StyledTableRow>
               <TableRow>
                 <TableBodyCellWrapper colspan={2}>
@@ -234,7 +373,7 @@ const IncomeSummary = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{total}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>

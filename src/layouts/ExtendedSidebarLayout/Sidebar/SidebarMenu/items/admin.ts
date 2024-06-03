@@ -448,13 +448,33 @@ const accounting: MenuItems[] = [
             icon: HistoryIcon
           },
           {
-            name: 'Head Wise Collercion',
+            name: 'Head Wise Collection',
             link: '/reports/head_wise_collection_report',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Head Wise Due',
+            link: '/reports/head_wise_due_report',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Student Due',
+            link: '/reports/student_due_report',
             icon: HistoryIcon
           },
           {
             name: 'Class Wise Income',
             link: '/reports/class_wise_income',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Income Summary',
+            link: '/reports/income_summary',
+            icon: HistoryIcon
+          },
+          {
+            name: 'Expense Summary',
+            link: '/reports/expense_summary',
             icon: HistoryIcon
           },
         ]

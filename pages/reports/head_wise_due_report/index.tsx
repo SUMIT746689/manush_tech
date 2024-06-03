@@ -116,25 +116,25 @@ const HeadWiseDueReport = () => {
   const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFeesHead, setSelectedFeesHead] = useState();
+
   const [feesMonths, setFeesMonths] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState();
+
+  const [classList, setClassList] = useState([]);
+  const [selectedClass, setSelectedClass] = useState();
+
+  const [sectionList, setSectionList] = useState([]);
+  const [selectedSection, setSelectedSection] = useState();
+
   const [reports, setReports] = useState([]);
   const { showNotification } = useNotistick();
   const [total, setTotal] = useState();
   const componentRef = useRef()
   const { muiMenuList: muiFeesHeadsLists } = useClientFetch('/api/fees_heads');
-  // const { }
+
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   })
-
-  const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setStartDate(event);
-  };
-
-  const endDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setEndDate(event);
-  };
 
   const handleSearch = () => {
     setIsLoading(true)
@@ -159,8 +159,18 @@ const HeadWiseDueReport = () => {
     axios.get(`/api/fees_heads/${value.id}`)
       .then(({ data }) => {
         setSelectedMonth(null)
-        if (!Array.isArray(data)) return setFeesMonths([]);
-        setFeesMonths(data)
+        // const { months, classes } = data;
+        // if (!Array.isArray(months)) return setFeesMonths([]);
+        // setFeesMonths(months)
+        // console.log({ classes })
+
+        if (!Array.isArray(data)) return setClassList([]);
+        // console.log({ classes })
+        const customizeCls = data.map(cls => ({ label: cls.name, id: cls.id, ...cls }))
+        // console.log({ customizeCls })
+        setClassList(customizeCls);
+        // return setClassList([]);
+
       })
       .catch((err) => { console.log({ err }) })
   }
@@ -170,10 +180,27 @@ const HeadWiseDueReport = () => {
 
   }
 
-  const handleClsChange = () => {
+  const handleClsChange = (event, value) => {
+    if (!value?.id) return;
+    setSelectedClass(value)
+    const findCls = classList.find(cls => cls.id === value.id);
+    if (!findCls) return setSectionList([]);
+    const cusSectionList = findCls.sections.map((section) => ({ label: section.name, id: section.id }));
+    setSectionList(cusSectionList)
+    if (!findCls?.has_section) setSelectedSection(cusSectionList[0]);
+    setSelectedSection(null)
+    // @ts-ignore
+    axios.get(`/api/fee/available_months?fees_head_id=${selectedFeesHead.id}&class_id=${value.id}`)
+      .then(({ data: feesMonths }) => { setFeesMonths(feesMonths) })
+      .catch(err => { console.log({ err }) })
 
   }
 
+  const handleSectionChange = (event, value) => {
+    if (!value?.id) return;
+    setSelectedSection(value)
+  }
+  console.log({ selectedSection })
   return (
     <>
       {/*  print report */}
@@ -206,24 +233,24 @@ const HeadWiseDueReport = () => {
                 <AutoCompleteWrapper options={muiFeesHeadsLists} value={selectedFeesHead} label="Select Head" placeholder="Select a Head" handleChange={handleFeesHeadChange} />
               </Grid>
 
+              {/* Class field */}
+              <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
+                <AutoCompleteWrapper options={classList} value={selectedClass} label="Select Class" placeholder="Select a Class" handleChange={handleClsChange} />
+              </Grid>
+
               {/* Month field */}
               <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
                 <DropDownSelectWrapper menuItems={feesMonths} value={selectedMonth} handleChange={handleMonthChange} label="Select Month" name='month' />
               </Grid>
 
-              {/* Class field */}
-              <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
-                <AutoCompleteWrapper options={[]} value={''} label="Select Class" placeholder="Select a Class" handleChange={handleClsChange} />
-              </Grid>
-
               {/* Group field */}
-              <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
+              {/* <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
                 <AutoCompleteWrapper options={[]} value={''} label="Select Group" placeholder="Select a Group" handleChange={() => { }} />
-              </Grid>
+              </Grid> */}
 
               {/* Section field */}
               <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '30%', xl: '15%' }, flexGrow: 1 }}>
-                <AutoCompleteWrapper options={[]} value={''} label="Select Section" placeholder="Select a Section" handleChange={() => { }} />
+                <AutoCompleteWrapper options={sectionList} value={selectedSection} label="Select Section" placeholder="Select a Section" handleChange={handleSectionChange} />
               </Grid>
 
               {/* Search button */}

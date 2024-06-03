@@ -189,13 +189,14 @@ model Teacher {
   user_id       Int  @unique
   school_id     Int
 
-  my_class   Section[]   @relation("class_teacher")
-  user       User        @relation(fields: [user_id], references: [id])
-  classes    Section[]   @relation("SectionToTeacher")
-  periods    Period[]
-  school     School      @relation(fields: [school_id], references: [id])
-  department Department? @relation(fields: [department_id], references: [id])
-  seatPlans  seatPlan[]  @relation("teacher_to_seat_plan")
+  my_class             Section[]              @relation("class_teacher")
+  user                 User                   @relation(fields: [user_id], references: [id])
+  classes              Section[]              @relation("SectionToTeacher")
+  periods              Period[]
+  school               School                 @relation(fields: [school_id], references: [id])
+  department           Department?            @relation(fields: [department_id], references: [id])
+  seatPlans            seatPlan[]             @relation("teacher_to_seat_plan")
+  StudentClassSubjects StudentClassSubjects[]
 
   @@map("teachers")
 }
@@ -311,10 +312,11 @@ model Student {
   waiver_fees   Fee[]              @relation("WaiverFeesToStudent")
   extra_section Section?           @relation("extra_section", fields: [extra_section_id], references: [id])
 
-  fees        StudentFee[]
-  attendances Attendance[]
-  results     StudentResult[]
-  Homework    Homework[]
+  fees                 StudentFee[]
+  attendances          Attendance[]
+  results              StudentResult[]
+  Homework             Homework[]
+  StudentClassSubjects StudentClassSubjects[]
 
   @@map("students")
 }
@@ -330,6 +332,18 @@ enum Gender {
   female
 }
 
+model StudentClassSubjects {
+  id         Int @id @default(autoincrement())
+  student_id Int
+  subject_id Int
+  teacher_id Int
+
+  student Student @relation(fields: [student_id], references: [id])
+  subject Subject @relation(fields: [subject_id], references: [id])
+  teacher Teacher @relation(fields: [teacher_id], references: [id])
+
+  @@map("std_cls_subjects")
+}
 
 /// StudentStatus holds student current status also history. Current status like payment info, results etc,
 /// duplicate by commonly section id
@@ -352,11 +366,12 @@ model Subject {
   class_id Int
   class    Class  @relation(fields: [class_id], references: [id])
 
-  exam_details ExamDetails[]
-  Period       Period[]
-  DailyNote    DailyNote[]
-  Syllabus     Syllabus[]
-  Homework     Homework[]
+  exam_details         ExamDetails[]
+  Period               Period[]
+  DailyNote            DailyNote[]
+  Syllabus             Syllabus[]
+  Homework             Homework[]
+  StudentClassSubjects StudentClassSubjects[]
 
   @@map("subjects")
 }
@@ -1195,13 +1210,13 @@ enum SelectedStatusType {
 }
 
 model tbl_student_sent_sms_queue {
-  id                  Int                @id @default(autoincrement())
+  id                  Int                 @id @default(autoincrement())
   class_id            Int
   section_id          Int?
   school_id           Int
   academic_year_id    Int
   sent_sms_std_status SelectedStatusType?
-  created_at          DateTime           @default(now())
+  created_at          DateTime            @default(now())
 
   class        Class        @relation(fields: [class_id], references: [id])
   sections     Section?     @relation(fields: [section_id], references: [id])

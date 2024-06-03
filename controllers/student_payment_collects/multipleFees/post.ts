@@ -70,9 +70,9 @@ const handleTransaction = ({ collection_date, data, status, account, voucher, re
             collected_by_user: { connect: { id: data.collected_by } },
             transaction: {
               create: {
-                amount: data.collected_amount,
-                account_id: account.id,
-                payment_method_id: account?.payment_method[0]?.id,
+                amount: data.collected_amount, // done
+                account_id: account.id, // done
+                payment_method_id: account?.payment_method[0]?.id, // done
                 voucher_id: voucher.id,
                 transID: data.transID,
                 school_id: refresh_token.school_id,
@@ -127,6 +127,7 @@ export const post = async (req, res, refresh_token) => {
   try {
     const { id: user_id, school_id } = refresh_token;
     let {
+      studentClass,
       collection_date,
       student_id,
       fee_id,
@@ -308,7 +309,7 @@ export const post = async (req, res, refresh_token) => {
         } catch (error) {
           //     here have a problem
 
-          throw new Error('failed to insert student fees');
+          throw new Error(`${error.message}`);
         }
       });
       const results = await Promise.all(promises);
@@ -322,7 +323,14 @@ export const post = async (req, res, refresh_token) => {
         }
 
         if (req.body?.other_fees_data !== null) {
-          const post_other_fees_res = await post_other_fees(collection_date, req.body.other_fees_data, res, refresh_token, tracking_number);
+          const post_other_fees_res = await post_other_fees(
+            studentClass,
+            collection_date,
+            req.body.other_fees_data,
+            res,
+            refresh_token,
+            tracking_number
+          );
 
           if (Object.keys(post_other_fees_res).length === 0) {
             // console.log("Object is empty");
@@ -359,7 +367,7 @@ export const post = async (req, res, refresh_token) => {
         throw new Error('failed to insert student fees');
       }
     } else if (req.body?.other_fees_data !== null) {
-      const post_other_fees_res = await post_other_fees(collection_date, req.body.other_fees_data, res, refresh_token, tracking_number);
+      const post_other_fees_res = await post_other_fees(studentClass, collection_date, req.body.other_fees_data, res, refresh_token, tracking_number);
 
       if (Object.keys(post_other_fees_res).length === 0) {
         // console.log("Object is empty");

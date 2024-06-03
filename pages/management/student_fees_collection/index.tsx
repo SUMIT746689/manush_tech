@@ -36,7 +36,7 @@ const monthData = monthList.map((month) => ({ label: month, value: month }));
 
 function Managementschools() {
   // updated code start
-
+  const [studentClass, setStudentClass] = useState<any>(null);
   const [searchValue, setSearchValue] = useState<any>(null);
   const [searchOptionData, setSearchOptionData] = useState<Array<any>>([]);
   const [userInformation, setUserInformation] = useState<any>(null);
@@ -109,17 +109,19 @@ function Managementschools() {
 
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
+
       if (res?.data?.length > 0) {
         const response = await axios.get(
           `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
         );
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
-
+        setStudentClass(res?.data[0]?.class_id);
         setLeftFeesTableColumnDataState(response?.data?.data);
         leftFeesTableColumnData({ ...response?.data?.data });
       } else {
         setSearchValue('');
+        setStudentClass('');
         return showNotification('student_id not founds', 'error');
       }
     } else if (v?.id && academicYear?.id) {
@@ -311,11 +313,12 @@ function Managementschools() {
         );
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
-
+        setStudentClass(res?.data[0]?.class_id);
         setLeftFeesTableColumnDataState(response?.data?.data);
         leftFeesTableColumnData({ ...response?.data?.data });
       } else {
         setSearchValue('');
+        setStudentClass('');
         return showNotification('student_id not founds', 'error');
       }
     } else if (searchValue?.id && academicYear?.id) {
@@ -357,6 +360,7 @@ function Managementschools() {
 
   // updated reset button code start
   const resetBtnHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setStudentClass('');
     setSearchValue('');
     setLeftFeesTableData([]);
     setFeesName('');
@@ -750,6 +754,7 @@ function Managementschools() {
           />
 
           <PaymentOptions
+            studentClass={studentClass}
             printAndCollect={printAndCollect}
             setPrintAndCollect={setPrintAndCollect}
             onTimeDiscountArr={onTimeDiscountArr}

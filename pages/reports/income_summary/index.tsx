@@ -45,7 +45,9 @@ const IncomeSummary = () => {
   const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
   const [endDate, setEndDate] = useState<any>(dayjs(Date.now()));
   const [isLoading, setIsLoading] = useState(false);
-  const [totalExpense, setTotalExpense] = useState<number>(0);
+  const [totalFees, setTotalFees] = useState<number>(0);
+  const [totalOtherFees, setTotalOtherFees] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
   const { showNotification } = useNotistick();
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -89,10 +91,14 @@ const IncomeSummary = () => {
     axios
       .get(`/api/reports/income_summary?from_date=${startDate}&to_date=${endDate}`)
       .then(({ data }) => {
-        if (data?.total) {
-          setTotalExpense(data?.total);
+        if (data?.result) {
+          setTotalFees(data?.result?.fees);
+          setTotalOtherFees(data?.result?.other_fees);
+          setTotal(parseInt(data?.result?.fees) + parseInt(data?.result?.other_fees));
         } else {
-          setTotalExpense(0);
+          setTotalFees(0);
+          setTotalOtherFees(0);
+          setTotal(0);
         }
       })
       .catch((err) => {
@@ -275,7 +281,14 @@ const IncomeSummary = () => {
                   <Grid py={0.5}>1</Grid>{' '}
                 </TableBodyCellWrapper>
                 <TableBodyCellWrapper>Fees</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>TK.{totalFees}</TableBodyCellWrapper>
+              </StyledTableRow>
+              <StyledTableRow>
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>2</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>Others Income</TableBodyCellWrapper>
+                <TableBodyCellWrapper>TK.{totalOtherFees}</TableBodyCellWrapper>
               </StyledTableRow>
               <TableRow>
                 <TableBodyCellWrapper colspan={2}>
@@ -284,7 +297,7 @@ const IncomeSummary = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{total}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>

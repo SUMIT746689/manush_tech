@@ -9,6 +9,7 @@ import axios from 'axios';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 const PaymentOptions = ({
+  studentClass,
   printAndCollect,
   setPrintAndCollect,
   onTimeDiscountArr,
@@ -234,6 +235,7 @@ const PaymentOptions = ({
 
     axios
       .post('/api/student_payment_collect/multiples_fees', {
+        studentClass,
         collection_date: collectionDate,
         student_id: feesUserData.id,
         collected_by_user: user?.id,

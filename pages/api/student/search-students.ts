@@ -27,6 +27,7 @@ const index = async (req, res, refresh_token, academic_year) => {
               ,students.class_roll_no
               ,sections.name as section_name
               ,classes.name as class_name
+              ,classes.id as class_id
               ,students.id as student_table_id
           FROM student_informations
           JOIN students on  students.student_information_id = student_informations.id
@@ -40,6 +41,7 @@ const index = async (req, res, refresh_token, academic_year) => {
             ,students.class_roll_no
             ,sections.name as section_name
             ,classes.name as class_name
+            ,classes.id as class_id
             ,students.id as student_table_id 
         FROM student_informations
         JOIN students on  students.student_information_id = student_informations.id

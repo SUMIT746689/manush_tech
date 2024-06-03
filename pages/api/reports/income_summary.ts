@@ -28,17 +28,51 @@ const index = async (req, res) => {
         //     voucher_type: 'credit'
         //   }
         // });
-        const incomeData = await prisma.studentFee.findMany({
-          select: {
-            transaction: true,
-            other_fee_name: true
+        // const incomeData = await prisma.studentFee.findMany({
+        //   select: {
+        //     transaction: true,
+        //     other_fee_name: true
+        //   }
+        // });
+
+        // const incomeData = await prisma.transaction.findMany({
+        //   include: {
+        //     voucher: true
+        //   }
+        // });
+
+        const incomeData = await prisma.transaction.findMany({
+          where: {
+            created_at: {
+              gte: isoFromDate,
+              lte: isoToDate
+            },
+            voucher_type: 'credit'
+          },
+          include: {
+            voucher: true
           }
         });
 
+        const result = incomeData.reduce(
+          (acc, transaction) => {
+            const resourceType = transaction.voucher.resource_type;
+            const amount = transaction.amount;
+
+            if (resourceType === 'fee' || resourceType === 'studentFee') {
+              acc.fees += amount;
+            } else {
+              acc.other_fees += amount;
+            }
+
+            return acc;
+          },
+          { fees: 0, other_fees: 0 }
+        );
+
         res.status(200).json({
           message: 'success',
-          //  total: expenseData?._sum?.voucher_amount
-          total: 0
+          result
         });
         break;
 

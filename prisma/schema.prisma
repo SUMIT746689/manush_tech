@@ -167,6 +167,12 @@ model Department {
   @@map("departments")
 }
 
+enum SalaryEnums {
+  percentage_wise
+  class_wise
+  monthly
+}
+
 model Teacher {
   id                Int       @id @default(autoincrement())
   first_name        String
@@ -179,6 +185,7 @@ model Teacher {
   blood_group       String?   @db.VarChar(20)
   religion          String?
   date_of_birth     DateTime  @db.Date
+  salary_type       SalaryEnums?
   present_address   String
   permanent_address String
   joining_date      DateTime  @db.Date

@@ -54,13 +54,7 @@ const BoxUploadWrapper = styled(Box)(
 `
 );
 
-
-function PageHeader({
-  editSchool,
-  setEditSchool,
-  departments,
-  reFetchData
-}): any {
+function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): any {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { showNotification } = useNotistick();
@@ -68,7 +62,7 @@ function PageHeader({
 
   useEffect(() => {
     if (editSchool) {
-     handleCreateProjectOpen();
+      handleCreateProjectOpen();
     }
   }, [editSchool]);
 
@@ -86,24 +80,19 @@ function PageHeader({
 
     setOpen(false);
   };
-  const handleFormSubmit = async (
-    _values,
-    resetForm,
-    setErrors,
-    setStatus,
-    setSubmitting
-  ) => {
+  const handleFormSubmit = async (_values, resetForm, setErrors, setStatus, setSubmitting) => {
     try {
       const resume: any = [];
-      if(_values.resume) Array.prototype.forEach.call(_values.resume, function (file) {
-        resume.push(file);
-      });
+      if (_values.resume)
+        Array.prototype.forEach.call(_values.resume, function (file) {
+          resume.push(file);
+        });
       const formData = new FormData();
       formData.append('first_name', _values.first_name);
       formData.append('middle_name', _values.middle_name);
       formData.append('last_name', _values.last_name);
       formData.append('national_id', _values.national_id);
-      if(_values.department_id) formData.append('department_id', _values.department_id);
+      if (_values.department_id) formData.append('department_id', _values.department_id);
       formData.append('phone', _values.phone);
       formData.append('gender', _values.gender);
       formData.append('blood_group', _values.blood_group);
@@ -111,6 +100,7 @@ function PageHeader({
       formData.append('date_of_birth', _values.date_of_birth);
       formData.append('present_address', _values.present_address);
       formData.append('permanent_address', _values.permanent_address);
+      formData.append('salary_type', _values.salary_type);
 
       if (_values.password !== '') {
         formData.append('password', _values.password);
@@ -138,11 +128,10 @@ function PageHeader({
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`
           }
         });
-        if (result.data?.success)
-          successProcess(t('A teacher has been updated successfully'));
+        if (result.data?.success) successProcess(t('A teacher has been updated successfully'));
         else throw new Error('edit teacher failed');
       } else {
-        formData.append('username', _values.username)
+        formData.append('username', _values.username);
         const res = await axios({
           method: 'POST',
           url: '/api/teacher',
@@ -151,12 +140,11 @@ function PageHeader({
             'Content-Type': `multipart/form-data; boundary=<calculated when request is sent>`
           }
         });
-        if (res.data?.success)
-          successProcess(t('A new teacher has been created successfully'));
+        if (res.data?.success) successProcess(t('A new teacher has been created successfully'));
         else throw new Error('created teacher failed');
       }
     } catch (err) {
-      handleShowErrMsg(err, showNotification)
+      handleShowErrMsg(err, showNotification);
       setStatus({ success: false });
       setErrors({ submit: err.message });
       setSubmitting(false);
@@ -165,18 +153,9 @@ function PageHeader({
 
   return (
     <>
+      <PageHeaderTitleWrapper name="Teacher" handleCreateClassOpen={handleCreateProjectOpen} />
 
-      <PageHeaderTitleWrapper
-        name="Teacher"
-        handleCreateClassOpen={handleCreateProjectOpen}
-      />
-
-      <Dialog
-        fullWidth
-        maxWidth="md"
-        open={open}
-        onClose={handleCreateProjectClose}
-      >
+      <Dialog fullWidth maxWidth="md" open={open} onClose={handleCreateProjectClose}>
         <DialogTitle
           sx={{
             p: 3
@@ -185,9 +164,7 @@ function PageHeader({
           <Typography variant="h4" gutterBottom>
             {t('Create new teacher')}
           </Typography>
-          <Typography variant="subtitle2">
-            {t('Use this dialog window to add a new teacher')}
-          </Typography>
+          <Typography variant="subtitle2">{t('Use this dialog window to add a new teacher')}</Typography>
         </DialogTitle>
         <Formik
           initialValues={{
@@ -208,59 +185,29 @@ function PageHeader({
             email: editSchool?.email || '',
             resume: editSchool?.resume || '',
             photo: '',
-            submit: null
+            submit: null,
+            salary_type: ''
           }}
           validationSchema={Yup.object().shape({
-            username: Yup.string()
-              .max(255)
-              .required(t('The name field is required')),
-            password: editSchool ? Yup.string() : Yup.string().required(
-              t('The password field is required')
-            ),
-            first_name: Yup.string().required(
-              t('The first name field is required')
-            ),
+            username: Yup.string().max(255).required(t('The name field is required')),
+            password: editSchool ? Yup.string() : Yup.string().required(t('The password field is required')),
+            first_name: Yup.string().required(t('The first name field is required')),
             gender: Yup.string().required(t('The gender field is required')),
-            date_of_birth: Yup.string().required(
-              t('The date of birth field is required')
-            ),
-            present_address: Yup.string().required(
-              t('The present address field is required')
-            ),
-            permanent_address: Yup.string().required(
-              t('The parmanent_address field is required')
-            ),
+            date_of_birth: Yup.string().required(t('The date of birth field is required')),
+            present_address: Yup.string().required(t('The present address field is required')),
+            permanent_address: Yup.string().required(t('The parmanent_address field is required')),
+            salary_type: Yup.string().required(t('The salary_type field is required')),
             // department_id: Yup.number().required(
             //   t('The depardment field is required')
             // ),
-            national_id: Yup.number().required(
-              t('The national id field is required')
-            ),
+            national_id: Yup.number().required(t('The national id field is required'))
             // resume: !editSchool ? Yup.mixed().required(t('The resume field is required')) : Yup.mixed()
           })}
-          onSubmit={async (
-            _values,
-            { resetForm, setErrors, setStatus, setSubmitting }
-          ) =>
-            handleFormSubmit(
-              _values,
-              resetForm,
-              setErrors,
-              setStatus,
-              setSubmitting
-            )
+          onSubmit={async (_values, { resetForm, setErrors, setStatus, setSubmitting }) =>
+            handleFormSubmit(_values, resetForm, setErrors, setStatus, setSubmitting)
           }
         >
-          {({
-            errors,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            isSubmitting,
-            touched,
-            values,
-            setFieldValue
-          }) => (
+          {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => (
             <form onSubmit={handleSubmit}>
               <DialogContent
                 dividers
@@ -316,12 +263,11 @@ function PageHeader({
                         onBlur={handleBlur}
                         onBlurCapture={(v) => {
                           if (v) {
-                            const temp = generateUsername(values.first_name)
+                            const temp = generateUsername(values.first_name);
                             if (!editSchool?.user?.username) {
-
-                              setFieldValue('password', temp)
+                              setFieldValue('password', temp);
                             }
-                            setFieldValue('username', temp)
+                            setFieldValue('username', temp);
                           }
                         }}
                         onChange={handleChange}
@@ -431,9 +377,7 @@ function PageHeader({
                           }
                         }}
                         size="small"
-                        error={Boolean(
-                          touched.national_id && errors.national_id
-                        )}
+                        error={Boolean(touched.national_id && errors.national_id)}
                         fullWidth
                         helperText={touched.national_id && errors.national_id}
                         name="national_id"
@@ -468,16 +412,9 @@ function PageHeader({
                       <Autocomplete
                         size="small"
                         disablePortal
-                        value={
-                          departments?.find(
-                            (department) =>
-                              department.value === values.department_id
-                          ) || null
-                        }
+                        value={departments?.find((department) => department.value === values.department_id) || null}
                         options={departments}
-                        isOptionEqualToValue={(option: any, value: any) =>
-                          option.value === value.value
-                        }
+                        isOptionEqualToValue={(option: any, value: any) => option.value === value.value}
                         renderInput={(params) => (
                           <TextField
                             sx={{
@@ -486,22 +423,16 @@ function PageHeader({
                               }
                             }}
                             size="small"
-                            error={Boolean(
-                              touched?.department_id && errors?.department_id
-                            )}
+                            error={Boolean(touched?.department_id && errors?.department_id)}
                             fullWidth
-                            helperText={
-                              touched?.department_id && errors?.department_id
-                            }
+                            helperText={touched?.department_id && errors?.department_id}
                             name="department_id"
                             {...params}
                             label={t('Select Department')}
                           />
                         )}
                         // @ts-ignore
-                        onChange={(e, value: any) =>
-                          setFieldValue('department_id', value?.value || 0)
-                        }
+                        onChange={(e, value: any) => setFieldValue('department_id', value?.value || 0)}
                       />
                     </Grid>
                   </Grid>
@@ -563,9 +494,7 @@ function PageHeader({
                       item
                     >
                       <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">
-                          Select Gender
-                        </InputLabel>
+                        <InputLabel id="demo-simple-select-helper-label">Select Gender</InputLabel>
                         <Select
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
@@ -584,9 +513,7 @@ function PageHeader({
                           <MenuItem value={'male'}>Male</MenuItem>
                           <MenuItem value={'female'}>Female</MenuItem>
                         </Select>
-                        <FormHelperText sx={{ color: 'red' }}>
-                          {touched.gender && errors.gender}
-                        </FormHelperText>
+                        <FormHelperText sx={{ color: 'red' }}>{touched.gender && errors.gender}</FormHelperText>
                       </FormControl>
                     </Grid>
                   </Grid>
@@ -611,9 +538,7 @@ function PageHeader({
                       item
                     >
                       <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">
-                          Select Blood Group
-                        </InputLabel>
+                        <InputLabel id="demo-simple-select-helper-label">Select Blood Group</InputLabel>
                         <Select
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
@@ -636,9 +561,7 @@ function PageHeader({
                           <MenuItem value={'ab+'}>AB+</MenuItem>
                           <MenuItem value={'ab-'}>AB-</MenuItem>
                         </Select>
-                        <FormHelperText>
-                          {touched.gender && errors.gender}
-                        </FormHelperText>
+                        <FormHelperText>{touched.gender && errors.gender}</FormHelperText>
                       </FormControl>
                     </Grid>
                   </Grid>
@@ -702,34 +625,102 @@ function PageHeader({
                     >
                       <MobileDatePicker
                         label="Provide birth date"
-                        inputFormat='dd/MM/yyyy'
+                        inputFormat="dd/MM/yyyy"
                         value={values.date_of_birth}
                         onChange={(n) => {
                           const value = dayjs(n);
                           if (n) {
-                            setFieldValue('date_of_birth', value)
+                            setFieldValue('date_of_birth', value);
                           }
                         }}
-                        renderInput={(params) => <TextField
-                          size='small'
-                          sx={{
-                            '& fieldset': {
-                              borderRadius: '3px'
-                            }
-                          }}
-                          fullWidth
-                          {...params}
-                          error={Boolean(
-                            touched?.date_of_birth && errors?.date_of_birth
-                          )}
-                          helperText={
-                            touched?.date_of_birth && errors?.date_of_birth
-                          }
-                        />}
+                        renderInput={(params) => (
+                          <TextField
+                            size="small"
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                            fullWidth
+                            {...params}
+                            error={Boolean(touched?.date_of_birth && errors?.date_of_birth)}
+                            helperText={touched?.date_of_birth && errors?.date_of_birth}
+                          />
+                        )}
                       />
                     </Grid>
                   </Grid>
-                  <Grid item sm={6}></Grid>
+
+                  {/* Teacher salary code  start*/}
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Grid item>
+                      <Box
+                        pr={3}
+                        sx={{
+                          pt: `${theme.spacing(1)}`,
+                          pb: { xs: 1, md: 0 }
+                        }}
+                        alignSelf="center"
+                      >
+                        <b>{t('Salary Type')}:*</b>
+                      </Box>
+                    </Grid>
+                    <Grid
+                      sx={{
+                        mb: `${theme.spacing(3)}`
+                      }}
+                      item
+                    >
+                      <Autocomplete
+                        size="small"
+                        disablePortal
+                        value={values.salary_type || null}
+                        options={[
+                          {
+                            label: 'percentage wise',
+                            value: 'percentage_wise',
+                            id: 1
+                          },
+                          {
+                            label: 'class wise',
+                            value: 'class_wise',
+                            id: 2
+                          },
+                          {
+                            label: 'monthly',
+                            value: 'monthly',
+                            id: 3
+                          }
+                        ]}
+                        isOptionEqualToValue={(option: any, value: any) => {
+                          return option.label === value;
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            sx={{
+                              '& fieldset': {
+                                borderRadius: '3px'
+                              }
+                            }}
+                            size="small"
+                            error={Boolean(touched?.salary_type && errors?.salary_type)}
+                            fullWidth
+                            helperText={touched?.salary_type && errors?.salary_type}
+                            name="salary_type"
+                            {...params}
+                            label={t('')}
+                            placeholder="Select salary type"
+                          />
+                        )}
+                        // @ts-ignore
+                        onChange={(e, value: any) => {
+                          setFieldValue('salary_type', value?.value || null);
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                  {/* Teacher salary code  end*/}
+
                   <Grid item xs={12} md={6}>
                     <Grid item>
                       <Box
@@ -758,13 +749,9 @@ function PageHeader({
                         size="small"
                         multiline
                         rows={3}
-                        error={Boolean(
-                          touched.present_address && errors.present_address
-                        )}
+                        error={Boolean(touched.present_address && errors.present_address)}
                         fullWidth
-                        helperText={
-                          touched.present_address && errors.present_address
-                        }
+                        helperText={touched.present_address && errors.present_address}
                         name="present_address"
                         placeholder={t('present address here...')}
                         onBlur={handleBlur}
@@ -803,13 +790,9 @@ function PageHeader({
                         size="small"
                         multiline
                         rows={3}
-                        error={Boolean(
-                          touched.permanent_address && errors.permanent_address
-                        )}
+                        error={Boolean(touched.permanent_address && errors.permanent_address)}
                         fullWidth
-                        helperText={
-                          touched.permanent_address && errors.permanent_address
-                        }
+                        helperText={touched.permanent_address && errors.permanent_address}
                         name="permanent_address"
                         placeholder={t('permanent address here...')}
                         onBlur={handleBlur}
@@ -971,16 +954,14 @@ function PageHeader({
                       <BoxUploadWrapper>
                         <TextField
                           type="file"
-                          accessKey='application/pdf'
+                          accessKey="application/pdf"
                           error={Boolean(touched.resume && errors.resume)}
                           fullWidth
                           helperText={touched.resume && errors.resume}
                           name="resume"
                           placeholder={t('Resume here...')}
                           onBlur={handleBlur}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => setFieldValue('resume', event.target?.files[0])}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setFieldValue('resume', event.target?.files[0])}
                           variant="outlined"
                         />
                       </BoxUploadWrapper>
@@ -997,11 +978,7 @@ function PageHeader({
                               color: 'primary.main'
                             }}
                           >
-                            <a
-                              style={{ width: '50px' }}
-                              href={getFile(editSchool?.resume)}
-                              target='_blank'
-                            >
+                            <a style={{ width: '50px' }} href={getFile(editSchool?.resume)} target="_blank">
                               {editSchool.resume}
                             </a>
                           </Grid>
@@ -1054,9 +1031,7 @@ function PageHeader({
                           name="photo"
                           placeholder={t('Photo here...')}
                           onBlur={handleBlur}
-                          onChange={(
-                            event: React.ChangeEvent<HTMLInputElement>
-                          ) => setFieldValue('photo', event.target?.files[0])}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setFieldValue('photo', event.target?.files[0])}
                           variant="outlined"
                         />
                       </BoxUploadWrapper>
@@ -1074,16 +1049,12 @@ function PageHeader({
                             }}
                             style={{ width: 'fit-content' }}
                           >
-                            <img
-                              style={{ width: '50px' }}
-                              src={getFile(editSchool?.photo)}
-                            />
+                            <img style={{ width: '50px' }} src={getFile(editSchool?.photo)} />
                           </Grid>
                         </>
                       )}
                     </Grid>
                   </Grid>
-
                 </Grid>
               </DialogContent>
               <DialogActionWrapper
@@ -1096,7 +1067,6 @@ function PageHeader({
             </form>
           )}
         </Formik>
-
       </Dialog>
     </>
   );

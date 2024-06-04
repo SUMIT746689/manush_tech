@@ -318,7 +318,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                                                 {i?.section?.class?.name}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
-                                                {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
+                                                {i?.section?.class?.has_section ? i?.section?.name : ''}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
                                                 <Grid display="flex" columnGap={1} justifyContent="center">

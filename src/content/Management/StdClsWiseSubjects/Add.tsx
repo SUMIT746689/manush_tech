@@ -6,7 +6,6 @@ import { useAuth } from 'src/hooks/useAuth';
 import { Grid, Dialog, DialogContent, } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
-import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { DisableTextWrapper } from '@/components/TextFields';

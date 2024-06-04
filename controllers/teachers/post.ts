@@ -8,7 +8,6 @@ import adminCheck from 'middleware/adminCheck';
 import { logFile } from 'utilities_api/handleLogFile';
 
 const post = async (req, res, refresh_token) => {
-
   const { admin_panel_id } = refresh_token;
   const uploadFolderName = 'teacher';
 
@@ -18,13 +17,13 @@ const post = async (req, res, refresh_token) => {
   const filterFiles = {
     photo: photoFileType,
     resume: resumeFileType
-  }
+  };
 
   const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
 
   const { resume, photo } = files;
   try {
-    if (error) throw new Error(error)
+    if (error) throw new Error(error);
 
     const {
       username,
@@ -42,25 +41,16 @@ const post = async (req, res, refresh_token) => {
       present_address,
       permanent_address,
       joining_date,
-      department_id
+      department_id,
+      salary_type
     }: any = fields;
 
-    if (
-      !username ||
-      !password ||
-      !first_name ||
-      !gender ||
-      !date_of_birth ||
-      !present_address ||
-      !permanent_address ||
-      !national_id
-    )
-      throw new Error('username || password || first_name || gender || date_of_birth || present_address || permanent_address is missing');
+    if (!username || !password || !first_name || !gender || !date_of_birth || !present_address || !permanent_address || !national_id || !salary_type)
+      throw new Error(
+        'username || password || first_name || gender || date_of_birth || salary_type || present_address || permanent_address is missing'
+      );
 
-    const encrypePassword = await bcrypt.hash(
-      password,
-      Number(process.env.SALTROUNDS)
-    );
+    const encrypePassword = await bcrypt.hash(password, Number(process.env.SALTROUNDS));
 
     const optionalQuery = {
       middle_name: middle_name && middle_name,
@@ -81,26 +71,31 @@ const post = async (req, res, refresh_token) => {
       where: {
         title: 'TEACHER'
       }
-    })
+    });
 
-    const filePathQuery = {}
+    const filePathQuery = {};
 
-    if (fields?.resume) filePathQuery['resume'] = fields?.resume
-    if (fields?.photo) filePathQuery['photo'] = fields?.photo
+    if (fields?.resume) filePathQuery['resume'] = fields?.resume;
+    if (fields?.photo) filePathQuery['photo'] = fields?.photo;
 
     for (let i in filePathQuery) {
       const oldPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, filePathQuery[i]);
-      const newPath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, uploadFolderName, filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1))
+      const newPath = path.join(
+        process.cwd(),
+        `${process.env.FILESFOLDER}`,
+        uploadFolderName,
+        filePathQuery[i]?.substring(filePathQuery[i].indexOf('\\') + 1)
+      );
 
       fs.rename(oldPath, newPath, (err) => {
-        if (err) throw err
-        console.log('Successfully moved file!')
-      })
+        if (err) throw err;
+        console.log('Successfully moved file!');
+      });
     }
     // console.log({ department_id, resume___: resume?.newFilename })
-    if (department_id) query["department"] = { connect: { id: parseInt(department_id) } };
+    if (department_id) query['department'] = { connect: { id: parseInt(department_id) } };
     // console.log(query)
-    
+
     const teacher = await prisma.teacher.create({
       // @ts-ignore
       data: {
@@ -109,12 +104,13 @@ const post = async (req, res, refresh_token) => {
         national_id: national_id && national_id,
         gender: gender,
         date_of_birth: new Date(date_of_birth),
+        salary_type: salary_type,
         permanent_address: permanent_address,
         present_address: present_address,
         joining_date: joining_date ? new Date(joining_date) : new Date(),
         // @ts-ignore
         // resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : (filePathQuery?.resume || ''),
-        resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) :  '',
+        resume: resume?.newFilename ? path.join(uploadFolderName, resume?.newFilename) : '',
         school: { connect: { id: refresh_token.school_id } },
         // department: { connect: { id: parseInt(department_id) } },
         user: {
@@ -132,18 +128,18 @@ const post = async (req, res, refresh_token) => {
     });
     return res.status(200).json({ teacher: teacher, success: true });
   } catch (err) {
-    logFile.error(err.message)
+    logFile.error(err.message);
     if (resume) deleteFiles(resume.filepath);
     if (photo) deleteFiles(photo.filepath);
     console.log({ err });
     res.status(404).json({ error: err.message });
   }
 };
-export default authenticate(adminCheck(post))
+export default authenticate(adminCheck(post));
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {
-    logFile.error(err)
+    logFile.error(err);
     console.log({ err });
   });
 };

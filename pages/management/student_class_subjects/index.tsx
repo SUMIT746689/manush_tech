@@ -5,29 +5,28 @@ import { useState, useEffect, useContext } from 'react';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 
-import PageHeader from 'src/content/Management/Fees/PageHeader';
+import PageHeader from 'src/content/Management/StudentClassSubjects/PageHeader';
 import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
 import { Grid } from '@mui/material';
 import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/StudentClassSubjects/Results';
-import { useClientFetch } from 'src/hooks/useClientFetch';
+import { useClientDataFetch, useClientFetch } from 'src/hooks/useClientFetch';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 
 function ManagementFees() {
   // const isMountedRef = useRefMounted();
-  const [datas, setDatas] = useState<Project[]>([]);
   const [editData, setEditData] = useState<Project>(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const { data, error, reFetchData } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
+  const { data, error, reFetchData } = useClientDataFetch(`/api/student_class_subjects`);
+  // const {} = useClientFetch(`/api/`)
   const { data: classData, error: classError } = useClientFetch('/api/class');
-  const { data: feesHeads } = useClientFetch('/api/fees_heads');
-
+  console.log({data})
   return (
     <>
       <Head>
-        <title>Fees - Management</title>
+        <title>Student Class Subjects - Management</title>
       </Head>
       <PageTitleWrapper>
         {/* @ts-ignore */}
@@ -39,7 +38,7 @@ function ManagementFees() {
               value: i.id
             })) || []
           }
-          feesHeads={feesHeads?.map(feesH => ({ label: feesH.title, value: feesH.id })) || []}
+          feesHeads={[]}
           editData={editData}
           seteditData={setEditData}
           reFetchData={reFetchData}
@@ -55,7 +54,7 @@ function ManagementFees() {
       // spacing={3}
       >
         <Grid item xs={12}>
-          <Results sessions={datas} setEditData={setEditData} reFetchData={reFetchData} />
+          <Results sessions={data} setEditData={setEditData} reFetchData={reFetchData} />
         </Grid>
       </Grid>
       <Footer />

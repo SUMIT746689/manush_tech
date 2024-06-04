@@ -130,6 +130,7 @@ model School {
   VoiceGateway               VoiceGateway?
   VoiceTemplate              VoiceTemplate[]
   FeesHaed                   FeesHaed[]
+  StudentClassSubjects       StudentClassSubjects[]
 
   // routines Routine[]
   @@map("schools")
@@ -337,10 +338,12 @@ model StudentClassSubjects {
   student_id Int
   subject_id Int
   teacher_id Int
+  school_id  Int
 
   student Student @relation(fields: [student_id], references: [id])
   subject Subject @relation(fields: [subject_id], references: [id])
   teacher Teacher @relation(fields: [teacher_id], references: [id])
+  school  School  @relation(fields: [school_id], references: [id])
 
   @@map("std_cls_subjects")
 }

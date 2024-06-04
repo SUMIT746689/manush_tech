@@ -1,24 +1,17 @@
 import prisma from '@/lib/prisma_client';
+import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
 async function get(req, res, refresh_token) {
   try {
-    if (!req.cookies.refresh_token) throw new Error('refresh token not founds');
-
-
-    const response = await prisma.subscription.findMany({
+    const { school_id } = refresh_token;
+    const response = await prisma.studentClassSubjects.findMany({
       where: {
-        is_active: true
+        school_id
       },
-      select: {
-        school: {
-          select: {
-            name: true
-          }
-        },
-        end_date: true
-      }
+        // select: {
+
+        // }
     })
 
     res.json({ data: response, success: true });

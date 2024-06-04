@@ -18,8 +18,8 @@ const index = async (req, res, refresh_token) => {
         if (req.query.class_id)
           query.where['class_id'] = parseInt(req.query.class_id);
 
-        const sections = await prisma.subject.findMany(query);
-        res.status(200).json(sections);
+        const subjects = await prisma.subject.findMany(query);
+        res.status(200).json(subjects);
         break;
       case 'POST':
         await prisma.subject.createMany({

@@ -20,8 +20,7 @@ export const useClientFetch = (url, method = 'GET', body) => {
     try {
       const response = await axios.get(url, options);
       setData(response.data);
-      const menuLists = response.data?.map(menu => ({ label: menu.title || menu.name, id: menu.id }));
-      console.log({ menuLists });
+      const menuLists = Array.isArray(response.data) ? response.data?.map(menu => ({ label: menu.title || menu.name, id: menu.id })) : [];
       setMuiMenuList(menuLists);
 
     } catch (err) {

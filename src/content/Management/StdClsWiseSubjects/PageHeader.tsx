@@ -120,7 +120,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       })
       .catch(err => { console.log({ err }) })
   }
-  console.log({ subjectLists })
   return (
     <>
       <PageHeaderTitleWrapper

@@ -12,11 +12,21 @@ import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 import { monthList } from '@/utils/getDay';
-const monthData = monthList.map((month) => ({ label: month, value: month }));
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import Footer from '@/components/Footer';
-
+import { useState, ChangeEvent, useContext } from 'react';
 import { styled } from '@mui/material/styles';
+import { useClientFetch } from 'src/hooks/useClientFetch';
+import axios from 'axios';
+import { AcademicYearContext } from '@/contexts/UtilsContextUse';
+import useNotistick from '@/hooks/useNotistick';
+
+// month related code start
+const currentDate = new Date();
+const monthIndex = currentDate.getMonth();
+const monthData = monthList.map((month) => ({ label: month, value: month }));
+const currentMonthName = monthList[monthIndex];
+// month related code end
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(even)': {
@@ -25,13 +35,255 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   ':hover': {
     backgroundColor: 'rgba(0, 0, 0, 0.10)'
   }
-  // hide last border
-  // '&:last-child td, &:last-child th': {
-  //   border: 0
-  // }
 }));
 
 const StudentDueReport = () => {
+  const { showNotification } = useNotistick();
+  const [selected_month, setSelectMonth] = useState<string | null>(currentMonthName);
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [sections, setSections] = useState<Array<any>>([]);
+  const [groups, setGroups] = useState<Array<any>>([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [studentInfo, setStudentInfo] = useState<Array<any>>([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [studentDueInfo, setStudentDueInfo] = useState<Array<any>>([]);
+  const [totalCalculation, setTotalCalculation] = useState<any>({ totalDueAmount: 0 });
+
+  const { data: classData, error: classError } = useClientFetch('/api/class');
+
+  const monthHandleChange = (event: ChangeEvent<HTMLInputElement>, v): void => {
+    setSelectMonth(v);
+  };
+  const handleGroupSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    setSelectedGroup(newValue);
+  };
+  const handleSectionSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    if (!newValue) {
+      setStudentInfo([]);
+      setSelectedStudent(null);
+      setSelectedSection(null);
+      return;
+    }
+    setSelectedSection(newValue);
+    let sectionIdArr = [];
+    if (newValue.label === 'Select all') {
+      sectionIdArr = sections.filter((item) => item.id !== null).map((item) => item.id);
+    } else {
+      sectionIdArr = [newValue.id];
+    }
+    // call student api here
+    getStudentInfo(sectionIdArr);
+  };
+  const handleStudentSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    // setSelectedStudent
+
+    if (newValue) {
+      // setSelectedStudent({
+      //   label: newValue?.name,
+      //   id: newValue?.id
+      // });
+      setSelectedStudent(newValue);
+    } else {
+      setSelectedStudent(null);
+    }
+  };
+
+  const handleClassSelect = (event: ChangeEvent<HTMLInputElement>, newValue) => {
+    if (newValue) {
+      const targetClassSections = classData.find((i) => i.id == newValue.id);
+      setSelectedClass(newValue);
+
+      const setTargetSection = targetClassSections?.sections?.map((i) => {
+        return {
+          label: i.name,
+          id: i.id
+        };
+      });
+      setSections([
+        {
+          label: 'Select all',
+          id: null
+        },
+        ...setTargetSection
+      ]);
+      const setTargetGroup = targetClassSections?.Group?.map((i) => {
+        return {
+          label: i.title,
+          id: i.id
+        };
+      });
+
+      setGroups([
+        {
+          label: 'Select all',
+          id: null
+        },
+        ...setTargetGroup
+      ]);
+      if (!newValue.has_section) {
+        setSelectedSection({
+          label: targetClassSections?.sections[0]?.name,
+          id: targetClassSections?.sections[0]?.id
+        });
+      } else {
+        setSelectedSection(null);
+      }
+    } else {
+      setStudentInfo([]);
+      setSections([]);
+      setSelectedSection(null);
+      setGroups([]);
+      setSelectedGroup(null);
+    }
+  };
+  const studentList = (student) => {
+    let studentInfo = '';
+
+    if (student?.student_info?.first_name) {
+      studentInfo += student?.student_info?.first_name;
+    }
+    if (student?.class_roll_no) {
+      studentInfo += '|' + student?.class_roll_no;
+    }
+    if (student?.student_info?.student_id) {
+      studentInfo += '|' + student?.student_info?.student_id;
+    }
+
+    return studentInfo;
+  };
+
+  // fetch student related data code start
+  const getStudentInfo = (section) => {
+    axios
+      .get(`/api/student/?section_id=${section}&academic_year_id=${academicYear?.id}`)
+      .then((res) => {
+        setStudentInfo(res?.data);
+
+        // setSections([
+        //   {
+        //     label: 'Select all',
+        //     id: null
+        //   },
+        //   ...setTargetSection
+        // ]);
+      })
+      .catch((err) => {
+        setStudentInfo([]);
+        // console.log(err);
+      });
+  };
+  // fetch student related data code end
+
+  const handleClickStudentInfo = async () => {
+    try {
+      if (!selected_month || !selectedClass || !selectedSection || !selectedStudent) {
+        showNotification('Please select a month, class, section and student before proceeding', 'error');
+        return;
+      }
+      setIsLoading(true);
+
+      let groupsIds = [];
+      let sectionIds = [];
+      let studentIds = [];
+      // group start
+      if (!selectedGroup) {
+      } else if (selectedGroup.label === 'Select all') {
+        groupsIds = groups.filter((item) => item.id !== null).map((item) => item.id);
+      } else {
+        groupsIds = [selectedGroup.id];
+      }
+      // group end
+      // section start
+      if (selectedSection.label === 'Select all') {
+        sectionIds = sections.filter((item) => item.id !== null).map((item) => item.id);
+      } else {
+        sectionIds = [selectedSection.id];
+      }
+      // section end
+      // student start
+      if (selectedStudent.label === 'Select all') {
+        studentIds = studentInfo.map((item) => item.id);
+      } else {
+        studentIds = [selectedStudent.id];
+      }
+      // student end
+
+      const res = await axios.get(
+        `/api/reports/student_due_report?month_name=${selected_month}&selected_class=${selectedClass.id}&selected_group=${
+          groupsIds.length > 0 ? groupsIds : ''
+        }&selected_section=${sectionIds}&selected_student=${studentIds}`
+      );
+
+      let totalPayableAmount = 0;
+      let totalPaidAmount = 0;
+      let totalDiscountAmount = 0;
+      let totalDueAmount = 0;
+
+      if (res?.data?.studentDueInfo?.length > 0) {
+        const totalAmountsByStudentId = calculateTotalAmountsByStudentId(res?.data?.studentDueInfo);
+        const resultArray = Object.values(totalAmountsByStudentId);
+
+        // total calculation part code start
+
+        if (resultArray.length > 0) {
+          resultArray.forEach((item) => {
+            //  @ts-ignore
+            totalPayableAmount = totalPayableAmount + item?.total_payable;
+            //  @ts-ignore
+            totalPaidAmount = totalPaidAmount + item?.collected_amount;
+            //  @ts-ignore
+            totalDiscountAmount = totalDiscountAmount + item?.total_on_time_discount + item?.previous_discount;
+            //  @ts-ignore
+            totalDueAmount = totalDueAmount + (item.total_payable - item.collected_amount);
+          });
+        }
+        setTotalCalculation({
+          totalPayableAmount: totalPayableAmount,
+          totalPaidAmount: totalPaidAmount,
+          totalDiscountAmount: totalDiscountAmount,
+          totalDueAmount: totalDueAmount
+        });
+        setStudentDueInfo(resultArray);
+      }
+    } catch (error) {
+      // console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const calculateTotalAmountsByStudentId = (arr) => {
+    return arr.reduce((acc, item) => {
+      const { student, collected_amount, on_time_discount, total_payable, student_info, fee } = item;
+      const { id } = student;
+
+      const previous_discount = acc[id] ? acc[id].previous_discount + (fee?.Discount?.[0]?.amt || 0) : fee?.Discount?.[0]?.amt || 0;
+      const total_on_time_discount = acc[id] ? acc[id].total_on_time_discount + on_time_discount : on_time_discount;
+
+      if (acc[id]) {
+        acc[id].collected_amount += collected_amount;
+        acc[id].total_payable += total_payable;
+
+        acc[id].fee = fee;
+      } else {
+        acc[id] = {
+          ...student,
+          ...student_info,
+          collected_amount,
+          total_payable,
+          fee
+        };
+      }
+
+      acc[id].previous_discount = previous_discount;
+      acc[id].total_on_time_discount = total_on_time_discount;
+
+      return acc;
+    }, {});
+  };
+
   return (
     <>
       <Head>
@@ -83,9 +335,9 @@ const StudentDueReport = () => {
                 <AutoCompleteWrapperWithDebounce
                   debounceTimeout=""
                   options={monthData}
-                  value={''}
+                  value={selected_month}
                   // value={undefined}
-                  handleChange={() => {}}
+                  handleChange={monthHandleChange}
                   label="Select Month"
                   placeholder="Month To"
                 />
@@ -103,7 +355,21 @@ const StudentDueReport = () => {
                   flexGrow: 1
                 }}
               >
-                <AutoCompleteWrapper options={[]} value={''} label="Select Class *" placeholder="Select a Class" handleChange={() => {}} />
+                <AutoCompleteWrapper
+                  options={
+                    classData?.map((i) => {
+                      return {
+                        label: i.name,
+                        id: i.id,
+                        has_section: i.has_section
+                      };
+                    }) || []
+                  }
+                  value={selectedClass}
+                  label="Select Class *"
+                  placeholder="Select a Class"
+                  handleChange={handleClassSelect}
+                />
               </Grid>
 
               {/* Group field */}
@@ -118,7 +384,13 @@ const StudentDueReport = () => {
                   flexGrow: 1
                 }}
               >
-                <AutoCompleteWrapper options={[]} value={''} label="Select Group" placeholder="Select a Group" handleChange={() => {}} />
+                <AutoCompleteWrapper
+                  options={groups}
+                  value={selectedGroup}
+                  label="Select Group"
+                  placeholder="Select a Group"
+                  handleChange={handleGroupSelect}
+                />
               </Grid>
 
               {/* Section field */}
@@ -133,7 +405,13 @@ const StudentDueReport = () => {
                   flexGrow: 1
                 }}
               >
-                <AutoCompleteWrapper options={[]} value={''} label="Select Section" placeholder="Select a Section" handleChange={() => {}} />
+                <AutoCompleteWrapper
+                  options={sections}
+                  value={selectedSection}
+                  label="Select Section"
+                  placeholder="Select a Section"
+                  handleChange={handleSectionSelect}
+                />
               </Grid>
               {/* Student field */}
               <Grid
@@ -147,7 +425,30 @@ const StudentDueReport = () => {
                   flexGrow: 1
                 }}
               >
-                <AutoCompleteWrapper options={[]} value={''} label="Select Student" placeholder="Select a Student" handleChange={() => {}} />
+                <AutoCompleteWrapper
+                  options={
+                    studentInfo.length > 0
+                      ? [
+                          {
+                            label: 'Select all',
+                            id: null,
+                            name: ''
+                          },
+                          ...studentInfo?.map((i) => {
+                            return {
+                              label: studentList(i),
+                              id: i.id,
+                              name: i?.student_info?.first_name
+                            };
+                          })
+                        ]
+                      : []
+                  }
+                  value={selectedStudent}
+                  label="Select Student"
+                  placeholder="select a student"
+                  handleChange={handleStudentSelect}
+                />
               </Grid>
 
               {/* Search button */}
@@ -170,7 +471,7 @@ const StudentDueReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Search'} />
+                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handleClickStudentInfo} disabled={isLoading} children={'Search'} />
                 </Grid>
                 <Grid
                   sx={{
@@ -224,22 +525,29 @@ const StudentDueReport = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <StyledTableRow>
-                <TableBodyCellWrapper>
-                  <Grid py={0.5}>1</Grid>{' '}
-                </TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-                <TableBodyCellWrapper>0</TableBodyCellWrapper>
-              </StyledTableRow>
+              {studentDueInfo?.map((item, i) => {
+                return (
+                  <StyledTableRow>
+                    <TableBodyCellWrapper>
+                      <Grid py={0.5}>{i + 1}</Grid>{' '}
+                    </TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.student_info.student_id}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{`${item.student_info.first_name ? item.student_info.first_name : ''} ${
+                      item.student_info.middle_name ? item.student_info.middle_name : ''
+                    } ${item.student_info.last_name ? item.student_info.last_name : ''}`}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{selectedClass.label}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.group.title && item.group.title}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.section.name && item.section.name}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.class_roll_no}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.academic_year.title}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.previous_discount + item.total_on_time_discount}</TableBodyCellWrapper>
+                    <TableBodyCellWrapper>{item.total_payable - item.collected_amount}</TableBodyCellWrapper>
+                  </StyledTableRow>
+                );
+              })}
+
               <TableRow>
                 <TableBodyCellWrapper colspan={8}>
                   <Grid py={0.5} textAlign={'right'}>
@@ -247,7 +555,7 @@ const StudentDueReport = () => {
                     Total
                   </Grid>{' '}
                 </TableBodyCellWrapper>
-                <TableBodyCellWrapper colspan={4}>0</TableBodyCellWrapper>
+                <TableBodyCellWrapper colspan={4}>{totalCalculation?.totalDueAmount}</TableBodyCellWrapper>
               </TableRow>
             </TableBody>
           </Table>

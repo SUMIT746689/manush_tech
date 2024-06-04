@@ -9,14 +9,19 @@ async function get(req, res, refresh_token) {
     const where = {};
 
     if (section_id) {
-      where['section_id'] = parseInt(section_id);
+      const Id_s = section_id.split(',').map((id) => parseInt(id, 10));
+      // old
+      //  where['section_id'] = parseInt(section_id);
+
+      where['section_id'] = {
+        in: Id_s
+      };
     } else if (class_id) {
       where['section'] = {
         class_id: parseInt(class_id)
       };
     }
-    if (academic_year_id)
-      where['academic_year_id'] = parseInt(academic_year_id);
+    if (academic_year_id) where['academic_year_id'] = parseInt(academic_year_id);
 
     const students = await prisma.student.findMany({
       where: {

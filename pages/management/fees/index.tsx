@@ -21,11 +21,10 @@ function ManagementFees() {
   const [datas, setDatas] = useState<Project[]>([]);
   const [editData, setEditData] = useState<Project>(null);
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
-  const { data, error, reFetchData } = useClientFetch(
-    `/api/fee?academic_year_id=${academicYear?.id}`
-  );
+  const { data, error, reFetchData } = useClientFetch(`/api/fee?academic_year_id=${academicYear?.id}`);
   const { data: classData, error: classError } = useClientFetch('/api/class');
   const { data: feesHeads } = useClientFetch('/api/fees_heads');
+  const { data: subjectData, error: subjectError } = useClientFetch('/api/subject');
 
   useEffect(() => {
     if (data?.success) setDatas(data.data);
@@ -46,7 +45,13 @@ function ManagementFees() {
               value: i.id
             })) || []
           }
-          feesHeads={feesHeads?.map(feesH=>({label:feesH.title,value:feesH.id})) || []}
+          subjectData={
+            subjectData?.map((i) => ({
+              label: i.name,
+              value: i.id
+            })) || []
+          }
+          feesHeads={feesHeads?.map((feesH) => ({ label: feesH.title, value: feesH.id })) || []}
           editData={editData}
           seteditData={setEditData}
           reFetchData={reFetchData}

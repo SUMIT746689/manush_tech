@@ -21,12 +21,11 @@ const patch = async (req, res) => {
     const filterFiles = {
       photo: photoFileType,
       resume: resumeFileType
-    }
-
+    };
 
     const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
 
-    if (error) throw new Error(error)
+    if (error) throw new Error(error);
 
     const { resume, photo } = files;
 
@@ -47,48 +46,42 @@ const patch = async (req, res) => {
       present_address,
       permanent_address,
       joining_date,
-      department_id
+      department_id,
+      salary_type
     }: any = fields;
 
     let encrypePassword;
-    if (password)
-      encrypePassword = await bcrypt.hash(
-        password,
-        Number(process.env.SALTROUNDS)
-      );
+    if (password) encrypePassword = await bcrypt.hash(password, Number(process.env.SALTROUNDS));
 
     let query = {};
 
     if (department_id) query['department'] = { connect: { id: parseInt(department_id) } };
-    
+
     let temp = {};
     if (username) {
       temp = {
-        username: username,
-      }
+        username: username
+      };
     }
     if (password !== '' && encrypePassword) {
       temp = {
         ...temp,
         password: encrypePassword
-      }
-
+      };
     }
     if (resume) {
       // deleteFiles(path.join(process.cwd(), `${process.env.FILESFOLDER}`, prev_resume))
-      query['resume'] = path.join(uploadFolderName, resume?.newFilename)
-
+      query['resume'] = path.join(uploadFolderName, resume?.newFilename);
     }
     if (photo) {
       // deleteFiles(path.join(process.cwd(), `${process.env.FILESFOLDER}`, prev_photo))
-      temp['user_photo'] = path.join(uploadFolderName, photo?.newFilename)
+      temp['user_photo'] = path.join(uploadFolderName, photo?.newFilename);
 
-      query['photo'] = path.join(uploadFolderName, photo?.newFilename)
-
+      query['photo'] = path.join(uploadFolderName, photo?.newFilename);
     }
     query['user'] = {
       update: temp
-    }
+    };
 
     try {
       const teacher = await prisma.teacher.update({
@@ -96,6 +89,8 @@ const patch = async (req, res) => {
         // @ts-ignore
         data: {
           ...query,
+          salary_type,
+          teacher_id: fields.teacher_id,
           middle_name,
           last_name,
           phone,
@@ -108,7 +103,7 @@ const patch = async (req, res) => {
           date_of_birth: date_of_birth && new Date(date_of_birth),
           permanent_address,
           present_address,
-          joining_date: joining_date ? new Date(joining_date) : new Date(),
+          joining_date: joining_date ? new Date(joining_date) : new Date()
         }
       });
       return res.status(200).json({ teacher: teacher, success: true });
@@ -119,9 +114,8 @@ const patch = async (req, res) => {
       if (photo) deleteFiles(photo.filepath);
       res.status(404).json({ error: err.message });
     }
-
   } catch (err) {
-    logFile.error(err.message)
+    logFile.error(err.message);
     res.status(404).json({ error: err.message });
   }
 };
@@ -129,7 +123,7 @@ export default authenticate(adminCheck(patch));
 
 const deleteFiles = (path) => {
   fs.unlink(path, (err) => {
-    logFile.error(err)
+    logFile.error(err);
     console.log({ err });
   });
 };

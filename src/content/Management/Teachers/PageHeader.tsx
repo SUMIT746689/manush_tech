@@ -101,6 +101,7 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
       formData.append('present_address', _values.present_address);
       formData.append('permanent_address', _values.permanent_address);
       formData.append('salary_type', _values.salary_type);
+      formData.append('teacher_id', _values.teacher_id);
 
       if (_values.password !== '') {
         formData.append('password', _values.password);
@@ -186,7 +187,8 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
             resume: editSchool?.resume || '',
             photo: '',
             submit: null,
-            salary_type: ''
+            salary_type: editSchool?.salary_type || '',
+            teacher_id: editSchool?.teacher_id || ''
           }}
           validationSchema={Yup.object().shape({
             username: Yup.string().max(255).required(t('The name field is required')),
@@ -197,6 +199,7 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
             present_address: Yup.string().required(t('The present address field is required')),
             permanent_address: Yup.string().required(t('The parmanent_address field is required')),
             salary_type: Yup.string().required(t('The salary_type field is required')),
+            teacher_id: Yup.string().required(t('The teacher_id field is required')),
             // department_id: Yup.number().required(
             //   t('The depardment field is required')
             // ),
@@ -428,7 +431,7 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
                             helperText={touched?.department_id && errors?.department_id}
                             name="department_id"
                             {...params}
-                            label={t('Select Department')}
+                            label={t('')}
                           />
                         )}
                         // @ts-ignore
@@ -494,13 +497,13 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
                       item
                     >
                       <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">Select Gender</InputLabel>
+                        {/* <InputLabel id="demo-simple-select-helper-label">Select Gender</InputLabel> */}
                         <Select
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
                           value={values.gender}
                           name="gender"
-                          label="Select Gender"
+                          label=""
                           onChange={handleChange}
                           error={Boolean(touched.gender && errors.gender)}
                           onBlur={handleBlur}
@@ -538,13 +541,13 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
                       item
                     >
                       <FormControl fullWidth size="small">
-                        <InputLabel id="demo-simple-select-helper-label">Select Blood Group</InputLabel>
+                        {/* <InputLabel id="demo-simple-select-helper-label">Select Blood Group</InputLabel> */}
                         <Select
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
                           value={values.blood_group}
                           name="blood_group"
-                          label="Select Blood Group"
+                          label=""
                           onChange={handleChange}
                           sx={{
                             '& fieldset': {
@@ -624,7 +627,7 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
                       item
                     >
                       <MobileDatePicker
-                        label="Provide birth date"
+                        label=""
                         inputFormat="dd/MM/yyyy"
                         value={values.date_of_birth}
                         onChange={(n) => {
@@ -720,6 +723,57 @@ function PageHeader({ editSchool, setEditSchool, departments, reFetchData }): an
                     </Grid>
                   </Grid>
                   {/* Teacher salary code  end*/}
+
+                  {/* Teacher id code start */}
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Grid>
+                      <Box
+                        pr={3}
+                        sx={{
+                          pt: `${theme.spacing(1)}`,
+                          pb: { xs: 1, md: 0 }
+                        }}
+                        alignSelf="center"
+                      >
+                        <b>{t('Teacher Id')}:*</b>
+                      </Box>
+                    </Grid>
+                    <Grid
+                      sx={{
+                        mb: `${theme.spacing(3)}`
+                      }}
+                      item
+                      xs={12}
+                    >
+                      <TextField
+                        sx={{
+                          '& fieldset': {
+                            borderRadius: '3px'
+                          }
+                        }}
+                        size="small"
+                        error={Boolean(touched.teacher_id && errors.teacher_id)}
+                        fullWidth
+                        helperText={touched.teacher_id && errors.teacher_id}
+                        name="teacher_id"
+                        placeholder={t('teacher id here...')}
+                        onBlur={handleBlur}
+                        onBlurCapture={(v) => {
+                          // if (v) {
+                          //   const temp = generateUsername(values.first_name);
+                          //   if (!editSchool?.user?.username) {
+                          //     setFieldValue('password', temp);
+                          //   }
+                          //   setFieldValue('username', temp);
+                          // }
+                        }}
+                        onChange={handleChange}
+                        value={values.teacher_id}
+                        variant="outlined"
+                      />
+                    </Grid>
+                  </Grid>
+                  {/* Teacher id code end */}
 
                   <Grid item xs={12} md={6}>
                     <Grid item>

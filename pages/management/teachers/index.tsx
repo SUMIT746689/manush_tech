@@ -11,18 +11,10 @@ import Results from 'src/content/Management/Teachers/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 
 function Managementschools() {
-  
   const [editSchool, setEditSchool] = useState<Project>(null);
 
-  const {
-    data: teachers,
-    setData: setTeachers,
-    reFetchData,
-    error
-  } = useClientFetch('/api/teacher');
-  const { data: departments, error: departmentError } =
-    useClientFetch('/api/departments');
-
+  const { data: teachers, setData: setTeachers, reFetchData, error } = useClientFetch('/api/teacher');
+  const { data: departments, error: departmentError } = useClientFetch('/api/departments');
 
   return (
     <>
@@ -45,14 +37,7 @@ function Managementschools() {
         />
       </PageTitleWrapper>
 
-      <Grid
-        sx={{ px: 4 }}
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+      <Grid sx={{ px: 4 }} container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           <Results
             schools={teachers || []}

@@ -42,12 +42,24 @@ const post = async (req, res, refresh_token) => {
       permanent_address,
       joining_date,
       department_id,
-      salary_type
+      salary_type,
+      teacher_id
     }: any = fields;
 
-    if (!username || !password || !first_name || !gender || !date_of_birth || !present_address || !permanent_address || !national_id || !salary_type)
+    if (
+      !username ||
+      !password ||
+      !first_name ||
+      !gender ||
+      !date_of_birth ||
+      !present_address ||
+      !permanent_address ||
+      !national_id ||
+      !salary_type ||
+      !teacher_id
+    )
       throw new Error(
-        'username || password || first_name || gender || date_of_birth || salary_type || present_address || permanent_address is missing'
+        'username || password || first_name || gender || date_of_birth || salary_type || teacher_id || present_address || permanent_address is missing'
       );
 
     const encrypePassword = await bcrypt.hash(password, Number(process.env.SALTROUNDS));
@@ -89,7 +101,6 @@ const post = async (req, res, refresh_token) => {
 
       fs.rename(oldPath, newPath, (err) => {
         if (err) throw err;
-        console.log('Successfully moved file!');
       });
     }
     // console.log({ department_id, resume___: resume?.newFilename })
@@ -105,6 +116,7 @@ const post = async (req, res, refresh_token) => {
         gender: gender,
         date_of_birth: new Date(date_of_birth),
         salary_type: salary_type,
+        teacher_id: teacher_id,
         permanent_address: permanent_address,
         present_address: present_address,
         joining_date: joining_date ? new Date(joining_date) : new Date(),

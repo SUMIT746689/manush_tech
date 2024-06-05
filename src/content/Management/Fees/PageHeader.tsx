@@ -3,11 +3,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'src/hooks/useAuth';
-import {
-  Grid,
-  Dialog,
-  DialogContent,
-} from '@mui/material';
+import { Grid, Dialog, DialogContent } from '@mui/material';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
@@ -18,16 +14,21 @@ import { AutoCompleteWrapper, AutoCompleteWrapperWithoutRenderInput } from '@/co
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
 import { ButtonWrapper } from '@/components/ButtonWrapper';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { label } from 'aws-amplify';
 
-const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i.toLocaleLowerCase() }))
+const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((i) => ({
+  label: i,
+  value: i.toLocaleLowerCase()
+}));
 
-function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetchData }) {
+function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetchData, subjectData }) {
   const { t }: { t: any } = useTranslation();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { showNotification } = useNotistick();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [checked, setChecked] = useState(false);
+  const [subjectList, setSubjectList] = useState<Array<any>>([]);
 
   useEffect(() => {
     if (editData) handleCreateClassOpen();
@@ -38,7 +39,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
   };
 
   const handleCreateClassClose = () => {
-    setChecked(false)
+    setChecked(false);
     setOpen(false);
     seteditData(null);
   };
@@ -59,17 +60,28 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
         reFetchData();
       };
       _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
-      _values['late_fee'] = parseFloat(_values.late_fee)
-      const customMonths = _values.months.map(month => month.value);
-      const class_ids = _values.class_ids.map(cls => cls.value);
+      _values['late_fee'] = parseFloat(_values.late_fee);
+      const customMonths = _values.months.map((month) => month.value);
+      // old code
+      //const class_ids = _values.class_ids.map((cls) => cls.value);
       // dayjs(_values.last_date).format('YYYY-MM-DD')
 
       if (editData) {
-        const res = await axios.patch(`/api/fee/${editData.id}`, { ..._values, months: customMonths, class_ids });
+        const res = await axios.patch(`/api/fee/${editData.id}`, {
+          ..._values,
+          months: customMonths,
+          class_ids: [_values.class_id],
+          subject_ids: _values.subject_id
+        }); // For edit _values.class_id    _values.subject_id
         successResponse('updated');
       } else {
         _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
-        const res = await axios.post(`/api/fee`, { ..._values, months: customMonths, class_ids });
+        const res = await axios.post(`/api/fee`, {
+          ..._values,
+          months: customMonths,
+          class_ids: [_values.class_id],
+          subject_ids: _values.subject_id
+        });
         successResponse('created');
       }
     } catch (err) {
@@ -79,28 +91,37 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
       setErrors({ submit: err.message });
       setSubmitting(false);
     }
-  }
+  };
 
   const handleSelectAllMonths = (setValue) => {
-    setValue('months', month)
-  }
+    setValue('months', month);
+  };
   const handleRemoveAllMonths = (setValue) => {
-    setValue('months', [])
-  }
+    setValue('months', []);
+  };
+
+  // subject list function
+  const subjectListFn = (classInfo) => {
+    axios
+      .get(`/api/subject?class_id=${classInfo.value}`)
+      .then((res) => {
+        const filterArr = res?.data.map((item) => {
+          return {
+            label: item.name,
+            value: item.id
+          };
+        });
+        setSubjectList(filterArr);
+      })
+      .catch((error) => {
+        setSubjectList([]);
+      });
+  };
 
   return (
     <>
-      <PageHeaderTitleWrapper
-        name="Fees Management"
-        handleCreateClassOpen={handleCreateClassOpen}
-      />
-      <Dialog
-        fullWidth
-        maxWidth="sm"
-        open={open}
-        onClose={handleCreateClassClose}
-      >
-
+      <PageHeaderTitleWrapper name="Fees Management" handleCreateClassOpen={handleCreateClassOpen} />
+      <Dialog fullWidth maxWidth="sm" open={open} onClose={handleCreateClassClose}>
         <DialogTitleWrapper editData={editData} name="fees" />
 
         <Formik
@@ -112,31 +133,22 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
             last_date: editData?.last_date || null,
             _for: editData?.for || undefined,
             academic_year_id: editData?.academic_year_id || academicYear?.id || undefined,
-            class_id: editData?.class_id || null,
-            class_ids: [],
+            class_id: editData?.class_id || undefined,
+            subject_id: editData?.subject_id || undefined,
+            subject_ids: editData?.subject ? subjectData.find((subject) => subject.value === editData.subject_id) : undefined,
+            class_ids: editData?.class ? classData.find((cls) => cls.value === editData.class_id) : undefined,
             // frequency: editData?.frequency || undefined,
             months: [],
             late_fee: editData?.late_fee || 0,
             submit: null
           }}
           validationSchema={Yup.object().shape({
-            // title: Yup.string()
-            //   .max(255)
-            //   .required(t('The title field is required')),
-            fees_head_id: Yup.number()
-              .min(1, 'The fees head is required')
-              .required(t('The fees head is required')),
-            amount: Yup.number()
-              .min(1)
-              .required(t('The amount code field is required')),
-            school_id: Yup.number()
-              .min(1)
-              .required(t('The school id is required')),
-            months: !editData && Yup.array().min(1, "select a month"),
-            class_ids: !editData && Yup.array().min(1, "select a class"),
-            // class_id: Yup.number()
-            //   .min(1)
-            //   .required(t('class filed field is required'))
+            fees_head_id: Yup.number().min(1, 'The fees head is required').required(t('The fees head is required')),
+            amount: Yup.number().min(1).required(t('The amount code field is required')),
+            school_id: Yup.number().min(1).required(t('The school id is required')),
+            months: !editData && Yup.array().min(1, 'select a month'),
+            class_id: Yup.number().min(1, 'The class is required').required(t('The class is required')),
+            subject_id: Yup.number().min(1, 'The section is required').required(t('The section is required'))
           })}
           onSubmit={handleSubmit}
         >
@@ -151,7 +163,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                 >
                   {/* <Grid display={'grid'} columnGap={2} rowGap={1} gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}> */}
                   <Grid container columnSpacing={1} columns={12}>
-
                     {/* fees heads */}
                     <Grid item xs={12} sm={6}>
                       <AutoCompleteWrapperWithoutRenderInput
@@ -170,17 +181,6 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       />
                     </Grid>
 
-                    {/* title  */}
-                    {/* <TextFieldWrapper
-                      errors={errors?.title}
-                      touched={touched?.title}
-                      name="title"
-                      label="Title"
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                      value={values?.title}
-                    /> */}
-
                     {/* fee's for which month */}
                     <Grid item xs={12} sm={6}>
                       <TextFieldWrapper
@@ -195,32 +195,57 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     </Grid>
 
                     {/* Class */}
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6}>
                       <AutoCompleteWrapperWithoutRenderInput
-                        multiple={editData ? false : true}
+                        multiple={false}
                         disabled={editData}
                         minWidth="100%"
                         label="Select Class"
                         placeholder="select a class..."
-                        value={editData ? classData.find((cls) => cls.value === values.class_id) : values.class_ids}
+                        value={editData ? classData.find((cls) => cls.value === values.class_id) : values?.class_ids?.value}
                         options={classData}
-                        name="class_ids"
-                        error={errors?.class_ids}
-                        touched={touched?.class_ids}
+                        name="class_id"
+                        error={errors?.class_id}
+                        touched={touched?.class_id}
                         // @ts-ignore
-                        handleChange={(event, value) => setFieldValue('class_ids', value || [])}
+                        handleChange={(event, value) => {
+                          if (value) {
+                            subjectListFn(value);
+                            setFieldValue('class_ids', value || undefined);
+                            setFieldValue('class_id', value.value || 0);
+                          } else {
+                            setFieldValue('subject_ids', undefined);
+                            setFieldValue('subject_id', 0);
+                            setSubjectList([]);
+                          }
+                        }}
                       />
                     </Grid>
-
-                    {/* <Grid item minWidth="100%">
-                      <DropDownSelectWrapper
-                        value={values.frequency}
-                        name='frequency'
-                        label='Frequency'
-                        handleChange={handleChange}
-                        menuItems={['on_demand', 'half_yearly', 'monthly', 'annual']}
+                    {/* subject related code start */}
+                    <Grid item xs={12} sm={6}>
+                      <AutoCompleteWrapperWithoutRenderInput
+                        multiple={false}
+                        disabled={editData}
+                        minWidth="100%"
+                        label="Select Subject"
+                        placeholder="select a subject..."
+                        value={editData ? subjectData.find((sub) => sub.value === values.subject_id) : values.subject_ids || null}
+                        options={subjectList}
+                        name="subject_id"
+                        error={errors?.subject_id}
+                        touched={touched?.subject_id}
+                        // @ts-ignore
+                        handleChange={(event, value) => {
+                          if (value) {
+                            setFieldValue('subject_ids', value || undefined);
+                            setFieldValue('subject_id', value.value || 0);
+                          } else {
+                            setFieldValue('subject_ids', undefined);
+                            setFieldValue('subject_id', 0);
+                          }
+                        }}
                       />
-                    </Grid> */}
+                    </Grid>
 
                     {/* Amount */}
                     <Grid item xs={12} sm={6}>
@@ -239,7 +264,7 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     {/* late_fee */}
                     <Grid item xs={12} sm={6}>
                       <TextFieldWrapper
-                        type='number'
+                        type="number"
                         errors={errors?.late_fee}
                         touched={touched?.late_fee}
                         name="late_fee"
@@ -251,8 +276,8 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                     </Grid>
                   </Grid>
 
-                  {
-                    !editData && <Grid item columnGap={1}>
+                  {!editData && (
+                    <Grid item columnGap={1}>
                       <AutoCompleteWrapperWithoutRenderInput
                         minWidth="100%"
                         label="Select Month"
@@ -266,18 +291,18 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                         // @ts-ignore
                         handleChange={(e, value: any) => setFieldValue('months', value)}
                       />
-                      {
-                        !editData && (
-                          <Grid display="flex" justifyContent="start" columnGap={1}>
-                            <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>Select All</ButtonWrapper>
-                            <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>Remove All</ButtonWrapper>
-                          </Grid>
-                        )
-                      }
-
+                      {!editData && (
+                        <Grid display="flex" justifyContent="start" columnGap={1}>
+                          <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>
+                            Select All
+                          </ButtonWrapper>
+                          <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>
+                            Remove All
+                          </ButtonWrapper>
+                        </Grid>
+                      )}
                     </Grid>
-                  }
-
+                  )}
                 </DialogContent>
                 <DialogActionWrapper
                   title="Fees"

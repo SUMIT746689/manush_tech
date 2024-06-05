@@ -186,6 +186,7 @@ model Teacher {
   religion          String?
   date_of_birth     DateTime     @db.Date
   salary_type       SalaryEnums?
+  teacher_id        String?
   present_address   String
   permanent_address String
   joining_date      DateTime     @db.Date
@@ -383,7 +384,7 @@ model Subject {
   Syllabus             Syllabus[]
   Homework             Homework[]
   StudentClassSubjects StudentClassSubjects[]
-
+  fees                 Fee[]
   @@map("subjects")
 }
 
@@ -515,12 +516,14 @@ model Fee {
 
   academic_year_id Int
   class_id         Int
+  subject_id       Int
   school_id        Int
   fees_head_id     Int?
   deleted_at       DateTime?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
+  subject             Subject     @relation(fields: [subject_id], references: [id])
   school              School       @relation(fields: [school_id], references: [id])
   fees_head           FeesHaed?    @relation(fields: [fees_head_id], references: [id])
   student_fees        StudentFee[]

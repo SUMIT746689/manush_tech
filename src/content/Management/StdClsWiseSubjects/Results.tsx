@@ -51,6 +51,8 @@ import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table
 import BulkActions from '@/components/BulkAction';
 import AddIcon from '@mui/icons-material/Add';
 import Add from './Add';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const DialogWrapper = styled(Dialog)(
     () => `
@@ -150,7 +152,7 @@ const applyPagination = (
     return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCard: any, fee: any[] }> = ({ students, refetch, selectedClass }) => {
+const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCard: any, fee: any[], selectedClass: any, selectedSection: any }> = ({ students, refetch, selectedClass, selectedSection }) => {
 
     const [selectedItems, setSelectedUsers] = useState([]);
     const { t }: { t: any } = useTranslation();
@@ -221,10 +223,38 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
     }
     // console.log(selectedStudent);
     const [addSubject, setAddSubject] = useState();
+    const [searchValue, setSearchValue] = useState('');
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
+
+    const handleFetch = async () => {
+        try {
+            if (!searchValue || searchValue.length < 3) return setSearchResults([]);
+            setSearchLoading(true);
+            const { data } = await axios.get(
+                `/api/student/search-students?search_value=${searchValue}`
+            );
+            setSearchResults(data);
+        } catch (err) {
+            setSearchResults([]);
+            handleShowErrMsg(err, showNotification);
+            console.log({ err });
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const getData = setTimeout(() => {
+            handleFetch();
+        }, 400);
+
+        return () => clearTimeout(getData);
+    }, [searchValue]);
 
     return (
         <>
-            {addSubject && <Add isOpen={true} selectCls={selectedClass} student_id={addSubject} setAddSubject={setAddSubject} />}
+            {addSubject && <Add refetch={refetch} isOpen={true} selectCls={selectedClass} student_id={addSubject} setAddSubject={setAddSubject} />}
             <Card sx={{ minHeight: 'calc(100vh - 410px)', borderRadius: 0 }}>
 
                 {selectedBulkActions && (
@@ -299,26 +329,28 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                                     return (
                                         <TableRow hover key={i.id} selected={isUserSelected}>
                                             {/* <TableBodyCellWrapper padding="checkbox">
-                          <Checkbox
-                            checked={isUserSelected}
-                            onChange={(event) =>
-                              handleSelectOneUser(event, i.id)
-                            }
-                            value={isUserSelected}
-                          />
-                        </TableBodyCellWrapper> */}
+                                            <Checkbox
+                                                checked={isUserSelected}
+                                                onChange={(event) =>
+                                                handleSelectOneUser(event, i.id)
+                                                }
+                                                value={isUserSelected}
+                                            />
+                                            </TableBodyCellWrapper> */}
                                             <TableBodyCellWrapper><Grid py={0.5}>{i.id}</Grid></TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
                                                 {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
-                                                {i?.StudentClassSubjects?.map(list => <Grid key={list.id}>{list.subject.name}</Grid>)}
+                                                <Grid display="flex" gap={0.5}>
+                                                    {i?.StudentClassSubjects?.map(list => <Grid key={list.id} sx={{ border: "1px solid gray", borderRadius: 0.25, px: 0.5, py: 0.25 }}>{list.subject.name} <button onClick={()=>{}}><ClearIcon sx={{ cursor: "pointer", fontSize: 13, ":hover": { bgcolor: "red", color: "white" } }} /></button></Grid>)}
+                                                </Grid>
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
-                                                {i?.section?.class?.name}
+                                                {selectedClass?.label}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
-                                                {i?.section?.class?.has_section ? i?.section?.name : ''}
+                                                {selectedClass?.has_section ? selectedSection?.label : ''}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
                                                 <Grid display="flex" columnGap={1} justifyContent="center">
@@ -327,8 +359,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                                                         <IconButton
                                                             color="primary"
                                                             sx={ActionStyle}
+                                                            // @ts-ignore
                                                             onClick={() => { setAddSubject(i.id) }}
-                                                        // onClick={<Page}
+                                                        //  onClick={<Page}
                                                         >
                                                             <AddIcon />
                                                         </IconButton>

@@ -174,7 +174,7 @@ enum SalaryEnums {
 }
 
 model Teacher {
-  id                Int       @id @default(autoincrement())
+  id                Int          @id @default(autoincrement())
   first_name        String
   middle_name       String?
   last_name         String?
@@ -182,13 +182,13 @@ model Teacher {
   phone             String?
   email             String?
   gender            Gender
-  blood_group       String?   @db.VarChar(20)
+  blood_group       String?      @db.VarChar(20)
   religion          String?
-  date_of_birth     DateTime  @db.Date
+  date_of_birth     DateTime     @db.Date
   salary_type       SalaryEnums?
   present_address   String
   permanent_address String
-  joining_date      DateTime  @db.Date
+  joining_date      DateTime     @db.Date
   resume            String
   photo             String?
   deleted_at        DateTime?
@@ -352,6 +352,7 @@ model StudentClassSubjects {
   teacher Teacher @relation(fields: [teacher_id], references: [id])
   school  School  @relation(fields: [school_id], references: [id])
 
+  @@unique([student_id, subject_id, teacher_id])
   @@map("std_cls_subjects")
 }
 

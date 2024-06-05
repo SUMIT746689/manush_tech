@@ -233,6 +233,7 @@ function ManagementClasses() {
             fee={fee}
             idCard={idCard}
             selectedClass={selectedClass}
+            sectedSetion={selectedSection}
           />
         </Grid>
       </Grid>

@@ -18,7 +18,7 @@ export const ExportData = ({ students }) => {
         "middle name": student.student_info.middle_name || '',
         "last name": student.student_info.last_name || '',
         "registration no": student.class_registration_no || '',
-        class: student.section.class?.name,
+        class: student.section?.class?.name,
         section: student.section?.name || '',
         guardian_phone: student.guardian_phone || '',
         "present address": student.student_present_address || '',

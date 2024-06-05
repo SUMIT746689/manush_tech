@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +9,13 @@ import useNotistick from '@/hooks/useNotistick';
 import { DialogActionWrapper, DialogTitleWrapper } from '@/components/DialogWrapper';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { DisableTextWrapper } from '@/components/TextFields';
+import { AutoCompleteWrapper, AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
+import { DropDownSelectWrapper } from '@/components/DropDown';
+import { ButtonWrapper } from '@/components/ButtonWrapper';
+import { label } from 'aws-amplify';
 
-const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map(i => ({ label: i, value: i.toLocaleLowerCase() }))
 
-function Add({ isOpen, selectCls, setAddSubject }) {
+function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
     console.log({ isOpen, selectCls, setAddSubject })
     const { t }: { t: any } = useTranslation();
     const [open, setOpen] = useState(isOpen);
@@ -21,9 +24,6 @@ function Add({ isOpen, selectCls, setAddSubject }) {
     const [checked, setChecked] = useState(false);
     const [subjectLists, setSubjectLists] = useState([]);
 
-    const handleCreateClassOpen = () => {
-        setOpen(true);
-    };
 
     const handleCreateClassClose = () => {
         setChecked(false)
@@ -40,28 +40,32 @@ function Add({ isOpen, selectCls, setAddSubject }) {
 
     const handleSubmit = async (_values, { resetForm, setErrors, setStatus, setSubmitting }) => {
         try {
-            const successResponse = (message) => {
-                showNotification('fees ' + message + ' successfully');
+            const successResponse = () => {
+                showNotification('subject add successfully');
                 resetForm();
                 setStatus({ success: true });
                 setSubmitting(false);
                 handleCreateUserSuccess();
                 // reFetchData();
+                refetch();
             };
-            _values['last_date'] = new Date(_values.last_date).setHours(23, 59, 0, 0);
-            _values['late_fee'] = parseFloat(_values.late_fee)
-            const customMonths = _values.months.map(month => month.value);
-            const class_ids = _values.class_ids.map(cls => cls.value);
-            // dayjs(_values.last_date).format('YYYY-MM-DD')
 
-            // if (editData) {
-            //     const res = await axios.patch(`/api/fee/${editData.id}`, { ..._values, months: customMonths, class_ids });
-            //     successResponse('updated');
-            // } else {
-            _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
-            const res = await axios.post(`/api/fee`, { ..._values, months: customMonths, class_ids });
-            successResponse('created');
-            // }
+            const sendDatas = {
+                student_id: _values.student_id
+            }
+            sendDatas['subjects'] = _values.subjects?.map(subject => {
+                const { value: subject_id, teacher } = subject;
+                const { id: teacher_id } = teacher || {};
+
+                if (!subject_id || !teacher_id) throw new Error('subject or teacher not founds ');
+
+                return { subject_id, teacher_id }
+            })
+
+            // _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
+            const res = await axios.post(`/api/student_class_subjects`, sendDatas);
+
+            successResponse();
         } catch (err) {
             handleShowErrMsg(err, showNotification);
             setStatus({ success: false });
@@ -71,33 +75,15 @@ function Add({ isOpen, selectCls, setAddSubject }) {
         }
     }
 
-    // const handleSelectAllMonths = (setValue) => {
-    //     setValue('months', month)
-    // }
-    // const handleRemoveAllMonths = (setValue) => {
-    //     setValue('months', [])
-    // }
-
-    // const handleClassChange = (event, value, setFieldValue) => {
-    //     setFieldValue('class_id', value || null);
-    //     console.log({ value })
-    //     if (!value?.value) return setSubjectLists([]);
-    //     axios.get(`/api/subject?class_id=${value.value}`)
-    //         .then(({ data }) => {
-    //             console.log({ data });
-    //             if (!Array.isArray(data)) return setSubjectLists([]);
-    //             const cusSubjectLists = data.map((subject) => ({ label: subject.name, value: subject.id }));
-    //             setSubjectLists(cusSubjectLists)
-    //         })
-    //         .catch(err => { console.log({ err }) })
-    // }
-
-    const handleSubjectChange = (event, value, setFieldValue) => {
-        setFieldValue('subject_id', value || null);
-        if (!value?.value) return;
+    const handleSelectAllSubjects = (setValue) => {
+        setValue('subjects', subjectLists)
     }
 
-    const getMonths = () => {
+    const handleRemoveAllSubjects = (setValue) => {
+        setValue('subjects', [])
+    }
+
+    const getSubjects = () => {
         axios.get(`/api/subject?class_id=${selectCls.id}`)
             .then(({ data }) => {
                 console.log({ data });
@@ -114,29 +100,28 @@ function Add({ isOpen, selectCls, setAddSubject }) {
     }
 
     useEffect(() => {
-        // getMonths();
+        getSubjects();
     }, [])
 
     return (
         <>
             <Dialog
                 fullWidth
-                maxWidth="xs"
+                maxWidth="sm"
                 open={open}
                 onClose={handleCreateClassClose}
-                sx={{borderRadius:0.5}}
+                sx={{ borderRadius: 0.5 }}
             >
 
-                <DialogTitleWrapper editData={true} name="fees" />
+                <DialogTitleWrapper editData={false} name="Student Subject" />
 
                 <Formik
                     initialValues={{
-                        school_id: user?.school_id || undefined,
-                        class_id: null,
-                        section_id: null,
+                        student_id,
                         class_name: selectCls?.label,
-                        months: [],
-                        submit: null
+                        submit: null,
+                        subjects: [],
+
                     }}
                     validationSchema={Yup.object().shape({
                         // title: Yup.string()
@@ -145,13 +130,13 @@ function Add({ isOpen, selectCls, setAddSubject }) {
                         // fees_head_id: Yup.number()
                         //     .min(1, 'The fees head is required')
                         //     .required(t('The fees head is required')),
-                        amount: Yup.number()
-                            .min(1)
-                            .required(t('The amount code field is required')),
+                        // amount: Yup.number()
+                        //     .min(1)
+                        //     .required(t('The amount code field is required')),
                         // school_id: Yup.number()
                         //     .min(1)
                         //     .required(t('The school id is required')),
-                        // months: !editData && Yup.array().min(1, "select a month"),
+                        months: Yup.array().min(1, "select a month"),
                         // class_ids: !editData && Yup.array().min(1, "select a class"),
                         // class_id: Yup.number()
                         //   .min(1)
@@ -171,57 +156,65 @@ function Add({ isOpen, selectCls, setAddSubject }) {
                                     }}
                                 >
                                     <Grid container columnSpacing={1} columns={12}>
-
                                         {/* Class */}
                                         <Grid item xs={12}>
                                             <DisableTextWrapper label="Select Class" value={values.class_name} touched={touched?.class_name} errors={errors?.class_name} />
                                         </Grid>
-
-                                        {/* <Grid item xs={12}>
-                                            <AutoCompleteWrapper
-                                                // multiple={editData ? false : true}
-                                                disabled={true}
-                                                minWidth="100%"
-                                                label="Select subject"
-                                                placeholder="select a subject..."
-                                                value={values.section_name}
-                                                options={subjectLists}
-                                                name="section_name"
-                                                error={errors?.section_name}
-                                                touched={touched?.section_name}
-                                                handleChange={(event, value) => { }}
-                                            />
-                                        </Grid> */}
-
                                     </Grid>
 
                                     {
-                                        // !editData && 
-                                        // <Grid item columnGap={1}>
-                                        //     <AutoCompleteWrapperWithoutRenderInput
-                                        //         minWidth="100%"
-                                        //         label="Select Month"
-                                        //         placeholder="Month..."
-                                        //         multiple
-                                        //         value={values.months}
-                                        //         options={month}
-                                        //         name="month"
-                                        //         error={errors?.months}
-                                        //         touched={touched?.months}
-                                        //         // @ts-ignore
-                                        //         handleChange={(e, value: any) => setFieldValue('months', value)}
-                                        //     />
-                                        //     {
-                                        //         // !editData && 
-                                        //         (
-                                        //             <Grid display="flex" justifyContent="start" columnGap={1}>
-                                        //                 {/* <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllMonths(setFieldValue)}>Select All</ButtonWrapper> */}
-                                        //                 {/* <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllMonths(setFieldValue)}>Remove All</ButtonWrapper> */}
-                                        //             </Grid>
-                                        //         )
-                                        //     }
+                                        <Grid item columnGap={1}>
+                                            <AutoCompleteWrapper
+                                                minWidth="100%"
+                                                label="Select Subject"
+                                                placeholder="subjects..."
+                                                multiple
+                                                value={values.subjects}
+                                                options={subjectLists}
+                                                name="month"
+                                                error={errors?.subjects}
+                                                touched={touched?.subjects}
+                                                // @ts-ignore
+                                                handleChange={(e, value: any) => setFieldValue('subjects', value)}
+                                            />
 
-                                        // </Grid>
+                                            {
+                                                // !editData && 
+                                                (
+                                                    <Grid display="flex" justifyContent="start" columnGap={1}>
+                                                        <ButtonWrapper variant="outlined" handleClick={() => handleSelectAllSubjects(setFieldValue)}>Select All</ButtonWrapper>
+                                                        <ButtonWrapper variant="outlined" handleClick={() => handleRemoveAllSubjects(setFieldValue)}>Remove All</ButtonWrapper>
+                                                    </Grid>
+                                                )
+                                            }
+
+                                            {
+                                                values.subjects?.map((subject, index) => (
+                                                    <Grid key={index} display="grid" gridTemplateColumns="1fr 2fr" columnGap={1}>
+                                                        <DisableTextWrapper label="Select Subject" value={subject?.label} touched={undefined} errors={undefined} />
+
+
+                                                        <Grid display="grid" gridTemplateColumns="1fr 6fr">
+                                                            <Grid minWidth={100}>
+                                                                <DropDownSelectWrapper
+                                                                    name='teacher_search_type'
+                                                                    label="Search By"
+                                                                    menuItems={['name', 'id']}
+                                                                    value={subject.teacher_search_type}
+                                                                    handleChange={(e, value: any) => {
+                                                                        const subjects_ = values.subjects;
+                                                                        subjects_[index]['teacher_search_type'] = e.target.value;
+                                                                        setFieldValue('subjects', subjects_)
+                                                                    }}
+                                                                />
+                                                            </Grid>
+                                                            <SearchTeacher setFieldValue={setFieldValue} index={index} values={values} searchType={subject.teacher_search_type} disabled={!!!subject.teacher_search_type} />
+                                                        </Grid>
+                                                    </Grid>
+                                                ))
+                                            }
+
+                                        </Grid>
                                     }
 
                                 </DialogContent>
@@ -239,6 +232,59 @@ function Add({ isOpen, selectCls, setAddSubject }) {
             </Dialog>
         </>
     );
+}
+
+const SearchTeacher = ({ setFieldValue, index, values, searchType, disabled }) => {
+
+    const [searchValue, setSearchValue] = useState();
+    const [searchOptionData, setSearchOptionData] = useState([]);
+
+    const handleDebounce = async (value) => {
+        try {
+            if (value?.length >= 2) {
+                const res = await axios.get(`/api/teacher/search-teachers?search_type=${searchType}&search_value=${value?.toLowerCase()}`);
+                const userInfoArr = res?.data?.map((item) => {
+                    return {
+                        label: `${item.name} | ${item.teacher_id || ''}`,
+                        id: item.id,
+                        teacher_id: item.student_id,
+                        // student_table_id: item.student_table_id
+                    };
+                });
+                setSearchOptionData(userInfoArr);
+            } else if (value?.length < 2) {
+                setSearchOptionData([]);
+            } else if (!value) {
+                setSearchOptionData([]);
+            }
+        } catch (error) { }
+    };
+
+    const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
+        setSearchValue(v);
+    };
+
+    const searchHandleUpdate = (event: ChangeEvent<HTMLInputElement>, v) => {
+        const subjects_ = values.subjects;
+        subjects_[index]['teacher'] = v;
+        setFieldValue('subjects', subjects_)
+        setSearchValue(v || null);
+    }
+
+    return (
+        <AutoCompleteWrapperWithDebounce
+            disabled={disabled}
+            debounceTimeout={500}
+            handleDebounce={handleDebounce}
+            // @ts-ignore
+            searchHandleUpdate={searchHandleUpdate}
+            options={searchOptionData}
+            value={searchValue}
+            handleChange={searchHandleChange}
+            label="Search Teacher"
+            placeholder="Search Teacher"
+        />
+    )
 }
 
 export default Add;

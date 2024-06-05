@@ -108,8 +108,8 @@ export const EmptyAutoCompleteWrapper = ({ minWidth = null, options, value, labe
 
 export const AutoCompleteWrapperWithDebounce = ({
   debounceTimeout,
-  handleDebounce = (value) => {},
-  searchHandleUpdate = () => {},
+  handleDebounce = (value) => { },
+  searchHandleUpdate = () => { },
   minWidth = null,
   required = false,
   options,

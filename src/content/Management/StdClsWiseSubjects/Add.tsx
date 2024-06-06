@@ -16,7 +16,6 @@ import { label } from 'aws-amplify';
 
 
 function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
-    console.log({ isOpen, selectCls, setAddSubject })
     const { t }: { t: any } = useTranslation();
     const [open, setOpen] = useState(isOpen);
     const { user } = useAuth();
@@ -57,7 +56,7 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
                 const { value: subject_id, teacher } = subject;
                 // const { id: teacher_id } = teacher || {};
 
-                if (!subject_id ) throw new Error('subject not founds ');
+                if (!subject_id) throw new Error('subject not founds ');
                 // if (!subject_id || !teacher_id) throw new Error('subject or teacher not founds ');
 
                 // return { subject_id, teacher_id }
@@ -88,17 +87,14 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
     const getSubjects = () => {
         axios.get(`/api/subject?class_id=${selectCls.id}`)
             .then(({ data }) => {
-                console.log({ data });
                 if (!Array.isArray(data)) return setSubjectLists([]);
                 const cusSubjectLists = data.map((subject_) => {
                     const val = { label: subject_.name, value: subject_.id }
-                    console.log({ val })
                     return val
                 });
-                console.log({ cusSubjectLists })
                 setSubjectLists(cusSubjectLists)
             })
-            .catch(err => { console.log({ err }) })
+            .catch(err => { })
     }
 
     useEffect(() => {
@@ -147,7 +143,6 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
                     onSubmit={handleSubmit}
                 >
                     {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => {
-                        console.log({ values })
                         return (
                             <form onSubmit={handleSubmit}>
                                 <DialogContent

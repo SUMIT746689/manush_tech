@@ -239,7 +239,6 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         } catch (err) {
             setSearchResults([]);
             handleShowErrMsg(err, showNotification);
-            console.log({ err });
         } finally {
             setSearchLoading(false);
         }
@@ -253,15 +252,15 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         return () => clearTimeout(getData);
     }, [searchValue]);
 
-    const [deleteIsLoading, setDeleteIsLoading] = useState(false)
+    // const [deleteIsLoading, setDeleteIsLoading] = useState(false)
 
-    const handleDeleteSubject = (student_id, subject_id) => {
-        setDeleteIsLoading(true);
-        axios.delete(`/api/student_class_subjects/${student_id}?subject_id=${subject_id}`)
-            .then(res => showNotification('deleted successfull'))
-            .catch(err => handleShowErrMsg(err, showNotification))
-            .finally(() => setDeleteIsLoading(false))
-    }
+    // const handleDeleteSubject = (student_id, subject_id) => {
+    //     setDeleteIsLoading(true);
+    //     axios.delete(`/api/student_class_subjects/${student_id}?subject_id=${subject_id}`)
+    //         .then(res => showNotification('deleted successfull'))
+    //         .catch(err => handleShowErrMsg(err, showNotification))
+    //         .finally(() => setDeleteIsLoading(false))
+    // }
 
     return (
         <>
@@ -356,7 +355,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                                                 <Grid display="flex" gap={0.5}>
                                                     {i?.subjects?.map(list => (
                                                         <Grid key={list.id} sx={{ border: "1px solid gray", borderRadius: 0.25, px: 0.5, py: 0.25 }}>{list.name}
-                                                            <button disabled={deleteIsLoading} onClick={() => {
+                                                            <button 
+                                                            // disabled={deleteIsLoading} 
+                                                            onClick={() => {
                                                                 // handleDeleteSubject(i.id, list.id)
                                                                 handleConfirmDelete({ student_id: i.id, subject_id: list.id })
                                                             }}>

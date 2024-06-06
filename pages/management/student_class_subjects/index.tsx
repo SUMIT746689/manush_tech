@@ -72,7 +72,6 @@ function ManagementClasses() {
           `/api/discount?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`
         )
         .then((res) => {
-          console.log('discount__', res.data);
           setDiscount(
             res.data?.map((i) => ({
               label: `${i?.title} (${i?.amt} ${i?.type})`,
@@ -100,16 +99,13 @@ function ManagementClasses() {
   const handleStudentList = () => {
     if (academicYear && selectedSection) {
       setIsLoading(true);
-      console.log({ selectedClass, sections });
       const section_ids = []
       if (selectedSection?.id == 'all') sections.forEach(sec => { if (sec.id !== "all") section_ids.push(sec.id) });
       else section_ids.push(selectedSection.id)
-      console.log({ section_ids })
       if (section_ids.length === 0) return showNotification("section not founds...", "error"), setIsLoading(false);
       axios
         .get(`/api/student/student_lists_with_cls_subjects?section_ids=${section_ids}`)
         .then((res) => {
-          console.log('ref__', res.data);
           setStudents({
             AllStudents: res.data,
             selectedClass,

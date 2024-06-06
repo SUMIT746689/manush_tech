@@ -74,7 +74,8 @@ async function get(req, res, refresh_token) {
             title: true
           }
         }
-      }
+      },
+      orderBy: { id: "desc" }
     });
 
     res.status(200).json(students);

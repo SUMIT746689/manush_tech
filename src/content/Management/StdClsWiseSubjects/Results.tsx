@@ -206,20 +206,21 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
     };
 
     const handleDeleteCompleted = () => {
-
-        axios.delete(`/api/student/${openConfirmDelete}`)
+        if (!openConfirmDelete?.student_id || !openConfirmDelete.subject_id) return showNotification("student id or subject id not founds", "error");
+        axios.delete(`/api/student_class_subjects/${openConfirmDelete.student_id}?subject_id=${openConfirmDelete.subject_id}`)
             .then(res => {
                 setOpenConfirmDelete(null);
-                refetch();
                 showNotification('The student has been removed');
+                refetch();
             })
             .catch(err => {
                 setOpenConfirmDelete(null);
                 showNotification('Student deletion failed !', 'error');
             })
     };
-    const handleConfirmDelete = (id) => {
-        setOpenConfirmDelete(id)
+
+    const handleConfirmDelete = ({ student_id, subject_id }) => {
+        setOpenConfirmDelete({ student_id, subject_id })
     }
     // console.log(selectedStudent);
     const [addSubject, setAddSubject] = useState();
@@ -251,6 +252,16 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
         return () => clearTimeout(getData);
     }, [searchValue]);
+
+    const [deleteIsLoading, setDeleteIsLoading] = useState(false)
+
+    const handleDeleteSubject = (student_id, subject_id) => {
+        setDeleteIsLoading(true);
+        axios.delete(`/api/student_class_subjects/${student_id}?subject_id=${subject_id}`)
+            .then(res => showNotification('deleted successfull'))
+            .catch(err => handleShowErrMsg(err, showNotification))
+            .finally(() => setDeleteIsLoading(false))
+    }
 
     return (
         <>
@@ -343,7 +354,16 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
                                                 <Grid display="flex" gap={0.5}>
-                                                    {i?.StudentClassSubjects?.map(list => <Grid key={list.id} sx={{ border: "1px solid gray", borderRadius: 0.25, px: 0.5, py: 0.25 }}>{list.subject.name} <button onClick={()=>{}}><ClearIcon sx={{ cursor: "pointer", fontSize: 13, ":hover": { bgcolor: "red", color: "white" } }} /></button></Grid>)}
+                                                    {i?.subjects?.map(list => (
+                                                        <Grid key={list.id} sx={{ border: "1px solid gray", borderRadius: 0.25, px: 0.5, py: 0.25 }}>{list.name}
+                                                            <button disabled={deleteIsLoading} onClick={() => {
+                                                                // handleDeleteSubject(i.id, list.id)
+                                                                handleConfirmDelete({ student_id: i.id, subject_id: list.id })
+                                                            }}>
+                                                                <ClearIcon sx={{ cursor: "pointer", fontSize: 13, ":hover": { bgcolor: "red", color: "white" } }} />
+                                                            </button>
+                                                        </Grid>
+                                                    ))}
                                                 </Grid>
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
@@ -392,10 +412,10 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                     alignItems="center"
                     justifyContent="center"
                     flexDirection="column"
-                    p={5}
+                    p={2}
                 >
-                    <AvatarError>
-                        <CloseIcon />
+                    <AvatarError sx={{ width: 40, height: 40 }}>
+                        <CloseIcon sx={{ p: 1 }} />
                     </AvatarError>
 
                     <Typography
@@ -404,9 +424,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                             py: 4,
                             px: 6
                         }}
-                        variant="h3"
+                        variant="h4"
                     >
-                        {t('Are you sure you want to permanently delete this student')}
+                        {t('Are you sure you want to permanently delete this student class subject')}
                         ?
                     </Typography>
 

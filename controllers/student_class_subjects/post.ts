@@ -1,38 +1,35 @@
 import prisma from '@/lib/prisma_client';
+import { authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
-import { refresh_token_varify } from 'utilities_api/jwtVerify';
 
-export default async function post(req, res) {
+async function post(req, res, refresh_token) {
   try {
-    const { title, date } = req.body;
+    const { subjects, student_id } = req.body;
+    const { school_id } = refresh_token;
 
-    if (title && date) {
-      if (!req.cookies.refresh_token)
-        throw new Error('refresh token not founds');
+    if (!student_id || !Array.isArray(subjects)) throw new Error('student field is required');
+    subjects.forEach(({ subject_id }) => {
+      if (!subject_id) throw new Error('subject or teacher not founds ');
+    })
 
-      const refresh_token: any = refresh_token_varify(
-        req.cookies.refresh_token
-      );
+    const subject_ids = subjects.map(sub => ({ id: sub.subject_id }));
 
-      if (!refresh_token) throw new Error('invalid user');
-      console.log({ refresh_token });
-
-      const user = await prisma.user.findFirst({
-        where: { id: refresh_token.id }
-      });
-
-      const response = await prisma.holiday.create({
-        data: {
-          title,
-          date,
-          school_id: user.school_id
+    await prisma.student.update({
+      where: { id: student_id, student_info: { school_id } },
+      data: {
+        subjects: {
+          connect: {
+            id: subject_ids[0].id
+          }
         }
-      });
-      if (response) return res.json({ success: true });
-      else throw new Error('Invalid to create school');
-    } else throw new Error('provide valid data');
+      }
+    })
+
+    return res.status(200).json({ message: "success" })
   } catch (err) {
     logFile.error(err.message)
     res.status(404).json({ error: err.message });
   }
 }
+
+export default authenticate(post)

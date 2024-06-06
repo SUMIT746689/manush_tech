@@ -57,17 +57,19 @@ const index = async (req, res, refresh_token, dcryptAcademicYear) => {
                                 student_id: true
                             }
                         },
-                        StudentClassSubjects: {
-                            select: {
-                                id: true,
-                                subject: true,
-                                teacher: {
-                                    select: {
-                                        first_name: true
-                                    }
-                                }
-                            }
-                        }
+                        subjects: true,
+                        // StudentClassSubjects: {
+                        //     select: {
+                        //         id: true,
+                        //         subject: true,
+                        //         teacher: {
+                        //             select: {
+                        //                 first_name: true
+                        //             }
+                        //         }
+                        //     }
+                        // }
+
                         // guardian_name: true,
                         // guardian_phone: true,
                         // extra_section_id: true

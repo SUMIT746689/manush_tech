@@ -55,11 +55,13 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
             }
             sendDatas['subjects'] = _values.subjects?.map(subject => {
                 const { value: subject_id, teacher } = subject;
-                const { id: teacher_id } = teacher || {};
+                // const { id: teacher_id } = teacher || {};
 
-                if (!subject_id || !teacher_id) throw new Error('subject or teacher not founds ');
+                if (!subject_id ) throw new Error('subject not founds ');
+                // if (!subject_id || !teacher_id) throw new Error('subject or teacher not founds ');
 
-                return { subject_id, teacher_id }
+                // return { subject_id, teacher_id }
+                return { subject_id }
             })
 
             // _values['late_fee'] = _values?.late_fee ? _values?.late_fee : 0;
@@ -188,7 +190,7 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
                                                 )
                                             }
 
-                                            {
+                                            {/* {
                                                 values.subjects?.map((subject, index) => (
                                                     <Grid key={index} display="grid" gridTemplateColumns="1fr 2fr" columnGap={1}>
                                                         <DisableTextWrapper label="Select Subject" value={subject?.label} touched={undefined} errors={undefined} />
@@ -212,7 +214,7 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
                                                         </Grid>
                                                     </Grid>
                                                 ))
-                                            }
+                                            } */}
 
                                         </Grid>
                                     }
@@ -234,57 +236,57 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
     );
 }
 
-const SearchTeacher = ({ setFieldValue, index, values, searchType, disabled }) => {
+// const SearchTeacher = ({ setFieldValue, index, values, searchType, disabled }) => {
 
-    const [searchValue, setSearchValue] = useState();
-    const [searchOptionData, setSearchOptionData] = useState([]);
+//     const [searchValue, setSearchValue] = useState();
+//     const [searchOptionData, setSearchOptionData] = useState([]);
 
-    const handleDebounce = async (value) => {
-        try {
-            if (value?.length >= 2) {
-                const res = await axios.get(`/api/teacher/search-teachers?search_type=${searchType}&search_value=${value?.toLowerCase()}`);
-                const userInfoArr = res?.data?.map((item) => {
-                    return {
-                        label: `${item.name} | ${item.teacher_id || ''}`,
-                        id: item.id,
-                        teacher_id: item.student_id,
-                        // student_table_id: item.student_table_id
-                    };
-                });
-                setSearchOptionData(userInfoArr);
-            } else if (value?.length < 2) {
-                setSearchOptionData([]);
-            } else if (!value) {
-                setSearchOptionData([]);
-            }
-        } catch (error) { }
-    };
+//     const handleDebounce = async (value) => {
+//         try {
+//             if (value?.length >= 2) {
+//                 const res = await axios.get(`/api/teacher/search-teachers?search_type=${searchType}&search_value=${value?.toLowerCase()}`);
+//                 const userInfoArr = res?.data?.map((item) => {
+//                     return {
+//                         label: `${item.name} | ${item.teacher_id || ''}`,
+//                         id: item.id,
+//                         teacher_id: item.student_id,
+//                         // student_table_id: item.student_table_id
+//                     };
+//                 });
+//                 setSearchOptionData(userInfoArr);
+//             } else if (value?.length < 2) {
+//                 setSearchOptionData([]);
+//             } else if (!value) {
+//                 setSearchOptionData([]);
+//             }
+//         } catch (error) { }
+//     };
 
-    const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
-        setSearchValue(v);
-    };
+//     const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
+//         setSearchValue(v);
+//     };
 
-    const searchHandleUpdate = (event: ChangeEvent<HTMLInputElement>, v) => {
-        const subjects_ = values.subjects;
-        subjects_[index]['teacher'] = v;
-        setFieldValue('subjects', subjects_)
-        setSearchValue(v || null);
-    }
+//     const searchHandleUpdate = (event: ChangeEvent<HTMLInputElement>, v) => {
+//         const subjects_ = values.subjects;
+//         subjects_[index]['teacher'] = v;
+//         setFieldValue('subjects', subjects_)
+//         setSearchValue(v || null);
+//     }
 
-    return (
-        <AutoCompleteWrapperWithDebounce
-            disabled={disabled}
-            debounceTimeout={500}
-            handleDebounce={handleDebounce}
-            // @ts-ignore
-            searchHandleUpdate={searchHandleUpdate}
-            options={searchOptionData}
-            value={searchValue}
-            handleChange={searchHandleChange}
-            label="Search Teacher"
-            placeholder="Search Teacher"
-        />
-    )
-}
+//     return (
+//         <AutoCompleteWrapperWithDebounce
+//             disabled={disabled}
+//             debounceTimeout={500}
+//             handleDebounce={handleDebounce}
+//             // @ts-ignore
+//             searchHandleUpdate={searchHandleUpdate}
+//             options={searchOptionData}
+//             value={searchValue}
+//             handleChange={searchHandleChange}
+//             label="Search Teacher"
+//             placeholder="Search Teacher"
+//         />
+//     )
+// }
 
 export default Add;

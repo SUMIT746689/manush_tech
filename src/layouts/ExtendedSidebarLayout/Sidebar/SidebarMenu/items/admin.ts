@@ -142,7 +142,12 @@ const students: MenuItems[] = [
         icon: GradeIcon
       },
       {
-        name: 'Manage Student',
+        name: 'Registration Student',
+        link: '/management/students/registration',
+        icon: RecordVoiceOverIcon
+      },
+      {
+        name: 'Add Student',
         link: '/management/students',
         icon: RecordVoiceOverIcon
       },

@@ -281,7 +281,6 @@ const MultipleStudentPhotoUpload = () => {
     const formData = new FormData();
 
     // updated code end
-
     for (const fileObj of files) {
       try {
         const response = await fetch(fileObj.src);
@@ -293,7 +292,6 @@ const MultipleStudentPhotoUpload = () => {
         }
 
         const file = new File([blob], fileObj.name, { type: blob.type });
-
         formData.append(fileObj.studentId, file);
 
         Object.keys(fileObj).forEach((key) => {
@@ -331,9 +329,6 @@ const MultipleStudentPhotoUpload = () => {
 
     // updated code end
   }, 1000);
-
-  console.log('previousValues');
-  console.log(previousValues);
 
   return (
     <>
@@ -592,9 +587,9 @@ const MultipleStudentPhotoUpload = () => {
 };
 
 MultipleStudentPhotoUpload.getLayout = (page) => (
-  <Authenticated requiredPermissions={['multiple_student_photo_upload', 'multiple_student_photo_upload']}>
-    <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
-  </Authenticated>
+  // <Authenticated requiredPermissions={['multiple_student_photo_upload', 'multiple_student_photo_upload']}>
+  <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
+  // </Authenticated>
 );
 
 export default MultipleStudentPhotoUpload;

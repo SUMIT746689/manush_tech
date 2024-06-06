@@ -89,7 +89,7 @@ export default async function multiplePhotoUpoad(req, res, refresh_token) {
 
               // target user
               const targetUser = await prisma.student.findFirst({
-                where: { id: parseInt(data?.studentId) },
+                where: { student_information_id: parseInt(data?.studentId) },
                 include: {
                   student_info: true
                 }
@@ -114,7 +114,11 @@ export default async function multiplePhotoUpoad(req, res, refresh_token) {
               const filePath = path.join(process.cwd(), `${process.env.FILESFOLDER}`, 'studentsPhoto', `${photo_url}`);
 
               const res = await prisma.student.update({
-                where: { id: parseInt(data?.studentId) },
+                // old
+                //  where: { id: parseInt(data?.studentId) },
+                // update
+                where: { id: targetUser.id },
+
                 data: {
                   student_photo: personObj?.student_photo ? data.url : undefined,
                   guardian_photo: personObj?.guardian_photo ? data.url : undefined,

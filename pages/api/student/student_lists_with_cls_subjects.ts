@@ -8,46 +8,28 @@ const index = async (req, res, refresh_token, dcryptAcademicYear) => {
 
         switch (method) {
             case 'GET':
-                const query = {};
-
                 const { school_id } = refresh_token;
                 const { academic_year_id } = dcryptAcademicYear;
-                const { section_id } = req.query
+                const { section_ids } = req.query;
+                const parseSectionIds = section_ids.split(',').map((section) => {
+                    const parseSection = parseInt(section);
+                    if (!Number.isInteger(parseSection)) throw new Error('invalid section')
+                    return parseSection
+                })
 
                 const students = await prisma.student.findMany({
                     where: {
                         academic_year_id,
-                        section_id: parseInt(section_id),
+                        section_id: { in: parseSectionIds },
                         student_info: {
                             user: {
                                 deleted_at: null
                             },
                             school_id
                         }
-                        // student_info: {
-                        //     school_id: parseInt(req.query.school_id)
-                        // }
                     },
                     select: {
                         id: true,
-                        // student_information_id: true,
-                        // section_id: true,
-                        // student_photo: true,
-                        // section: {
-                        //     select: {
-                        //         id: true,
-                        //         name: true,
-                        //         class: {
-                        //             select: {
-                        //                 id: true,
-                        //                 name: true
-                        //             }
-                        //         }
-                        //     }
-                        // },
-                        // academic_year_id: true,
-                        // class_roll_no: true,
-                        // class_registration_no: true,
                         student_info: {
                             select: {
                                 first_name: true,
@@ -58,21 +40,6 @@ const index = async (req, res, refresh_token, dcryptAcademicYear) => {
                             }
                         },
                         subjects: true,
-                        // StudentClassSubjects: {
-                        //     select: {
-                        //         id: true,
-                        //         subject: true,
-                        //         teacher: {
-                        //             select: {
-                        //                 first_name: true
-                        //             }
-                        //         }
-                        //     }
-                        // }
-
-                        // guardian_name: true,
-                        // guardian_phone: true,
-                        // extra_section_id: true
                     }
                 })
                 res.status(200).json(students)

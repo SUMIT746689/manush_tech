@@ -159,7 +159,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
     const { showNotification } = useNotistick();
 
     const [page, setPage] = useState<number>(0);
-    const [limit, setLimit] = useState<number>(10);
+    const [limit, setLimit] = useState<number>(25);
     const [query, setQuery] = useState<string>('');
     const [filters, setFilters] = useState<Filters>({
         role: null
@@ -293,7 +293,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                             onRowsPerPageChange={handleLimitChange}
                             page={page}
                             rowsPerPage={limit}
-                            rowsPerPageOptions={[5, 10, 15]}
+                            rowsPerPageOptions={[25, 50, 75, 100]}
                         />
                     </Box>
                 )}

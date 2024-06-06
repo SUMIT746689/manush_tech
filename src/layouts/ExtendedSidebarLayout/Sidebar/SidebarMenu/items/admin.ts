@@ -122,6 +122,11 @@ const students: MenuItems[] = [
         icon: MenuBookIcon
       },
       {
+        name: 'Student Class Subjects',
+        link: '/management/student_class_subjects',
+        icon: MenuBookIcon
+      },
+      {
         name: ' Group',
         link: '/management/group',
         icon: GroupsIcon

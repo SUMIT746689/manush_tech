@@ -21,6 +21,7 @@ export default async function post(req, res, refresh_token) {
       }
       for (const i of months) {
         const fee = await prisma.fee.create({
+          // @ts-ignore
           data: {
             ...data,
             title: `${i.value} - ${title}`,
@@ -42,6 +43,7 @@ export default async function post(req, res, refresh_token) {
       }
     } else {
       const fee = await prisma.fee.create({
+        // @ts-ignore
         data
       });
       await prisma.voucher.create({

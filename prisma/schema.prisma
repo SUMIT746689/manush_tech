@@ -555,12 +555,13 @@ model StudentFee {
   collection_date   DateTime?
   on_time_discount  Int?
 
-  transaction         Transaction?    @relation(fields: [transaction_id], references: [id])
-  account             Accounts?       @relation(fields: [account_id], references: [id])
-  payment_method_list payment_method? @relation(fields: [payment_method_id], references: [id])
-  student             Student         @relation(fields: [student_id], references: [id])
-  fee                 Fee?            @relation(fields: [fee_id], references: [id])
-  collected_by_user   User?           @relation(fields: [collected_by], references: [id])
+  transaction              Transaction?              @relation(fields: [transaction_id], references: [id])
+  account                  Accounts?                 @relation(fields: [account_id], references: [id])
+  payment_method_list      payment_method?           @relation(fields: [payment_method_id], references: [id])
+  student                  Student                   @relation(fields: [student_id], references: [id])
+  fee                      Fee?                      @relation(fields: [fee_id], references: [id])
+  collected_by_user        User?                     @relation(fields: [collected_by], references: [id])
+  studentFeeWiseTeacherPay studentFeeWiseTeacherPay?
 
   @@map("student_fees")
 }
@@ -1695,4 +1696,19 @@ model tbl_schools_transactions {
   created_at DateTime @default(now())
 
   @@map("tbl_schools_transactions")
+}
+
+enum TeacherPayType {
+  percentage
+  flat
+}
+
+model studentFeeWiseTeacherPay {
+  id               Int            @id @default(autoincrement())
+  student_fee_id   Int            @unique
+  subject_id       Int
+  teacher_pay_type TeacherPayType
+  amount           Float
+
+  studentFee StudentFee? @relation(fields: [student_fee_id], references: [id])
 }

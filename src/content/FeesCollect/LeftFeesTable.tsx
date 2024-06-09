@@ -190,42 +190,35 @@ export default function LeftFeesTable({
           <TableCellWrapper align="center" width={10}>
             <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
           </TableCellWrapper>
-          <TableCellWrapper component="th" scope="row">
-            {row.head_title}
-          </TableCellWrapper>
-          <TableCellWrapper component="th" scope="row">
-            {row.title}
-          </TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">{row.head_title}</TableCellWrapper>
+          <TableCellWrapper component="th" scope="row"><Grid textTransform="capitalize">{row.title}</Grid></TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">{row.subject_name}</TableCellWrapper>
           <TableCellWrapper align="right">{row.amount}</TableCellWrapper>
           <TableCellWrapper align="right">{row.late_fee}</TableCellWrapper>
           <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
           <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
 
           <TableCellWrapper>
-            <TextFieldWrapper
-              pb={0}
-              disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
-              label="Amount"
-              name=""
-              type="number"
-              touched={undefined}
-              errors={undefined}
-              // value={currDiscount || ''}
-              value={currDiscount[row.feeId] || ''}
-              handleChange={(e) => {
-                const int_value = parseInt(e.target.value);
-                const value = Math.abs(int_value);
-                handleCurrDiscountChange(row.feeId, value);
-              }}
-              handleBlur={undefined}
-              inputProps={{
-                style: {
-                  px: 2,
-                  py: 2,
-                  fontSize: { xs: 10, sm: 11, md: 12 }
-                }
-              }}
-            />
+            <Grid >
+              <TextFieldWrapper
+                pb={0}
+                disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
+                label=""
+                name="type discount amount"
+                type="number"
+                touched={undefined}
+                errors={undefined}
+                // value={currDiscount || ''}
+                value={currDiscount[row.feeId] || ''}
+                handleChange={(e) => {
+                  const int_value = parseInt(e.target.value);
+                  const value = Math.abs(int_value);
+                  handleCurrDiscountChange(row.feeId, value);
+                }}
+                handleBlur={undefined}
+                inputProps={{ style: { px: 2, py: 2, fontSize: { xs: 10, sm: 11, md: 10 } } }}
+              />
+            </Grid>
           </TableCellWrapper>
           <TableCellWrapper align="right">
             <Grid pr={1}>{row.dueAmount}</Grid>
@@ -254,6 +247,7 @@ export default function LeftFeesTable({
             </TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Fees Head</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Fees</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Subject</TableHeaderCellWrapper>
             <TableHeaderCellWrapper align="right"> Amount</TableHeaderCellWrapper>
             <TableHeaderCellWrapper align="right"> Late Fee</TableHeaderCellWrapper>
             <TableHeaderCellWrapper align="right"> Prev. Discount</TableHeaderCellWrapper>
@@ -325,6 +319,7 @@ export default function LeftFeesTable({
               <TableFooterCellWrapper component="th" scope="row">
                 {' '}
               </TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">{' '}</TableFooterCellWrapper>
               <TableFooterCellWrapper component="th" scope="row">
                 {leftFeesTableTotalCalculation && 'Total'}
               </TableFooterCellWrapper>

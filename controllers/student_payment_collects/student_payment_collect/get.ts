@@ -82,7 +82,8 @@ export const get = async (req, res) => {
                     ]
                   },
                   include: {
-                    fees_head: true
+                    fees_head: true,
+                    subject: true
                   },
                   orderBy: { fees_month: 'asc' }
                 }

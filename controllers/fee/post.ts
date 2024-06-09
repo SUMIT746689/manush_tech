@@ -36,7 +36,7 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
 
     const resAlreadyCreatedFees = await prisma.fee.findMany({
       where: {
-        AND: [{ fees_head_id }, { academic_year_id }, { class_id: { in: class_ids } }, { fees_month: { in: months } }, { deleted_at: null }]
+        AND: [{ fees_head_id }, { academic_year_id }, { class_id: { in: class_ids } }, { fees_month: { in: months } }, { subject_id: subject_ids }, { deleted_at: null }]
       },
       select: { fees_month: true }
     });

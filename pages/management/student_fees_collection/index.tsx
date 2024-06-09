@@ -4,13 +4,11 @@ import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 import Footer from 'src/components/Footer';
 import { Button, Card, Grid } from '@mui/material';
-import type { Project } from 'src/models/project';
 import Results from 'src/content/Management/StudentFeesCollection/Results';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import PaymentInvoice from '@/content/Management/StudentFeesCollection/PaymentInvoice';
 import DesignPaymentInvoice from '@/content/Management/StudentFeesCollection/DesignPaymentInvoice';
 import { useReactToPrint } from 'react-to-print';
-import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import LeftBox from '@/content/FeesCollect/LeftBox';
@@ -80,7 +78,9 @@ function Managementschools() {
             label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
             id: item.id,
             student_id: item.student_id,
-            student_table_id: item.student_table_id
+            student_table_id: item.student_table_id,
+            subject_ids: item.subject_ids,
+            subject_names: item.subject_names
           };
         });
         setSearchOptionData(userInfoArr);
@@ -89,7 +89,7 @@ function Managementschools() {
       } else if (!value) {
         setSearchOptionData([]);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
@@ -106,7 +106,7 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
-
+    console.log({ v })
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
 
@@ -149,7 +149,7 @@ function Managementschools() {
       currDiscount: 0,
       dueAmount: 0
     };
-
+    console.log({ data })
     // fees array
     let feesData = data?.fees?.map((item) => {
       const last_trnsaction_time = new Date(item?.last_payment_date).getTime();
@@ -193,6 +193,7 @@ function Managementschools() {
         feeId: item.id,
         title: item.title,
         head_title: item?.fees_head?.title,
+        subject_name: item?.subject?.name,
         amount: item.amount ? item.amount : 0,
         late_fee: late_fee_value,
         paidAmount: paid_amount_value,
@@ -304,9 +305,17 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
-
+    console.log({ searchValue })
     if (student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${student_id?.toLowerCase()}`);
+      console.log({ res })
+      // const 
+      if (
+        !res?.data[0]?.subject_ids ||
+        res?.data[0]?.subject_ids.split(',').map(Number)
+      )
+        return showNotification('student subjects not founds', 'error')
+
       if (res?.data?.length > 0) {
         const response = await axios.get(
           `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
@@ -322,6 +331,7 @@ function Managementschools() {
         return showNotification('student_id not founds', 'error');
       }
     } else if (searchValue?.id && academicYear?.id) {
+      if (!searchValue?.subject_ids || searchValue?.subject_ids.split(',').map(Number)) return showNotification('student subjects not founds', 'error')
       const res = await axios.get(
         `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
       );
@@ -330,7 +340,7 @@ function Managementschools() {
       leftFeesTableColumnData(res?.data?.data);
     }
   };
-
+  console.log({ leftFeesTableColumnData })
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -719,7 +729,7 @@ function Managementschools() {
           }}
           columnGap={1}
           gap={{ xs: 1 }}
-          // minHeight="fit-content"
+        // minHeight="fit-content"
         >
           <LeftFeesTable
             onTimeDiscountArr={onTimeDiscountArr}

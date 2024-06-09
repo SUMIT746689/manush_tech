@@ -40,7 +40,8 @@ const index = async (req, res, refresh_token, dcryptAcademicYear) => {
                             }
                         },
                         subjects: true,
-                    }
+                    },
+                    orderBy: { id: "desc" }
                 })
                 res.status(200).json(students)
                 break;

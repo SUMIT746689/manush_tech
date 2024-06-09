@@ -17,7 +17,7 @@ import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
 import useNotistick from '@/hooks/useNotistick';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 
 function ManagementClasses() {
   const [students, setStudents] = useContext<any[]>(Students);

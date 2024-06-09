@@ -216,7 +216,8 @@ function Add({ refetch, student_id, isOpen, selectCls, setAddSubject }) {
 
                                 </DialogContent>
                                 <DialogActionWrapper
-                                    title="Fees"
+                                    titleFront="Add"
+                                    title="Subject"
                                     errors={errors}
                                     editData={false}
                                     handleCreateClassClose={handleCreateClassClose}

@@ -39,6 +39,7 @@ const AdmitCard = () => {
   const [displayStudent, setDisplayStudent] = useState<Array<any>>([]);
   const [showPrint, setShowPrint] = useState<Boolean>(false);
   const [schoolInformation, setSchoolInformation] = useState(null);
+
   const { user } = useAuth();
   const printPageRef = useRef();
 
@@ -60,6 +61,21 @@ const AdmitCard = () => {
 
   // fetch exam related data code start
 
+  const studentList = (student) => {
+    let studentInfo = '';
+
+    if (student?.student_info?.first_name) {
+      studentInfo += student?.student_info?.first_name;
+    }
+    if (student?.class_roll_no) {
+      studentInfo += '|' + student?.class_roll_no;
+    }
+    if (student?.student_info?.student_id) {
+      studentInfo += '|' + student?.student_info?.student_id;
+    }
+
+    return studentInfo;
+  };
   // fetch student related data code start
   const getStudentInfo = (section, exam) => {
     axios
@@ -68,7 +84,22 @@ const AdmitCard = () => {
         `/api/student/?section_id=${section?.id}&academic_year_id=${academicYear?.id}`
       )
       .then((res) => {
-        setStudentInfo(res?.data);
+        const studentListArr = res?.data?.map((i) => {
+          return {
+            label: studentList(i),
+            id: i.id,
+            name: i?.student_info?.first_name
+          };
+        });
+
+        setStudentInfo([
+          {
+            label: 'Select all',
+            id: null,
+            name: ''
+          },
+          ...studentListArr
+        ]);
       })
       .catch((err) => console.log(err));
   };
@@ -190,6 +221,25 @@ const AdmitCard = () => {
       showNotification('Please select an exam before proceeding.', 'error');
       return;
     }
+    if (!selectedStudent) {
+      showNotification('Please select an student before proceeding.', 'error');
+      return;
+    }
+
+    // let groupStudentArr = [selectedStudent?.id];
+
+    // if (!selectedStudent?.id) {
+    //   groupStudentArr = studentInfo
+    //     ?.map((item) => {
+    //       return item.id;
+    //     })
+    //     ?.filter((item) => {
+    //       return item !== null;
+    //     });
+    // }
+
+    console.log('Hello studentinfor is here ');
+    console.log(studentInfo);
 
     if (selectedStudent?.id && studentInfo.length > 0) {
       const singleUser = studentInfo?.find((item) => item?.id === selectedStudent?.id);
@@ -198,7 +248,7 @@ const AdmitCard = () => {
         setDisplayStudent([{ ...singleUser }]);
         setShowPrint(true);
       }
-    } else if (!selectedStudent && studentInfo.length > 0) {
+    } else if (!selectedStudent?.id && studentInfo.length > 0) {
       setDisplayStudent([...studentInfo]);
       setShowPrint(true);
     } else {
@@ -222,21 +272,6 @@ const AdmitCard = () => {
       fullName += student?.student_info?.last_name + ' ';
     }
     return fullName;
-  };
-  const studentList = (student) => {
-    let studentInfo = '';
-
-    if (student?.student_info?.first_name) {
-      studentInfo += student?.student_info?.first_name;
-    }
-    if (student?.class_roll_no) {
-      studentInfo += '|' + student?.class_roll_no;
-    }
-    if (student?.student_info?.student_id) {
-      studentInfo += '|' + student?.student_info?.student_id;
-    }
-
-    return studentInfo;
   };
 
   // school logo
@@ -374,15 +409,7 @@ const AdmitCard = () => {
                 }}
               >
                 <AutoCompleteWrapper
-                  options={
-                    studentInfo?.map((i) => {
-                      return {
-                        label: studentList(i),
-                        id: i.id,
-                        name: i?.student_info?.first_name
-                      };
-                    }) || []
-                  }
+                  options={studentInfo || []}
                   value={selectedStudent}
                   label="Select Student"
                   placeholder="select a student"

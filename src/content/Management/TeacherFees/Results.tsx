@@ -1,4 +1,4 @@
-import { FC, ChangeEvent, useState, ReactElement, Ref, forwardRef } from 'react';
+import React, { FC, ChangeEvent, useState, ReactElement, Ref, forwardRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Avatar,
@@ -139,7 +139,8 @@ const applyPagination = (schools: Project[], page: number, limit: number): Proje
 
 const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetchData }) => {
   const [selectedItems, setSelectedschools] = useState<string[]>([]);
-  const [openModal, setOpenModal] = useState<number | null>(null);
+  const [teacherId, setTeacherId] = useState<number | null>(null);
+  const [schoolId, setSchoolId] = useState<number | null>(null);
   const { t }: { t: any } = useTranslation();
   const { showNotification } = useNotistick();
 
@@ -149,6 +150,10 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+
+  useEffect(() => {
+    reFetchData();
+  }, [teacherId]);
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     event.persist();
@@ -190,9 +195,28 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
     }
   };
 
+  const handleSubjectRemove = async (e, id) => {
+    try {
+      const res = await axios.patch('/api/teacher/teacher_fees', {
+        id: id,
+        deleted_at: new Date()
+      });
+
+      console.log('Hello response ');
+      console.log(res);
+
+      if (res) {
+        reFetchData();
+        showNotification(`Teacher fees deleted successfully!`, 'success');
+      }
+    } catch (err) {
+      // showNotification(`${err}`, 'error');
+    }
+  };
+
   return (
     <>
-      {openModal && <Add isOpen={true} setOpenModal={setOpenModal} />}
+      {teacherId && <Add reFetchData isOpen={true} setTeacherId={setTeacherId} teacherId={teacherId} schoolId={schoolId} />}
       <Card
         sx={{
           p: 1,
@@ -265,10 +289,10 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                         <TableBodyCellWrapper>{[i?.first_name, i?.middle_name, i?.last_name].join(' ')}</TableBodyCellWrapper>
                         <TableBodyCellWrapper>
                           <Grid display="flex" gap={0.5}>
-                            {i?.StudentClassSubjects?.map((list) => (
+                            {i?.teacherSalaries?.map((list) => (
                               <Grid key={list.id} sx={{ border: '1px solid gray', borderRadius: 0.25, px: 0.5, py: 0.25 }}>
                                 {list.subject.name}{' '}
-                                <button onClick={() => {}}>
+                                <button onClick={(e) => handleSubjectRemove(e, list?.id)}>
                                   <ClearIcon sx={{ cursor: 'pointer', fontSize: 13, ':hover': { bgcolor: 'red', color: 'white' } }} />
                                 </button>
                               </Grid>
@@ -282,7 +306,8 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                               sx={ActionStyle}
                               // @ts-ignore
                               onClick={() => {
-                                setOpenModal(parseInt(i?.id));
+                                setTeacherId(parseInt(i?.id));
+                                setSchoolId(i?.school_id);
                               }}
                             >
                               <AddIcon />

@@ -1,36 +1,28 @@
-import {
-    ChangeEvent,
-    useState,
-    ReactElement,
-    Ref,
-    forwardRef,
-    useEffect,
-    FC,
-} from 'react';
+import { ChangeEvent, useState, ReactElement, Ref, forwardRef, useEffect, FC } from 'react';
 
 import PropTypes from 'prop-types';
 import {
-    Avatar,
-    Box,
-    Card,
-    Checkbox,
-    Slide,
-    Divider,
-    Tooltip,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableContainer,
-    TableRow,
-    Button,
-    Typography,
-    Dialog,
-    styled,
-    TablePagination,
-    Grid,
-    Switch,
+  Avatar,
+  Box,
+  Card,
+  Checkbox,
+  Slide,
+  Divider,
+  Tooltip,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableContainer,
+  TableRow,
+  Button,
+  Typography,
+  Dialog,
+  styled,
+  TablePagination,
+  Grid,
+  Switch
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -55,7 +47,7 @@ import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import ClearIcon from '@mui/icons-material/Clear';
 
 const DialogWrapper = styled(Dialog)(
-    () => `
+  () => `
         .MuiDialog-paper {
           overflow: visible;
         }
@@ -63,7 +55,7 @@ const DialogWrapper = styled(Dialog)(
 );
 
 const AvatarError = styled(Avatar)(
-    ({ theme }) => `
+  ({ theme }) => `
         background-color: ${theme.colors.error.lighter};
         color: ${theme.colors.error.main};
         width: ${theme.spacing(12)};
@@ -76,7 +68,7 @@ const AvatarError = styled(Avatar)(
 );
 
 const ButtonError = styled(Button)(
-    ({ theme }) => `
+  ({ theme }) => `
        background: ${theme.colors.error.main};
        color: ${theme.palette.error.contrastText};
   
@@ -87,76 +79,69 @@ const ButtonError = styled(Button)(
 );
 
 const ActionStyle: object = {
-    height: '15px',
-    width: '15px',
-    padding: 0.5,
-}
+  height: '15px',
+  width: '15px',
+  padding: 0.5
+};
 interface Filters {
-    role?: string;
+  role?: string;
 }
 
-const Transition = forwardRef(function Transition(
-    props: TransitionProps & { children: ReactElement<any, any> },
-    ref: Ref<unknown>
-) {
-    return <Slide direction="down" ref={ref} {...props} />;
+const Transition = forwardRef(function Transition(props: TransitionProps & { children: ReactElement<any, any> }, ref: Ref<unknown>) {
+  return <Slide direction="down" ref={ref} {...props} />;
 });
 
-const applyFilters = (
-    users,
-    query,
-    filters
-) => {
-    return users?.filter((user) => {
-        let matches = true;
+const applyFilters = (users, query, filters) => {
+  return users?.filter((user) => {
+    let matches = true;
 
-        if (query) {
-            const properties = ['first_name', 'class_roll_no'];
-            let containsQuery = false;
+    if (query) {
+      const properties = ['first_name', 'class_roll_no'];
+      let containsQuery = false;
 
-            properties.forEach((property) => {
-                if (user[property]?.toLowerCase().includes(query.toLowerCase())) {
-                    containsQuery = true;
-                }
-                if (user?.student_info[property]?.toLowerCase().includes(query.toLowerCase())) {
-                    containsQuery = true;
-                }
-            });
-
-            if (filters.role && user.role !== filters.role) {
-                matches = false;
-            }
-
-            if (!containsQuery) {
-                matches = false;
-            }
+      properties.forEach((property) => {
+        if (user[property]?.toLowerCase().includes(query.toLowerCase())) {
+          containsQuery = true;
         }
+        if (user?.student_info[property]?.toLowerCase().includes(query.toLowerCase())) {
+          containsQuery = true;
+        }
+      });
 
-        Object.keys(filters).forEach((key) => {
-            const value = filters[key];
+      if (filters.role && user.role !== filters.role) {
+        matches = false;
+      }
 
-            if (value && user[key] !== value) {
-                matches = false;
-            }
-        });
+      if (!containsQuery) {
+        matches = false;
+      }
+    }
 
-        return matches;
+    Object.keys(filters).forEach((key) => {
+      const value = filters[key];
+
+      if (value && user[key] !== value) {
+        matches = false;
+      }
     });
+
+    return matches;
+  });
 };
 
-const applyPagination = (
-    users: User[],
-    page: number,
-    limit: number
-): User[] => {
-    return users?.slice(page * limit, page * limit + limit);
+const applyPagination = (users: User[], page: number, limit: number): User[] => {
+  return users?.slice(page * limit, page * limit + limit);
 };
 
-const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCard: any, fee: any[], selectedClass: any, selectedSection: any }> = ({ students, refetch, selectedClass, selectedSection }) => {
-
-    const [selectedItems, setSelectedUsers] = useState([]);
-    const { t }: { t: any } = useTranslation();
-    const { showNotification } = useNotistick();
+const Results: FC<{ students: any[]; refetch: () => void; discount: any[]; idCard: any; fee: any[]; selectedClass: any; selectedSection: any }> = ({
+  students,
+  refetch,
+  selectedClass,
+  selectedSection
+}) => {
+  const [selectedItems, setSelectedUsers] = useState([]);
+  const { t }: { t: any } = useTranslation();
+  const { showNotification } = useNotistick();
 
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(25);
@@ -165,45 +150,36 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         role: null
     });
 
-    const handlePageChange = (_event: any, newPage: number): void => {
-        setPage(newPage);
-    };
-    const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
-        setLimit(parseInt(event.target.value));
-    };
+  const handlePageChange = (_event: any, newPage: number): void => {
+    setPage(newPage);
+  };
+  const handleLimitChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setLimit(parseInt(event.target.value));
+  };
 
+  const handleSelectAllUsers = (event: ChangeEvent<HTMLInputElement>): void => {
+    setSelectedUsers(event.target.checked ? students.map((user) => user.id) : []);
+  };
 
-    const handleSelectAllUsers = (event: ChangeEvent<HTMLInputElement>): void => {
-        setSelectedUsers(event.target.checked ? students.map((user) => user.id) : []);
-    };
+  const handleSelectOneUser = (_event: ChangeEvent<HTMLInputElement>, userId: string): void => {
+    if (!selectedItems.includes(userId)) {
+      setSelectedUsers((prevSelected) => [...prevSelected, userId]);
+    } else {
+      setSelectedUsers((prevSelected) => prevSelected.filter((id) => id !== userId));
+    }
+  };
 
-    const handleSelectOneUser = (
-        _event: ChangeEvent<HTMLInputElement>,
-        userId: string
-    ): void => {
-        if (!selectedItems.includes(userId)) {
-            setSelectedUsers((prevSelected) => [...prevSelected, userId]);
-        } else {
-            setSelectedUsers((prevSelected) =>
-                prevSelected.filter((id) => id !== userId)
-            );
-        }
-    };
+  const filteredClasses = applyFilters(students, query, filters);
+  const paginatedClasses = applyPagination(filteredClasses, page, limit);
+  const selectedBulkActions = selectedItems.length > 0;
+  const selectedSomeUsers = selectedItems.length > 0 && selectedItems.length < students.length;
+  const selectedAllUsers = selectedItems.length === students.length;
 
-    const filteredClasses = applyFilters(students, query, filters);
-    const paginatedClasses = applyPagination(filteredClasses, page, limit);
-    const selectedBulkActions = selectedItems.length > 0;
-    const selectedSomeUsers =
-        selectedItems.length > 0 && selectedItems.length < students.length;
-    const selectedAllUsers = selectedItems.length === students.length;
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
 
-
-    const [openConfirmDelete, setOpenConfirmDelete] = useState(null);
-
-
-    const closeConfirmDelete = () => {
-        setOpenConfirmDelete(null);
-    };
+  const closeConfirmDelete = () => {
+    setOpenConfirmDelete(null);
+  };
 
     const handleDeleteCompleted = () => {
         if (!openConfirmDelete?.student_id || !openConfirmDelete.subject_id) return showNotification("student id or subject id not founds", "error");
@@ -244,10 +220,10 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         }
     };
 
-    useEffect(() => {
-        const getData = setTimeout(() => {
-            handleFetch();
-        }, 400);
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      handleFetch();
+    }, 400);
 
         return () => clearTimeout(getData);
     }, [searchValue]);
@@ -298,47 +274,47 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                 )}
                 <Divider />
 
-                {paginatedClasses.length === 0 ? (
-                    <>
-                        <Typography
-                            sx={{
-                                py: 10
-                            }}
-                            variant="h3"
-                            fontWeight="normal"
-                            color="text.secondary"
-                            align="center"
-                        >
-                            {t("We couldn't find any students matching your search criteria")}
-                        </Typography>
-                    </>
-                ) : (
-                    <TableContainer>
-                        <Table size='small'>
-                            <TableHead>
-                                <TableRow>
-                                    {/* <TableCell padding="checkbox">
+        {paginatedClasses.length === 0 ? (
+          <>
+            <Typography
+              sx={{
+                py: 10
+              }}
+              variant="h3"
+              fontWeight="normal"
+              color="text.secondary"
+              align="center"
+            >
+              {t("We couldn't find any students matching your search criteria")}
+            </Typography>
+          </>
+        ) : (
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={selectedAllUsers}
                         indeterminate={selectedSomeUsers}
                         onChange={handleSelectAllUsers}
                       />
                     </TableCell> */}
-                                    <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
-                                    <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
-                                    <TableHeaderCellWrapper >{t('Selected Subjects')}</TableHeaderCellWrapper>
-                                    <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
-                                    <TableHeaderCellWrapper >{t('Section')}</TableHeaderCellWrapper>
-                                    <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {paginatedClasses.map((i) => {
-                                    const isUserSelected = selectedItems.includes(i.id);
+                  <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Selected Subjects')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Section')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedClasses.map((i) => {
+                  const isUserSelected = selectedItems.includes(i.id);
 
-                                    return (
-                                        <TableRow hover key={i.id} selected={isUserSelected}>
-                                            {/* <TableBodyCellWrapper padding="checkbox">
+                  return (
+                    <TableRow hover key={i.id} selected={isUserSelected}>
+                      {/* <TableBodyCellWrapper padding="checkbox">
                                             <Checkbox
                                                 checked={isUserSelected}
                                                 onChange={(event) =>
@@ -431,41 +407,41 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                         ?
                     </Typography>
 
-                    <Box>
-                        <Button
-                            variant="text"
-                            size="large"
-                            sx={{
-                                mx: 1
-                            }}
-                            onClick={closeConfirmDelete}
-                        >
-                            {t('Cancel')}
-                        </Button>
-                        <ButtonError
-                            onClick={handleDeleteCompleted}
-                            size="large"
-                            sx={{
-                                mx: 1,
-                                px: 3
-                            }}
-                            variant="contained"
-                        >
-                            {t('Delete')}
-                        </ButtonError>
-                    </Box>
-                </Box>
-            </DialogWrapper>
-        </>
-    );
+          <Box>
+            <Button
+              variant="text"
+              size="large"
+              sx={{
+                mx: 1
+              }}
+              onClick={closeConfirmDelete}
+            >
+              {t('Cancel')}
+            </Button>
+            <ButtonError
+              onClick={handleDeleteCompleted}
+              size="large"
+              sx={{
+                mx: 1,
+                px: 3
+              }}
+              variant="contained"
+            >
+              {t('Delete')}
+            </ButtonError>
+          </Box>
+        </Box>
+      </DialogWrapper>
+    </>
+  );
 };
 
 Results.propTypes = {
-    students: PropTypes.array.isRequired
+  students: PropTypes.array.isRequired
 };
 
 Results.defaultProps = {
-    students: []
+  students: []
 };
 
 export default Results;

@@ -2,7 +2,6 @@ import Head from 'next/head';
 import { Authenticated } from 'src/components/Authenticated';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Grid, Typography } from '@mui/material';
-import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { useClientFetch } from 'src/hooks/useClientFetch';
@@ -20,8 +19,9 @@ import Paper from '@mui/material/Paper';
 import Image from 'next/image';
 import { getFile } from '@/utils/utilitY-functions';
 import { useReactToPrint } from 'react-to-print';
-import { Translate } from '@mui/icons-material';
 import useNotistick from '@/hooks/useNotistick';
+import PrintAdmin from './PrintAdmin';
+import { userName } from './PrintAdmin';
 
 const AdmitCard = () => {
   const { showNotification } = useNotistick();
@@ -39,6 +39,8 @@ const AdmitCard = () => {
   const [displayStudent, setDisplayStudent] = useState<Array<any>>([]);
   const [showPrint, setShowPrint] = useState<Boolean>(false);
   const [schoolInformation, setSchoolInformation] = useState(null);
+  const [studentInfoOption, setStudentInfoOption] = useState<Array<any>>([]);
+
   const { user } = useAuth();
   const printPageRef = useRef();
 
@@ -60,15 +62,44 @@ const AdmitCard = () => {
 
   // fetch exam related data code start
 
+  const studentList = (student) => {
+    let studentInfo = '';
+
+    if (student?.student_info?.first_name) {
+      studentInfo += student?.student_info?.first_name;
+    }
+    if (student?.class_roll_no) {
+      studentInfo += '|' + student?.class_roll_no;
+    }
+    if (student?.student_info?.student_id) {
+      studentInfo += '|' + student?.student_info?.student_id;
+    }
+
+    return studentInfo;
+  };
   // fetch student related data code start
   const getStudentInfo = (section, exam) => {
     axios
-      .get(
-        // `/api/student/with-exam-information?section_id=${section?.id}&academic_year_id=${academicYear?.id}&class_id=${selectedClass?.id}&exam_id=${exam?.id}`
-        `/api/student/?section_id=${section?.id}&academic_year_id=${academicYear?.id}`
-      )
+      .get(`/api/student/?section_id=${section?.id}&academic_year_id=${academicYear?.id}`)
       .then((res) => {
+        const studentListArr = res?.data?.map((i) => {
+          return {
+            label: studentList(i),
+            id: i.id,
+            name: i?.student_info?.first_name
+          };
+        });
+
         setStudentInfo(res?.data);
+
+        setStudentInfoOption([
+          {
+            label: 'Select all',
+            id: null,
+            name: ''
+          },
+          ...studentListArr
+        ]);
       })
       .catch((err) => console.log(err));
   };
@@ -77,11 +108,9 @@ const AdmitCard = () => {
   const handleExamList = (event: ChangeEvent<HTMLInputElement>, newValue) => {
     if (newValue) {
       setSelectedExam(newValue);
-      // call student api here
       getStudentInfo(selectedSection, newValue);
     } else {
-      setStudentInfo([]);
-      // setExams([]);
+      setStudentInfoOption([]);
       setSelectedExam(null);
       setSelectedStudent(null);
     }
@@ -109,11 +138,10 @@ const AdmitCard = () => {
       }
     } else {
       setSections([]);
-      // setStudents([]);
       setSelectedSection(null);
       setExams([]);
       setSelectedExam(null);
-      setStudentInfo([]);
+      setStudentInfoOption([]);
       setSelectedStudent(null);
     }
   };
@@ -134,13 +162,13 @@ const AdmitCard = () => {
           })
         );
       } else {
-        setStudentInfo([]);
+        setStudentInfoOption([]);
         setExams([]);
         setSelectedExam(null);
         setSelectedStudent(null);
       }
     } else {
-      setStudentInfo([]);
+      setStudentInfoOption([]);
       setExams([]);
       setSelectedExam(null);
       setSelectedStudent(null);
@@ -151,10 +179,6 @@ const AdmitCard = () => {
     // setSelectedStudent
 
     if (newValue) {
-      // setSelectedStudent({
-      //   label: newValue?.name,
-      //   id: newValue?.id
-      // });
       setSelectedStudent(newValue);
     } else {
       setSelectedStudent(null);
@@ -190,6 +214,10 @@ const AdmitCard = () => {
       showNotification('Please select an exam before proceeding.', 'error');
       return;
     }
+    if (!selectedStudent) {
+      showNotification('Please select an student before proceeding.', 'error');
+      return;
+    }
 
     if (selectedStudent?.id && studentInfo.length > 0) {
       const singleUser = studentInfo?.find((item) => item?.id === selectedStudent?.id);
@@ -198,7 +226,7 @@ const AdmitCard = () => {
         setDisplayStudent([{ ...singleUser }]);
         setShowPrint(true);
       }
-    } else if (!selectedStudent && studentInfo.length > 0) {
+    } else if (!selectedStudent?.id && studentInfo.length > 0) {
       setDisplayStudent([...studentInfo]);
       setShowPrint(true);
     } else {
@@ -209,36 +237,6 @@ const AdmitCard = () => {
     }
   }, 1000);
 
-  const userName = (student) => {
-    let fullName = '';
-
-    if (student?.student_info?.first_name) {
-      fullName += student?.student_info?.first_name + ' ';
-    }
-    if (student?.student_info?.middle_name) {
-      fullName += student?.student_info?.middle_name + ' ';
-    }
-    if (student?.student_info?.last_name) {
-      fullName += student?.student_info?.last_name + ' ';
-    }
-    return fullName;
-  };
-  const studentList = (student) => {
-    let studentInfo = '';
-
-    if (student?.student_info?.first_name) {
-      studentInfo += student?.student_info?.first_name;
-    }
-    if (student?.class_roll_no) {
-      studentInfo += '|' + student?.class_roll_no;
-    }
-    if (student?.student_info?.student_id) {
-      studentInfo += '|' + student?.student_info?.student_id;
-    }
-
-    return studentInfo;
-  };
-
   // school logo
   useEffect(() => {
     axios
@@ -248,10 +246,6 @@ const AdmitCard = () => {
       })
       .catch((err) => console.log(err));
   }, []);
-
-  // const isEmptyObject = (obj) => {
-  //   return Object.entries(obj).length === 0;
-  // };
 
   const handleClickPrint = (event: ChangeEvent<HTMLInputElement>, newValue) => {
     if (showPrint && displayStudent?.length > 0) {
@@ -267,31 +261,15 @@ const AdmitCard = () => {
       </Head>
 
       {/* searching part code start */}
-      <Grid px={4} mt={3} display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} mx={1} minHeight="fit-content">
+      <Grid mt={3} display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} mx={1} minHeight="fit-content">
         {/* split your code start */}
         <Grid
           sx={{
-            borderRadius: 10,
             overflow: 'hidden',
-            //border: (themes) => `1px dashed ${themes.colors.primary.dark}`,
             backgroundColor: '#fff'
           }}
         >
-          {/* <Grid
-            sx={{
-              borderRadious: 0,
-              background: (themes) => themes.colors.primary.dark,
-              py: 1,
-              px: 1,
-              color: 'white',
-              fontWeight: 700,
-              textAlign: 'left'
-            }}
-          >
-            Search
-          </Grid> */}
-
-          <Grid px={2} pt="9px">
+          <Grid pt="9px" px={2}>
             <Grid
               sx={{
                 display: 'flex',
@@ -305,7 +283,11 @@ const AdmitCard = () => {
               {/* Class field */}
               <Grid
                 sx={{
-                  flexBasis: '15%',
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '15%'
+                  },
                   flexGrow: 1
                 }}
               >
@@ -329,7 +311,11 @@ const AdmitCard = () => {
               {/* Section field */}
               <Grid
                 sx={{
-                  flexBasis: '15%',
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '15%'
+                  },
                   flexGrow: 1
                 }}
               >
@@ -344,21 +330,16 @@ const AdmitCard = () => {
               {/* Exam field */}
               <Grid
                 sx={{
-                  flexBasis: '15%',
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '15%'
+                  },
                   flexGrow: 1
                 }}
               >
                 <AutoCompleteWrapper
-                  options={
-                    exams
-                    // exams?.map((i) => {
-                    //   return {
-                    //     label: i?.title,
-                    //     id: i?.section_id,
-                    //     section: i?.section?.has_section
-                    //   };
-                    // }) || []
-                  }
+                  options={exams}
                   value={selectedExam}
                   label="Select Exam"
                   placeholder="select an exam"
@@ -369,20 +350,16 @@ const AdmitCard = () => {
               {/* Student list */}
               <Grid
                 sx={{
-                  flexBasis: '15%',
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '15%'
+                  },
                   flexGrow: 1
                 }}
               >
                 <AutoCompleteWrapper
-                  options={
-                    studentInfo?.map((i) => {
-                      return {
-                        label: studentList(i),
-                        id: i.id,
-                        name: i?.student_info?.first_name
-                      };
-                    }) || []
-                  }
+                  options={studentInfoOption || []}
                   value={selectedStudent}
                   label="Select Student"
                   placeholder="select a student"
@@ -392,7 +369,11 @@ const AdmitCard = () => {
               {/* Search button */}
               <Grid
                 sx={{
-                  flexBasis: '15%',
+                  flexBasis: {
+                    xs: '100%',
+                    sm: '40%',
+                    md: '15%'
+                  },
                   flexGrow: 1,
                   position: 'relative',
                   display: 'flex',
@@ -428,26 +409,33 @@ const AdmitCard = () => {
       {/* searching part code end */}
 
       {/* Admit card design code part start */}
+      <Grid sx={{ display: 'none' }}>
+        <Grid ref={printPageRef}>
+          <PrintAdmin displayStudent={displayStudent} schoolInformation={schoolInformation} user={user} selectedExam={selectedExam} />
+        </Grid>
+      </Grid>
 
       <Grid
         mx={1}
         px={4}
         minHeight="fit-content"
+        // maxHeight={}
         mt={1}
         sx={{
           backgroundColor: '#fff',
-          position: 'relative',
+          // position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          gap: '4vh',
-          mt: '10px'
+          gap: '10px',
+          mt: '10px',
+          overflowX: 'auto',
+          maxWidth: { xs: '100vw' }
           // py: '4vh'
         }}
-        ref={printPageRef}
       >
         {displayStudent?.map((item) => {
           return (
-            <Grid sx={{ border: '7px solid #f50519', height: '44vh', my: '1vh' }}>
+            <Grid sx={{ border: '7px solid #f50519', height: 'fit-content', my: '10px', minWidth: 700 }}>
               <Grid
                 sx={{
                   border: '7px solid #03fc13',
@@ -614,6 +602,7 @@ const AdmitCard = () => {
           );
         })}
       </Grid>
+
       {/* Admit Card desing code part end */}
     </>
   );

@@ -291,7 +291,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                           <Grid display="flex" gap={0.5}>
                             {i?.teacherSalaries?.map((list) => (
                               <Grid key={list.id} sx={{ border: '1px solid gray', borderRadius: 0.25, px: 0.5, py: 0.25 }}>
-                                {list.subject.name}{' '}
+                                {`${list?.class?.name} | ${list?.section?.name} | ${list?.subject?.name}`}
                                 <button onClick={(e) => handleSubjectRemove(e, list?.id)}>
                                   <ClearIcon sx={{ cursor: 'pointer', fontSize: 13, ':hover': { bgcolor: 'red', color: 'white' } }} />
                                 </button>

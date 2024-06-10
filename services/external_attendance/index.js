@@ -17,12 +17,13 @@ const main = async () => {
                     select: {
                         name: true
                     }
-                }
+                },
+                school_id: true
             }
         });
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
-            const { external_api_info, school } = singleResp;
+            const { external_api_info, school, school_id } = singleResp;
             const { url_params } = external_api_info || {};
 
             const date = new Date(Date.now() - 60000 * 3);
@@ -74,11 +75,15 @@ const main = async () => {
             data?.log.forEach(async attendance_stat => {
                 const { registration_id, user_name, access_id, unit_id, card, access_time, access_date } = attendance_stat;
 
+                // save attendence files
+                prisma.attendence_info.create({data:{ body:attendance_stat, school_id}});
+
+                // find student
                 const datas = await prisma.user.findFirst({
                     where: {
                         AND: [
-                            { username: user_name },
-                            { school: { name: { equals: school?.name } } }
+                            {   },
+                            { school_id }
                         ],
                     },
                     select: {
@@ -141,6 +146,30 @@ const main = async () => {
     }
 }
 
-setInterval(() => {
+// setInterval(() => {
 main();
-}, 60000 * 2)
+// }, 60000 * 2)
+
+
+
+
+// for test
+ 
+(async () => {
+    const date = new Date(Date.now() - 800000 * 3);
+    const today = date.toLocaleDateString('en-CA');
+    const start_time = date.toLocaleTimeString('en-US', { hour12: false });
+    console.log({ today, start_time })
+    const smsBody = {
+        operation: "fetch_log",
+        auth_user: "TUAMS",
+        auth_code: "8c3dwtsz1r2e8y5y5r4cj3qcie4nit3",
+        start_date: today,
+        end_date: today,
+        start_time: "03:59:59",
+        end_time: "23:59:59"
+    }
+    const { data } = await axios.post("https://rumytechnologies.com/rams/json_api", smsBody);
+
+    console.log(data)
+})()

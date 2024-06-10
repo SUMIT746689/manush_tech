@@ -113,7 +113,10 @@ const index = async (req, res) => {
                 }
 
                 body.map((attendance) => {
+                    // save attendence files
+
                     const { userID, schoolID, timestamp, status, machineID } = attendance || {};
+                    if (schoolID) prisma.attendence_info.create({ data: { body: attendance, school_id: schoolID } });
                     if (!userID || !schoolID || !timestamp || !status || !machineID) return logFile.error(`for creating attendance_table_queue missing required fields`);
 
                     prisma.tbl_attendance_queue.create({

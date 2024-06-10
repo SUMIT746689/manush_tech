@@ -40,12 +40,14 @@ const index = async (req, res, refresh_token, academic_year) => {
         const existSelectedSubject = await prisma.teacherSalaryStructure.findFirst({
           where: {
             teacher_id: teacher_id,
+            class_id: class_id,
+            section_id: section_id,
             subject_id: subject_id,
             deleted_at: null
           }
         });
 
-        if (existSelectedSubject?.deleted_at && existSelectedSubject?.deleted_at === null) {
+        if (existSelectedSubject?.deleted_at === null) {
           throw new Error('This subject is already selected for this teacher');
         }
 

@@ -38,6 +38,16 @@ export const get = async (req, res) => {
             }
           },
           select: {
+            class: {
+              select: {
+                name: true
+              }
+            },
+            section: {
+              select: {
+                name: true
+              }
+            },
             id: true,
             subject: {
               select: {

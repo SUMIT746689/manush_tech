@@ -162,6 +162,10 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                             subjectListFn(value);
                             setFieldValue('class', value);
                             setFieldValue('class_id', value.id);
+                            setFieldValue('section', undefined);
+                            setFieldValue('section_id', undefined);
+                            setFieldValue('subject', undefined);
+                            setFieldValue('subject_id', undefined);
                             handleClassSelect(value);
                           } else {
                             setFieldValue('class', undefined);

@@ -113,7 +113,8 @@ const handleTransaction = ({ collection_date, data, status, account, voucher, re
           late_fee: fee.late_fee,
           amount: fee.amount,
           paidAmount: temp.collected_amount,
-          title: fee.title
+          title: fee.title,
+          subject_id: fee.subject_id
         });
       });
     } catch (err) {
@@ -316,6 +317,12 @@ export const post = async (req, res, refresh_token) => {
       let successfulResults = results.filter((result) => result !== null);
 
       if (successfulResults.length > 0) {
+        for (const successfulResult of successfulResults) {
+          console.log(successfulResult)
+          await teacherPayamount(successfulResult, school_id)
+        }
+
+        // Expected outpu
         const calculate_result = await handleAccounts(successfulResults);
 
         if (calculate_result !== null) {
@@ -409,3 +416,50 @@ export const post = async (req, res, refresh_token) => {
   }
   // updated code end
 };
+
+
+const teacherPayamount = async (data, school_id) => {
+  const {
+    fee_id, id: student_fee_id
+    , account_id, account_balance, collect_amount, tracking_number, created_at,
+    on_time_discount,
+    last_payment_date,
+    account_name,
+    transID,
+    payment_method,
+    status,
+    last_date,
+    late_fee,
+    amount,
+    paidAmount,
+    title,
+    subject_id
+  } = data;
+  const teacherFindPay = await prisma.teacherSalaryStructure.findFirst({
+    where: {
+      subject_id,
+      deleted_at: null,
+      school_id
+    }
+  });
+  console.log({ subject_id, teacherFindPay })
+  if (!teacherFindPay) return;
+
+  const totalAmt = amount + late_fee;
+
+  // calculate teacher should pay from student fee
+  const calcTeacherPayAmt = teacherFindPay.payment_type === "percentage" ?
+    (paidAmount * teacherFindPay.percentage_amount) / 100
+    :
+    (paidAmount * teacherFindPay.fixed_amount) / totalAmt;
+
+  return await prisma.studentFeeWiseTeacherPay.create({
+    data: {
+      teacher_pay_type: teacherFindPay.payment_type,
+      subject_id,
+      student_fee_id,
+      amount: calcTeacherPayAmt
+    }
+  }).then(res => { console.log(res) })
+
+}

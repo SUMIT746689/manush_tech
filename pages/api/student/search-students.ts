@@ -23,59 +23,47 @@ const index = async (req, res, refresh_token, academic_year) => {
 
         if (student_id) {
           students = await prisma.$queryRaw`
-          WITH 
-            student AS (
-                SELECT 
-                    student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
-                    ,students.class_roll_no
-                    ,sections.name as section_name
-                    ,classes.name as class_name
-                    ,classes.id as class_id
-                    ,students.id as student_table_id
-                FROM student_informations
-                JOIN students on  students.student_information_id = student_informations.id
-                JOIN sections on students.section_id = sections.id
-                JOIN classes  on classes.id = sections.class_id
-                WHERE student_informations.student_id = ${student_id_} AND students.academic_year_id=${academic_year_id}
-            ),
-            
-            subjects AS (
-              SELECT GROUP_CONCAT(subjects.id) as subject_ids, GROUP_CONCAT(name) AS subject_names FROM _student_subjects
-              JOIN student
-              JOIN subjects on subjects.id = _student_subjects.B
-              WHERE student.id = _student_subjects.A
-              GROUP BY _student_subjects.A
-            )
-          SELECT * FROM student,subjects;
+                      SELECT 
+                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
+                ,students.class_roll_no
+                ,sections.name as section_name
+                ,classes.name as class_name
+                ,classes.id as class_id
+                ,students.id as student_table_id,
+                GROUP_CONCAT(subjects.id) as subject_ids,
+                GROUP_CONCAT(subjects.name) AS subject_names
+                
+            FROM student_informations
+            JOIN students on  students.student_information_id = student_informations.id
+            JOIN sections on students.section_id = sections.id
+            JOIN classes  on classes.id = sections.class_id
+            LEFT JOIN _student_subjects on _student_subjects.A = students.id
+            LEFT JOIN subjects on subjects.id = _student_subjects.B
+            WHERE student_informations.student_id = ${student_id_} AND students.academic_year_id=${academic_year_id}
+            GROUP BY students.id
         `;
 
         } else if (search_value) {
           students = await prisma.$queryRaw`
-            WITH 
-              student AS (
-                  SELECT 
-                      student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
-                      ,students.class_roll_no
-                      ,sections.name as section_name
-                      ,classes.name as class_name
-                      ,classes.id as class_id
-                      ,students.id as student_table_id
-                  FROM student_informations
-                  JOIN students on  students.student_information_id = student_informations.id
-                  JOIN sections on students.section_id = sections.id
-                  JOIN classes  on classes.id = sections.class_id
-                  WHERE CONCAT(student_informations.first_name, IFNULL(student_informations.middle_name , ' '),IFNULL(student_informations.last_name, '')) REGEXP ${search_value_} AND students.academic_year_id=${academic_year_id}
-              ),
-              
-              subjects AS (
-                SELECT GROUP_CONCAT(subjects.id) as subject_ids, GROUP_CONCAT(name) AS subject_names FROM _student_subjects
-                JOIN student
-                LEFT JOIN subjects on subjects.id = _student_subjects.B
-                WHERE student.id = _student_subjects.A
-                GROUP BY _student_subjects.A
-              )
-              
-            SELECT * FROM student,subjects;
+            SELECT 
+                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
+                ,students.class_roll_no
+                ,sections.name as section_name
+                ,classes.name as class_name
+                ,classes.id as class_id
+                ,students.id as student_table_id,
+                GROUP_CONCAT(subjects.id) as subject_ids,
+                GROUP_CONCAT(subjects.name) AS subject_names
+                
+            FROM student_informations
+            JOIN students on  students.student_information_id = student_informations.id
+            JOIN sections on students.section_id = sections.id
+            JOIN classes  on classes.id = sections.class_id
+            LEFT JOIN _student_subjects on _student_subjects.A = students.id
+            LEFT JOIN subjects on subjects.id = _student_subjects.B
+            WHERE CONCAT(student_informations.first_name, IFNULL(student_informations.middle_name , ' '),IFNULL(student_informations.last_name, '')) REGEXP ${search_value_} AND students.academic_year_id=${academic_year_id}
+            GROUP BY students.id
+          
           `;
         }
 

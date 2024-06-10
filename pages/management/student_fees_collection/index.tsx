@@ -297,6 +297,18 @@ function Managementschools() {
     setUserInformation(data);
     // student information code end
   };
+
+  const haveInvalidSubjectId = (datas) => {
+    let haveInvalidSubjectId = false;
+    datas?.split(',').map((subject_id) => {
+      const parseSubId = parseInt(subject_id);
+      if (typeof parseSubId !== "number") haveInvalidSubjectId = true;
+      return parseSubId;
+    })
+    return haveInvalidSubjectId;
+    // if (haveInvalidSubjectId) return showNotification('student subjects not founds', 'error');
+  }
+
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     // setPrintAndCollect(false);
     // setShowPrint(false);
@@ -305,20 +317,17 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
-    console.log({ searchValue })
+
     if (student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${student_id?.toLowerCase()}`);
-      console.log({ res })
-      // const 
-      if (
-        !res?.data[0]?.subject_ids ||
-        res?.data[0]?.subject_ids.split(',').map(Number)
-      )
-        return showNotification('student subjects not founds', 'error')
+
+      // verify have subjects
+      if (!res?.data[0]?.subject_ids) return showNotification('student subjects not founds', 'error');
+      if (haveInvalidSubjectId(res?.data[0]?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
       if (res?.data?.length > 0) {
         const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
         );
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
@@ -331,16 +340,20 @@ function Managementschools() {
         return showNotification('student_id not founds', 'error');
       }
     } else if (searchValue?.id && academicYear?.id) {
-      if (!searchValue?.subject_ids || searchValue?.subject_ids.split(',').map(Number)) return showNotification('student subjects not founds', 'error')
+      
+      // verify have subjects
+      if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
+      if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
+
       const res = await axios.get(
-        `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+        `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids}`
       );
 
       setLeftFeesTableColumnDataState(res?.data?.data);
       leftFeesTableColumnData(res?.data?.data);
     }
   };
-  console.log({ leftFeesTableColumnData })
+
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {

@@ -250,6 +250,11 @@ const teachers: MenuItems[] = [
             icon: RecordVoiceOverIcon
           },
           {
+            name: 'Subject Wise Teacher Fees',
+            icon: GridOnIcon,
+            link: '/management/teacher_fees',
+          },
+          {
             name: ' Department',
             icon: GridOnIcon,
             link: '/management/department',

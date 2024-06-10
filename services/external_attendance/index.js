@@ -9,7 +9,8 @@ const main = async () => {
     try {
         const resAutoAttdnceSentSms = await prisma.autoAttendanceSentSms.findMany({
             where: {
-                use_system_type: "external_api"
+                use_system_type: "external_api",
+                is_attendence_active: true,
             },
             select: {
                 external_api_info: true,

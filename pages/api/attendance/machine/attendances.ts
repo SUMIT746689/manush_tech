@@ -82,7 +82,7 @@ const index = async (req, res) => {
                 //                             console.log({ attendance })
                 //                         })
                 //                         .catch(err => {
-                //                             console.log({ "err create attendamce": err.message });
+                //                             console.log({ "err create attendance": err.message });
                 //                         })
 
                 //                 })
@@ -112,17 +112,17 @@ const index = async (req, res) => {
                     return res.status(405).end(`required array`);
                 }
 
-                body.map((attendamce) => {
-                    const { userID, schoolID, timestamp, status, machineID } = attendamce;
+                body.map((attendance) => {
+                    const { userID, schoolID, timestamp, status, machineID } = attendance || {};
                     if (!userID || !schoolID || !timestamp || !status || !machineID) return logFile.error(`for creating attendance_table_queue missing required fields`);
 
                     prisma.tbl_attendance_queue.create({
                         data: {
-                            user_id: parseInt(attendamce.userID),
-                            school_id: attendamce.schoolID,
-                            submission_time: new Date(Date.now() || attendamce.timestamp),
-                            status: attendamce.status,
-                            machine_id: attendamce.machineID,
+                            user_id: parseInt(attendance.userID),
+                            school_id: attendance.schoolID,
+                            submission_time: new Date(Date.now() || attendance.timestamp),
+                            status: attendance.status,
+                            machine_id: attendance.machineID,
                         }
                     })
                         .catch(err => {

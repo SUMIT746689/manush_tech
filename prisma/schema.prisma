@@ -274,6 +274,7 @@ model StudentInformation {
   mother_nid                String?
   student_permanent_address String?
   previous_school           String?
+  card_no                   String?
 
   user   User   @relation(fields: [user_id], references: [id])
   school School @relation(fields: [school_id], references: [id])

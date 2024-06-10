@@ -1665,11 +1665,17 @@ model tbl_schools_transactions {
   @@map("tbl_schools_transactions")
 }
 
+enum attendenceInfoTypeEnum {
+  automatic
+  external_api
+}
+
 model attendence_info {
-  id         Int      @id @default(autoincrement())
+  id         Int                    @id @default(autoincrement())
   body       Json?
   school_id  Int
-  created_at DateTime @default(now())
+  type       attendenceInfoTypeEnum
+  created_at DateTime               @default(now())
 
   @@map("attendence_logs")
 }

@@ -5,15 +5,7 @@ import ReactToPrint, { useReactToPrint } from 'react-to-print';
 import ExtendedSidebarLayout from 'src/layouts/ExtendedSidebarLayout';
 import { Authenticated } from 'src/components/Authenticated';
 
-import {
-  Button,
-  Card,
-  Chip,
-  Dialog,
-  DialogTitle,
-  Grid,
-  Typography
-} from '@mui/material';
+import { Button, Card, Chip, Dialog, DialogTitle, Grid, Typography } from '@mui/material';
 import { useRefMounted } from 'src/hooks/useRefMounted';
 
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
@@ -129,10 +121,9 @@ function ManagementClasses() {
     if (academicYear && selectedSection) {
       axios
         .get(
-          `/api/student/?${
-            selectedSection.id == 'all'
-              ? `class_id=${selectedClass?.id}`
-              : `section_id=${selectedSection?.id}`
+          `/api/student/?${selectedSection.id == 'all'
+            ? `class_id=${selectedClass?.id}`
+            : `section_id=${selectedSection?.id}`
           }&academic_year_id=${academicYear?.id}`
         )
         .then((res) => {
@@ -390,7 +381,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
       .post('/api/student/bulk-admission', form)
       .then((res) => {
         setExcelFileUpload(null);
-        showNotification(t( `${res?.data?.message}, (failed: ${res?.data?.faildedCreateStd})`))
+        showNotification(t(`${res?.data?.message}, (failed: ${res?.data?.faildedCreateStd})`))
       })
       .catch((err) => {
         handleShowErrMsg(err, showNotification);

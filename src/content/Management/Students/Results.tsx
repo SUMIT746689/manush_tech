@@ -48,6 +48,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import IdentityCard from '@/content/Management/Students/StudentIdCardDesign';
 import { getFile } from '@/utils/utilitY-functions';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -152,7 +153,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
   const { showNotification } = useNotistick();
 
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(20);
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -405,7 +406,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         </Grid>
       </Dialog>
 
-      <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
+      <Card sx={{ minHeight: 'calc(100vh - 410px)',borderRadius:0 }}>
 
         {selectedBulkActions && (
           <Box p={2}>
@@ -414,7 +415,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         )}
         {!selectedBulkActions && (
           <Box
-            p={2}
+            px={2}
             display="flex"
             alignItems="center"
             justifyContent="space-between"
@@ -432,7 +433,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
               onRowsPerPageChange={handleLimitChange}
               page={page}
               rowsPerPage={limit}
-              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPageOptions={[20, 50, 70]}
             />
           </Box>
         )}
@@ -457,19 +458,21 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  {/* <TableCell padding="checkbox">
                     <Checkbox
                       checked={selectedAllUsers}
                       indeterminate={selectedSomeUsers}
                       onChange={handleSelectAllUsers}
                     />
-                  </TableCell>
-                  <TableCell>{t('student name')}</TableCell>
-                  <TableCell>{t('Class')}</TableCell>
-                  <TableCell >{t('Class Roll')}</TableCell>
-                  <TableCell >{t('Section')}</TableCell>
-                  <TableCell>{t('Phone')}</TableCell>
-                  <TableCell align="center">{t('Actions')}</TableCell>
+                  </TableCell> */}
+                  <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('student id')}</TableHeaderCellWrapper>
+
+                  <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper >{t('Class Roll')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper >{t('Section')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Phone')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -478,7 +481,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
-                      <TableCell padding="checkbox">
+                      {/* <TableCell padding="checkbox">
                         <Checkbox
                           checked={isUserSelected}
                           onChange={(event) =>
@@ -486,34 +489,27 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           }
                           value={isUserSelected}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h5">
-                          {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h5">
-                          {i?.section?.class?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h5">
-                          {i?.class_roll_no}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h5">
-                          {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="h5" color="yellowgreen">
-                          <a href={`tel:${i?.student_info?.phone}`}>{i?.student_info?.phone}</a>
-                        </Typography>
-                      </TableCell>
+                      </TableCell> */}
+                      <TableBodyCellWrapper>
+                        {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
+                      </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>
+                        {i?.student_info?.student_id}
+                      </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>
+                        {i?.section?.class?.name}
+                      </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>
+                        {i?.class_roll_no}
+                      </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>
+                        {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
+                      </TableBodyCellWrapper>
+                      <TableBodyCellWrapper>
+                        <a href={`tel:${i?.student_info?.phone}`}>{i?.student_info?.phone}</a>
+                      </TableBodyCellWrapper>
 
-                      <TableCell align={'center'}
+                      {/* <TableCell align={'center'}
                         sx={{
                           display: 'flex',
                           flexDirection: 'row',
@@ -521,52 +517,61 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           justifyContent: 'center'
 
                         }}
-                      >
-                        <Tooltip title={t('View Profile')} arrow >
-                          <IconButton
-                            sx={ActionStyle}
-                            color="primary"
-                            onClick={() => {
-                              setSelectedStudent(i)
-                              setStudentProfileModal(true)
-                            }}
-                          >
-                            <VisibilityIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                      > */}
+                      <TableBodyCellWrapper>
+                        <Grid py={0.25} mx="auto" display="flex" justifyContent="center" columnGap={1} >
+                          <Tooltip title={t('View Profile')} arrow >
+                            <IconButton
+                              sx={ActionStyle}
+                              color="primary"
+                              onClick={() => {
+                                setSelectedStudent(i)
+                                setStudentProfileModal(true)
+                              }}
+                              size="small"
 
-                        <Tooltip title={t('Edit')} arrow>
-                          <IconButton
-                            color="primary"
-                            sx={ActionStyle}
-                          >
-                            <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
-                          </IconButton>
-                        </Tooltip>
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
-                        <Tooltip title={t('Discount')} arrow>
-                          <IconButton
-                            sx={ActionStyle}
-                            color="primary"
-                            onClick={() => {
-                              setSelectedStudent(i)
-                              setDiscountModal(true)
-                            }}
-                          >
-                            <DiscountIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                          <Tooltip title={t('Edit')} arrow>
+                            <IconButton
+                              color="primary"
+                              sx={ActionStyle}
+                              size='small'
+                            >
+                              <NextLink href={`/students/${i.id}/edit`}><LaunchTwoToneIcon fontSize="small" /></NextLink>
+                            </IconButton>
+                          </Tooltip>
 
-                        <Tooltip title={t('Delete')} arrow>
-                          <IconButton
-                            sx={ActionStyle}
-                            onClick={() => handleConfirmDelete(i.id)}
-                            color="primary"
-                          >
-                            <DeleteTwoToneIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
+                          <Tooltip title={t('Discount')} arrow>
+                            <IconButton
+                              sx={ActionStyle}
+                              color="primary"
+                              onClick={() => {
+                                setSelectedStudent(i)
+                                setDiscountModal(true)
+                              }}
+                              size="small"
+                            >
+                              <DiscountIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              sx={ActionStyle}
+                              onClick={() => handleConfirmDelete(i.id)}
+                              color="primary"
+                              size="small"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Grid>
+                      </TableBodyCellWrapper>
+                      {/* </TableCell> */}
                     </TableRow>
                   );
                 })}
@@ -574,7 +579,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
             </Table>
           </TableContainer>
         )}
-      </Card>
+      </Card >
       <div style={{ display: 'none', visibility: 'hidden' }}>
         <Grid ref={idCard} display={'grid'} gridTemplateColumns={'1fr 1fr'} container gap={1.5}>
           {students?.filter?.(j => selectedItems.includes(j.id))?.map(

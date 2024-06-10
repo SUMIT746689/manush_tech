@@ -328,7 +328,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
       .post('/api/student/bulk-admission', form)
       .then((res) => {
         setExcelFileUpload(null);
-        showNotification(t(`${res?.data?.message}, (failed: ${res?.data?.faildedCreateStd})`));
+        showNotification(t(`${res?.data?.message}, ${(Array.isArray(res?.data?.faildedCreateStd) && res?.data?.faildedCreateStd.length > 0) ? '(failed:' + res?.data?.faildedCreateStd +')' : '' }`))
       })
       .catch((err) => {
         handleShowErrMsg(err, showNotification);

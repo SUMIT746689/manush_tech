@@ -1677,5 +1677,5 @@ model attendence_info {
   type       attendenceInfoTypeEnum
   created_at DateTime               @default(now())
 
-  @@map("attendence_logs")
+  @@map("attendence_info")
 }

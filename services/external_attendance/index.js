@@ -66,41 +66,35 @@ const main = async () => {
                 end_time: "23:59:59"
             }
             const { data } = await axios.post("https://rumytechnologies.com/rams/json_api", smsBody);
-
+            // console.log(data)
             if (!Array.isArray(data?.log)) return logFile.error(`auth_user(${auth_user}) response(${data})`);
 
-            // const tbl_attendance_queue_datas = [];
 
-            // for (let attendance_stat of data?.log) {
             data?.log.forEach(async attendance_stat => {
                 const { registration_id, user_name, access_id, unit_id, card, access_time, access_date } = attendance_stat;
 
                 // save attendence files
-                prisma.attendence_info.create({data:{ body:attendance_stat, school_id}});
+                prisma.attendence_info.create({ data: { type: "external_api", body: attendance_stat, school_id } })
+                    .catch(err => { logFile.error(` user_name(${user_name}) ${err}`) })
 
-                // find student
-                const datas = await prisma.user.findFirst({
+                const datas = await prisma.student.findFirst({
                     where: {
-                        AND: [
-                            {   },
-                            { school_id }
-                        ],
+                        student_info: {
+                            card_no: card,
+                            school_id
+                        },
+                        academic_year: { curr_active: true },
                     },
                     select: {
                         id: true,
-                        school_id: true,
-                        student: {
+                        student_info: {
                             select: {
-                                variance: {
-                                    where: { academic_year: { curr_active: true } },
-                                    select: {
-                                        id: true
-                                    }
-                                }
+                                user_id: true
                             }
                         }
                     }
-                });
+                })
+
                 if (!datas) {
                     return logFile.error(`auth_user(${auth_user}), user not founds username(${user_name}) `);
                     // continue;
@@ -122,9 +116,10 @@ const main = async () => {
 
                 await prisma.tbl_attendance_queue.create({
                     data: {
-                        school_id: datas.school_id,
-                        machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
-                        user_id: datas.id,
+                        school_id,
+                        // machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
+                        machine_id: unit_id,
+                        user_id: datas.student_info.user_id,
                         status: 1,
                         submission_time: time
                     }
@@ -134,42 +129,13 @@ const main = async () => {
             }
             );
 
-            // await prisma.tbl_attendance_queue.createMany({
-            //     data: tbl_attendance_queue_datas
-            // });
-
         });
     }
     catch (err) {
         logFile.error(err.message)
-        // console.log({ err: err.message })
     }
 }
 
-// setInterval(() => {
-main();
-// }, 60000 * 2)
-
-
-
-
-// for test
- 
-(async () => {
-    const date = new Date(Date.now() - 800000 * 3);
-    const today = date.toLocaleDateString('en-CA');
-    const start_time = date.toLocaleTimeString('en-US', { hour12: false });
-    console.log({ today, start_time })
-    const smsBody = {
-        operation: "fetch_log",
-        auth_user: "TUAMS",
-        auth_code: "8c3dwtsz1r2e8y5y5r4cj3qcie4nit3",
-        start_date: today,
-        end_date: today,
-        start_time: "03:59:59",
-        end_time: "23:59:59"
-    }
-    const { data } = await axios.post("https://rumytechnologies.com/rams/json_api", smsBody);
-
-    console.log(data)
-})()
+setInterval(() => {
+    main();
+}, 60000 * 2)

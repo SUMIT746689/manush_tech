@@ -21,17 +21,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useClientFetch } from '@/hooks/useClientFetch';
 import Footer from '@/components/Footer';
 import { ExportData } from '@/content/Management/Students/ExportData';
-import {
-  FileUploadFieldWrapper,
-  NewFileUploadFieldWrapper
-} from '@/components/TextFields';
+import { FileUploadFieldWrapper, NewFileUploadFieldWrapper } from '@/components/TextFields';
 import dayjs from 'dayjs';
 import useNotistick from '@/hooks/useNotistick';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
-import {
-  ButtonWrapper,
-  SearchingButtonWrapper
-} from '@/components/ButtonWrapper';
+import { ButtonWrapper, SearchingButtonWrapper } from '@/components/ButtonWrapper';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 import { read, utils } from 'xlsx';
 import { handleCreateFileObj } from 'utilities_api/handleCreateFileObject';
@@ -55,9 +49,7 @@ function ManagementClasses() {
   const [isDownloadingExcelFile, setIsDownloadingExcelFile] = useState(false);
   const idCard = useRef();
 
-  const { data: classes } = useClientFetch(
-    `/api/class?school_id=${user?.school_id}`
-  );
+  const { data: classes } = useClientFetch(`/api/class?school_id=${user?.school_id}`);
 
   useEffect(() => {
     if (selectedClass && academicYear && selectedSection) handleStudentList();
@@ -77,9 +69,7 @@ function ManagementClasses() {
         });
         setSections(sections);
         if (students?.selectedSection) {
-          setSelectedSection(
-            sections?.find((i) => i.id == students?.selectedSection?.id)
-          );
+          setSelectedSection(sections?.find((i) => i.id == students?.selectedSection?.id));
         }
       });
     }
@@ -88,9 +78,7 @@ function ManagementClasses() {
   useEffect(() => {
     if (selectedClass && academicYear) {
       axios
-        .get(
-          `/api/discount?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`
-        )
+        .get(`/api/discount?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`)
         .then((res) => {
           console.log('discount__', res.data);
           setDiscount(
@@ -102,9 +90,7 @@ function ManagementClasses() {
         })
         .catch((err) => console.log(err));
       axios
-        .get(
-          `/api/fee?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`
-        )
+        .get(`/api/fee?class_id=${selectedClass?.id}&academic_year_id=${academicYear?.id}`)
         .then((res) =>
           setFee(
             res?.data?.data?.map((i) => ({
@@ -121,10 +107,9 @@ function ManagementClasses() {
     if (academicYear && selectedSection) {
       axios
         .get(
-          `/api/student/?${selectedSection.id == 'all'
-            ? `class_id=${selectedClass?.id}`
-            : `section_id=${selectedSection?.id}`
-          }&academic_year_id=${academicYear?.id}`
+          `/api/student/?${selectedSection.id == 'all' ? `class_id=${selectedClass?.id}` : `section_id=${selectedSection?.id}`}&academic_year_id=${
+            academicYear?.id
+          }`
         )
         .then((res) => {
           console.log('ref__', res.data);
@@ -200,12 +185,7 @@ function ManagementClasses() {
 
   return (
     <>
-      <BulkStudentUpload
-        class_id={selectedClass?.id}
-        section_id={selectedSection?.id}
-        open={openBulkStdUpload}
-        setOpen={setOpenBulkStdUpload}
-      />
+      <BulkStudentUpload class_id={selectedClass?.id} section_id={selectedSection?.id} open={openBulkStdUpload} setOpen={setOpenBulkStdUpload} />
       <Head>
         <title>Students - Management</title>
       </Head>
@@ -216,17 +196,11 @@ function ManagementClasses() {
             <Typography variant="h3" component="h3" gutterBottom>
               {t('Student Management')}
             </Typography>
-            <Typography variant="subtitle2">
-              {t(
-                'All aspects related to the students can be managed from this page'
-              )}
-            </Typography>
+            <Typography variant="subtitle2">{t('All aspects related to the students can be managed from this page')}</Typography>
           </Grid>
 
           <Grid item my="auto">
-            <ButtonWrapper handleClick={handleSendToRegistrationPage}>
-              {t('Registration student')}
-            </ButtonWrapper>
+            <ButtonWrapper handleClick={handleSendToRegistrationPage}>{t('Registration student')}</ButtonWrapper>
           </Grid>
         </Grid>
       </PageTitleWrapper>
@@ -242,20 +216,11 @@ function ManagementClasses() {
           columnGap: 1
         }}
       >
-        <ButtonWrapper
-          handleClick={undefined}
-          href={`/Student-Bulk-Import-Sample.xlsx`}
-        >
+        <ButtonWrapper handleClick={undefined} href={`/Student-Bulk-Import-Sample.xlsx`}>
           Download Excel format
         </ButtonWrapper>
-        <ButtonWrapper handleClick={() => setOpenBulkStdUpload(true)}>
-          Upload Bulk Student
-        </ButtonWrapper>
-        <SearchingButtonWrapper
-          disabled={isDownloadingExcelFile}
-          isLoading={isDownloadingExcelFile}
-          handleClick={handleDownloadStudentExcelFile}
-        >
+        <ButtonWrapper handleClick={() => setOpenBulkStdUpload(true)}>Upload Bulk Student</ButtonWrapper>
+        <SearchingButtonWrapper disabled={isDownloadingExcelFile} isLoading={isDownloadingExcelFile} handleClick={handleDownloadStudentExcelFile}>
           Downlaod All Student List (Excel Format)
         </SearchingButtonWrapper>
       </Card>
@@ -304,14 +269,9 @@ function ManagementClasses() {
             }}
           />
         )}
-        {selectedSection && (
-          <ButtonWrapper handleClick={handleStudentList}> Find</ButtonWrapper>
-        )}
+        {selectedSection && <ButtonWrapper handleClick={handleStudentList}> Find</ButtonWrapper>}
         {students?.AllStudents?.length > 0 && (
-          <ButtonWrapper
-            handleClick={handlePrint}
-            startIcon={<LocalPrintshopIcon />}
-          >
+          <ButtonWrapper handleClick={handlePrint} startIcon={<LocalPrintshopIcon />}>
             Print Id Card
           </ButtonWrapper>
         )}
@@ -320,22 +280,9 @@ function ManagementClasses() {
         </Grid>
       </Card>
 
-      <Grid
-        sx={{ px: 1 }}
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+      <Grid sx={{ px: 1 }} container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          <Results
-            students={students?.AllStudents || []}
-            refetch={handleStudentList}
-            discount={discount}
-            fee={fee}
-            idCard={idCard}
-          />
+          <Results students={students?.AllStudents || []} refetch={handleStudentList} discount={discount} fee={fee} idCard={idCard} />
         </Grid>
       </Grid>
       <Footer />
@@ -422,7 +369,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
       // setFieldValue('preview_contact_file', objFiles[0]);
     };
     reader.readAsArrayBuffer(event.target.files[0]);
-  }
+  };
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={handleModalClose}>
       <DialogTitle display="flex" justifyContent="space-between" sx={{ p: 3 }}>
@@ -430,9 +377,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
           <Typography variant="h4" gutterBottom>
             {t('Add new Section')}
           </Typography>
-          <Typography variant="subtitle2">
-            {t('Fill in the fields below to create and add a new section')}
-          </Typography>
+          <Typography variant="subtitle2">{t('Fill in the fields below to create and add a new section')}</Typography>
         </Grid>
         <CloseIcon
           onClick={handleModalClose}
@@ -467,17 +412,8 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
                 Upload File Name:
               </Grid>
               <Grid>
-                <Chip
-                  variant="outlined"
-                  label="File Name: "
-                  sx={{ borderRadius: 0, height: 40 }}
-                />
-                <Chip
-                  color="success"
-                  variant="outlined"
-                  label={excelFileUpload.name}
-                  sx={{ borderRadius: 0, height: 40 }}
-                />
+                <Chip variant="outlined" label="File Name: " sx={{ borderRadius: 0, height: 40 }} />
+                <Chip color="success" variant="outlined" label={excelFileUpload.name} sx={{ borderRadius: 0, height: 40 }} />
                 <Chip
                   color="warning"
                   label="Remove"
@@ -492,11 +428,7 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
           )}
         </Grid>
 
-        <SearchingButtonWrapper
-          isLoading={isLoading}
-          disabled={isLoading}
-          handleClick={handleExcelUpload}
-        >
+        <SearchingButtonWrapper isLoading={isLoading} disabled={isLoading} handleClick={handleExcelUpload}>
           {t('Bulk admission')}
         </SearchingButtonWrapper>
       </Grid>

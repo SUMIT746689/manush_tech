@@ -49,6 +49,7 @@ function RegistrationFirstPart({
           phone: student ? (student?.phone || student?.student_info?.phone) : undefined,
           email: student ? (student?.email || student?.student_info?.email) : '',
           national_id: student ? (student?.national_id || student?.student_info?.national_id) : '',
+          card_no: student  ? (student?.card_no || student?.student_info?.card_no) : '',
           student_photo: null
         }}
         validationSchema={Yup.object().shape({
@@ -174,7 +175,7 @@ function RegistrationFirstPart({
                     </Grid>
 
                     {/* admission_no   */}
-                    <Grid item xs={12} display={"grid"} gridTemplateColumns={{md:"1fr 1fr"}} gap={2}>
+                    <Grid item xs={12} display={"grid"} gridTemplateColumns={{ md: "1fr 1fr" }} gap={2}>
                       <TextField
                         // required
                         size="small"
@@ -295,7 +296,7 @@ function RegistrationFirstPart({
                     </Grid>
 
                     {/* Gender */}
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6} md={6}>
                       <FormControl required>
                         <FormLabel id="demo-row-radio-buttons-group-label">
                           Select Gender
@@ -322,6 +323,29 @@ function RegistrationFirstPart({
                           />
                         </RadioGroup>
                       </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={6}>
+                      <TextField
+                        size="small"
+                        sx={{
+                          '& fieldset': {
+                            borderRadius: '3px'
+                          }
+                        }}
+                        error={Boolean(
+                          touched.card_no && errors.card_no
+                        )}
+                        fullWidth
+                        helperText={touched.card_no && errors.card_no}
+                        label={t('Card Number')}
+                        name="card_no"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        type="text"
+                        value={values.card_no}
+                        variant="outlined"
+                      />
                     </Grid>
 
                     {/* blood_group */}

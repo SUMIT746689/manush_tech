@@ -9,7 +9,8 @@ const main = async () => {
     try {
         const resAutoAttdnceSentSms = await prisma.autoAttendanceSentSms.findMany({
             where: {
-                use_system_type: "external_api"
+                use_system_type: "external_api",
+                is_attendence_active: true,
             },
             select: {
                 external_api_info: true,
@@ -17,12 +18,13 @@ const main = async () => {
                     select: {
                         name: true
                     }
-                }
+                },
+                school_id: true
             }
         });
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
-            const { external_api_info, school } = singleResp;
+            const { external_api_info, school, school_id } = singleResp;
             const { url_params } = external_api_info || {};
 
             const date = new Date(Date.now() - 60000 * 3);
@@ -65,37 +67,35 @@ const main = async () => {
                 end_time: "23:59:59"
             }
             const { data } = await axios.post("https://rumytechnologies.com/rams/json_api", smsBody);
-
+            // console.log(data)
             if (!Array.isArray(data?.log)) return logFile.error(`auth_user(${auth_user}) response(${data})`);
 
-            // const tbl_attendance_queue_datas = [];
 
-            // for (let attendance_stat of data?.log) {
             data?.log.forEach(async attendance_stat => {
                 const { registration_id, user_name, access_id, unit_id, card, access_time, access_date } = attendance_stat;
 
-                const datas = await prisma.user.findFirst({
+                // save attendence files
+                prisma.attendence_info.create({ data: { type: "external_api", body: attendance_stat, school_id } })
+                    .catch(err => { logFile.error(` user_name(${user_name}) ${err}`) })
+
+                const datas = await prisma.student.findFirst({
                     where: {
-                        AND: [
-                            { username: user_name },
-                            { school: { name: { equals: school?.name } } }
-                        ],
+                        student_info: {
+                            card_no: card,
+                            school_id
+                        },
+                        academic_year: { curr_active: true },
                     },
                     select: {
                         id: true,
-                        school_id: true,
-                        student: {
+                        student_info: {
                             select: {
-                                variance: {
-                                    where: { academic_year: { curr_active: true } },
-                                    select: {
-                                        id: true
-                                    }
-                                }
+                                user_id: true
                             }
                         }
                     }
-                });
+                })
+
                 if (!datas) {
                     return logFile.error(`auth_user(${auth_user}), user not founds username(${user_name}) `);
                     // continue;
@@ -117,9 +117,10 @@ const main = async () => {
 
                 await prisma.tbl_attendance_queue.create({
                     data: {
-                        school_id: datas.school_id,
-                        machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
-                        user_id: datas.id,
+                        school_id,
+                        // machine_id: `${registration_id}_${access_id}_${unit_id}_${card}`,
+                        machine_id: unit_id,
+                        user_id: datas.student_info.user_id,
                         status: 1,
                         submission_time: time
                     }
@@ -129,18 +130,13 @@ const main = async () => {
             }
             );
 
-            // await prisma.tbl_attendance_queue.createMany({
-            //     data: tbl_attendance_queue_datas
-            // });
-
         });
     }
     catch (err) {
         logFile.error(err.message)
-        // console.log({ err: err.message })
     }
 }
 
 setInterval(() => {
-main();
+    main();
 }, 60000 * 2)

@@ -287,6 +287,7 @@ model StudentInformation {
   mother_nid                String?
   student_permanent_address String?
   previous_school           String?
+  card_no                   String?
 
   user   User   @relation(fields: [user_id], references: [id])
   school School @relation(fields: [school_id], references: [id])
@@ -1742,3 +1743,17 @@ model TeacherSalaryStructure{
   @@map("teacher_salary_structure")
 }
 
+enum attendenceInfoTypeEnum {
+  automatic
+  external_api
+}
+
+model attendence_info {
+  id         Int                    @id @default(autoincrement())
+  body       Json?
+  school_id  Int
+  type       attendenceInfoTypeEnum
+  created_at DateTime               @default(now())
+
+  @@map("attendence_info")
+}

@@ -821,7 +821,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
               Student Payment Receipt
             </Typography>
             <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-              Office Copy
+              Student Copy
             </Typography>
           </Grid>
           <Grid></Grid>

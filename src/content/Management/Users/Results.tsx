@@ -303,10 +303,10 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
           sx={
             isNotSuperAdmin
               ? {
-                  display: 'grid',
-                  gridTemplateColumns: 'auto auto',
-                  gap: 4
-                }
+                display: 'grid',
+                gridTemplateColumns: 'auto auto',
+                gap: 4
+              }
               : {}
           }
         >
@@ -434,6 +434,9 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                 <TableHead>
                   <TableRow>
                     <TableCell>
+                      <Typography noWrap>{t('Id')}</Typography>
+                    </TableCell>
+                    <TableCell>
                       <Typography noWrap>{t('Username')}</Typography>
                     </TableCell>
                     <TableCell>
@@ -479,6 +482,11 @@ const Results = ({ users, roleOptions, reFetchData, setEditUser }) => {
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
                       <TableRow hover key={i.id} selected={isUserSelected}>
+                        <TableCell>
+                          <Typography noWrap variant="h5">
+                            {i?.id}
+                          </Typography>
+                        </TableCell>
                         <TableCell>
                           <Typography noWrap variant="h5">
                             {i?.username}

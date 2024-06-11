@@ -206,7 +206,7 @@ const Results: FC<ResultsProps> = ({
     setOpenConfirmDelete(false);
     setDeleteSchoolId(null);
   };
-  
+
   const handleDeleteCompleted = async () => {
     try {
       const result = await axios.delete(`/api/school/${deleteSchoolId}`);
@@ -215,7 +215,7 @@ const Results: FC<ResultsProps> = ({
       showNotification('The schools has been deleted successfully')
     } catch (err) {
       setOpenConfirmDelete(false);
-      showNotification('The school falied to delete ','error');
+      showNotification('The school falied to delete ', 'error');
     }
   };
 
@@ -233,7 +233,7 @@ const Results: FC<ResultsProps> = ({
               <TextField
                 sx={{
                   m: 0,
-                  borderRadius:0.6,
+                  borderRadius: 0.6,
                 }}
                 size='small'
 
@@ -256,7 +256,7 @@ const Results: FC<ResultsProps> = ({
       </Card>
 
       <Card>
-        
+
         {!selectedBulkActions && (
           <Box
             p={2}
@@ -303,6 +303,7 @@ const Results: FC<ResultsProps> = ({
               <Table size='small'>
                 <TableHead>
                   <TableRow>
+                    <TableCell>{t('Id')}</TableCell>
                     <TableCell>{t('Name')}</TableCell>
                     <TableCell>{t('Subscription Start')}</TableCell>
                     <TableCell>{t('Subscription End')}</TableCell>
@@ -317,15 +318,21 @@ const Results: FC<ResultsProps> = ({
                       <TableRow
                         hover
                         key={school.id}
-                       
+
                       >
-                        
+
+                        <TableCell>
+                          <Typography noWrap variant="h5">
+                            {school?.id}
+                          </Typography>
+                        </TableCell>
+
                         <TableCell>
                           <Typography noWrap variant="h5">
                             {school?.name}
                           </Typography>
                         </TableCell>
-                        
+
                         <TableCell>
                           <Typography noWrap variant="h5">
                             {school?.subscription[0]?.start_date &&
@@ -339,8 +346,8 @@ const Results: FC<ResultsProps> = ({
                             noWrap
                             variant="h5"
                             color={
-                              school?.subscription[0]?.end_date+ 86400000 <
-                              new Date().getTime()
+                              school?.subscription[0]?.end_date + 86400000 <
+                                new Date().getTime()
                                 ? 'red'
                                 : 'primary'
                             }
@@ -363,7 +370,7 @@ const Results: FC<ResultsProps> = ({
                             </a>
                           </Typography>
                         </TableCell>
-                        
+
                         <TableCell align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Manage Subscription')} arrow>

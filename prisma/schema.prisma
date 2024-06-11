@@ -319,8 +319,7 @@ model Student {
   extra_section_id        Int?
   created_at              DateTime? @default(now())
   is_separate             Boolean?  @default(false)
-  updated_at              DateTime? 
-
+  updated_at              DateTime?
 
   academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
   student_info  StudentInformation @relation(fields: [student_information_id], references: [id])
@@ -529,14 +528,14 @@ model Fee {
 
   academic_year_id Int
   class_id         Int
-  subject_id       Int?
+  subject_id       Int
   school_id        Int
   fees_head_id     Int?
   deleted_at       DateTime?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
-  subject             Subject?     @relation(fields: [subject_id], references: [id])
+  subject             Subject      @relation(fields: [subject_id], references: [id])
   school              School       @relation(fields: [school_id], references: [id])
   fees_head           FeesHaed?    @relation(fields: [fees_head_id], references: [id])
   student_fees        StudentFee[]

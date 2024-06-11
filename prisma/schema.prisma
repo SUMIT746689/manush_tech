@@ -33,8 +33,8 @@ model User {
   student     StudentInformation?
 
   // admin_school School? @relation(name: "AdminUserSchool")
-  EmployeeAttendance   EmployeeAttendance[]
-  StudentFee           StudentFee[]
+  EmployeeAttendance EmployeeAttendance[]
+  StudentFee         StudentFee[]
 
   Leave                Leave[]
   tbl_attendence_queue tbl_attendance_queue[]
@@ -133,7 +133,7 @@ model School {
   FeesHaed                   FeesHaed[]
   teacherSalaries            TeacherSalaryStructure[]
   // StudentClassSubjects       StudentClassSubjects[]
-  
+
   // routines Routine[]
   @@map("schools")
 }
@@ -200,15 +200,15 @@ model Teacher {
   user_id       Int  @unique
   school_id     Int
 
-  my_class             Section[]              @relation("class_teacher")
-  user                 User                   @relation(fields: [user_id], references: [id])
-  classes              Section[]              @relation("SectionToTeacher")
-  periods              Period[]
-  school               School                 @relation(fields: [school_id], references: [id])
-  department           Department?            @relation(fields: [department_id], references: [id])
-  seatPlans            seatPlan[]             @relation("teacher_to_seat_plan")
+  my_class        Section[]                @relation("class_teacher")
+  user            User                     @relation(fields: [user_id], references: [id])
+  classes         Section[]                @relation("SectionToTeacher")
+  periods         Period[]
+  school          School                   @relation(fields: [school_id], references: [id])
+  department      Department?              @relation(fields: [department_id], references: [id])
+  seatPlans       seatPlan[]               @relation("teacher_to_seat_plan")
   // StudentClassSubjects StudentClassSubjects[]
-  teacherSalaries      TeacherSalaryStructure[]
+  teacherSalaries TeacherSalaryStructure[]
 
   @@map("teachers")
 }
@@ -228,6 +228,7 @@ model Class {
   Group                      Group[]
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   teacherSalaries            TeacherSalaryStructure[]
+
   @@map("classes")
 }
 
@@ -254,6 +255,7 @@ model Section {
   tbl_student_sent_sms_queue tbl_student_sent_sms_queue[]
   extraStudents              Student[]                    @relation("extra_section")
   teacherSalaries            TeacherSalaryStructure[]
+
   @@map("sections")
 }
 
@@ -383,15 +385,15 @@ model Subject {
   class_id Int
   class    Class  @relation(fields: [class_id], references: [id])
 
-  exam_details         ExamDetails[]
-  Period               Period[]
-  DailyNote            DailyNote[]
-  Syllabus             Syllabus[]
-  Homework             Homework[]
+  exam_details    ExamDetails[]
+  Period          Period[]
+  DailyNote       DailyNote[]
+  Syllabus        Syllabus[]
+  Homework        Homework[]
   // StudentClassSubjects StudentClassSubjects[]
-  fees                 Fee[]
-  teacherSalaries      TeacherSalaryStructure[]
-  students             Student[]     @relation("student_subjects")
+  fees            Fee[]
+  teacherSalaries TeacherSalaryStructure[]
+  students        Student[]                @relation("student_subjects")
 
   @@map("subjects")
 }
@@ -524,14 +526,14 @@ model Fee {
 
   academic_year_id Int
   class_id         Int
-  subject_id       Int
+  subject_id       Int?
   school_id        Int
   fees_head_id     Int?
   deleted_at       DateTime?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
-  subject             Subject      @relation(fields: [subject_id], references: [id])
+  subject             Subject?     @relation(fields: [subject_id], references: [id])
   school              School       @relation(fields: [school_id], references: [id])
   fees_head           FeesHaed?    @relation(fields: [fees_head_id], references: [id])
   student_fees        StudentFee[]
@@ -1723,8 +1725,8 @@ enum PaymentType {
   flat
 }
 
-model TeacherSalaryStructure{
-  id                Int @id @default(autoincrement())
+model TeacherSalaryStructure {
+  id                Int         @id @default(autoincrement())
   teacher_id        Int
   school_id         Int
   section_id        Int
@@ -1735,11 +1737,12 @@ model TeacherSalaryStructure{
   fixed_amount      Int?
   deleted_at        DateTime?
 
-  teacher           Teacher  @relation(fields: [teacher_id], references: [id])
-  school            School   @relation(fields: [school_id],  references: [id])
-  section           Section  @relation(fields: [section_id], references: [id])
-  subject           Subject  @relation(fields: [subject_id], references: [id])
-  class             Class      @relation(fields: [class_id],   references: [id])
+  teacher Teacher @relation(fields: [teacher_id], references: [id])
+  school  School  @relation(fields: [school_id], references: [id])
+  section Section @relation(fields: [section_id], references: [id])
+  subject Subject @relation(fields: [subject_id], references: [id])
+  class   Class   @relation(fields: [class_id], references: [id])
+
   @@map("teacher_salary_structure")
 }
 

@@ -179,7 +179,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
               Office Copy
             </Typography>
           </Grid>
-          <Grid></Grid>
+          <Grid width="80px" height="80px"></Grid>
         </Grid>
 
         {/* student information */}
@@ -824,7 +824,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
               Student Copy
             </Typography>
           </Grid>
-          <Grid></Grid>
+          <Grid width="80px" height="80px"></Grid>
         </Grid>
         {/* student information */}
         <Grid sx={{ display: 'flex', justifyContent: 'space-between' }}>

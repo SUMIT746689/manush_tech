@@ -303,6 +303,9 @@ model Student {
   student_present_address String?
   extra_section_id        Int?
   created_at              DateTime? @default(now())
+  is_separate             Boolean?  @default(false)
+  updated_at              DateTime? 
+
 
   academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
   student_info  StudentInformation @relation(fields: [student_information_id], references: [id])

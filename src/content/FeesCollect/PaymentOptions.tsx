@@ -110,7 +110,7 @@ const PaymentOptions = ({
     }
     // handle transId input field error message
 
-    if (selectedGateway?.label !== 'Cash' ? true : false) {
+    if (selectedGateway?.label?.toLowerCase() !== 'cash' ? true : false) {
       if (!transID) {
         showNotification('please provide the transaction id.', 'error');
         return;

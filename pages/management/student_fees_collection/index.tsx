@@ -73,6 +73,7 @@ function Managementschools() {
     try {
       if (value?.length >= 2) {
         const res = await axios.get(`/api/student/search-students?search_value=${value?.toLowerCase()}`);
+
         const userInfoArr = res?.data?.map((item) => {
           return {
             label: `${item.first_name} | ${item.class_name} | ${item.class_roll_no} | ${item.section_name}`,
@@ -89,7 +90,7 @@ function Managementschools() {
       } else if (!value) {
         setSearchOptionData([]);
       }
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
@@ -106,7 +107,7 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
-    console.log({ v })
+    console.log({ v });
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
 
@@ -149,7 +150,7 @@ function Managementschools() {
       currDiscount: 0,
       dueAmount: 0
     };
-    console.log({ data })
+    console.log({ data });
     // fees array
     let feesData = data?.fees?.map((item) => {
       const last_trnsaction_time = new Date(item?.last_payment_date).getTime();
@@ -302,12 +303,12 @@ function Managementschools() {
     let haveInvalidSubjectId = false;
     datas?.split(',').map((subject_id) => {
       const parseSubId = parseInt(subject_id);
-      if (typeof parseSubId !== "number") haveInvalidSubjectId = true;
+      if (typeof parseSubId !== 'number') haveInvalidSubjectId = true;
       return parseSubId;
-    })
+    });
     return haveInvalidSubjectId;
     // if (haveInvalidSubjectId) return showNotification('student subjects not founds', 'error');
-  }
+  };
 
   const btnHandleClick = async (event: MouseEvent<HTMLButtonElement>) => {
     // setPrintAndCollect(false);
@@ -340,7 +341,6 @@ function Managementschools() {
         return showNotification('student_id not founds', 'error');
       }
     } else if (searchValue?.id && academicYear?.id) {
-      
       // verify have subjects
       if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
       if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
@@ -742,7 +742,7 @@ function Managementschools() {
           }}
           columnGap={1}
           gap={{ xs: 1 }}
-        // minHeight="fit-content"
+          // minHeight="fit-content"
         >
           <LeftFeesTable
             onTimeDiscountArr={onTimeDiscountArr}

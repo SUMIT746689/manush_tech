@@ -149,10 +149,41 @@ const createClassesWithSections = async (school_id) => {
   // cls sec one
   await prisma.section.create({
     data: {
+      name: "default-Play",
+      class: {
+        create:
+          { name: "Play", code: "001", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec one
+  await prisma.section.create({
+    data: {
+      name: "default-Nursery",
+      class: {
+        create:
+          { name: "Nursery", code: "002", has_section: false, school_id, }
+      }
+    }
+  });
+  // cls sec one
+  await prisma.section.create({
+    data: {
+      name: "default-KG",
+      class: {
+        create:
+          { name: "KG", code: "003", has_section: false, school_id, }
+      }
+    }
+  });
+  
+  // cls sec one
+  await prisma.section.create({
+    data: {
       name: "default-One",
       class: {
         create:
-          { name: "One", code: "001", has_section: false, school_id, }
+          { name: "One", code: "004", has_section: false, school_id, }
       }
     }
   });
@@ -162,7 +193,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Two",
       class: {
         create:
-          { name: "Two", code: "002", has_section: false, school_id, }
+          { name: "Two", code: "005", has_section: false, school_id, }
       }
     }
   });
@@ -172,7 +203,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Three",
       class: {
         create:
-          { name: "Three", code: "003", has_section: false, school_id, }
+          { name: "Three", code: "006", has_section: false, school_id, }
       }
     }
   });
@@ -182,7 +213,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Four",
       class: {
         create:
-          { name: "Four", code: "004", has_section: false, school_id, }
+          { name: "Four", code: "007", has_section: false, school_id, }
       }
     }
   });
@@ -192,7 +223,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Five",
       class: {
         create:
-          { name: "Five", code: "005", has_section: false, school_id, }
+          { name: "Five", code: "008", has_section: false, school_id, }
       }
     }
   });
@@ -202,7 +233,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Six",
       class: {
         create:
-          { name: "Six", code: "006", has_section: false, school_id, }
+          { name: "Six", code: "009", has_section: false, school_id, }
       }
     }
   });
@@ -212,7 +243,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Seven",
       class: {
         create:
-          { name: "Seven", code: "007", has_section: false, school_id, }
+          { name: "Seven", code: "010", has_section: false, school_id, }
       }
     }
   });
@@ -222,7 +253,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Eight",
       class: {
         create:
-          { name: "Eight", code: "008", has_section: false, school_id, }
+          { name: "Eight", code: "011", has_section: false, school_id, }
       }
     }
   });
@@ -232,7 +263,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Nine",
       class: {
         create:
-          { name: "Nine", code: "009", has_section: false, school_id, }
+          { name: "Nine", code: "012", has_section: false, school_id, }
       }
     }
   });
@@ -242,7 +273,7 @@ const createClassesWithSections = async (school_id) => {
       name: "default-Ten",
       class: {
         create:
-          { name: "Ten", code: "010", has_section: false, school_id, }
+          { name: "Ten", code: "013", has_section: false, school_id, }
       }
     }
   });

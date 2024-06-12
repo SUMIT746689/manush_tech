@@ -140,7 +140,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <AutoCompleteWrapper
                         minWidth="100%"
-                        label=""
+                        label="Select Class"
                         placeholder="Select Class"
                         multiple={false}
                         value={values.class || null}
@@ -186,7 +186,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <AutoCompleteWrapper
                         minWidth="100%"
-                        label=""
+                        label="Select Section"
                         placeholder="Select Section"
                         multiple={false}
                         value={values.section || null}
@@ -212,7 +212,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <AutoCompleteWrapper
                         minWidth="100%"
-                        label=""
+                        label="Select Subject"
                         placeholder="Select Subject"
                         multiple={false}
                         value={values.subject || null}
@@ -238,7 +238,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <AutoCompleteWrapper
                         minWidth="100%"
-                        label=""
+                        label="Select Payment Type"
                         placeholder="Select Payment Type"
                         multiple={false}
                         value={values.payment_type || null}
@@ -273,7 +273,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <TextFieldWrapper
                         disabled={values.payment_type_id ? false : true}
-                        label=""
+                        label="Amount"
                         name="amount"
                         type="number"
                         touched={undefined}

@@ -24,7 +24,7 @@ const index = async (req, res, refresh_token, academic_year) => {
         if (student_id) {
           students = await prisma.$queryRaw`
                       SELECT 
-                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
+                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name, student_informations.student_id
                 ,students.class_roll_no
                 ,sections.name as section_name
                 ,classes.name as class_name
@@ -42,11 +42,10 @@ const index = async (req, res, refresh_token, academic_year) => {
             WHERE student_informations.student_id = ${student_id_} AND students.academic_year_id=${academic_year_id}
             GROUP BY students.id
         `;
-
         } else if (search_value) {
           students = await prisma.$queryRaw`
             SELECT 
-                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name
+                student_informations.id,student_informations.first_name,student_informations.middle_name,student_informations.last_name, student_informations.student_id
                 ,students.class_roll_no
                 ,sections.name as section_name
                 ,classes.name as class_name

@@ -148,7 +148,7 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
       const values = {
         student_ids: selectedItems
       };
-      const res = await axios.patch(`/api/student/separate_students`, values);
+      const res = await axios.patch(`/api/student/separated_students`, values);
 
       if (res?.data?.data?.count > 0) {
         setSelectedUsers((prevSelected) => []);

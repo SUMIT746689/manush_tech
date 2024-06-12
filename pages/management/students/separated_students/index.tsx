@@ -258,7 +258,7 @@ function SeparatedStudents() {
         </Grid> */}
       </Card>
       <Grid sx={{ px: 1 }} container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ width: { xs: '100vw', md: '100%' } }}>
           <Results
             query={query}
             setQuery={setQuery}

@@ -393,7 +393,14 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
 
       <Card sx={{ minHeight: 'calc(100vh - 410px)', borderRadius: 0 }}>
         {!selectedBulkActions && (
-          <Box px={2} display="flex" alignItems="center" justifyContent="space-between">
+          <Box
+            sx={{
+              px: { xs: '9px', md: '18px' }
+            }}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
             <Box>
               <Typography component="span" variant="subtitle1">
                 {t('Showing')}:

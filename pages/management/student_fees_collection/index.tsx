@@ -107,13 +107,13 @@ function Managementschools() {
     setCurrDiscount({});
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
-    console.log({ v });
+
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
 
       if (res?.data?.length > 0) {
         const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
         );
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
@@ -127,7 +127,7 @@ function Managementschools() {
       }
     } else if (v?.id && academicYear?.id) {
       const res = await axios.get(
-        `/api/student_payment_collect/${v.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}`
+        `/api/student_payment_collect/${v.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
       );
 
       setLeftFeesTableColumnDataState(res?.data?.data);
@@ -327,9 +327,11 @@ function Managementschools() {
       if (haveInvalidSubjectId(res?.data[0]?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
       if (res?.data?.length > 0) {
+        // old code
         const response = await axios.get(
           `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
         );
+
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
         setStudentClass(res?.data[0]?.class_id);

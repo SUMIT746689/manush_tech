@@ -4,24 +4,50 @@ import prisma from "./utilities/prismaClient.js";
 
 let max_date;
 let max_time;
+let resAutoAttdnceSentSms = [];
+
+const handleGetAutoAttdnceSentSms = () => {
+    prisma.autoAttendanceSentSms.findMany({
+        where: {
+            use_system_type: "external_api",
+            is_attendence_active: true,
+        },
+        select: {
+            external_api_info: true,
+            school: {
+                select: {
+                    name: true
+                }
+            },
+            school_id: true
+        }
+    }).then((res) => resAutoAttdnceSentSms = res);
+}
+
+handleGetAutoAttdnceSentSms();
+
+setInterval(() => {
+    handleGetAutoAttdnceSentSms();
+}, 60000 * 5)
 
 const main = async () => {
     try {
-        const resAutoAttdnceSentSms = await prisma.autoAttendanceSentSms.findMany({
-            where: {
-                use_system_type: "external_api",
-                is_attendence_active: true,
-            },
-            select: {
-                external_api_info: true,
-                school: {
-                    select: {
-                        name: true
-                    }
-                },
-                school_id: true
-            }
-        });
+        console.log(resAutoAttdnceSentSms)
+        // const resAutoAttdnceSentSms = await prisma.autoAttendanceSentSms.findMany({
+        //     where: {
+        //         use_system_type: "external_api",
+        //         is_attendence_active: true,
+        //     },
+        //     select: {
+        //         external_api_info: true,
+        //         school: {
+        //             select: {
+        //                 name: true
+        //             }
+        //         },
+        //         school_id: true
+        //     }
+        // });
         resAutoAttdnceSentSms?.forEach(async singleResp => {
 
             const { external_api_info, school, school_id } = singleResp;

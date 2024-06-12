@@ -167,6 +167,16 @@ const students: MenuItems[] = [
         icon: RecordVoiceOverIcon
       },
       {
+        name: 'Separate Students',
+        link: '/management/students/separated_students',
+        icon: RecordVoiceOverIcon
+      },
+      {
+        name: 'Separate Students List',
+        link: '/management/students/separated_students/list',
+        icon: RecordVoiceOverIcon
+      },
+      {
         name: 'Rooms',
         link: '/management/rooms',
         icon: RoomPreferencesIcon

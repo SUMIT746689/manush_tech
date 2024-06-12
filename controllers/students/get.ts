@@ -26,6 +26,7 @@ async function get(req, res, refresh_token) {
     const students = await prisma.student.findMany({
       where: {
         ...where,
+        is_separate: false,
         student_info: {
           school_id: refresh_token.school_id,
           user: {

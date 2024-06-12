@@ -9,7 +9,7 @@ import { Card, Chip, Dialog, DialogTitle, Grid, Typography, Box, TextField, Inpu
 
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 
-import Results from '@/content/Management/Students/separate_students/Results';
+import Results from '@/content/Management/Students/separated_students/list/Results';
 // import RegistrationFirstPart from '@/content/Management/Students/RegistrationFirstPart';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -27,7 +27,7 @@ import { read, utils } from 'xlsx';
 import { handleCreateFileObj } from 'utilities_api/handleCreateFileObject';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
-function ManagementClasses() {
+function SeparatedStudentsList() {
   const [students, setStudents] = useContext<any[]>(Students);
 
   const { t }: { t: any } = useTranslation();
@@ -104,7 +104,7 @@ function ManagementClasses() {
     if (academicYear && selectedSection) {
       axios
         .get(
-          `/api/student/separate_students?${
+          `/api/student/separated_students_list?${
             selectedSection.id == 'all' ? `class_id=${selectedClass?.id}` : `section_id=${selectedSection?.id}`
           }&academic_year_id=${academicYear?.id}`
         )
@@ -158,14 +158,14 @@ function ManagementClasses() {
   return (
     <>
       <Head>
-        <title>Separate_Students</title>
+        <title>Separated_Students_list</title>
       </Head>
 
       <PageTitleWrapper>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Typography variant="h3" component="h3" gutterBottom>
-              {t('Separate Students')}
+              {t('Separated Students List')}
             </Typography>
           </Grid>
         </Grid>
@@ -195,7 +195,7 @@ function ManagementClasses() {
                   )
                 }}
                 onChange={handleQueryChange}
-                placeholder={t('Search by teacher name, username or phone number...')}
+                placeholder={t('Search by student name, username or phone number...')}
                 value={query}
                 fullWidth
                 variant="outlined"
@@ -258,7 +258,7 @@ function ManagementClasses() {
         </Grid> */}
       </Card>
       <Grid sx={{ px: 1 }} container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ width: { xs: '100vw', md: '100%' } }}>
           <Results
             query={query}
             setQuery={setQuery}
@@ -277,10 +277,10 @@ function ManagementClasses() {
   );
 }
 
-ManagementClasses.getLayout = (page) => (
+SeparatedStudentsList.getLayout = (page) => (
   <Authenticated name="student">
     <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
   </Authenticated>
 );
 
-export default ManagementClasses;
+export default SeparatedStudentsList;

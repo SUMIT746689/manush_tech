@@ -5,8 +5,10 @@ import { logFile } from 'utilities_api/handleLogFile';
 export default async function post(req, res, refresh_token, dcryptAcademicYear) {
   try {
     const { id: academic_year_id } = dcryptAcademicYear;
+    const { school_id } = refresh_token;
+    console.log({ academic_year_id })
 
-    const { fees_type_id, fees_head_id, amount, last_date, class_ids, school_id, late_fee, months, subject_ids } = req.body;
+    const { fees_type_id, fees_head_id, amount, last_date, class_ids, late_fee, months, subject_ids } = req.body;
 
     if (fees_type_id === 'subject_based' && !subject_ids) {
       throw new Error('provide all valid information gfgfgfg');
@@ -68,7 +70,8 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
             class_id,
             title: month,
             last_date,
-            fees_month: month
+            fees_month: month,
+            academic_year_id
           }
         });
         await prisma.voucher.create({
@@ -80,7 +83,7 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
             type: 'credit',
             resource_type: 'fee',
             resource_id: fee.id,
-            school_id: refresh_token.school_id
+            school_id
           }
         });
       }

@@ -8,9 +8,9 @@ const get = async (req, res, refresh_token, academic_year) => {
     let on_time_discount_total_arr = [];
     const { id, selected_month, fromDate, toDate, subject_ids } = req.query;
     const { id: academic_year_id } = academic_year;
-    console.log({ academic_year_id })
+
     if (!id) throw new Error('provide student_id');
-    if (!subject_ids) throw new Error();
+    // if (!subject_ids) throw new Error();
 
     const parseSubjectIds = subject_ids?.split(',').map((subject_id) => {
       const parseSubId = parseInt(subject_id);
@@ -26,7 +26,7 @@ const get = async (req, res, refresh_token, academic_year) => {
     const monthsBeforeSelected: monthListType[] = monthList.slice(0, selectedIndex + 1);
     // monthsBeforeSelected.push(selected_month.toLocaleLowerCase());
     // multiple month related code end
-
+    console.log({ parseSubjectIds })
     const dateFilter = {},
       query = {};
     if (fromDate) dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0));
@@ -81,15 +81,18 @@ const get = async (req, res, refresh_token, academic_year) => {
                 name: true,
                 fees: {
                   where: {
-                    // old  AND: [{ academic_year_id: Number(academic_year_id) }, { fees_month: lowerCaseMonth }]
-                    AND: [
-                      { academic_year_id: Number(academic_year_id) },
+                    academic_year_id,
+                    fees_month: { in: monthsBeforeSelected },
+                    OR: [
                       {
-                        fees_month: { in: monthsBeforeSelected }
+                        fees_type: "class_based"
                       },
-                      {
+                      parseSubjectIds ? {
+                        fees_type: "subject_based",
                         subject_id: { in: parseSubjectIds }
                       }
+                        :
+                        {}
                     ]
                   },
                   include: {

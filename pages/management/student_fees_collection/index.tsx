@@ -90,7 +90,7 @@ function Managementschools() {
       } else if (!value) {
         setSearchOptionData([]);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
@@ -108,7 +108,6 @@ function Managementschools() {
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
 
-    console.log({v})
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
 
@@ -324,14 +323,14 @@ function Managementschools() {
       const res = await axios.get(`/api/student/search-students?student_id=${student_id?.toLowerCase()}`);
 
       // verify have subjects
-      if (!res?.data[0]?.subject_ids) return showNotification('student subjects not founds', 'error');
-      if (haveInvalidSubjectId(res?.data[0]?.subject_ids)) return showNotification('student subjects not founds', 'error');
+      // if (!res?.data[0]?.subject_ids) return showNotification('student subjects not founds', 'error');
+      // if (haveInvalidSubjectId(res?.data[0]?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
       if (res?.data?.length > 0) {
         // old code
-        const response = await axios.get(
-          `/api/student_payment_collect/${res?.data[0]?.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
-        );
+        let url = `/api/student_payment_collect/${res?.data[0]?.student_table_id}?selected_month=${selected_month}`;
+        if (res?.data[0]?.subject_ids && !haveInvalidSubjectId(res?.data[0]?.subject_ids)) url = url + `&subject_ids=${res?.data[0]?.subject_ids}`;
+        const response = await axios.get(url);
 
         // set search level code
         setSearchValue(`${res?.data[0]?.first_name} | ${res?.data[0]?.class_name} | ${res?.data[0]?.class_roll_no} | ${res?.data[0]?.section_name}`);
@@ -345,12 +344,12 @@ function Managementschools() {
       }
     } else if (searchValue?.id && academicYear?.id) {
       // verify have subjects
-      if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
-      if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
+      // if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
+      // if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
-      const res = await axios.get(
-        `/api/student_payment_collect/${searchValue.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids}`
-      );
+      let url = `/api/student_payment_collect/${searchValue.student_table_id}?selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids}`
+      if (searchValue?.subject_ids && !haveInvalidSubjectId(searchValue?.subject_ids)) url = url + `&subject_ids=${searchValue?.subject_ids}`;
+      const res = await axios.get(url);
 
       setLeftFeesTableColumnDataState(res?.data?.data);
       leftFeesTableColumnData(res?.data?.data);
@@ -745,7 +744,7 @@ function Managementschools() {
           }}
           columnGap={1}
           gap={{ xs: 1 }}
-          // minHeight="fit-content"
+        // minHeight="fit-content"
         >
           <LeftFeesTable
             onTimeDiscountArr={onTimeDiscountArr}

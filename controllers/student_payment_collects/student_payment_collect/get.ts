@@ -1,21 +1,22 @@
 import prisma from '@/lib/prisma_client';
 import { monthList, monthListType } from '@/utils/getDay';
+import { academicYearVerify, authenticate } from 'middleware/authenticate';
 import { logFile } from 'utilities_api/handleLogFile';
 
-export const get = async (req, res) => {
+const get = async (req, res, refresh_token, academic_year) => {
   try {
     let on_time_discount_total_arr = [];
-    const { id, selected_month, fromDate, toDate, academic_year_id, subject_ids } = req.query;
-    console.log({ subject_ids });
-
+    const { id, selected_month, fromDate, toDate, subject_ids } = req.query;
+    const { id: academic_year_id } = academic_year;
+    console.log({ academic_year_id })
     if (!id) throw new Error('provide student_id');
-    if (!subject_ids) throw new Error()
+    if (!subject_ids) throw new Error();
 
     const parseSubjectIds = subject_ids?.split(',').map((subject_id) => {
       const parseSubId = parseInt(subject_id);
-      if (typeof parseSubId !== "number") throw new Error('provide invalid subject id')
+      if (typeof parseSubId !== 'number') throw new Error('provide invalid subject id');
       return parseSubId;
-    })
+    });
 
     const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
     if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error('provide a valid month');
@@ -254,3 +255,5 @@ export const get = async (req, res) => {
     res.status(404).json({ error: err.message });
   }
 };
+
+export default authenticate(academicYearVerify(get));

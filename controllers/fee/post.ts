@@ -5,18 +5,23 @@ import { logFile } from 'utilities_api/handleLogFile';
 export default async function post(req, res, refresh_token, dcryptAcademicYear) {
   try {
     const { id: academic_year_id } = dcryptAcademicYear;
-    const { fees_head_id, amount, last_date, class_ids, school_id, late_fee, months, subject_ids } = req.body;
 
-    console.log(subject_ids);
-    if (!subject_ids || !fees_head_id || !amount || !last_date || !academic_year_id || !class_ids || !school_id)
+    const { fees_type_id, fees_head_id, amount, last_date, class_ids, school_id, late_fee, months, subject_ids } = req.body;
+
+    if (fees_type_id === 'subject_based' && !subject_ids) {
+      throw new Error('provide all valid information gfgfgfg');
+    }
+    if (!fees_type_id || !fees_head_id || !amount || !last_date || !academic_year_id || !class_ids || !school_id)
       throw new Error('provide all valid information');
+
     // old code
     if (!Array.isArray(class_ids)) throw new Error('invalid class ids field');
 
-    const data = { fees_head_id, amount, last_date: new Date(last_date), academic_year_id, school_id };
+    const data = { fees_head_id, amount, last_date: new Date(last_date), academic_year_id, school_id, fees_type: fees_type_id };
 
     if (req.body.for) data['for'] = req.body.for;
     if (late_fee) data['late_fee'] = late_fee;
+    if (subject_ids) data['subject_id'] = subject_ids;
 
     let haveInvalidClsId = false;
 
@@ -36,7 +41,14 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
 
     const resAlreadyCreatedFees = await prisma.fee.findMany({
       where: {
-        AND: [{ fees_head_id }, { academic_year_id }, { class_id: { in: class_ids } }, { fees_month: { in: months } }, { subject_id: subject_ids }, { deleted_at: null }]
+        AND: [
+          { fees_head_id },
+          { academic_year_id },
+          { class_id: { in: class_ids } },
+          { fees_month: { in: months } },
+          { subject_id: subject_ids },
+          { deleted_at: null }
+        ]
       },
       select: { fees_month: true }
     });
@@ -49,11 +61,11 @@ export default async function post(req, res, refresh_token, dcryptAcademicYear) 
       for (const month of months) {
         const monthIndex = monthList.indexOf(month);
         const last_date = lastDateOfMonth({ monthInt: monthIndex, date: today });
+
         const fee = await prisma.fee.create({
           data: {
             ...data,
             class_id,
-            subject_id: subject_ids,
             title: month,
             last_date,
             fees_month: month

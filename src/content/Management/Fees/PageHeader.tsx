@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik, ErrorMessage } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'src/hooks/useAuth';
 import { Grid, Dialog, DialogContent } from '@mui/material';
@@ -20,6 +20,16 @@ const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
   label: i,
   value: i.toLocaleLowerCase()
 }));
+const fees_type_arr = [
+  {
+    id: 'class_based',
+    label: 'Class-Based'
+  },
+  {
+    id: 'subject_based',
+    label: 'Subject-Based'
+  }
+];
 
 function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetchData, subjectData }) {
   const { t }: { t: any } = useTranslation();
@@ -137,7 +147,8 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
             subject_id: editData?.subject_id || undefined,
             subject_ids: editData?.subject ? subjectData.find((subject) => subject.value === editData.subject_id) : undefined,
             class_ids: editData?.class ? classData.find((cls) => cls.value === editData.class_id) : undefined,
-            // frequency: editData?.frequency || undefined,
+            fees_type: editData?.fees_type ? fees_type_arr.find((item) => item.id === editData?.fees_type) : undefined,
+            fees_type_id: editData?.fees_type || undefined,
             months: [],
             late_fee: editData?.late_fee || 0,
             submit: null
@@ -148,7 +159,14 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
             school_id: Yup.number().min(1).required(t('The school id is required')),
             months: !editData && Yup.array().min(1, 'select a month'),
             class_id: Yup.number().min(1, 'The class is required').required(t('The class is required')),
-            subject_id: Yup.number().min(1, 'The section is required').required(t('The section is required'))
+            subject_id: Yup.number()
+              .min(1, 'The subject is required')
+              .when('fees_type_id', {
+                is: 'subject_based', // Check if fees_type_id is equal to "subject_based"
+                then: Yup.number().required('The subject is required'),
+                otherwise: Yup.number().notRequired()
+              }),
+            fees_type_id: Yup.string().min(1, 'The section is required').required(t('Fees type is required'))
           })}
           onSubmit={handleSubmit}
         >
@@ -194,58 +212,92 @@ function PageHeader({ name, feesHeads, editData, seteditData, classData, reFetch
                       />
                     </Grid>
 
+                    {/* select type */}
+
+                    <Grid item xs={12} sm={6}>
+                      <AutoCompleteWrapperWithoutRenderInput
+                        multiple={false}
+                        disabled={editData}
+                        minWidth="100%"
+                        label="Select Fees Type"
+                        placeholder="Select Fees Type"
+                        // value={values.fees_type || null}
+
+                        value={editData ? fees_type_arr.find((item) => item.id === values.fees_type_id) : values.fees_type}
+                        options={fees_type_arr}
+                        name="fees_type_id"
+                        error={errors?.fees_type_id}
+                        touched={touched?.fees_type_id}
+                        // @ts-ignore
+                        handleChange={(e, value: any) => {
+                          if (value) {
+                            setFieldValue('fees_type', value);
+                            setFieldValue('fees_type_id', value.id);
+                          } else {
+                            setFieldValue('fees_type', undefined);
+                            setFieldValue('fees_type_id', undefined);
+                          }
+                        }}
+                      />
+                    </Grid>
+
                     {/* Class */}
-                    <Grid item xs={12} sm={6}>
-                      <AutoCompleteWrapperWithoutRenderInput
-                        multiple={false}
-                        disabled={editData}
-                        minWidth="100%"
-                        label="Select Class"
-                        placeholder="select a class..."
-                        value={editData ? classData.find((cls) => cls.value === values.class_id) : values?.class_ids?.value}
-                        options={classData}
-                        name="class_id"
-                        error={errors?.class_id}
-                        touched={touched?.class_id}
-                        // @ts-ignore
-                        handleChange={(event, value) => {
-                          if (value) {
-                            subjectListFn(value);
-                            setFieldValue('class_ids', value || undefined);
-                            setFieldValue('class_id', value.value || 0);
-                          } else {
-                            setFieldValue('subject_ids', undefined);
-                            setFieldValue('subject_id', 0);
-                            setSubjectList([]);
-                          }
-                        }}
-                      />
-                    </Grid>
+                    {values.fees_type_id && (
+                      <Grid item xs={12} sm={6}>
+                        <AutoCompleteWrapperWithoutRenderInput
+                          multiple={false}
+                          disabled={editData}
+                          minWidth="100%"
+                          label="Select Class"
+                          placeholder="select a class..."
+                          value={editData ? classData.find((cls) => cls.value === values.class_id) : values?.class_ids?.value}
+                          options={classData}
+                          name="class_id"
+                          error={errors?.class_id}
+                          touched={touched?.class_id}
+                          // @ts-ignore
+                          handleChange={(event, value) => {
+                            if (value) {
+                              subjectListFn(value);
+                              setFieldValue('class_ids', value || undefined);
+                              setFieldValue('class_id', value.value || 0);
+                            } else {
+                              setFieldValue('subject_ids', undefined);
+                              setFieldValue('subject_id', 0);
+                              setSubjectList([]);
+                            }
+                          }}
+                        />
+                      </Grid>
+                    )}
+
                     {/* subject related code start */}
-                    <Grid item xs={12} sm={6}>
-                      <AutoCompleteWrapperWithoutRenderInput
-                        multiple={false}
-                        disabled={editData}
-                        minWidth="100%"
-                        label="Select Subject"
-                        placeholder="select a subject..."
-                        value={editData ? subjectData.find((sub) => sub.value === values.subject_id) : values.subject_ids || null}
-                        options={subjectList}
-                        name="subject_id"
-                        error={errors?.subject_id}
-                        touched={touched?.subject_id}
-                        // @ts-ignore
-                        handleChange={(event, value) => {
-                          if (value) {
-                            setFieldValue('subject_ids', value || undefined);
-                            setFieldValue('subject_id', value.value || 0);
-                          } else {
-                            setFieldValue('subject_ids', undefined);
-                            setFieldValue('subject_id', 0);
-                          }
-                        }}
-                      />
-                    </Grid>
+                    {values.fees_type_id === 'subject_based' && (
+                      <Grid item xs={12} sm={6}>
+                        <AutoCompleteWrapperWithoutRenderInput
+                          multiple={false}
+                          disabled={editData}
+                          minWidth="100%"
+                          label="Select Subject"
+                          placeholder="select a subject..."
+                          value={editData ? subjectData.find((sub) => sub.value === values.subject_id) : values.subject_ids || null}
+                          options={subjectList}
+                          name="subject_id"
+                          error={errors?.subject_id}
+                          touched={touched?.subject_id}
+                          // @ts-ignore
+                          handleChange={(event, value) => {
+                            if (value) {
+                              setFieldValue('subject_ids', value || undefined);
+                              setFieldValue('subject_id', value.value || 0);
+                            } else {
+                              setFieldValue('subject_ids', undefined);
+                              setFieldValue('subject_id', 0);
+                            }
+                          }}
+                        />
+                      </Grid>
+                    )}
 
                     {/* Amount */}
                     <Grid item xs={12} sm={6}>

@@ -465,6 +465,8 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                       onChange={handleSelectAllUsers}
                     />
                   </TableCell> */}
+                  <TableHeaderCellWrapper>{t('User id')}</TableHeaderCellWrapper>
+                  
                   <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('student id')}</TableHeaderCellWrapper>
 
@@ -490,6 +492,9 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           value={isUserSelected}
                         />
                       </TableCell> */}
+                      <TableBodyCellWrapper>
+                        {i?.student_info?.user?.id}
+                      </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
                         {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
                       </TableBodyCellWrapper>

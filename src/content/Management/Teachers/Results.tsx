@@ -44,6 +44,7 @@ import Image from 'next/image';
 import useNotistick from '@/hooks/useNotistick';
 import { TableEmptyWrapper } from '@/components/TableWrapper';
 import { getFile } from '@/utils/utilitY-functions';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -271,13 +272,13 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">{t('ID')}</TableCell>
-                    <TableCell>{t('Name')}</TableCell>
-                    <TableCell>{t('UserName')}</TableCell>
-                    <TableCell>{t('Phone Number')}</TableCell>
-                    <TableCell>{t('Photo')}</TableCell>
-                    <TableCell>{t('School Name')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    <TableHeaderCellWrapper align="center">{t('User ID')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('UserName')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Phone Number')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Photo')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('School Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -288,53 +289,41 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                         key={i.id}
 
                       >
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {i.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {[i?.first_name, i?.middle_name, i?.last_name].join(' ')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {i.user?.username}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5" color="yellowgreen">
-                            <a href={`tel:${i.phone}`}>{i.phone}</a>
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {i.photo ? (
-                              <Image
-                                style={{ width: '50px' }}
-                                alt="profile photo"
-                                width={20}
-                                height={20}
-                                src={getFile(i?.photo)}
-                              />
-                            ) : (
-                              <Image
-                                style={{ width: '50px' }}
-                                alt="profile photo"
-                                width={20}
-                                height={20}
-                                src={`/dumy_teacher.png`}
-                              />
-                            )}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography noWrap variant="h5">
-                            {i.user?.school?.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
+                        <TableBodyCellWrapper>
+                          {[i?.first_name, i?.middle_name, i?.last_name].join(' ')}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper >
+                          {i.user.id}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper>
+                          {i.user?.username}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper>
+                          <a href={`tel:${i.phone}`}>{i.phone}</a>
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">
+                          {i.photo ? (
+                            <Image
+                              style={{ width: '50px' }}
+                              alt="profile photo"
+                              width={20}
+                              height={20}
+                              src={getFile(i?.photo)}
+                            />
+                          ) : (
+                            <Image
+                              style={{ width: '50px' }}
+                              alt="profile photo"
+                              width={20}
+                              height={20}
+                              src={`/dumy_teacher.png`}
+                            />
+                          )}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper>
+                          {i.user?.school?.name}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper>
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
@@ -355,7 +344,7 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                               </IconButton>
                             </Tooltip>
                           </Typography>
-                        </TableCell>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

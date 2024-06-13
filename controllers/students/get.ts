@@ -49,6 +49,7 @@ async function get(req, res, refresh_token) {
             },
             user: {
               select: {
+                id: true,
                 username: true
               }
             }

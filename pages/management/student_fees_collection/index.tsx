@@ -108,6 +108,7 @@ function Managementschools() {
     setLeftFeesTableData(() => []);
     setLeftFeesTableData(() => []);
 
+    console.log({v})
     if (v?.student_id) {
       const res = await axios.get(`/api/student/search-students?student_id=${v?.student_id?.toLowerCase()}`);
 
@@ -127,7 +128,7 @@ function Managementschools() {
       }
     } else if (v?.id && academicYear?.id) {
       const res = await axios.get(
-        `/api/student_payment_collect/${v.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${res?.data[0]?.subject_ids}`
+        `/api/student_payment_collect/${v.student_table_id}?academic_year_id=${academicYear.id}&selected_month=${selected_month}&subject_ids=${v.subject_ids}`
       );
 
       setLeftFeesTableColumnDataState(res?.data?.data);

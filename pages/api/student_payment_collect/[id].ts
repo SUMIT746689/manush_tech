@@ -1,4 +1,4 @@
-import { get } from 'controllers/student_payment_collects/student_payment_collect/get';
+import get from 'controllers/student_payment_collects/student_payment_collect/get';
 import { patch } from 'controllers/student_payment_collects/student_payment_collect/patch';
 import { logFile } from 'utilities_api/handleLogFile';
 

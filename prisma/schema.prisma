@@ -532,11 +532,11 @@ model Fee {
   school_id        Int
   fees_head_id     Int?
   deleted_at       DateTime?
-  fees_type        String? 
+  fees_type        String?
 
   academic_year       AcademicYear @relation(fields: [academic_year_id], references: [id])
   class               Class        @relation(fields: [class_id], references: [id])
-  subject             Subject?      @relation(fields: [subject_id], references: [id])
+  subject             Subject?     @relation(fields: [subject_id], references: [id])
   school              School       @relation(fields: [school_id], references: [id])
   fees_head           FeesHaed?    @relation(fields: [fees_head_id], references: [id])
   student_fees        StudentFee[]
@@ -1719,8 +1719,12 @@ model studentFeeWiseTeacherPay {
   subject_id       Int
   teacher_pay_type TeacherPayType
   amount           Float
+  collection_date  DateTime
+  created_at       DateTime       @default(now())
 
   studentFee StudentFee? @relation(fields: [student_fee_id], references: [id])
+
+  @@map("student_fee_wise_teacher_pays")
 }
 
 enum PaymentType {

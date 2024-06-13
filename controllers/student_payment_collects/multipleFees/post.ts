@@ -437,7 +437,7 @@ const teacherPayamount = async (data, school_id) => {
   } = data;
   const teacherFindPay = await prisma.teacherSalaryStructure.findFirst({
     where: {
-      subject_id,
+      subject_id: subject_id || undefined,
       deleted_at: null,
       school_id
     }

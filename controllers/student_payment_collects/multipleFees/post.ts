@@ -101,6 +101,7 @@ const handleTransaction = ({ collection_date, data, status, account, voucher, re
           account_balance: account.balance,
           collect_amount: data.collected_amount,
           tracking_number,
+          collection_date,
           created_at: temp.created_at,
           on_time_discount: temp.on_time_discount,
           //  last_payment_date: temp.created_at,
@@ -421,7 +422,7 @@ export const post = async (req, res, refresh_token) => {
 const teacherPayamount = async (data, school_id) => {
   const {
     fee_id, id: student_fee_id
-    , account_id, account_balance, collect_amount, tracking_number, created_at,
+    , account_id, account_balance, collect_amount, tracking_number, collection_date, created_at,
     on_time_discount,
     last_payment_date,
     account_name,
@@ -458,7 +459,8 @@ const teacherPayamount = async (data, school_id) => {
       teacher_pay_type: teacherFindPay.payment_type,
       subject_id,
       student_fee_id,
-      amount: calcTeacherPayAmt
+      amount: calcTeacherPayAmt,
+      collection_date
     }
   }).then(res => { console.log(res) })
 

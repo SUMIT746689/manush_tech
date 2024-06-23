@@ -272,9 +272,10 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableHeaderCellWrapper align="center">{t('User ID')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Teacher Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Teacher Id')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('User ID')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper>{t('UserName')}</TableHeaderCellWrapper>
-                    <TableHeaderCellWrapper>{t('Name')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper>{t('Phone Number')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper>{t('Photo')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper>{t('School Name')}</TableHeaderCellWrapper>
@@ -291,6 +292,9 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
                       >
                         <TableBodyCellWrapper>
                           {[i?.first_name, i?.middle_name, i?.last_name].join(' ')}
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper >
+                          {i.teacher_id}
                         </TableBodyCellWrapper>
                         <TableBodyCellWrapper >
                           {i.user.id}

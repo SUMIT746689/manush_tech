@@ -629,6 +629,11 @@ const sms: MenuItems[] = [
             icon: RequestQuoteIcon
           },
           {
+            name: 'Fees Collection SMS',
+            link: '/settings/fees_collection_sms',
+            icon: RequestQuoteIcon
+          },
+          {
             name: 'Student Auto Sent Sms',
             link: '/settings/student_autometic_sent_sms',
             icon: RequestQuoteIcon

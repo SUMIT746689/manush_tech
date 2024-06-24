@@ -133,6 +133,7 @@ model School {
   FeesHaed                   FeesHaed[]
   teacherSalaries            TeacherSalaryStructure[]
   // StudentClassSubjects       StudentClassSubjects[]
+  smsSettings                SmsSettings?
 
   // routines Routine[]
   @@map("schools")
@@ -1572,6 +1573,21 @@ model AutoAttendanceSentSms {
   school School @relation(fields: [school_id], references: [id])
 
   @@map("auto_attendance_sent_sms")
+}
+
+model SmsSettings {
+  id                            Int     @id @default(autoincrement())
+  fees_collection_sms_body      String?
+  is_fees_collection_sms_active Boolean @default(false)
+  school_id                     Int     @unique
+
+  updated_by Json?     @default("[]")
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  school School @relation(fields: [school_id], references: [id])
+
+  @@map("sms_settings")
 }
 
 // model StdSentSmsSettings {

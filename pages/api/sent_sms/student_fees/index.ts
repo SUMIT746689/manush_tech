@@ -10,6 +10,7 @@ const index = async (req, res) => {
     case 'GET':
       get(req, res);
       break;
+      
     case 'POST':
       post(req, res);
       break;

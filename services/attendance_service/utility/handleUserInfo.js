@@ -12,7 +12,6 @@ export const handleResStdInfo = async ({ user_id }) => {
                 id: true,
                 guardian_phone: true,
                 class_roll_no: true,
-                guardian_phone: true,
                 section: {
                     select:
                     {

@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { monthList } from '@/utils/getDay';
 import { Data } from '@/models/front_end';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 // updated searching code start
 
@@ -569,7 +570,7 @@ function Managementschools() {
     const singleUser = student_list.data.find((item, i) => {
       return item.student_information_id === userInformation.id;
     });
-
+    console.log({ singleUser })
     // updated code end
 
     if (!singleUser?.student_info?.phone) return showNotification('phone number not founds', 'error');
@@ -598,14 +599,18 @@ function Managementschools() {
 
     axios
       .post('/api/sent_sms/student_fees', {
+        student_info_id: singleUser.student_information_id,
+        student_id: singleUser.id,
         sms_text,
+        total_paid_amount,
+        tracking_number: printFees[0].tracking_number,
         contacts: singleUser?.student_info?.phone
       })
       .then(({ data }) => {
         if (data?.success) showNotification('sending sms successfully');
       })
       .catch((err) => {
-        showNotification('faild to sending sms ', 'error');
+        handleShowErrMsg(err, showNotification);
       })
       .finally(() => {
         setIsSentSmsLoading(false);

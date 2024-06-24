@@ -131,8 +131,11 @@ model School {
   VoiceGateway               VoiceGateway?
   VoiceTemplate              VoiceTemplate[]
   FeesHaed                   FeesHaed[]
+<<<<<<< HEAD
   teacherSalaries            TeacherSalaryStructure[]
   // StudentClassSubjects       StudentClassSubjects[]
+=======
+>>>>>>> 6d39fe3 (create template for student fees sms and sent sms)
   smsSettings                SmsSettings?
 
   // routines Routine[]

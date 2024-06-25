@@ -28,7 +28,8 @@ import {
   Button,
   Typography,
   Dialog,
-  styled
+  styled,
+  Grid
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -43,6 +44,7 @@ import { accessNestedProperty } from '@/utils/utilitY-functions';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -251,12 +253,12 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">{t('Section Id')}</TableCell>
-                    <TableCell >{t('Section name')}</TableCell>
-                    <TableCell >{t('class Name')}</TableCell>
-                    <TableCell >{t('Group Name')}</TableCell>
-                    <TableCell >{t('section teacher name')}</TableCell>
-                    <TableCell >{t('Actions')}</TableCell>
+                    <TableHeaderCellWrapper >{t('Batch Id')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('Batch name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('class Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('Group Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('section teacher name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -264,27 +266,13 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
                       <TableRow hover key={i.id} selected={isUserSelected}>
-                        <TableCell>
-                          <Typography align="center" variant="h5">{i?.id}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">{i?.name}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">{i?.class.name}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {i?.groups?.map(group => group.title).join(', ')}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {i?.class_teacher?.user?.username}
-                          </Typography>
-                        </TableCell>
+                        <TableBodyCellWrapper>{i?.id}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{i?.name}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{i?.class.name}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{i?.groups?.map(group => group.title).join(', ')}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{i?.class_teacher?.user?.username}</TableBodyCellWrapper>
 
-                        <TableCell align="center">
+                        <TableBodyCellWrapper align="center">
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
@@ -304,7 +292,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
                               </IconButton>
                             </Tooltip>
                           </Typography>
-                        </TableCell>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

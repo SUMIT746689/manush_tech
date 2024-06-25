@@ -4,21 +4,20 @@ import { logFile } from 'utilities_api/handleLogFile';
 
 async function post(req, res, refresh_token) {
   try {
-    const { subjects, student_id } = req.body;
+    const { sections, student_id } = req.body;
     const { school_id } = refresh_token;
 
-    if (!student_id || !Array.isArray(subjects)) throw new Error('student field is required');
-    subjects.forEach(({ subject_id }) => {
-      if (!subject_id) throw new Error('subject or teacher not founds ');
+    if (!student_id || !Array.isArray(sections)) throw new Error('student field is required');
+    sections.forEach(({ section_id }) => {
+      if (!section_id) throw new Error('subject or teacher not founds ');
     })
 
-    const subject_ids = subjects.map(sub => ({ id: sub.subject_id }));
-
+    const section_ids = sections.map(sec => ({ id: sec.section_id }));
     await prisma.student.update({
       where: { id: student_id, student_info: { school_id } },
       data: {
-        subjects: {
-          connect: subject_ids
+        batches: {
+          connect: section_ids
         }
       }
     })

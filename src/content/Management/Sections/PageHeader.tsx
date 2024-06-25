@@ -205,7 +205,7 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
   return (
     <>
       <PageHeaderTitleWrapper
-        name="Section"
+        name="batch"
         handleCreateClassOpen={handleCreateClassOpen}
       />
 
@@ -221,10 +221,10 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            {t(editSection ? 'Edit a Section' : 'Add new Section')}
+            {t(editSection ? 'Edit a Batch' : 'Add new Batch')}
           </Typography>
           <Typography variant="subtitle2">
-            {t('Fill in the fields below to create and add a new section')}
+            {t('Fill in the fields below to create and add a new batch')}
           </Typography>
         </DialogTitle>
         <Formik
@@ -241,7 +241,7 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
           validationSchema={Yup.object().shape({
             name: Yup.string()
               .max(255)
-              .required(t('The Section name field is required')),
+              .required(t('The Batch name field is required')),
             class_id: editSection ? Yup.number()
               .positive()
               .integer()
@@ -273,7 +273,7 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
                     <TextFieldWrapper
                       errors={errors.name}
                       touched={touched.name}
-                      label={t('Section name')}
+                      label={t('Batch Name')}
                       name="name"
                       value={values.name}
                       handleBlur={handleBlur}
@@ -406,7 +406,7 @@ function PageHeader({ editSection, setEditSection, reFetchData, classList }) {
                   </Grid>
                 </DialogContent>
                 <DialogActionWrapper
-                  title="Section"
+                  title="Batch"
                   handleCreateClassClose={handleCreateClassClose}
                   errors={errors}
                   editData={editSection}

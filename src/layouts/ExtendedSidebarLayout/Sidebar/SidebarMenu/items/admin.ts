@@ -114,8 +114,13 @@ const students: MenuItems[] = [
         link: '/management/classes'
       },
       {
-        name: ' Sections',
-        link: '/management/sections',
+        name: 'Batches',
+        link: '/management/batches',
+        icon: AllInboxIcon
+      },
+      {
+        name: 'Student Batches',
+        link: '/management/student_batches',
         icon: AllInboxIcon
       },
       {

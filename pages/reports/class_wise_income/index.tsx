@@ -214,7 +214,12 @@ const ClassWiseIncome = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => handlePrint()} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={false}
+                    handleClick={() => handlePrint()}
+                    disabled={reports.length === 0 ? true : false}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>

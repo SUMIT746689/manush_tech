@@ -10,12 +10,12 @@ const index = async (req, res) => {
       case 'GET':
         const { start_date, end_date, selected_class, selected_group, selected_section } = req.query;
 
-        if (!start_date || !end_date || !selected_section) throw new Error("provide required information")
+        if (!start_date || !end_date || !selected_section) throw new Error('provide required information');
 
         // date formating code start
         let start_date_ = new Date(new Date(start_date).setHours(0, 0, 0, 0));
         let end_date_ = new Date(new Date(end_date).setHours(23, 59, 59, 999));
-        
+
         // let hoursToSubtract = 6;
         // let new_start_date = subtractHours(start_date_, hoursToSubtract);
         // let new_end_date = subtractHours(end_date_, hoursToSubtract);
@@ -67,6 +67,19 @@ const index = async (req, res) => {
             }
           },
           select: {
+            on_time_discount: true,
+            fee: {
+              select: {
+                id: true,
+                Discount: true,
+                amount: true
+              }
+            },
+            transaction: {
+              select: {
+                voucher_name: true
+              }
+            },
             total_payable: true,
             collected_amount: true,
             student: {

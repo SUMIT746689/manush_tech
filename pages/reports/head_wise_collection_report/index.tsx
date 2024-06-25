@@ -37,7 +37,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const TableContent = ({ total, reports }) => {
-
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
       <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
@@ -49,27 +48,27 @@ const TableContent = ({ total, reports }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {
-            reports?.map((report, index) => (
-              <StyledTableRow key={report.id}>
-                <TableBodyCellWrapper>
-                  <Grid py={0.5}>{index + 1}</Grid>{' '}
-                </TableBodyCellWrapper>
-                <TableBodyCellWrapper>{report.title}</TableBodyCellWrapper>
-                <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
-              </StyledTableRow>
-            ))
-          }
+          {reports?.map((report, index) => (
+            <StyledTableRow key={report.id}>
+              <TableBodyCellWrapper>
+                <Grid py={0.5}>{index + 1}</Grid>{' '}
+              </TableBodyCellWrapper>
+              <TableBodyCellWrapper>{report.title}</TableBodyCellWrapper>
+              <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+            </StyledTableRow>
+          ))}
         </TableBody>
         <TableFooter>
-          <TableFooterCellWrapper colSpan={2} align="right"> Total</TableFooterCellWrapper>
+          <TableFooterCellWrapper colSpan={2} align="right">
+            {' '}
+            Total
+          </TableFooterCellWrapper>
           <TableFooterCellWrapper align="right"> {formatNumber(total)}</TableFooterCellWrapper>
-
         </TableFooter>
       </Table>
     </TableContainer>
-  )
-}
+  );
+};
 
 const PrintData = ({ startDate, endDate, reports, total }) => {
   const { user } = useAuth();
@@ -78,17 +77,20 @@ const PrintData = ({ startDate, endDate, reports, total }) => {
   return (
     <Grid mx={1}>
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
-        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Head Wise Collection Report</Typography>
-        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+        <Typography variant="h4">Head Wise Collection Report</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
       </Grid>
 
       <TableContent reports={reports} total={total} />
     </Grid>
-  )
-}
-
+  );
+};
 
 const HeadWiseCollectionReport = () => {
   const [startDate, setStartDate] = useState<any>(dayjs(Date.now()));
@@ -97,11 +99,11 @@ const HeadWiseCollectionReport = () => {
   const [reports, setReports] = useState([]);
   const { showNotification } = useNotistick();
   const [total, setTotal] = useState();
-  const componentRef = useRef()
+  const componentRef = useRef();
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  })
+    content: () => componentRef.current
+  });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
@@ -111,19 +113,20 @@ const HeadWiseCollectionReport = () => {
   };
 
   const handleSearch = () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
-    axios.get(`/api/reports/head_wise_collections?from_date=${startDate}&to_date=${endDate}`)
+    axios
+      .get(`/api/reports/head_wise_collections?from_date=${startDate}&to_date=${endDate}`)
       .then(({ data }) => {
         setReports(data);
-        setTotal(data.reduce((prev, curr) => prev + curr.total_collected_amt, 0))
+        setTotal(data.reduce((prev, curr) => prev + curr.total_collected_amt, 0));
       })
-      .catch(err => {
-        handleShowErrMsg(err, showNotification)
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
       })
       .finally(() => {
-        setIsLoading(false)
-      })
+        setIsLoading(false);
+      });
   };
 
   // head_wise_collections.ts
@@ -223,7 +226,12 @@ const HeadWiseCollectionReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handlePrint} disabled={isLoading} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handlePrint}
+                    disabled={reports.length === 0 ? true : false}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -261,22 +269,22 @@ const HeadWiseCollectionReport = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {
-                reports?.map((report, index) => (
-                  <StyledTableRow key={report.id}>
-                    <TableBodyCellWrapper>
-                      <Grid py={0.5}>{index + 1}</Grid>{' '}
-                    </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{report.title}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
-                  </StyledTableRow>
-                ))
-              }
+              {reports?.map((report, index) => (
+                <StyledTableRow key={report.id}>
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{index + 1}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{report.title}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(report.total_collected_amt)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              ))}
             </TableBody>
             <TableFooter>
-              <TableFooterCellWrapper colSpan={2} align="right"> Total</TableFooterCellWrapper>
+              <TableFooterCellWrapper colSpan={2} align="right">
+                {' '}
+                Total
+              </TableFooterCellWrapper>
               <TableFooterCellWrapper align="right"> {formatNumber(total)}</TableFooterCellWrapper>
-
             </TableFooter>
           </Table>
         </TableContainer>

@@ -9,6 +9,10 @@ const get = async (req, res, refresh_token, academic_year) => {
     const { id, selected_month, fromDate, toDate, subject_ids } = req.query;
     const { id: academic_year_id } = academic_year;
 
+
+
+  
+
     if (!id) throw new Error('provide student_id');
     // if (!subject_ids) throw new Error();
 
@@ -26,7 +30,7 @@ const get = async (req, res, refresh_token, academic_year) => {
     const monthsBeforeSelected: monthListType[] = monthList.slice(0, selectedIndex + 1);
     // monthsBeforeSelected.push(selected_month.toLocaleLowerCase());
     // multiple month related code end
-    console.log({ parseSubjectIds })
+  
     const dateFilter = {},
       query = {};
     if (fromDate) dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0));
@@ -48,6 +52,24 @@ const get = async (req, res, refresh_token, academic_year) => {
         }
       }
     });
+  
+   
+    let whereObj = {}
+    if(monthsBeforeSelected.length > 0){
+      whereObj['fees_month'] =  { in: monthsBeforeSelected }
+      whereObj['OR'] =  [
+        {
+          fees_type: "class_based"
+        },
+        parseSubjectIds ? {
+          fees_type: "subject_based",
+          subject_id: { in: parseSubjectIds }
+        }
+          :
+          {}
+      ]
+    }
+    
 
     const all_fees = await prisma.student.findFirst({
       where: { id: Number(id) },
@@ -82,18 +104,20 @@ const get = async (req, res, refresh_token, academic_year) => {
                 fees: {
                   where: {
                     academic_year_id,
-                    fees_month: { in: monthsBeforeSelected },
-                    OR: [
-                      {
-                        fees_type: "class_based"
-                      },
-                      parseSubjectIds ? {
-                        fees_type: "subject_based",
-                        subject_id: { in: parseSubjectIds }
-                      }
-                        :
-                        {}
-                    ]
+                    // old
+                    // fees_month: { in: monthsBeforeSelected },
+                    // OR: [
+                    //   {
+                    //     fees_type: "class_based"
+                    //   },
+                    //   parseSubjectIds ? {
+                    //     fees_type: "subject_based",
+                    //     subject_id: { in: parseSubjectIds }
+                    //   }
+                    //     :
+                    //     {}
+                    // ]
+                    ...whereObj
                   },
                   include: {
                     fees_head: true,
@@ -108,8 +132,10 @@ const get = async (req, res, refresh_token, academic_year) => {
       }
     });
 
-    const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map((i) => i.id) : [];
 
+
+    const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map((i) => i.id) : [];
+  
     const fees = all_fees.section.class.fees
       ?.filter((i) => !waiver_fee.includes(i.id))
       ?.map((fee) => {
@@ -211,12 +237,14 @@ const get = async (req, res, refresh_token, academic_year) => {
           return { ...fee, status: 'unpaid', on_time_discount: 0 };
         }
       });
-
+    
     // remove deleted fees
 
     let filterDeletedFees = fees?.filter((item) => {
       return item.deleted_at === null;
     });
+
+
 
     let newFees = filterDeletedFees?.map((item) => {
       return {
@@ -234,6 +262,9 @@ const get = async (req, res, refresh_token, academic_year) => {
         }
       }
     }
+    
+  
+ 
 
     const data = {
       ...all_fees.student_info,
@@ -251,6 +282,10 @@ const get = async (req, res, refresh_token, academic_year) => {
       //   return item.status !== 'paid' && item.status !== 'paid late';
       // })
     };
+
+    
+
+
 
     res.status(200).json({ data, success: true });
   } catch (err) {

@@ -27,16 +27,13 @@ export default function RightFeesTable({
   };
 
   const handleFeesAmount = (event: ChangeEvent<HTMLInputElement>) => {
-    const int_value = parseInt(event.target.value);
+    const int_value = Number(event.target.value);
     const value = Math.abs(int_value);
     setFeesAmount(value);
     setCollect_other_fees_btn(false);
   };
 
-  
-  const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setCollect_other_fees_btn(true);
   };
 
@@ -55,42 +52,41 @@ export default function RightFeesTable({
       >
         Other Fees
       </Grid>
-      <Grid sx={{pt: 2,px: 1}}>
-          <form>
-            <Grid
-              sx={{
-                display: 'grid',
-                gridTemplateColumns:"1fr",
-              }}
-            >
-              
-              <TextFieldWrapper
-                minWidth="100%"
-                label="Fee Name *"
-                name="fee_name"
-                placeholder="type other fee name"
-                variant="outlined"
-                handleChange={handleFeesName}
-                value={feesName}
-                touched={undefined}
-                errors={undefined}
-                handleBlur={undefined}
-              />
+      <Grid sx={{ pt: 2, px: 1 }}>
+        <form>
+          <Grid
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr'
+            }}
+          >
+            <TextFieldWrapper
+              minWidth="100%"
+              label="Fee Name *"
+              name="fee_name"
+              placeholder="type other fee name"
+              variant="outlined"
+              handleChange={handleFeesName}
+              value={feesName}
+              touched={undefined}
+              errors={undefined}
+              handleBlur={undefined}
+            />
 
-              <TextFieldWrapper
-                label="Amount *"
-                name="amount"
-                type='number'
-                placeholder="type other fee amount..."
-                variant="outlined"
-                handleChange={handleFeesAmount}
-                value={feesAmount}
-                touched={undefined}
-                errors={undefined}
-                handleBlur={undefined}
-              />
-            </Grid>
-          </form>
+            <TextFieldWrapper
+              label="Amount *"
+              name="amount"
+              type="number"
+              placeholder="type other fee amount..."
+              variant="outlined"
+              handleChange={handleFeesAmount}
+              value={feesAmount}
+              touched={undefined}
+              errors={undefined}
+              handleBlur={undefined}
+            />
+          </Grid>
+        </form>
       </Grid>
     </Grid>
   );

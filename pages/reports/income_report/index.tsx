@@ -50,7 +50,7 @@ const IncomeReport = () => {
   const componentRef = useRef();
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    content: () => componentRef.current
   });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -62,19 +62,20 @@ const IncomeReport = () => {
   };
 
   const handleSearch = () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
-    axios.get(`/api/reports/incomes?from_date=${startDate}&to_date=${endDate}`)
+    axios
+      .get(`/api/reports/incomes?from_date=${startDate}&to_date=${endDate}`)
       .then(({ data }) => {
         setReports(data);
-        setTotal(data.reduce((prev, curr) => prev + curr.total_amount, 0))
+        setTotal(data.reduce((prev, curr) => prev + curr.total_amount, 0));
       })
-      .catch(err => {
-        handleShowErrMsg(err, showNotification)
+      .catch((err) => {
+        handleShowErrMsg(err, showNotification);
       })
       .finally(() => {
-        setIsLoading(false)
-      })
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -100,7 +101,6 @@ const IncomeReport = () => {
       >
         Income Report ( all academic Wise )
       </Typography>
-
 
       {/* searching part code start */}
       <Grid display="grid" gridTemplateColumns="1fr" rowGap={{ xs: 1, md: 0 }} px={1} mt={1} minHeight="fit-content">
@@ -138,10 +138,20 @@ const IncomeReport = () => {
               {/* Search button */}
               <Grid sx={{ flexBasis: { xs: '100%', sm: '40%', md: '15%' }, flexGrow: 1, position: 'relative', display: 'flex', gap: 1 }}>
                 <Grid sx={{ flexGrow: 1 }}>
-                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handleSearch} disabled={isLoading || !endDate || !startDate} children={'Search'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handleSearch}
+                    disabled={isLoading || !endDate || !startDate}
+                    children={'Search'}
+                  />
                 </Grid>
                 <Grid sx={{ flexGrow: 1 }}>
-                  <SearchingButtonWrapper isLoading={false} handleClick={handlePrint} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={false}
+                    handleClick={handlePrint}
+                    disabled={reports.length === 0 ? true : false}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -182,23 +192,27 @@ const IncomeReport = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {
-                reports?.map((report, index) => (
-                  <StyledTableRow key={report.voicher_id}>
-                    <TableBodyCellWrapper>
-                      <Grid py={0.5}>{index + 1}</Grid>{' '}
-                    </TableBodyCellWrapper>
-                    <TableBodyCellWrapper><Grid textTransform="capitalize">{report.voucher_name}</Grid></TableBodyCellWrapper>
-                    <TableBodyCellWrapper><Grid textTransform="capitalize">{report.payment_methods}</Grid></TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
-                  </StyledTableRow>
-                ))
-              }
+              {reports?.map((report, index) => (
+                <StyledTableRow key={report.voicher_id}>
+                  <TableBodyCellWrapper>
+                    <Grid py={0.5}>{index + 1}</Grid>{' '}
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>
+                    <Grid textTransform="capitalize">{report.voucher_name}</Grid>
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>
+                    <Grid textTransform="capitalize">{report.payment_methods}</Grid>
+                  </TableBodyCellWrapper>
+                  <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
+                  <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
+                </StyledTableRow>
+              ))}
             </TableBody>
 
             <TableFooter>
-              <TableFooterCellWrapper colSpan={4} align="right">Total</TableFooterCellWrapper>
+              <TableFooterCellWrapper colSpan={4} align="right">
+                Total
+              </TableFooterCellWrapper>
               <TableFooterCellWrapper align="right">{formatNumber(total)}</TableFooterCellWrapper>
             </TableFooter>
           </Table>
@@ -212,19 +226,23 @@ const IncomeReport = () => {
 };
 
 const PrintData = ({ startDate, endDate, total, reports }) => {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const { school } = user || {};
   const { name, address } = school || {};
   return (
     <Grid mx={1}>
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
-        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Income Report</Typography>
-        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+        <Typography variant="h4">Income Report</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
       </Grid>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 0,pt:2 }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 0, pt: 2 }}>
         <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
@@ -237,30 +255,34 @@ const PrintData = ({ startDate, endDate, total, reports }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {
-              reports?.map((report, index) => (
-                <StyledTableRow key={report.voicher_id}>
-                  <TableBodyCellWrapper>
-                    <Grid py={0.5}>{index + 1}</Grid>{' '}
-                  </TableBodyCellWrapper>
-                  <TableBodyCellWrapper><Grid textTransform="capitalize">{report.voucher_name}</Grid></TableBodyCellWrapper>
-                  <TableBodyCellWrapper><Grid textTransform="capitalize">{report.payment_methods}</Grid></TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
-                </StyledTableRow>
-              ))
-            }
+            {reports?.map((report, index) => (
+              <StyledTableRow key={report.voicher_id}>
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>{index + 1}</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>
+                  <Grid textTransform="capitalize">{report.voucher_name}</Grid>
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>
+                  <Grid textTransform="capitalize">{report.payment_methods}</Grid>
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>{dayjs(report.created_at).format('DD-MM-YYYY h:mm A')}</TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">{formatNumber(report.total_amount)}</TableBodyCellWrapper>
+              </StyledTableRow>
+            ))}
           </TableBody>
 
           <TableFooter>
-            <TableFooterCellWrapper colSpan={4} align="right">Total</TableFooterCellWrapper>
+            <TableFooterCellWrapper colSpan={4} align="right">
+              Total
+            </TableFooterCellWrapper>
             <TableFooterCellWrapper align="right">{formatNumber(total)}</TableFooterCellWrapper>
           </TableFooter>
         </Table>
       </TableContainer>
     </Grid>
-  )
-}
+  );
+};
 
 IncomeReport.getLayout = (page) => (
   <Authenticated requiredPermissions={['create_admit_card', 'show_admit_card']}>

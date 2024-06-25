@@ -7,34 +7,36 @@ const index = async (req, res) => {
 
     switch (method) {
       case 'GET':
-        const { month_name, selected_class, selected_group, selected_section, selected_student } = req.query;
-    
+        const { selected_head, selected_class, selected_section, month_name } = req.query;
+        // month related code
+        const currentDate = new Date();
+        const monthIndex = currentDate.getMonth();
+        const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+        const currentMonthName = monthNames[monthIndex].toLowerCase();
+        const startMonthIndex = monthNames.indexOf(month_name);
 
-        const where = {};
-        if (selected_group) {
-          where['group_id'] = {
-            in: selected_group?.split(',').map(Number)
-          };
-        }
+        const monthsToQuery = monthNames.slice(startMonthIndex, monthIndex + 1);
+
         const studentDueInfo = await prisma.studentFee.findMany({
           where: {
             fee: {
-              fees_month: month_name.toLowerCase(),
-              class_id: parseInt(selected_class)
+              fees_head_id: parseInt(selected_head),
+              class_id: parseInt(selected_class),
+              fees_month: {
+                // @ts-ignore
+                in: monthsToQuery
+              }
             },
             student: {
-              id: {
-                in: selected_student?.split(',').map(Number)
-              },
               section_id: {
                 in: selected_section?.split(',').map(Number)
-              },
-              ...where
+              }
             }
           },
 
           select: {
             on_time_discount: true,
+
             fee: {
               select: {
                 amount: true,
@@ -80,8 +82,6 @@ const index = async (req, res) => {
             }
           }
         });
-
-    
 
         res.status(200).json({
           status: true,

@@ -152,7 +152,7 @@ export default function LeftFeesTable({
     const arr = [];
 
     for (const key in obj) {
-      arr.push({ id: parseInt(key), value: obj[key] });
+      arr.push({ id: Number(key), value: obj[key] });
     }
 
     const singleFeeInfo = leftFeesTableData?.find((item) => {
@@ -171,7 +171,7 @@ export default function LeftFeesTable({
       return;
     }
 
-    if (parseInt(value) < parseInt(singleFeeInfo?.mainDueAmount)) {
+    if (Number(value) < Number(singleFeeInfo?.mainDueAmount)) {
       setOnTimeDiscountArr(arr);
       setCurrDiscount(obj);
       leftFeesTableColumnData(leftFeesTableColumnDataState, arr);
@@ -190,16 +190,22 @@ export default function LeftFeesTable({
           <TableCellWrapper align="center" width={10}>
             <Checkbox size="small" checked={selectedRows.indexOf(row.feeId) !== -1} onChange={(event) => handleClick(event, row.feeId)} />
           </TableCellWrapper>
-          <TableCellWrapper component="th" scope="row">{row.head_title}</TableCellWrapper>
-          <TableCellWrapper component="th" scope="row"><Grid textTransform="capitalize">{row.title}</Grid></TableCellWrapper>
-          <TableCellWrapper component="th" scope="row">{row.subject_name}</TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">
+            {row.head_title}
+          </TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">
+            <Grid textTransform="capitalize">{row.title}</Grid>
+          </TableCellWrapper>
+          <TableCellWrapper component="th" scope="row">
+            {row.subject_name}
+          </TableCellWrapper>
           <TableCellWrapper align="right">{row.amount}</TableCellWrapper>
           <TableCellWrapper align="right">{row.late_fee}</TableCellWrapper>
           <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
           <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
 
           <TableCellWrapper>
-            <Grid >
+            <Grid>
               <TextFieldWrapper
                 pb={0}
                 disabled={selectedRows.find((item) => item === row.feeId) ? false : true}
@@ -211,7 +217,7 @@ export default function LeftFeesTable({
                 // value={currDiscount || ''}
                 value={currDiscount[row.feeId] || ''}
                 handleChange={(e) => {
-                  const int_value = parseInt(e.target.value);
+                  const int_value = Number(e.target.value);
                   const value = Math.abs(int_value);
                   handleCurrDiscountChange(row.feeId, value);
                 }}
@@ -288,7 +294,7 @@ export default function LeftFeesTable({
                   // value={currDiscount || ''}
                   value={currDiscount[row.feeId] || ''}
                   handleChange={(e) => {
-                    const int_value = parseInt(e.target.value);
+                    const int_value = Number(e.target.value);
                     const value = Math.abs(int_value);
                     handleCurrDiscountChange(row.feeId, value);
                   }}
@@ -319,21 +325,30 @@ export default function LeftFeesTable({
               <TableFooterCellWrapper component="th" scope="row">
                 {' '}
               </TableFooterCellWrapper>
-              <TableFooterCellWrapper component="th" scope="row">{' '}</TableFooterCellWrapper>
+              <TableFooterCellWrapper component="th" scope="row">
+                {' '}
+              </TableFooterCellWrapper>
               <TableFooterCellWrapper component="th" scope="row">
                 {leftFeesTableTotalCalculation && 'Total'}
               </TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right"> {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.amount}</TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.late_fee}</TableFooterCellWrapper>
-              <TableFooterCellWrapper align="right">{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.discount}</TableFooterCellWrapper>
               <TableFooterCellWrapper align="right">
-                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount}
+                {' '}
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.amount.toFixed(2)}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.late_fee.toFixed(2)}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.discount.toFixed(2)}
+              </TableFooterCellWrapper>
+              <TableFooterCellWrapper align="right">
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.paidAmount.toFixed(2)}
               </TableFooterCellWrapper>
               <TableFooterCellWrapper align="center">
-                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount}
+                {leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.currDiscount.toFixed(2)}
               </TableFooterCellWrapper>
               <TableFooterCellWrapper align="right">
-                <Grid pr={1}>{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount}</Grid>
+                <Grid pr={1}>{leftFeesTableTotalCalculation && leftFeesTableTotalCalculation.dueAmount.toFixed(2)}</Grid>
               </TableFooterCellWrapper>
             </TableRow>
           )}

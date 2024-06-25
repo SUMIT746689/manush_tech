@@ -78,18 +78,20 @@ export interface MenuItems {
 const module_dashboard: MenuItem = {
   name: 'Module Dashboard',
   icon: DashboardIcon,
-  link: '/dashboards/modules/admin',
+  link: '/dashboards/modules/admin'
 };
 
-const all_users: MenuItems[] = [{
-  items: [
-    {
-      name: 'Users',
-      icon: AssignmentIndTwoToneIcon,
-      link: '/management/users',
-    },
-  ]
-}]
+const all_users: MenuItems[] = [
+  {
+    items: [
+      {
+        name: 'Users',
+        icon: AssignmentIndTwoToneIcon,
+        link: '/management/users'
+      }
+    ]
+  }
+];
 
 const online_addmission: MenuItems[] = [
   {
@@ -98,10 +100,10 @@ const online_addmission: MenuItems[] = [
         name: 'Online admission',
         link: '/management/students/online-admission',
         icon: RecordVoiceOverIcon
-      },
+      }
     ]
   }
-]
+];
 
 const students: MenuItems[] = [
   {
@@ -214,7 +216,7 @@ const students: MenuItems[] = [
             name: 'Show Notes',
             link: '/daily_notes/show_notes',
             icon: FormatListBulletedIcon
-          },
+          }
         ]
       },
       {
@@ -240,12 +242,12 @@ const students: MenuItems[] = [
             name: 'Employee Certificate',
             link: '/certificate/employee_certificate',
             icon: LocalPrintshopIcon
-          },
+          }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const teachers: MenuItems[] = [
   {
@@ -262,12 +264,12 @@ const teachers: MenuItems[] = [
           {
             name: 'Subject Wise Teacher Fees',
             icon: GridOnIcon,
-            link: '/management/teacher_fees',
+            link: '/management/teacher_fees'
           },
           {
             name: ' Department',
             icon: GridOnIcon,
-            link: '/management/department',
+            link: '/management/department'
           },
           {
             name: 'Teachers recruitment',
@@ -278,12 +280,12 @@ const teachers: MenuItems[] = [
             name: 'Teacher Exam Routine',
             link: '/management/teacher_exam_routine',
             icon: SummarizeIcon
-          },
+          }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const other_users: MenuItems[] = [
   {
@@ -291,21 +293,21 @@ const other_users: MenuItems[] = [
       {
         name: 'Users',
         icon: AssignmentIndTwoToneIcon,
-        link: '/management/users',
+        link: '/management/users'
       },
       {
         name: 'Other Users',
         icon: AssignmentIndTwoToneIcon,
-        link: '/management/users/entry_other_users',
+        link: '/management/users/entry_other_users'
       },
       {
         name: 'Leave Application',
         icon: WifiTetheringErrorIcon,
-        link: '/management/leave',
-      },
+        link: '/management/leave'
+      }
     ]
   }
-]
+];
 
 const attendance: MenuItems[] = [
   {
@@ -318,7 +320,7 @@ const attendance: MenuItems[] = [
       {
         name: 'Leave Application',
         icon: WifiTetheringErrorIcon,
-        link: '/management/leave',
+        link: '/management/leave'
       },
 
       {
@@ -362,10 +364,10 @@ const attendance: MenuItems[] = [
             icon: GroupIcon
           }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const accounting: MenuItems[] = [
   {
@@ -397,13 +399,13 @@ const accounting: MenuItems[] = [
           {
             name: 'Payment History',
             icon: AccountTreeTwoToneIcon,
-            link: '/management/fees/student_payment_history',
+            link: '/management/fees/student_payment_history'
           },
           {
             name: 'Collect Fee',
             icon: AccountTreeTwoToneIcon,
-            link: '/management/student_fees_collection',
-          },
+            link: '/management/student_fees_collection'
+          }
         ]
       },
       {
@@ -440,18 +442,18 @@ const accounting: MenuItems[] = [
             name: 'Profit and loss',
             link: '/management/accounting/profit_and_loss',
             icon: PaidIcon
-          },
+          }
         ]
       },
       {
         name: 'Reports',
         icon: AssessmentIcon,
         items: [
-          {
-            name: 'Payment history',
-            link: '/reports/fees/payment_history',
-            icon: HistoryIcon
-          },
+          // {
+          //   name: 'Payment history',
+          //   link: '/reports/fees/payment_history',
+          //   icon: HistoryIcon
+          // },
           {
             name: 'Recipt report',
             link: '/reports/fees/recipt_report',
@@ -501,17 +503,17 @@ const accounting: MenuItems[] = [
             name: 'Expense Summary',
             link: '/reports/expense_summary',
             icon: HistoryIcon
-          },
+          }
         ]
       },
       {
         name: 'Pending Buy Sms',
         icon: ShoppingBagIcon,
-        link: '/pending_sms_requests',
-      },
+        link: '/pending_sms_requests'
+      }
     ]
   }
-]
+];
 
 const notice: MenuItems[] = [
   {
@@ -519,11 +521,11 @@ const notice: MenuItems[] = [
       {
         name: 'Notice',
         icon: WifiTetheringErrorIcon,
-        link: '/front_end/notice',
-      },
+        link: '/front_end/notice'
+      }
     ]
   }
-]
+];
 
 const routine: MenuItems[] = [
   {
@@ -537,20 +539,18 @@ const routine: MenuItems[] = [
         name: 'Exam Routine',
         link: '/management/routine/exam_routine',
         icon: AccessibilityIcon
-      },
+      }
     ]
-
   }
-]
+];
 
 const sms: MenuItems[] = [
   {
-
     items: [
       {
         name: 'Pending Buy Sms',
         icon: ShoppingBagIcon,
-        link: '/pending_sms_requests',
+        link: '/pending_sms_requests'
       },
       {
         name: 'Send Sms / Email',
@@ -580,7 +580,7 @@ const sms: MenuItems[] = [
             name: 'EMAIL Template',
             link: '/bulk_sms_and_email/email_template',
             icon: DraftsIcon
-          },
+          }
         ]
       },
       {
@@ -601,7 +601,7 @@ const sms: MenuItems[] = [
             name: 'Template',
             link: '/voice_msg/templates',
             icon: ContentPasteIcon
-          },
+          }
         ]
       },
       {
@@ -632,12 +632,12 @@ const sms: MenuItems[] = [
             name: 'Student Auto Sent Sms',
             link: '/settings/student_autometic_sent_sms',
             icon: RequestQuoteIcon
-          },
+          }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const study_materials: MenuItems[] = [
   {
@@ -665,12 +665,12 @@ const study_materials: MenuItems[] = [
             name: 'Employee Certificate',
             link: '/certificate/employee_certificate',
             icon: LocalPrintshopIcon
-          },
+          }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const website_settings: MenuItems[] = [
   {
@@ -678,11 +678,11 @@ const website_settings: MenuItems[] = [
       {
         name: 'Front End',
         icon: CameraFrontIcon,
-        link: '/front_end',
-      },
+        link: '/front_end'
+      }
     ]
   }
-]
+];
 
 const report: MenuItems[] = [
   {
@@ -721,8 +721,7 @@ const report: MenuItems[] = [
             name: 'Recipt report',
             link: '/reports/fees/recipt_report',
             icon: HistoryIcon
-          },
-
+          }
         ]
       },
       {
@@ -753,17 +752,15 @@ const report: MenuItems[] = [
             name: 'Result sheet',
             link: '/reports/exam/result_sheet',
             icon: DescriptionIcon
-          },
-
+          }
         ]
-      },
+      }
     ]
   }
-]
+];
 
 const examination: MenuItems[] = [
   {
-
     items: [
       {
         name: 'Exam',
@@ -793,7 +790,7 @@ const examination: MenuItems[] = [
             name: 'Exam Question',
             link: '/management/exam/question',
             icon: AssignmentIcon
-          },
+          }
         ]
       },
       {
@@ -844,8 +841,7 @@ const examination: MenuItems[] = [
             name: 'Student Result',
             link: '/management/result/student_result',
             icon: AutoAwesomeMotionIcon
-          },
-
+          }
         ]
       },
       {
@@ -876,10 +872,9 @@ const examination: MenuItems[] = [
             name: 'Result sheet',
             link: '/reports/exam/result_sheet',
             icon: DescriptionIcon
-          },
-
+          }
         ]
-      },
+      }
       // {
       //   name: 'Result sheet',
       //   link: '/reports/exam/result_sheet',
@@ -887,13 +882,23 @@ const examination: MenuItems[] = [
       // },
     ]
   }
-]
+];
 
 export default {
-  all_users, online_addmission, students, teachers, other_users, attendance, accounting, notice, routine, sms,
+  all_users,
+  online_addmission,
+  students,
+  teachers,
+  other_users,
+  attendance,
+  accounting,
+  notice,
+  routine,
+  sms,
   study_materials,
   website_settings,
-  report, examination,
+  report,
+  examination,
   module_dashboard
-}
+};
 // export default adminItems

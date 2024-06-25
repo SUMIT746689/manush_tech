@@ -14,12 +14,14 @@ import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table
 import { monthList } from '@/utils/getDay';
 import { AutoCompleteWrapperWithDebounce } from '@/components/AutoCompleteWrapper';
 import Footer from '@/components/Footer';
-import { useState, ChangeEvent, useContext } from 'react';
+import { useState, ChangeEvent, useContext, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { useClientFetch } from 'src/hooks/useClientFetch';
 import axios from 'axios';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import useNotistick from '@/hooks/useNotistick';
+import { useReactToPrint } from 'react-to-print';
+import { useAuth } from '@/hooks/useAuth';
 
 // month related code start
 const currentDate = new Date();
@@ -36,6 +38,84 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: 'rgba(0, 0, 0, 0.10)'
   }
 }));
+
+const TableContent = ({ totalCalculation, studentDueInfo, selectedClass }) => {
+  return (
+    <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
+      <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Name</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Year</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Paid Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Due Amount</TableHeaderCellWrapper>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {studentDueInfo?.map((item, i) => {
+            return (
+              <StyledTableRow>
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>{i + 1}</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.student_info.student_id}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{`${item.student_info.first_name ? item.student_info.first_name : ''} ${
+                  item.student_info.middle_name ? item.student_info.middle_name : ''
+                } ${item.student_info.last_name ? item.student_info.last_name : ''}`}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{selectedClass.label}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.group.title && item.group.title}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.section.name && item.section.name}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.class_roll_no}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.academic_year.title}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{parseFloat(item.discount_amount?.toFixed(2)) + parseFloat(item.total_on_time_discount)}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.total_payable - item.collected_amount}</TableBodyCellWrapper>
+              </StyledTableRow>
+            );
+          })}
+
+          <TableRow>
+            <TableBodyCellWrapper colspan={8}>
+              <Grid py={0.5} textAlign={'right'}>
+                {' '}
+                Total
+              </Grid>{' '}
+            </TableBodyCellWrapper>
+            <TableBodyCellWrapper colspan={4}>{totalCalculation?.totalDueAmount}</TableBodyCellWrapper>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+const PrintData = ({ studentDueInfo, totalCalculation, selectedClass }) => {
+  const { user } = useAuth();
+  const { school } = user || {};
+  const { name, address } = school || {};
+  return (
+    <Grid mx={1}>
+      <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
+        <h4>{address}</h4>
+        <Typography variant="h4">Student Due Report</Typography>
+      </Grid>
+
+      <TableContent studentDueInfo={studentDueInfo} totalCalculation={totalCalculation} selectedClass={selectedClass} />
+    </Grid>
+  );
+};
 
 const StudentDueReport = () => {
   const { showNotification } = useNotistick();
@@ -247,6 +327,8 @@ const StudentDueReport = () => {
           totalDueAmount: totalDueAmount
         });
         setStudentDueInfo(resultArray);
+      } else {
+        setStudentDueInfo([]);
       }
     } catch (error) {
       // console.log(error);
@@ -256,36 +338,62 @@ const StudentDueReport = () => {
   };
   const calculateTotalAmountsByStudentId = (arr) => {
     return arr.reduce((acc, item) => {
-      const { student, collected_amount, on_time_discount, total_payable, student_info, fee } = item;
+      const { student, collected_amount, on_time_discount, total_payable, fee } = item;
       const { id } = student;
 
-      const previous_discount = acc[id] ? acc[id].previous_discount + (fee?.Discount?.[0]?.amt || 0) : fee?.Discount?.[0]?.amt || 0;
-      const total_on_time_discount = acc[id] ? acc[id].total_on_time_discount + on_time_discount : on_time_discount;
+      // Calculate current discounts for percent and flat
+      const currentPercentDiscount = fee?.Discount?.filter((d) => d.type === 'percent').reduce((sum, discount) => sum + (discount.amt || 0), 0) || 0;
+      const currentFlatDiscount = fee?.Discount?.filter((d) => d.type === 'flat').reduce((sum, discount) => sum + (discount.amt || 0), 0) || 0;
+
+      // Calculate current discount amount for percentage
+      const currentPercentDiscountAmount =
+        fee?.Discount?.filter((d) => d.type === 'percent').reduce((sum, discount) => sum + fee.amount * (discount.amt / 100), 0) || 0;
+
+      // Accumulate previous discounts
+      const previousPercentDiscount = acc[id] ? acc[id].previous_percent_discount + currentPercentDiscount : currentPercentDiscount;
+      const previousFlatDiscount = acc[id] ? acc[id].previous_flat_discount + currentFlatDiscount : currentFlatDiscount;
+      const totalOnTimeDiscount = acc[id] ? acc[id].total_on_time_discount + on_time_discount : on_time_discount;
+
+      const totalDiscountAmount = currentPercentDiscountAmount + currentFlatDiscount;
 
       if (acc[id]) {
         acc[id].collected_amount += collected_amount;
         acc[id].total_payable += total_payable;
-
-        acc[id].fee = fee;
+        acc[id].previous_percent_discount = previousPercentDiscount;
+        acc[id].previous_flat_discount = previousFlatDiscount;
+        acc[id].total_on_time_discount = totalOnTimeDiscount;
+        acc[id].discount_amount += totalDiscountAmount;
       } else {
         acc[id] = {
           ...student,
-          ...student_info,
+          ...student.student_info,
           collected_amount,
           total_payable,
-          fee
+          fee,
+          previous_percent_discount: previousPercentDiscount,
+          previous_flat_discount: previousFlatDiscount,
+          total_on_time_discount: totalOnTimeDiscount,
+          discount_amount: totalDiscountAmount
         };
       }
-
-      acc[id].previous_discount = previous_discount;
-      acc[id].total_on_time_discount = total_on_time_discount;
 
       return acc;
     }, {});
   };
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current
+  });
 
   return (
     <>
+      {/*  print report */}
+      <Grid display="none">
+        <Grid ref={componentRef}>
+          <PrintData studentDueInfo={studentDueInfo} totalCalculation={totalCalculation} selectedClass={selectedClass} />
+        </Grid>
+      </Grid>
+
       <Head>
         <title>Student_Due_Report</title>
       </Head>
@@ -478,7 +586,12 @@ const StudentDueReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={() => {}} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={false}
+                    handleClick={handlePrint}
+                    disabled={studentDueInfo.length === 0 ? true : false}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -506,60 +619,7 @@ const StudentDueReport = () => {
           }
         }}
       >
-        <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
-          <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Name</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Year</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Paid Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
-                <TableHeaderCellWrapper>Due Amount</TableHeaderCellWrapper>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {studentDueInfo?.map((item, i) => {
-                return (
-                  <StyledTableRow>
-                    <TableBodyCellWrapper>
-                      <Grid py={0.5}>{i + 1}</Grid>{' '}
-                    </TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.student_info.student_id}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{`${item.student_info.first_name ? item.student_info.first_name : ''} ${
-                      item.student_info.middle_name ? item.student_info.middle_name : ''
-                    } ${item.student_info.last_name ? item.student_info.last_name : ''}`}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{selectedClass.label}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.group.title && item.group.title}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.section.name && item.section.name}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.class_roll_no}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.academic_year.title}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.previous_discount + item.total_on_time_discount}</TableBodyCellWrapper>
-                    <TableBodyCellWrapper>{item.total_payable - item.collected_amount}</TableBodyCellWrapper>
-                  </StyledTableRow>
-                );
-              })}
-
-              <TableRow>
-                <TableBodyCellWrapper colspan={8}>
-                  <Grid py={0.5} textAlign={'right'}>
-                    {' '}
-                    Total
-                  </Grid>{' '}
-                </TableBodyCellWrapper>
-                <TableBodyCellWrapper colspan={4}>{totalCalculation?.totalDueAmount}</TableBodyCellWrapper>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <TableContent studentDueInfo={studentDueInfo} totalCalculation={totalCalculation} selectedClass={selectedClass} />
       </Grid>
       {/* table code part end */}
       {/* footer */}

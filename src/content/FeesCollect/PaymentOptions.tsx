@@ -58,11 +58,11 @@ const PaymentOptions = ({
   // totalAmount calculation
   useEffect(() => {
     if (amount && feesAmount) {
-      setTotalFeesCalculate(parseInt(amount) + parseInt(feesAmount));
+      setTotalFeesCalculate(Number(amount) + Number(feesAmount));
     } else if (amount) {
-      setTotalFeesCalculate(parseInt(amount));
+      setTotalFeesCalculate(Number(amount));
     } else if (feesAmount) {
-      setTotalFeesCalculate(parseInt(feesAmount));
+      setTotalFeesCalculate(Number(feesAmount));
     } else {
       setTotalFeesCalculate(0);
     }
@@ -121,8 +121,8 @@ const PaymentOptions = ({
     let error_row_count = 0;
     let error_row_due_value = 0;
     for (let i = 0; i < dueAmount.length; i++) {
-      error_row_due_value += parseInt(dueAmount[i]);
-      if (error_row_due_value < parseInt(amount)) {
+      error_row_due_value += Number(dueAmount[i]);
+      if (error_row_due_value < Number(amount)) {
         error_row_count += 1;
       }
     }
@@ -135,7 +135,7 @@ const PaymentOptions = ({
     if (!amount && !totalFeesCalculate) {
       // showNotification('please fill out amount field.', 'error');
       // return;
-    } else if (parseInt(amount) > parseInt(total_amount)) {
+    } else if (Number(amount) > Number(total_amount)) {
       showNotification('The amount is less than or equal to the due amount.', 'error');
       return;
     } else if (total_amount === amount) {
@@ -147,11 +147,11 @@ const PaymentOptions = ({
         return accumulator + currentValue;
       }, 0);
 
-      if (parseInt(total_amount_without_last_item) === parseInt(amount)) {
+      if (Number(total_amount_without_last_item) === Number(amount)) {
         // error message because now have no remaining value for last item
         showNotification('please deselect the last row in the table as it does not contain any remaining values.', 'error');
         return;
-      } else if (parseInt(amount) < parseInt(total_amount_without_last_item)) {
+      } else if (Number(amount) < Number(total_amount_without_last_item)) {
         // error message because now amount is less than selected first 2 items but user already select 3rd items.
         showNotification(
           `The amount is less than the total number of selected items (${error_row_count + 1}) but the user has selected (${
@@ -160,9 +160,9 @@ const PaymentOptions = ({
           'error'
         );
         return;
-      } else if (parseInt(amount) > parseInt(total_amount_without_last_item)) {
+      } else if (Number(amount) > Number(total_amount_without_last_item)) {
         // user select 3 items andd amount is 31000 so first 2 items total value is 30000 now remaining value is 1000. So this value will be added for next item that means 3rd items
-        remaining_due_value = parseInt(amount) - parseInt(total_amount_without_last_item); // amount = 31000, total_amount_without_lat_item = 30000 , result = 1000
+        remaining_due_value = Number(amount) - Number(total_amount_without_last_item); // amount = 31000, total_amount_without_lat_item = 30000 , result = 1000
         copy_dueAmount_arr.push(remaining_due_value);
       }
     }
@@ -192,7 +192,7 @@ const PaymentOptions = ({
           collect_filter_data.push({
             id: finalArray[j].id,
             collected_amount: finalArray[j].due,
-            total_payable: parseInt(tableData[i].dueAmount),
+            total_payable: Number(tableData[i].dueAmount),
             on_time_discount: 0
           });
         }
@@ -219,14 +219,14 @@ const PaymentOptions = ({
         //  fee_id: selectedRows,  // optional
         account_id: selectedAccount?.id,
         payment_method_id: selectedGateway?.id,
-        collected_amount: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate),
+        collected_amount: amount ? Number(totalFeesCalculate) - Number(amount) : Number(totalFeesCalculate),
         transID: transID ? transID : null,
-        total_payable: [amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate)],
+        total_payable: [amount ? Number(totalFeesCalculate) - Number(amount) : Number(totalFeesCalculate)],
         sent_sms: false,
         collect_filter_data: [
           {
-            collected_amount: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate),
-            total_payable: amount ? parseInt(totalFeesCalculate) - parseInt(amount) : parseInt(totalFeesCalculate)
+            collected_amount: amount ? Number(totalFeesCalculate) - Number(amount) : Number(totalFeesCalculate),
+            total_payable: amount ? Number(totalFeesCalculate) - Number(amount) : Number(totalFeesCalculate)
           }
         ],
         fees_name: feesName
@@ -392,8 +392,8 @@ const PaymentOptions = ({
                 return;
               }
 
-              if (parseInt(e.target.value) < parseInt(totalDueValue)) {
-                const int_value = parseInt(e.target.value);
+              if (Number(e.target.value) < Number(totalDueValue)) {
+                const int_value = Number(e.target.value);
                 const value = Math.abs(int_value);
                 setAmount(value);
               }

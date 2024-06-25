@@ -84,10 +84,10 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
         if (temp[i].fee_id === leftFeesTableData[j].feeId) {
           let sum = 0;
           sum =
-            parseInt(temp[i].payableAmount) -
-            (parseInt(leftFeesTableData[j].dueAmount) +
-              parseInt(temp[i].paidAmount) +
-              parseInt(leftFeesTableData[j].on_time_discount + leftFeesTableData[j].discount));
+            Number(temp[i].payableAmount) -
+            (Number(leftFeesTableData[j].dueAmount) +
+              Number(temp[i].paidAmount) +
+              Number(leftFeesTableData[j].on_time_discount + leftFeesTableData[j].discount));
 
           temp[i].prevAmount = sum;
           temp[i].due = leftFeesTableData[j].dueAmount;
@@ -105,7 +105,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     setTotalPreDueAmount(totalPrePaidvalue);
     const totalDueValue = temp.reduce((prev, curr) => prev + Number(curr.due), 0) || 0;
 
-    setTotalDueAmount(parseInt(totalDueValue));
+    setTotalDueAmount(Number(totalDueValue));
 
     const totalPaidAmount_ = temp.reduce((prev, curr) => prev + (Number(curr.paidAmount) || 0), 0) || 0;
 
@@ -122,7 +122,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     // }
 
     const totalPrevDiscountValue = temp.reduce((prev, curr) => prev + Number(curr.prev_disount), 0) || 0;
-    setTotalPreviousDiscount(parseInt(totalPrevDiscountValue));
+    setTotalPreviousDiscount(Number(totalPrevDiscountValue));
     const totalAmount = temp.reduce((prev, curr) => prev + Number(curr.payableAmount), 0) || 0;
     setTotalFeeamount(totalAmount);
 

@@ -91,7 +91,7 @@ function Managementschools() {
       } else if (!value) {
         setSearchOptionData([]);
       }
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const searchHandleChange = async (event: ChangeEvent<HTMLInputElement>, v) => {
@@ -127,9 +127,7 @@ function Managementschools() {
         return showNotification('student_id not founds', 'error');
       }
     } else if (v?.id && academicYear?.id) {
-      const res = await axios.get(
-        `/api/student_payment_collect/${v.student_table_id}?selected_month=${selected_month}&subject_ids=${v.subject_ids}`
-      );
+      const res = await axios.get(`/api/student_payment_collect/${v.student_table_id}?selected_month=${selected_month}&subject_ids=${v.subject_ids}`);
 
       setLeftFeesTableColumnDataState(res?.data?.data);
       leftFeesTableColumnData(res?.data?.data);
@@ -210,9 +208,9 @@ function Managementschools() {
       for (let j = 0; j < data?.discount.length; j++) {
         if (feesData[i].feeId === data?.discount[j].fee_id) {
           if (data?.discount[j].type === 'flat') {
-            feesData[i].discount = feesData[i].discount + parseInt(data.discount[j].amt); // 100
+            feesData[i].discount = feesData[i].discount + Number(data.discount[j].amt); // 100
           } else if (data?.discount[j].type === 'percent') {
-            feesData[i].discount = feesData[i].discount + parseInt(feesData[i].amount) / parseInt(data.discount[j].amt);
+            feesData[i].discount = feesData[i].discount + Number(feesData[i].amount) / Number(data.discount[j].amt);
           }
         }
       }
@@ -222,8 +220,8 @@ function Managementschools() {
     feesData = feesData.map((item) => {
       return {
         ...item,
-        dueAmount: parseInt(item.dueAmount) - parseInt(item.discount),
-        mainDueAmount: parseInt(item.dueAmount) - parseInt(item.discount)
+        dueAmount: parseFloat(Number(item.dueAmount).toFixed(2)) - parseFloat(Number(item.discount).toFixed(2)),
+        mainDueAmount: parseFloat(Number(item.dueAmount).toFixed(2)) - parseFloat(Number(item.discount).toFixed(2))
       };
     });
 
@@ -249,11 +247,11 @@ function Managementschools() {
       for (let i = 0; i < default_current_discount.length; i++) {
         for (let j = 0; j < feesData.length; j++) {
           if (default_current_discount[i].id === feesData[j].feeId && !Number.isNaN(default_current_discount[i].value)) {
-            feesData[j].dueAmount = parseInt(feesData[j].dueAmount) - parseInt(default_current_discount[i].value);
+            feesData[j].dueAmount = Number(feesData[j].dueAmount) - Number(default_current_discount[i].value);
             // feesData[j].currDiscount = parseInt(
             //   default_current_discount[i].value
             // );
-            feesData[j].on_time_discount = parseInt(default_current_discount[i].value);
+            feesData[j].on_time_discount = Number(default_current_discount[i].value);
           }
         }
       }
@@ -261,14 +259,14 @@ function Managementschools() {
       // calculate current totalDue
 
       default_current_discount.forEach((item) => {
-        totalCurrentDue += parseInt(item.value);
+        totalCurrentDue += Number(item.value);
       });
     }
 
     // calculate totalDue
 
     feesData.forEach((item) => {
-      totalDue = totalDue + parseInt(item.dueAmount);
+      totalDue = totalDue + Number(item.dueAmount);
     });
 
     // total (amount , Late Fee,  Paid Amount, Discount, Due)  functionality
@@ -303,7 +301,7 @@ function Managementschools() {
   const haveInvalidSubjectId = (datas) => {
     let haveInvalidSubjectId = false;
     datas?.split(',').map((subject_id) => {
-      const parseSubId = parseInt(subject_id);
+      const parseSubId = Number(subject_id);
       if (typeof parseSubId !== 'number') haveInvalidSubjectId = true;
       return parseSubId;
     });
@@ -348,7 +346,7 @@ function Managementschools() {
       // if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
       // if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
-      let url = `/api/student_payment_collect/${searchValue.student_table_id}?selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids}`
+      let url = `/api/student_payment_collect/${searchValue.student_table_id}?selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids}`;
       if (searchValue?.subject_ids && !haveInvalidSubjectId(searchValue?.subject_ids)) url = url + `&subject_ids=${searchValue?.subject_ids}`;
       const res = await axios.get(url);
 
@@ -749,7 +747,7 @@ function Managementschools() {
           }}
           columnGap={1}
           gap={{ xs: 1 }}
-        // minHeight="fit-content"
+          // minHeight="fit-content"
         >
           <LeftFeesTable
             onTimeDiscountArr={onTimeDiscountArr}

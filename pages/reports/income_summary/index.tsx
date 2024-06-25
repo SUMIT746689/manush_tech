@@ -127,7 +127,7 @@ const IncomeSummary = () => {
   };
 
   const getFormattedDate = (date) => {
-    return date.format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ [(Bangladesh Standard Time)]');
+    return date?.format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ [(Bangladesh Standard Time)]');
   };
 
   const periodHandleChange = (event: ChangeEvent<HTMLInputElement>, v): void => {
@@ -314,7 +314,12 @@ const IncomeSummary = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={isLoading} handleClick={handlePrint} disabled={isLoading} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={isLoading}
+                    handleClick={handlePrint}
+                    disabled={totalFees || totalOtherFees ? false : true}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>

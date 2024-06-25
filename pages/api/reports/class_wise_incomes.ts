@@ -14,13 +14,19 @@ const index = async (req, res, refresh_token, dcrypt_academic_year) => {
         const { from_date, to_date, class_ids } = req.query;
         const class_ids_ = class_ids.split(',').map((cls_id) => Number(cls_id));
 
+        const isoFromDate = new Date(new Date(from_date).setHours(0, 0, 0, 0)).toISOString();
+        const isoToDate = new Date(new Date(to_date).setHours(23, 59, 59, 999)).toISOString();
+
+
+
         if (!from_date || !to_date || !class_ids) throw new Error('required fields is not founds');
+
 
         const studentFees = await prisma.studentFee.findMany({
           where: {
             collection_date: {
-              gte: new Date(from_date),
-              lte: new Date(to_date)
+              gte: isoFromDate,
+              lte: isoToDate
             },
             student: {
               academic_year_id,
@@ -51,6 +57,8 @@ const index = async (req, res, refresh_token, dcrypt_academic_year) => {
             }
           }
         });
+
+       
 
         const classesRes = class_ids_.map((cls_id: number) => {
           // console.log({  })

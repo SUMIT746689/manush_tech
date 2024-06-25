@@ -11,7 +11,8 @@ import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
-import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
+import TableFooter from '@mui/material/TableFooter';
+import { TableBodyCellWrapper, TableHeaderCellWrapper, TableFooterCellWrapper } from '@/components/Table/Table';
 import { useState, ChangeEvent, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useClientFetch } from 'src/hooks/useClientFetch';
@@ -37,21 +38,21 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   // }
 }));
 
-const TableContent = ({ studentFees, selectedClass }) => {
-
+const TableContent = ({ studentFees, selectedClass, totalPreviousAmt, totalDiscountAmt, totalPaymentAmt, totalDueAmt }) => {
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 0 }}>
       <Table sx={{ minWidth: 650, maxWidth: 'calc(100%-10px)' }} size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
             <TableHeaderCellWrapper>SL</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Fees Name</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Student Id</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
-            <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
+            {/* <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper> */}
             <TableHeaderCellWrapper>Previous Amount</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Discount Amount</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Payment</TableHeaderCellWrapper>
@@ -59,61 +60,83 @@ const TableContent = ({ studentFees, selectedClass }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {
-            studentFees?.map((item, i) => {
-              return (
-                <StyledTableRow
-                  key={i}
-                  sx={
-                    {
-                      //   '&:last-child td, &:last-child th': { border: 0 }
-                    }
+          {studentFees?.map((item, i) => {
+            return (
+              <StyledTableRow
+                key={i}
+                sx={
+                  {
+                    //   '&:last-child td, &:last-child th': { border: 0 }
                   }
-                >
-                  <TableBodyCellWrapper>
-                    <Grid py={0.5}>{i + 1}</Grid>{' '}
-                  </TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{item.student?.student_info?.student_id}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{
-                    `${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}
+                }
+              >
+                <TableBodyCellWrapper>
+                  <Grid py={0.5}>{i + 1}</Grid>{' '}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item?.transaction?.voucher_name}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.student?.student_info?.student_id}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{`${item.student.student_info.first_name ? item.student.student_info.first_name + ' ' : ''}
                 ${item.student.student_info.middle_name ? item.student.student_info.middle_name + ' ' : ''}
-                ${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`
-                  }</TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{item.student?.group?.title}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{item.student.section?.name}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper>{item.student?.class_roll_no}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right">{formatNumber(item.total_payable || 0)}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)}</TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right"> </TableBodyCellWrapper>
-                  <TableBodyCellWrapper align="right">{formatNumber(item.total_payable - item.collected_amount)}</TableBodyCellWrapper>
-                </StyledTableRow>
-              );
-            })}
+                ${item.student.student_info.last_name ? item.student.student_info.last_name + ' ' : ''}`}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{selectedClass?.label}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.student?.group?.title}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.student.section?.name}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item.student?.class_roll_no}</TableBodyCellWrapper>
+                {/* <TableBodyCellWrapper align="right">{formatNumber(item.total_payable || 0)}</TableBodyCellWrapper> */}
+                <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)}</TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">
+                  {' '}
+                  {formatNumber((item.discount ? item.discount : 0 + item.on_time_discount) || 0)}
+                </TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">{formatNumber(item.collected_amount || 0)} </TableBodyCellWrapper>
+                <TableBodyCellWrapper align="right">{formatNumber(item.total_payable - item.collected_amount)}</TableBodyCellWrapper>
+              </StyledTableRow>
+            );
+          })}
         </TableBody>
+        {/* <TableFooter>
+          <TableFooterCellWrapper colSpan={8} align="right">
+            Total
+          </TableFooterCellWrapper>
+
+          <TableFooterCellWrapper align="right">{totalPreviousAmt}</TableFooterCellWrapper>
+          <TableFooterCellWrapper align="right">{totalDiscountAmt}</TableFooterCellWrapper>
+          <TableFooterCellWrapper align="right">{totalPaymentAmt}</TableFooterCellWrapper>
+          <TableFooterCellWrapper align="right">{totalDueAmt}</TableFooterCellWrapper>
+        </TableFooter> */}
       </Table>
     </TableContainer>
-  )
-}
+  );
+};
 
-const PrintData = ({ startDate, endDate, studentFees, selectedClass }) => {
-  const { user } = useAuth()
+const PrintData = ({ startDate, endDate, studentFees, selectedClass, totalPreviousAmt, totalDiscountAmt, totalPaymentAmt, totalDueAmt }) => {
+  const { user } = useAuth();
   const { school } = user || {};
   const { name, address } = school || {};
   return (
     <Grid mx={1}>
       <Grid textAlign="center" fontWeight={500} lineHeight={3} pt={5}>
-        <Typography variant="h3" fontWeight={500}>{name}</Typography>
+        <Typography variant="h3" fontWeight={500}>
+          {name}
+        </Typography>
         <h4>{address}</h4>
-        <Typography variant='h4'>Student Collections Report</Typography>
-        <h4>Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b></h4>
+        <Typography variant="h4">Student Collections Report</Typography>
+        <h4>
+          Date From: <b>{dayjs(startDate).format('DD-MM-YYYY')}</b>, Date To: <b>{dayjs(endDate).format('DD-MM-YYYY')}</b>
+        </h4>
       </Grid>
 
-      <TableContent studentFees={studentFees} selectedClass={selectedClass} />
+      <TableContent
+        studentFees={studentFees}
+        selectedClass={selectedClass}
+        totalPreviousAmt={totalPreviousAmt}
+        totalDiscountAmt={totalDiscountAmt}
+        totalPaymentAmt={totalPaymentAmt}
+        totalDueAmt={totalDueAmt}
+      />
     </Grid>
-  )
-}
+  );
+};
 
 const StudentCollectionReport = () => {
   const { showNotification } = useNotistick();
@@ -127,12 +150,16 @@ const StudentCollectionReport = () => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [studentFees, setStudentFees] = useState<Array<any>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalPreviousAmt, setTotalPreviousAmt] = useState<Number>(0);
+  const [totalDiscountAmt, setTotalDiscountAmt] = useState<Number>(0);
+  const [totalPaymentAmt, setTotalPaymentAmt] = useState<Number>(0);
+  const [totalDueAmt, setTotalDueAmt] = useState<Number>(0);
+
   const componentRef = useRef();
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  })
-
+    content: () => componentRef.current
+  });
 
   const startDatePickerHandleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setStartDate(event);
@@ -214,48 +241,80 @@ const StudentCollectionReport = () => {
     }
 
     return axios.get(
-      `/api/reports/student_collections?start_date=${startDate}&end_date=${endDate}&selected_class=${selectedClass?.id}&selected_group=${groupQueryArr?.length > 0 ? groupQueryArr : ''
+      `/api/reports/student_collections?start_date=${startDate}&end_date=${endDate}&selected_class=${selectedClass?.id}&selected_group=${
+        groupQueryArr?.length > 0 ? groupQueryArr : ''
       }&selected_section=${groupSectionArr}`
     );
   };
   // fetch student related data code end
-  // Debounce function
-  const debounce = (func, delay) => {
-    let timerId;
-    return function (...args) {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-      timerId = setTimeout(() => {
-        func.apply(this, args);
-      }, delay);
-    };
-  };
+
   const handleClickStudentInfo = async () => {
     try {
       if (!selectedClass) {
         showNotification('Please select a class before proceeding', 'error');
         return;
       }
-      setIsLoading(true)
+      setIsLoading(true);
       const res = await getStudentInfo();
-      console.log({ res })
+
+      // calculate discount
+      let discount = 0;
+      for (let i = 0; i < res?.data?.result.length; i++) {
+        for (let j = 0; j < res?.data?.result[i]?.fee?.Discount.length; j++) {
+          if (res?.data?.result[i]?.fee?.id === res?.data?.result[i]?.fee?.Discount[j].fee_id) {
+            if (res?.data?.result[i]?.fee?.Discount[j].type === 'flat') {
+              res.data.result[i].discount =
+                (res.data.result[i].discount ? res.data.result[i].discount : 0) + parseInt(res?.data?.result[i]?.fee?.Discount[j].amt); // 100
+            } else if (res?.data?.result[i]?.fee?.Discount[j].type === 'percent') {
+              res.data.result[i].discount =
+                (res.data.result[i].discount ? res.data.result[i].discount : 0) +
+                parseInt(res?.data?.result[i]?.fee.amount) / parseInt(res?.data?.result[i]?.fee?.Discount[j].amt);
+            }
+          }
+        }
+      }
+
+      // calculate total prvious amount, total discount amount, total payment, total due amount
+      let totalPreviousAmt = 0,
+        totalDiscountAmt = 0,
+        totalPaymentAmt = 0,
+        totalDueAmt = 0;
+
+      res?.data?.result.forEach((item) => {
+        totalPreviousAmt = totalPreviousAmt + item?.collected_amount;
+        totalDiscountAmt = totalDiscountAmt + ((item?.discount ? item?.discount : 0) + item?.on_time_discount);
+        totalPaymentAmt = totalPaymentAmt + item?.collected_amount;
+        totalDueAmt = totalDueAmt + item?.total_payable - item?.collected_amount;
+      });
+
+      setTotalPreviousAmt(totalPreviousAmt);
+      setTotalDiscountAmt(totalDiscountAmt);
+      setTotalPaymentAmt(totalPaymentAmt);
+      setTotalDueAmt(totalDueAmt);
+
       setStudentFees(res?.data?.result);
     } catch (error) {
       // console.log(error);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
     <>
-
       {/*  print report */}
       <Grid display="none">
         <Grid ref={componentRef}>
-          <PrintData startDate={startDate} endDate={endDate} selectedClass={selectedClass} studentFees={studentFees} />
+          <PrintData
+            startDate={startDate}
+            endDate={endDate}
+            selectedClass={selectedClass}
+            studentFees={studentFees}
+            totalPreviousAmt={totalPreviousAmt}
+            totalDiscountAmt={totalDiscountAmt}
+            totalPaymentAmt={totalPaymentAmt}
+            totalDueAmt={totalDueAmt}
+          />
         </Grid>
       </Grid>
 
@@ -419,7 +478,12 @@ const StudentCollectionReport = () => {
                     flexGrow: 1
                   }}
                 >
-                  <SearchingButtonWrapper isLoading={false} handleClick={handlePrint} disabled={false} children={'Print'} />
+                  <SearchingButtonWrapper
+                    isLoading={false}
+                    handleClick={handlePrint}
+                    disabled={studentFees.length === 0 ? true : false}
+                    children={'Print'}
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -447,7 +511,14 @@ const StudentCollectionReport = () => {
           }
         }}
       >
-        <TableContent studentFees={studentFees} selectedClass={selectedClass} />
+        <TableContent
+          studentFees={studentFees}
+          selectedClass={selectedClass}
+          totalPreviousAmt={totalPreviousAmt}
+          totalDiscountAmt={totalDiscountAmt}
+          totalPaymentAmt={totalPaymentAmt}
+          totalDueAmt={totalDueAmt}
+        />
       </Grid>
       {/* table code part end */}
       {/* footer */}

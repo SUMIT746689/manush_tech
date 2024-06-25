@@ -54,6 +54,8 @@ const index = async (req, res) => {
                                 },
                                 section: {
                                     select: {
+                                        name:true,
+                                        
                                         class: {
                                             select: {
                                                 id: true,
@@ -67,6 +69,8 @@ const index = async (req, res) => {
                         },
                         fee: {
                             select: {
+                                Discount:true,
+                                fees_head:true,
                                 id: true,
                                 title: true,
                                 last_date: true,

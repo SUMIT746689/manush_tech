@@ -295,7 +295,7 @@ const Results: FC<{ students: any[]; refetch: () => void; discount: any[]; idCar
                   <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Selected Subjects')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
-                  <TableHeaderCellWrapper>{t('Section')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Batch')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                 </TableRow>
               </TableHead>
@@ -338,7 +338,7 @@ const Results: FC<{ students: any[]; refetch: () => void; discount: any[]; idCar
                                                 {selectedClass?.label}
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
-                                                {selectedClass?.has_section ? selectedSection?.label : ''}
+                                                { i?.batches?.map((batch)=>batch.name).join(', ') }
                                             </TableBodyCellWrapper>
                                             <TableBodyCellWrapper>
                                                 <Grid display="flex" columnGap={1} justifyContent="center">

@@ -257,13 +257,13 @@ function RegistrationSecondPart({
             : '',
           student_permanent_address: student
             ? student?.student_permanent_address ||
-              student?.student_info?.student_permanent_address ||
-              ''
+            student?.student_info?.student_permanent_address ||
+            ''
             : '',
           previous_school: student
             ? student?.previous_school ||
-              student?.student_info?.previous_school ||
-              ''
+            student?.student_info?.previous_school ||
+            ''
             : ''
         }}
         validationSchema={Yup.object().shape({
@@ -278,7 +278,7 @@ function RegistrationSecondPart({
           section_id: Yup.number()
             .integer()
             .positive()
-            .required(t('Section field is required')),
+            .required(t('batch field is required')),
 
           academic_year_id: Yup.number().positive().integer().required(),
 
@@ -470,17 +470,12 @@ function RegistrationSecondPart({
                               )}
                               helperText={touched.password && errors.password}
                               onBlur={handleBlur}
-                              label={t('Select section')}
+                              label={t('Select Batch')}
                             />
                           )}
                           onChange={(event, value) => {
-                            console.log('selected sections__', {
-                              event,
-                              value
-                            });
                             setSelecetedSection(value);
                             // @ts-ignore
-
                             setFieldValue('section_id', value?.id);
                           }}
                         />
@@ -544,8 +539,8 @@ function RegistrationSecondPart({
                             name="academic_year_id"
                             {...params}
                             label={t('Select Academic Year')}
-                            //  error={Boolean(touched.academic_year_id && errors.academic_year_id)}
-                            //  helperText={'The session is required'}
+                          //  error={Boolean(touched.academic_year_id && errors.academic_year_id)}
+                          //  helperText={'The session is required'}
                           />
                         )}
                         onChange={(event, value) => {
@@ -646,7 +641,7 @@ function RegistrationSecondPart({
                         }}
                         error={Boolean(
                           touched.student_present_address &&
-                            errors.student_present_address
+                          errors.student_present_address
                         )}
                         fullWidth
                         helperText={
@@ -676,7 +671,7 @@ function RegistrationSecondPart({
                         }}
                         error={Boolean(
                           touched.student_permanent_address &&
-                            errors.student_permanent_address
+                          errors.student_permanent_address
                         )}
                         fullWidth
                         helperText={
@@ -699,7 +694,7 @@ function RegistrationSecondPart({
                       xs={12}
                       display="flex"
                       justifyItems="center"
-                      // bgcolor={"red"}
+                    // bgcolor={"red"}
                     >
                       <Grid item>
                         {' '}
@@ -733,7 +728,7 @@ function RegistrationSecondPart({
                                 fullWidth
                                 error={Boolean(
                                   touched.extra_class_id &&
-                                    errors.extra_class_id
+                                  errors.extra_class_id
                                 )}
                                 helperText={
                                   touched.extra_class_id &&
@@ -807,9 +802,9 @@ function RegistrationSecondPart({
                             student_photo
                               ? student_photo
                               : getFile(
-                                  student?.student_photo ||
-                                    student?.filePathQuery?.student_photo_path
-                                )
+                                student?.student_photo ||
+                                student?.filePathQuery?.student_photo_path
+                              )
                           }
                           height={150}
                           width={150}

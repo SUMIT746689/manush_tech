@@ -23,10 +23,16 @@ async function get(req, res, refresh_token, dcryptAcademicYear) {
             where: { academic_year_id, student_info: { school_id } },
             include: {
                 student_info: true,
-                section: {
+                // section: {
+                //     select: {
+                //         name: true,
+                //         class: { select: { name: true, has_section: true, subjects: true } },
+                //     }
+                // },
+                class: { select: { name: true, subjects: true } },
+                batches: {
                     select: {
                         name: true,
-                        class: { select: { name: true, has_section: true, subjects: true } },
                     }
                 },
                 group: {
@@ -98,23 +104,25 @@ const generateExcelFile = (datas, academic_year_title, uploadFilePath) => {
         const writeStream = fs.createWriteStream(uploadFilePath);
         const headerList = [
             "Student Id", "Student Name", "Academic Year", "Class", "Group",
-            // "Shift", 
-            "Section", "Roll", "Subjects", "Blood Group", "Father Name", "Mother Name", "Guardian Name"
+            // "Shift", "Section", 
+            "Branch", "Roll", "Subjects", "Blood Group", "Father Name", "Mother Name", "Guardian Name"
             , "Guardian Mobile Number", "Address"
         ]
         let header = headerList.join("\t") + "\n";
         writeStream.write(header);
 
         datas.forEach(student => {
-            const subjects = JSON.stringify(student.section.class.subjects.map(subject => subject.name).join(", "));
-            
+            const subjects = JSON.stringify(student.class.subjects.map(subject => subject.name).join(", "));
+            const batches = JSON.stringify(student.batches?.map(batch => batch.name).join(", "));
+
             const row = [
                 student.student_info.student_id || '',
                 student.student_info.first_name,
                 academic_year_title,
-                student.section.class.name,
+                student.class.name,
                 student.group?.title || '',
-                student.section.class.has_section ? student.section.name : '',
+                // student.section.class.has_section ? student.section.name : '',
+                batches,
                 student.class_roll_no,
                 subjects,
                 student.student_info.blood_group || '',

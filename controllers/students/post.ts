@@ -255,11 +255,17 @@ const postHandle = async (req, res, refresh_token) => {
 
           relation_with_guardian: fields?.relation_with_guardian,
           student_present_address: fields?.student_present_address,
-          
+
           ...group,
           ...extra_section,
           section: {
             connect: { id: parseInt(fields?.section_id) }
+          },
+          batches: {
+            connect: { id: parseInt(fields?.section_id) }
+          },
+          class: {
+            connect: { id: parseInt(fields?.class_id) }
           },
           academic_year: {
             connect: { id: parseInt(fields?.academic_year_id) }

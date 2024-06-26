@@ -36,6 +36,7 @@ import { useTranslation } from 'react-i18next';
 import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import useNotistick from '@/hooks/useNotistick';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -197,30 +198,30 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
     <>
 
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
-    
-          <Box
-            p={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Box>
-              <Typography component="span" variant="subtitle1">
-                {t('Showing')}:
-              </Typography>{' '}
-              <b>{paginatedGroups.length}</b> <b>{t('groups')}</b>
-            </Box>
-            <TablePagination
-              component="div"
-              count={filteredGroups.length}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleLimitChange}
-              page={page}
-              rowsPerPage={limit}
-              rowsPerPageOptions={[5, 10, 15]}
-            />
+
+        <Box
+          p={1}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Box>
+            <Typography component="span" variant="subtitle1">
+              {t('Showing')}:
+            </Typography>{' '}
+            <b>{paginatedGroups.length}</b> <b>{t('groups')}</b>
           </Box>
-        
+          <TablePagination
+            component="div"
+            count={filteredGroups.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleLimitChange}
+            page={page}
+            rowsPerPage={limit}
+            rowsPerPageOptions={[5, 10, 15]}
+          />
+        </Box>
+
         <Divider />
 
         {paginatedGroups.length === 0 ? (
@@ -244,16 +245,16 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={selectedAllUsers}
                         indeterminate={selectedSomeUsers}
                         onChange={handleSelectAllUsers}
                       />
-                    </TableCell>
-                    <TableCell>{t('Section name')}</TableCell>
-                    <TableCell >{t('class Name')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    </TableCell> */}
+                    <TableHeaderCellWrapper>{t('Section name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper >{t('class Name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -262,7 +263,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                     const isUserSelected = selectedItems.includes(group.id);
                     return (
                       <TableRow hover key={group.id} selected={isUserSelected}>
-                        <TableCell padding="checkbox">
+                        {/* <TableCell padding="checkbox">
                           <Checkbox
                             checked={isUserSelected}
                             onChange={(event) =>
@@ -270,47 +271,37 @@ const Results: FC<ResultsProps> = ({ setEditSection, users }) => {
                             }
                             value={isUserSelected}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {group?.title}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {group?.class?.name}
-                          </Typography>
-                        </TableCell>
+                        </TableCell> */}
+                        <TableBodyCellWrapper>{group?.title}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{group?.class?.name} </TableBodyCellWrapper>
 
-                        <TableCell align="center">
-                          <Typography noWrap>
-                            <Tooltip title={t('View')} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() => setEditSection(group)}
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                        <TableBodyCellWrapper align="center">
+                          <Tooltip title={t('View')} arrow>
+                            <IconButton
+                              color="primary"
+                              onClick={() => setEditSection(group)}
+                            >
+                              <LaunchTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={handleConfirmDelete}
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={handleConfirmDelete}
+                              color="primary"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
-                          </Typography>
-                        </TableCell>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
           </>
         )}
       </Card>

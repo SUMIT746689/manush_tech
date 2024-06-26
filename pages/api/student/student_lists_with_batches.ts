@@ -10,23 +10,34 @@ const index = async (req, res, refresh_token, dcryptAcademicYear) => {
             case 'GET':
                 const { school_id } = refresh_token;
                 const { academic_year_id } = dcryptAcademicYear;
-                const { section_ids } = req.query;
-                const parseSectionIds = section_ids.split(',').map((section) => {
+                const { class_id, section_ids } = req.query;
+
+                if (!class_id) throw new Error('class field not founds');
+
+                const parseClassId = parseInt(class_id);
+                if (!Number.isInteger(parseClassId)) throw new Error('invalid class');
+
+                const parseSectionIds = section_ids && section_ids.split(',').map((section) => {
                     const parseSection = parseInt(section);
-                    if (!Number.isInteger(parseSection)) throw new Error('invalid section')
+                    if (!Number.isInteger(parseSection)) throw new Error('invalid batch')
                     return parseSection
                 })
+                const batches = {}
+                if (section_ids) batches['some'] = { id: { in: parseSectionIds } };
 
                 const students = await prisma.student.findMany({
                     where: {
                         academic_year_id,
-                        section_id: { in: parseSectionIds },
+                        // section_id: { in: parseSectionIds },
+                        class_id: parseClassId,
+                        batches,
                         student_info: {
                             user: {
                                 deleted_at: null
                             },
                             school_id
-                        }
+                        },
+                        is_separate: false
                     },
                     select: {
                         id: true,

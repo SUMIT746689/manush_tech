@@ -244,7 +244,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
               color="text.secondary"
               align="center"
             >
-              {t("We couldn't find any sections matching your search criteria")}
+              {t("We couldn't find any batches matching your search criteria")}
             </Typography>
           </>
         ) : (
@@ -257,7 +257,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
                     <TableHeaderCellWrapper >{t('Batch name')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper >{t('class Name')}</TableHeaderCellWrapper>
                     <TableHeaderCellWrapper >{t('Group Name')}</TableHeaderCellWrapper>
-                    <TableHeaderCellWrapper >{t('section teacher name')}</TableHeaderCellWrapper>
+                    {/* <TableHeaderCellWrapper >{t('section teacher name')}</TableHeaderCellWrapper> */}
                     <TableHeaderCellWrapper >{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
@@ -270,7 +270,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
                         <TableBodyCellWrapper>{i?.name}</TableBodyCellWrapper>
                         <TableBodyCellWrapper>{i?.class.name}</TableBodyCellWrapper>
                         <TableBodyCellWrapper>{i?.groups?.map(group => group.title).join(', ')}</TableBodyCellWrapper>
-                        <TableBodyCellWrapper>{i?.class_teacher?.user?.username}</TableBodyCellWrapper>
+                        {/* <TableBodyCellWrapper>{i?.class_teacher?.user?.username}</TableBodyCellWrapper> */}
 
                         <TableBodyCellWrapper align="center">
                           <Typography noWrap>
@@ -341,7 +341,7 @@ const Results: FC<ResultsProps> = ({ setEditSection, users, reFetchData }) => {
             }}
             variant="h3"
           >
-            {t('Are you sure you want to permanently delete this section')}?
+            {t('Are you sure you want to permanently delete this batch')}?
           </Typography>
 
           <Box>

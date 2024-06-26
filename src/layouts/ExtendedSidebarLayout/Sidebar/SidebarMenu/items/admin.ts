@@ -722,11 +722,11 @@ const report: MenuItems[] = [
         name: 'Fees',
         icon: PaidIcon,
         items: [
-          {
-            name: 'Payment history',
-            link: '/reports/fees/payment_history',
-            icon: HistoryIcon
-          },
+          // {
+          //   name: 'Payment history',
+          //   link: '/reports/fees/payment_history',
+          //   icon: HistoryIcon
+          // },
           {
             name: 'Recipt report',
             link: '/reports/fees/recipt_report',

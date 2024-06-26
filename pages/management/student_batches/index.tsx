@@ -18,6 +18,7 @@ import Footer from '@/components/Footer';
 import useNotistick from '@/hooks/useNotistick';
 import { AutoCompleteWrapper } from '@/components/AutoCompleteWrapper';
 import { SearchingButtonWrapper } from '@/components/ButtonWrapper';
+import { handleShowErrMsg } from 'utilities_api/handleShowErrMsg';
 
 function ManagementClasses() {
   const [students, setStudents] = useContext<any[]>(Students);
@@ -99,12 +100,17 @@ function ManagementClasses() {
   const handleStudentList = () => {
     if (academicYear && selectedSection) {
       setIsLoading(true);
+      
       const section_ids = []
-      if (selectedSection?.id == 'all') sections.forEach(sec => { if (sec.id !== "all") section_ids.push(sec.id) });
-      else section_ids.push(selectedSection.id)
+      // if (selectedSection?.id === 'all') sections.forEach(sec => { if (sec.id !== "all") section_ids.push(sec.id) });
+      // else 
+      section_ids.push(selectedSection.id)
       if (section_ids.length === 0) return showNotification("section not founds...", "error"), setIsLoading(false);
-      axios
-        .get(`/api/student/student_lists_with_batches?section_ids=${section_ids}`)
+
+      let url = `/api/student/student_lists_with_batches?class_id=${selectedClass?.id}&`;
+      if (selectedSection?.id !== 'all') url += `section_ids=${section_ids}`;
+      
+      axios.get(url)
         .then((res) => {
           setStudents({
             AllStudents: res.data,
@@ -112,6 +118,7 @@ function ManagementClasses() {
             selectedSection
           });
         })
+        .catch(err => handleShowErrMsg(err, showNotification))
         .finally(() => setIsLoading(false))
     }
   };
@@ -144,7 +151,7 @@ function ManagementClasses() {
       }
     }
   };
-  console.log({selectedClass})
+  console.log({ selectedClass })
   return (
     <>
       <Head>

@@ -154,8 +154,10 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                             class_roll_no: String(today) + index,
                             class_registration_no: registration_no_generate(index),
                             section: { connect: { id: parseInt(section_id) } },
+                            batches: { connect: { id: parseInt(section_id) } },
                             academic_year: { connect: { id: dcryptAcademicYear.id } },
-                            student_info: { connect: { id: stdInfo.id } }
+                            student_info: { connect: { id: stdInfo.id } },
+                            class: { connect: { id: parseInt(class_id) } }
                         }
                     });
                     const fees = await transaction.fee.findMany({
@@ -189,10 +191,11 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                     .catch(err => {
                         faildedCreateStd.push(customStudentInfo.student_id);
                         logFile.error(`user_id=${user_id}` + err.message)
-                        if (err.message === '\n' + 'Invalid `prisma.studentInformation.create()` invocation:\n' + '\n' + '\n' + 'Unique constraint failed on the constraint: `student_informations_student_id_school_id_key`') {
-                            // resolve({ isSuccess: false, error: 'student id already used', student_id: customStudentInfo.student_id })
-                            resolve(false)
-                        }
+                        if (err.message.includes('Unique constraint failed')) resolve(false);
+                        // if (err.message === '\n' + 'Invalid `prisma.studentInformation.create()` invocation:\n' + '\n' + '\n' + 'Unique constraint failed on the constraint: `student_informations_student_id_school_id_key`') {
+                        //     // resolve({ isSuccess: false, error: 'student id already used', student_id: customStudentInfo.student_id })
+                        //     resolve(false)
+                        // }
                         // resolve({ isSuccess: false, error: err.message, student_id: customStudentInfo.student_id });
                         resolve(false)
 

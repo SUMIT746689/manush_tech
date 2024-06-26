@@ -33,6 +33,7 @@ import LaunchTwoToneIcon from '@mui/icons-material/LaunchTwoTone';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import { DebounceInput } from '@/components/DebounceInput';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -185,7 +186,7 @@ const Results = ({ setEditSubject, users, classList }) => {
   return (
     <>
       <Card sx={{ minHeight: '64.8vh' }}>
-        <Box p={2}>
+        <Box p={1} pt={1.5}>
           <DebounceInput
             debounceTimeout={500}
             handleDebounce={(v) => setQuery(v)}
@@ -225,16 +226,17 @@ const Results = ({ setEditSubject, users, classList }) => {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         checked={selectedAllUsers}
                         indeterminate={selectedSomeUsers}
                         onChange={handleSelectAllUsers}
                       />
-                    </TableCell>
-                    <TableCell>{t('Subject name')}</TableCell>
-                    <TableCell>{t('Class name')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    </TableCell> */}
+                    <TableHeaderCellWrapper>{t('id')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Subject name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Class name')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -242,7 +244,7 @@ const Results = ({ setEditSubject, users, classList }) => {
                     const isUserSelected = selectedItems.includes(i.id);
                     return (
                       <TableRow hover key={i.id} selected={isUserSelected}>
-                        <TableCell padding="checkbox">
+                        {/* <TableCell padding="checkbox">
                           <Checkbox
                             checked={isUserSelected}
                             onChange={(event) =>
@@ -250,39 +252,31 @@ const Results = ({ setEditSubject, users, classList }) => {
                             }
                             value={isUserSelected}
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">{i.name}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="h5">
-                            {
-                              classList?.find((c) => c.value === i.class_id)
-                                ?.label
-                            }
-                          </Typography>
-                        </TableCell>
+                        </TableCell> */}
+                        <TableBodyCellWrapper>{i.id}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{i.name}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{classList?.find((c) => c.value === i.class_id)?.label}</TableBodyCellWrapper>
 
-                        <TableCell align="center">
-                          <Typography noWrap>
-                            <Tooltip title={t('Edit')} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() => setEditSubject(i)}
-                              >
-                                <LaunchTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={handleConfirmDelete}
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Typography>
-                        </TableCell>
+                        <TableBodyCellWrapper align="center">
+                          {/* <Typography noWrap> */}
+                          <Tooltip title={t('Edit')} arrow>
+                            <IconButton
+                              color="primary"
+                              onClick={() => setEditSubject(i)}
+                            >
+                              <LaunchTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={handleConfirmDelete}
+                              color="primary"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          {/* </Typography> */}
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

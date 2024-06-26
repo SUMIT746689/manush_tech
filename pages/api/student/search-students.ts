@@ -39,7 +39,7 @@ const index = async (req, res, refresh_token, academic_year) => {
             JOIN classes  on classes.id = sections.class_id
             LEFT JOIN _student_subjects on _student_subjects.A = students.id
             LEFT JOIN subjects on subjects.id = _student_subjects.B
-            WHERE student_informations.student_id = ${student_id_} AND students.academic_year_id=${academic_year_id}
+            WHERE student_informations.student_id = ${student_id_} AND students.academic_year_id=${academic_year_id} AND students.is_separate = false
             GROUP BY students.id
         `;
         } else if (search_value) {

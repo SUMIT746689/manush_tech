@@ -20,7 +20,7 @@ const students = [
     { color: quickLinksColors[1], linkUrl: "/management/students", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Students" },
     { color: quickLinksColors[0], linkUrl: "/management/students", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Multiple " },
     { color: quickLinksColors[2], linkUrl: "/management/classes", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Classes" },
-    { color: quickLinksColors[0], linkUrl: "/management/sections", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Sections" },
+    { color: quickLinksColors[0], linkUrl: "/management/batches", icon: <StudentRegIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Batches" },
     { color: quickLinksColors[1], linkUrl: "/management/subjects", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Subjects" },
     { color: quickLinksColors[2], linkUrl: "/management/rooms", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "rooms" },
     { color: quickLinksColors[0], linkUrl: "/management/homework", icon: <WebsiteSettingsIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "homework" },
@@ -84,11 +84,11 @@ const report = [
 
 ]
 const examination = [
-{ color: quickLinksColors[0], linkUrl: "/management/exam/exam_terms", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam Terms" },
-{ color: quickLinksColors[1], linkUrl: "/management/exam", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exams" },
-{ color: quickLinksColors[2], linkUrl: "/management/exam/addtional_marks", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Exams Addtional Marks" },
-{ color: quickLinksColors[1], linkUrl: "/management/exam/seat-plan", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exams Seat Plan" },
-{ color: quickLinksColors[0], linkUrl: "/management/exam/question", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam Questions" },
+    { color: quickLinksColors[0], linkUrl: "/management/exam/exam_terms", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam Terms" },
+    { color: quickLinksColors[1], linkUrl: "/management/exam", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exams" },
+    { color: quickLinksColors[2], linkUrl: "/management/exam/addtional_marks", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[2].dark} />, name: "Exams Addtional Marks" },
+    { color: quickLinksColors[1], linkUrl: "/management/exam/seat-plan", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[1].dark} />, name: "Exams Seat Plan" },
+    { color: quickLinksColors[0], linkUrl: "/management/exam/question", icon: <ExamIcon style={{ margin: 'auto' }} fillColor={quickLinksColors[0].dark} />, name: "Exam Questions" },
 
 ]
 

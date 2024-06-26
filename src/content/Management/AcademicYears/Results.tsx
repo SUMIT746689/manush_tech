@@ -42,6 +42,7 @@ import useNotistick from '@/hooks/useNotistick';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -223,13 +224,14 @@ const Results: FC<ResultsProps> = ({
           mb: 1
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
-            <Box p={1}>
+            <Box p={0}>
               <TextField
                 sx={{
                   m: 0
                 }}
+                size="small"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -250,7 +252,7 @@ const Results: FC<ResultsProps> = ({
 
       <Card sx={{ minHeight: 'calc(100vh - 428px) !important' }}>
         <Box
-          p={2}
+          p={1}
           display="flex"
           alignItems="center"
           justifyContent="space-between"
@@ -296,10 +298,10 @@ const Results: FC<ResultsProps> = ({
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">{t('Academic year Id')}</TableCell>
-                    <TableCell align="center">{t('Title')}</TableCell>
-                    <TableCell align="center">{t('Current Active')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    {/* <TableHeaderCellWrapper>{t('Academic year Id')}</TableHeaderCellWrapper> */}
+                    <TableHeaderCellWrapper>{t('Title')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Current Active')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -310,22 +312,11 @@ const Results: FC<ResultsProps> = ({
                         hover
                         key={project.id}
                       >
-                        <TableCell align="center">
-                          {project?.id}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {project.title}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {project.curr_active ? <CheckIcon /> : <ClearIcon />}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
+                        {/* <TableHeaderCellWrapper>{project?.id}</TableHeaderCellWrapper> */}
+                        <TableBodyCellWrapper>{project.title}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">{project.curr_active ? <CheckIcon /> : <ClearIcon />}</TableBodyCellWrapper>
+                          
+                        <TableBodyCellWrapper align="center">
                           <Typography noWrap>
 
                             <Tooltip title={t('Make Active')} arrow>
@@ -357,7 +348,7 @@ const Results: FC<ResultsProps> = ({
                               </IconButton>
                             </Tooltip>
                           </Typography>
-                        </TableCell>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

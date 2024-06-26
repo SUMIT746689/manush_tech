@@ -100,11 +100,15 @@ function ManagementClasses() {
     if (academicYear && selectedSection) {
       setIsLoading(true);
       const section_ids = []
-      if (selectedSection?.id == 'all') sections.forEach(sec => { if (sec.id !== "all") section_ids.push(sec.id) });
-      else section_ids.push(selectedSection.id)
+      // if (selectedSection?.id === 'all') sections.forEach(sec => { if (sec.id !== "all") section_ids.push(sec.id) });
+      // else 
+      section_ids.push(selectedSection.id)
       if (section_ids.length === 0) return showNotification("section not founds...", "error"), setIsLoading(false);
-      axios
-        .get(`/api/student/student_lists_with_cls_subjects?section_ids=${section_ids}`)
+
+      let url = `/api/student/student_lists_with_cls_subjects?class_id=${selectedClass?.id}&`;
+      if (selectedSection?.id !== 'all') url += `section_ids=${section_ids}`;
+
+      axios.get(url)
         .then((res) => {
           setStudents({
             AllStudents: res.data,
@@ -130,7 +134,7 @@ function ManagementClasses() {
         };
       });
       sections.push({
-        label: 'All sections',
+        label: 'All Batches',
         id: 'all'
       });
       setSections(sections);
@@ -201,8 +205,8 @@ function ManagementClasses() {
 
         {selectedClass && selectedClass.has_section && sections && (
           <AutoCompleteWrapper
-            label="Select section"
-            placeholder="Section..."
+            label="Select Batch"
+            placeholder="batch..."
             options={sections}
             value={selectedSection}
             handleChange={(e, v) => {

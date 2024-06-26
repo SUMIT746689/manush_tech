@@ -43,6 +43,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import axios from 'axios';
 import useNotistick from '@/hooks/useNotistick';
 import { DebounceInput } from '@/components/DebounceInput';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 const DialogWrapper = styled(Dialog)(
   () => `
       .MuiDialog-paper {
@@ -229,7 +230,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
 
      
           <Box
-            p={2}
+            p={1}
             display="flex"
             alignItems="center"
             justifyContent="space-between"
@@ -276,11 +277,11 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">{t('Lower mark')}</TableCell>
-                    <TableCell align="center">{t('Upper mark')}</TableCell>
-                    <TableCell align="center">{t('Point')}</TableCell>
-                    <TableCell align="center">{t('Grade')}</TableCell>
-                    <TableCell align="center">{t('Actions')}</TableCell>
+                    <TableHeaderCellWrapper>{t('Lower mark')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Upper mark')}</TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Point')}     </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Grade')}     </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper>{t('Actions')}   </TableHeaderCellWrapper>
 
                   </TableRow>
                 </TableHead>
@@ -293,31 +294,12 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
                         key={singleGrade.id}
                       >
 
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.lower_mark}
-                          </Typography>
-                        </TableCell>
+                        <TableBodyCellWrapper>{singleGrade?.lower_mark}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{singleGrade?.upper_mark}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{singleGrade?.point}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper>{singleGrade?.grade}</TableBodyCellWrapper>
 
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.upper_mark}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.point}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Typography noWrap variant="h5">
-                            {singleGrade?.grade}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
+                        <TableBodyCellWrapper>
                           <Typography noWrap>
                             <Tooltip title={t('Edit')} arrow>
                               <IconButton
@@ -338,7 +320,7 @@ const Results: FC<ResultsProps> = ({ grade, setEditGrade, editGrade, reFetchData
                               </IconButton>
                             </Tooltip>
                           </Typography>
-                        </TableCell>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

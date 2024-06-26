@@ -118,7 +118,7 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
           }}
           validationSchema={Yup.object().shape({
             class_id: Yup.number().min(1).required(t('The class field is required')),
-            section_id: Yup.number().min(1).required(t('The section field is required')),
+            section_id: Yup.number().min(1).required(t('The batch field is required')),
             subject_id: Yup.number().min(1).required(t('The subject field is required')),
             payment_type_id: Yup.string().min(1).required(t('The payment field is required')),
             amount: Yup.string().min(1).required(t('The amount field is required'))

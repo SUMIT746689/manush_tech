@@ -50,7 +50,7 @@ const TableContent = ({ studentFees, selectedClass, totalPreviousAmt, totalDisco
             <TableHeaderCellWrapper>Student Name</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
-            <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Batch</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
             {/* <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper> */}
             <TableHeaderCellWrapper>Previous Amount</TableHeaderCellWrapper>
@@ -445,8 +445,8 @@ const StudentCollectionReport = () => {
                 <AutoCompleteWrapper
                   options={sections}
                   value={selectedSection}
-                  label="Select Section"
-                  placeholder="Select a Section"
+                  label="Select Batch"
+                  placeholder="Select a Batch"
                   handleChange={handleSectionSelect}
                 />
               </Grid>

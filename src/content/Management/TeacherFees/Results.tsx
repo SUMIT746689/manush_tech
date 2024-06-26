@@ -202,9 +202,6 @@ const Results: FC<ResultsProps> = ({ schools, setTeachers, setEditSchool, reFetc
         deleted_at: new Date()
       });
 
-      console.log('Hello response ');
-      console.log(res);
-
       if (res) {
         reFetchData();
         showNotification(`Teacher fees deleted successfully!`, 'success');

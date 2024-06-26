@@ -91,7 +91,7 @@ const DesignInvoice = ({ schoolData, selectedInvoice }) => {
                 Student Name
               </Typography>
               <Typography variant="body1" sx={{ color: '#000' }}>
-                Section
+                Batch
               </Typography>
             </Grid>
             <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>

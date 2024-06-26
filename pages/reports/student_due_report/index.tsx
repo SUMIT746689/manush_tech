@@ -50,7 +50,7 @@ const TableContent = ({ totalCalculation, studentDueInfo, selectedClass }) => {
             <TableHeaderCellWrapper>Name</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Class</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Group</TableHeaderCellWrapper>
-            <TableHeaderCellWrapper>Section</TableHeaderCellWrapper>
+            <TableHeaderCellWrapper>Batch</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Roll</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Year</TableHeaderCellWrapper>
             <TableHeaderCellWrapper>Payable Amount</TableHeaderCellWrapper>
@@ -260,7 +260,7 @@ const StudentDueReport = () => {
   const handleClickStudentInfo = async () => {
     try {
       if (!selected_month || !selectedClass || !selectedSection || !selectedStudent) {
-        showNotification('Please select a month, class, section and student before proceeding', 'error');
+        showNotification('Please select a month, class, batch and student before proceeding', 'error');
         return;
       }
       setIsLoading(true);
@@ -516,8 +516,8 @@ const StudentDueReport = () => {
                 <AutoCompleteWrapper
                   options={sections}
                   value={selectedSection}
-                  label="Select Section"
-                  placeholder="Select a Section"
+                  label="Select Batch"
+                  placeholder="Select a Batch"
                   handleChange={handleSectionSelect}
                 />
               </Grid>

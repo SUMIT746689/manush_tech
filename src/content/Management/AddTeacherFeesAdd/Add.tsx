@@ -186,8 +186,8 @@ function Add({ reFetchData, isOpen, setTeacherId, teacherId, schoolId }) {
                     <Grid item md={6}>
                       <AutoCompleteWrapper
                         minWidth="100%"
-                        label="Select Section"
-                        placeholder="Select Section"
+                        label="Select Batch"
+                        placeholder="Select Batch"
                         multiple={false}
                         value={values.section || null}
                         options={sections}

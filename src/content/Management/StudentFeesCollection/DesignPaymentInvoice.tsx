@@ -52,6 +52,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   const [totalCurrentDisountAmount, setTotalCurrentDiscountAmount] = useState(0);
   const [totalPreviousDiscount, setTotalPreviousDiscount] = useState(0);
 
+
   // date
   let date = dayjs(new Date(collectionDate));
   date = date.subtract(1, 'day');
@@ -121,7 +122,15 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     // update printFees data end
     const totalCurrentDiscountValue = temp.reduce((prev, curr) => prev + Number(curr.on_time_discount), 0) || 0;
     setTotalCurrentDiscountAmount(totalCurrentDiscountValue);
-    const totalPrePaidvalue = temp.reduce((prev, curr) => prev + Number(curr.prevAmount), 0) || 0;
+    const totalPrePaidvalue =
+      temp.reduce((prev, curr) => {
+        if (curr?.prevAmount) {
+          return prev + Number(curr.prevAmount);
+        } else {
+          return prev;
+        }
+      }, 0) || 0;
+
     setTotalPreDueAmount(totalPrePaidvalue);
     const totalDueValue = temp.reduce((prev, curr) => prev + Number(curr.due), 0) || 0;
 
@@ -141,11 +150,19 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     //   }
     // }
 
-    const totalPrevDiscountValue = temp.reduce((prev, curr) => prev + Number(curr.prev_disount), 0) || 0;
+    const totalPrevDiscountValue =
+      temp.reduce((prev, curr) => {
+        if (curr?.prev_disount) {
+          return prev + Number(curr.prev_disount);
+        } else {
+          return prev;
+        }
+      }, 0) || 0;
+
     setTotalPreviousDiscount(Number(totalPrevDiscountValue));
     const totalAmount = temp.reduce((prev, curr) => prev + Number(curr.payableAmount), 0) || 0;
     setTotalFeeamount(totalAmount);
-
+ 
     setSelectedFees(temp);
     if (printFees.length > 0) {
       setShowPrint(true);
@@ -154,6 +171,11 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
       // setPrintAndCollect(true);
     }
   }, [printFees, leftFeesTableData]);
+
+
+  let calAmount = totalPreAmount + totalPaidAmount;
+  let sumPaidAmount = Number(calAmount.toFixed(2))
+
 
   return (
     <Grid>
@@ -766,7 +788,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount + totalPaidAmount}
+                    {sumPaidAmount}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -1442,7 +1464,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount + totalPaidAmount}
+                    {sumPaidAmount}
                   </TableCell>
                 </TableRow>
                 <TableRow

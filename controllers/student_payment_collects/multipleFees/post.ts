@@ -91,6 +91,9 @@ const handleTransaction = ({ collection_date, data, status, account, voucher, re
           }
         });
 
+
+      
+
         new_student_fees_id.push(temp.id);
         new_transaction_fees_id.push(temp.transaction_id);
 
@@ -319,7 +322,7 @@ export const post = async (req, res, refresh_token) => {
 
       if (successfulResults.length > 0) {
         for (const successfulResult of successfulResults) {
-          console.log(successfulResult)
+       
           await teacherPayamount(successfulResult, school_id)
         }
 
@@ -436,6 +439,9 @@ const teacherPayamount = async (data, school_id) => {
     title,
     subject_id
   } = data;
+
+  if(!subject_id) return ;
+
   const teacherFindPay = await prisma.teacherSalaryStructure.findFirst({
     where: {
       subject_id: subject_id || undefined,
@@ -443,7 +449,7 @@ const teacherPayamount = async (data, school_id) => {
       school_id
     }
   });
-  console.log({ subject_id, teacherFindPay })
+
   if (!teacherFindPay) return;
 
   const totalAmt = amount + late_fee;

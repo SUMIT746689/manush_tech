@@ -201,8 +201,8 @@ export default function LeftFeesTable({
           </TableCellWrapper>
           <TableCellWrapper align="right">{row.amount}</TableCellWrapper>
           <TableCellWrapper align="right">{row.late_fee}</TableCellWrapper>
-          <TableCellWrapper align="right">{row.discount}</TableCellWrapper>
-          <TableCellWrapper align="right">{row.paidAmount}</TableCellWrapper>
+          <TableCellWrapper align="right">{row.discount.toFixed(2)}</TableCellWrapper>
+          <TableCellWrapper align="right">{row.paidAmount.toFixed(2)}</TableCellWrapper>
 
           <TableCellWrapper>
             <Grid>
@@ -227,7 +227,7 @@ export default function LeftFeesTable({
             </Grid>
           </TableCellWrapper>
           <TableCellWrapper align="right">
-            <Grid pr={1}>{row.dueAmount}</Grid>
+            <Grid pr={1}>{row.dueAmount.toFixed(2)}</Grid>
           </TableCellWrapper>
           {/* </TableRow> */}
         </StyledTableRow>

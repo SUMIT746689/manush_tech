@@ -22,6 +22,7 @@ type PaymentInvoiceType = {
   setPrintAndCollect?: (arg: boolean) => void;
   setIsCompleteUpdate: (arg: boolean) => void;
   schoolData: Data;
+  teacherFees: any[];
 };
 
 const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
@@ -37,7 +38,8 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   setShowPrint,
   printFees,
   student,
-  setIsCompleteUpdate
+  setIsCompleteUpdate,
+  teacherFees
 }) => {
   const dueRef = useRef(0);
   const { user } = useAuth();
@@ -56,6 +58,22 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   let formattedDate = date.format('DD-MM-YYYY');
 
   useEffect(() => {
+    // update teacher name information part code start
+    for (let i = 0; i < teacherFees.length; i++) {
+      for (let j = 0; j < leftFeesTableData.length; j++) {
+        if (teacherFees[i].subject_id === leftFeesTableData[j].subject_id && teacherFees[i].class_id === leftFeesTableData[j].class_id) {
+          leftFeesTableData[j]['teacher_name'] = [
+            teacherFees[i].teacher.first_name,
+            teacherFees[i].teacher.middle_name,
+            teacherFees[i].teacher.last_name
+          ]
+            .filter(Boolean)
+            .join(' ');
+        }
+      }
+    }
+    // update teacher name information part code end
+
     let temp = printFees.map((payment: any) => {
       const last_date = new Date(payment.last_date);
       // @ts-ignore
@@ -94,6 +112,8 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
           // temp[i].head_title = leftFeesTableData[j].head_title;
           temp[i].prev_disount = leftFeesTableData[j].discount + (leftFeesTableData[j].on_time_discount - temp[i].on_time_discount);
           temp[i].payableAmount = temp[i].payableAmount - leftFeesTableData[j].discount;
+          temp[i]['subject_name'] = leftFeesTableData[j]?.subject_name;
+          temp[i]['teacher_name'] = leftFeesTableData[j]?.teacher_name;
         }
       }
     }
@@ -138,7 +158,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   return (
     <Grid>
       {/* part 1 */}
-      <Grid pt={2} height={`${selectedFees.length <= 2 ? '50vh' : '100vh'}`}>
+      <Grid pt={2} height={`${selectedFees.length <= 1 ? '50vh' : '100vh'}`}>
         {/* school information */}
 
         <Grid sx={{ borderBottom: '1px solid #000', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} pb={1} mb={0.5}>
@@ -201,7 +221,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                 : {selectedFees[0]?.tracking_number}
               </Typography>
               <Typography variant="body1" sx={{ color: '#000' }}>
-                :{student_id}, {[feesUserData?.first_name, feesUserData?.middle_name, feesUserData?.last_name].join(' ')}
+                : {student_id}, {[feesUserData?.first_name, feesUserData?.middle_name, feesUserData?.last_name].join(' ')}
               </Typography>
               <Typography variant="body1" sx={{ color: '#000' }}>
                 : {feesUserData?.section_name}
@@ -255,6 +275,27 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                   >
                     Particulars
                   </TableCell>
+
+                  {selectedFees.find((item) => item.teacher_name) ? (
+                    <TableCell
+                      style={{
+                        border: '1px solid black',
+                        textTransform: 'capitalize',
+                        fontWeight: 'bold',
+                        width: '25%',
+                        paddingLeft: '5px',
+                        paddingRight: '5px',
+                        paddingTop: '2px',
+                        paddingBottom: '2px',
+                        color: '#000'
+                      }}
+                    >
+                      Teacher Name
+                    </TableCell>
+                  ) : (
+                    ''
+                  )}
+
                   <TableCell
                     style={{
                       border: '1px solid black',
@@ -350,43 +391,62 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
                         {payment?.head_title && payment?.fee_id ? `${payment?.head_title} (${payment?.title})` : payment?.title}
+
+                        {/* {[payment?.head_title, payment?.title, payment?.subject_name].filter(Boolean)[0] +
+                          ' ' +
+                          [payment?.head_title, payment?.title, payment?.subject_name]
+                            .filter(Boolean)
+                            .slice(1)
+                            .map((item) => `(${item})`)
+                            .join(' ')} */}
                       </TableCell>
+
+                      {selectedFees.find((item) => item.teacher_name) ? (
+                        <TableCell
+                          align="left"
+                          style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
+                        >
+                          {payment?.teacher_name ? payment?.teacher_name : ''}
+                        </TableCell>
+                      ) : (
+                        ''
+                      )}
 
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment?.payableAmount}
+                        {payment?.payableAmount?.toFixed(2)}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.prevAmount ? formatNumber(payment?.prevAmount) : 0}
+                        {payment.prevAmount ? formatNumber(payment?.prevAmount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.prev_disount ? formatNumber(payment.prev_disount) : 0}
+                        {payment.prev_disount ? formatNumber(payment.prev_disount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.paidAmount ? formatNumber(payment.paidAmount) : 0}
+                        {payment.paidAmount ? formatNumber(payment.paidAmount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount) : 0}
+                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.paidAmount ? formatNumber(payment.due) : 0}
+                        {payment.paidAmount ? formatNumber(payment.due?.toFixed(2)) : 0}
                       </TableCell>
                     </TableRow>
                   );
@@ -397,6 +457,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                   }}
                 >
                   <TableCell
+                    colSpan={selectedFees.find((item) => item.teacher_name) ? 2 : 1}
                     component="th"
                     scope="row"
                     align="left"
@@ -423,7 +484,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalFeeamount}
+                    {totalFeeamount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -436,7 +497,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount}
+                    {totalPreAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -449,7 +510,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreviousDiscount}
+                    {totalPreviousDiscount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -462,7 +523,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount}
+                    {totalPaidAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -475,7 +536,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalCurrentDisountAmount}
+                    {totalCurrentDisountAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -488,7 +549,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalDueAmount}
+                    {totalDueAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -507,7 +568,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
             </b>
           </Grid>
           <Grid>
-            Paid: <b>{formatNumber(totalPaidAmount)}</b>
+            Paid: <b>{formatNumber(parseFloat(Number(totalPaidAmount).toFixed(2)))}</b>
           </Grid>
         </Grid>
         {/* table two */}
@@ -563,7 +624,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalFeeamount}
+                    {totalFeeamount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -589,7 +650,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount}
+                    {totalPreAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -621,7 +682,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreviousDiscount}
+                    {totalPreviousDiscount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -647,7 +708,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalCurrentDisountAmount}
+                    {totalCurrentDisountAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -679,7 +740,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount}
+                    {totalPaidAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -737,7 +798,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalDueAmount}
+                    {totalDueAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -845,7 +906,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                 : {selectedFees[0]?.tracking_number}
               </Typography>
               <Typography variant="body1" sx={{ color: '#000' }}>
-                :{student_id}, {[feesUserData?.first_name, feesUserData?.middle_name, feesUserData?.last_name].join(' ')}
+                : {student_id}, {[feesUserData?.first_name, feesUserData?.middle_name, feesUserData?.last_name].join(' ')}
               </Typography>
               <Typography variant="body1" sx={{ color: '#000' }}>
                 : {feesUserData?.section_name}
@@ -899,6 +960,26 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                   >
                     Particulars
                   </TableCell>
+                  {selectedFees.find((item) => item.teacher_name) ? (
+                    <TableCell
+                      style={{
+                        border: '1px solid black',
+                        textTransform: 'capitalize',
+                        fontWeight: 'bold',
+                        width: '25%',
+                        paddingLeft: '5px',
+                        paddingRight: '5px',
+                        paddingTop: '2px',
+                        paddingBottom: '2px',
+                        color: '#000'
+                      }}
+                    >
+                      Teacher Name
+                    </TableCell>
+                  ) : (
+                    ''
+                  )}
+
                   <TableCell
                     style={{
                       border: '1px solid black',
@@ -996,41 +1077,52 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                         {payment?.head_title && payment?.fee_id ? `${payment?.head_title} (${payment?.title})` : payment?.title}
                       </TableCell>
 
+                      {selectedFees.find((item) => item.teacher_name) ? (
+                        <TableCell
+                          align="left"
+                          style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
+                        >
+                          {payment?.teacher_name ? payment?.teacher_name : ''}
+                        </TableCell>
+                      ) : (
+                        ''
+                      )}
+
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment?.payableAmount}
+                        {payment?.payableAmount?.toFixed(2)}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.prevAmount ? formatNumber(payment?.prevAmount) : 0}
+                        {payment.prevAmount ? formatNumber(payment?.prevAmount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.prev_disount ? formatNumber(payment.prev_disount) : 0}
+                        {payment.prev_disount ? formatNumber(payment.prev_disount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.paidAmount ? formatNumber(payment.paidAmount) : 0}
+                        {payment.paidAmount ? formatNumber(payment.paidAmount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount) : 0}
+                        {payment.on_time_discount && payment.fee_id ? formatNumber(payment.on_time_discount?.toFixed(2)) : 0}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ border: '1px solid black', paddingLeft: '5px', paddingRight: '5px', paddingTop: '2px', paddingBottom: '2px' }}
                       >
-                        {payment.paidAmount ? formatNumber(payment.due) : 0}
+                        {payment.paidAmount ? formatNumber(payment.due?.toFixed(2)) : 0}
                       </TableCell>
                     </TableRow>
                   );
@@ -1041,6 +1133,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                   }}
                 >
                   <TableCell
+                    colSpan={selectedFees.find((item) => item.teacher_name) ? 2 : 1}
                     component="th"
                     scope="row"
                     align="left"
@@ -1067,7 +1160,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalFeeamount}
+                    {totalFeeamount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1080,7 +1173,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount}
+                    {totalPreAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1093,7 +1186,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreviousDiscount}
+                    {totalPreviousDiscount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1106,7 +1199,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount}
+                    {totalPaidAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1119,7 +1212,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalCurrentDisountAmount}
+                    {totalCurrentDisountAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1132,7 +1225,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalDueAmount}
+                    {totalDueAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -1151,7 +1244,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
             </b>
           </Grid>
           <Grid>
-            Paid: <b>{formatNumber(totalPaidAmount)}</b>
+            Paid: <b>{formatNumber(parseFloat(Number(totalPaidAmount).toFixed(2)))}</b>
           </Grid>
         </Grid>
         {/* table two */}
@@ -1207,7 +1300,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalFeeamount}
+                    {totalFeeamount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1233,7 +1326,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreAmount}
+                    {totalPreAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -1265,7 +1358,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPreviousDiscount}
+                    {totalPreviousDiscount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1291,7 +1384,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalCurrentDisountAmount}
+                    {totalCurrentDisountAmount?.toFixed(2)}
                   </TableCell>
                 </TableRow>
                 <TableRow
@@ -1323,7 +1416,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalPaidAmount}
+                    {totalPaidAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"
@@ -1381,7 +1474,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
                       paddingBottom: '2px'
                     }}
                   >
-                    {totalDueAmount}
+                    {totalDueAmount?.toFixed(2)}
                   </TableCell>
                   <TableCell
                     align="left"

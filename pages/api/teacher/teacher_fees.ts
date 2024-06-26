@@ -65,11 +65,35 @@ const index = async (req, res, refresh_token, academic_year) => {
           }
         });
 
-        res.status(200).json({
+        res.status(201).json({
           status: 'success',
           salaryInfo: salaryInformation
         });
 
+        break;
+      
+      case 'GET':
+
+       const teacherSalary = await prisma.teacherSalaryStructure.findMany({
+        select:{
+          school_id:true,
+          section_id:true,
+          class_id:true,
+          subject_id:true,
+          teacher:{
+            select:{
+              first_name:true,
+              middle_name:true,
+              last_name:true
+            }
+          }
+        }
+       })
+
+        res.status(200).json({
+          status:'success',
+          teacherSalary
+        })
         break;
 
       default:

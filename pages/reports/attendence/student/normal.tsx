@@ -206,8 +206,8 @@ function Attendence() {
               <>
                 <AutoCompleteWrapper
                   minWidth="100%"
-                  label={t('Sections')}
-                  placeholder={t('Select section...')}
+                  label={t('Batch')}
+                  placeholder={t('Select batch...')}
                   options={sections}
                   value={selectedSection}
                   handleChange={(e, value) => setSelectedSection(value)}
@@ -218,8 +218,8 @@ function Attendence() {
               :
               <EmptyAutoCompleteWrapper
                 minWidth="100%"
-                label={t('Sections')}
-                placeholder={t('Select section...')}
+                label={t('Batch')}
+                placeholder={t('Select batch...')}
                 options={[]}
                 value={undefined}
               />

@@ -406,14 +406,14 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
         </Grid>
       </Dialog>
 
-      <Card sx={{ minHeight: 'calc(100vh - 410px)',borderRadius:0 }}>
+      <Card sx={{ minHeight: 'calc(100vh - 410px)', borderRadius: 0 }}>
 
-        {selectedBulkActions && (
+        {/* {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />
           </Box>
-        )}
-        {!selectedBulkActions && (
+        )} */}
+        {/* {!selectedBulkActions && ( */}
           <Box
             px={2}
             display="flex"
@@ -436,7 +436,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
               rowsPerPageOptions={[20, 50, 70]}
             />
           </Box>
-        )}
+        {/* )} */}
         <Divider />
 
         {paginatedClasses.length === 0 ? (
@@ -458,21 +458,21 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  {/* <TableCell padding="checkbox">
+                  <TableHeaderCellWrapper padding="checkbox">
                     <Checkbox
                       checked={selectedAllUsers}
                       indeterminate={selectedSomeUsers}
                       onChange={handleSelectAllUsers}
                     />
-                  </TableCell> */}
+                  </TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('User id')}</TableHeaderCellWrapper>
-                  
+
                   <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('student id')}</TableHeaderCellWrapper>
 
                   <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper >{t('Class Roll')}</TableHeaderCellWrapper>
-                  <TableHeaderCellWrapper >{t('Section')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper >{t('Branch')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Phone')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper align="center">{t('Actions')}</TableHeaderCellWrapper>
                 </TableRow>
@@ -483,7 +483,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
-                      {/* <TableCell padding="checkbox">
+                      <TableHeaderCellWrapper padding="checkbox">
                         <Checkbox
                           checked={isUserSelected}
                           onChange={(event) =>
@@ -491,7 +491,7 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                           }
                           value={isUserSelected}
                         />
-                      </TableCell> */}
+                      </TableHeaderCellWrapper>
                       <TableBodyCellWrapper>
                         {i?.student_info?.user?.id}
                       </TableBodyCellWrapper>
@@ -502,13 +502,13 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
                         {i?.student_info?.student_id}
                       </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
-                        {i?.section?.class?.name}
+                        {i?.class?.name}
                       </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
                         {i?.class_roll_no}
                       </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
-                        {i?.section?.class?.has_section ? i?.section?.name : 'no section'}
+                        {i?.batches?.map(batch => batch.name)?.join(', ')}
                       </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
                         <a href={`tel:${i?.student_info?.phone}`}>{i?.student_info?.phone}</a>

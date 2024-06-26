@@ -223,7 +223,7 @@ const Results: FC<{ students: any[]; refetch: () => void; selectedUpdateColumns:
   };
   return (
     <>
-      <Card sx={{ minHeight: 'calc(100vh - 410px)' }}>
+      <Card sx={{ minHeight: 'calc(100vh - 410px)', borderRadius: 0.5 }} >
         {selectedBulkActions && (
           <Box p={2}>
             <BulkActions />

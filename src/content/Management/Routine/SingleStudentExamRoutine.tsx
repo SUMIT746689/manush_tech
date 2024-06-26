@@ -58,8 +58,8 @@ const SingleStudentExamRoutine = ({ data }) => {
       <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr min-content' }, gap: { sm: 1 } }}>
 
         <UncontrolledTextFieldWrapper label="Class" value={data?.class} />
-        <UncontrolledTextFieldWrapper label="Section" value={data?.section} />
-        <AutoCompleteWrapper label="Select Exam" placeholder="Select section..." value={selectedExam} options={exams} handleChange={(e, value) => { setselectedExam(value) }} />
+        <UncontrolledTextFieldWrapper label="Batch" value={data?.section} />
+        <AutoCompleteWrapper label="Select Exam" placeholder="Select a exam..." value={selectedExam} options={exams} handleChange={(e, value) => { setselectedExam(value) }} />
 
         <Grid>
           {

@@ -117,8 +117,8 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                         minWidth: '200px',
                     }}>
                         <AutoCompleteWrapper
-                            label='Select Section'
-                            placeholder='select a section...'
+                            label='Select Batch'
+                            placeholder='select a batch...'
                             options={sections}
                             value={selectedSection}
                             handleChange={(e, value) => setSelectedSection(value)}
@@ -127,8 +127,8 @@ export const ClassAndSectionSelect = ({ classes, selectedDate, selectedClass, se
                     :
                     <EmptyAutoCompleteWrapper
                         minWidth="200px"
-                        label='Select Section'
-                        placeholder='select a section...'
+                        label='Select Batch'
+                        placeholder='select a batch...'
                         options={[]}
                         value={undefined}
                     />

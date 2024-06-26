@@ -62,7 +62,7 @@ function SeparatedStudentsList() {
           id: i.id
         }));
         sections.push({
-          label: 'All sections',
+          label: 'All Batch',
           id: 'all'
         });
         setSections(sections);
@@ -134,7 +134,7 @@ function SeparatedStudentsList() {
         };
       });
       sections.push({
-        label: 'All sections',
+        label: 'All Batch',
         id: 'all'
       });
       setSections(sections);
@@ -240,8 +240,8 @@ function SeparatedStudentsList() {
 
         {selectedClass && selectedClass.has_section && sections && (
           <AutoCompleteWrapper
-            label="Select section"
-            placeholder="Section..."
+            label="Select Batch"
+            placeholder="batch..."
             options={sections}
             value={selectedSection}
             handleChange={(e, v) => {

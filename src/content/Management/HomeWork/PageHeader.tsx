@@ -182,8 +182,8 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
 
           {selectedClass && selectedClass.has_section && sections && (
             <AutoCompleteWrapper
-              label="Select section"
-              placeholder="Section..."
+              label="Select Batch"
+              placeholder="Batch..."
               options={sections}
               value={selectedSection}
               handleChange={(e, v) => {

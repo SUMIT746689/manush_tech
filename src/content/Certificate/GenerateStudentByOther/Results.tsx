@@ -176,7 +176,7 @@ const Results: FC<ResultsProps> = ({ classes, templates }) => {
           <DynamicDropDownSelectWrapper value={selectedClass} label='Select Class' name='' handleChange={handleClassChange} menuItems={classes?.map(cls => ({ title: cls.name, value: cls.id }))} />
         </Grid>
         <Grid >
-          <DynamicDropDownSelectWrapper value={selectedSection} label='Select Section' name='' handleChange={handleSectionChange} menuItems={sections} />
+          <DynamicDropDownSelectWrapper value={selectedSection} label='Select Batch' name='' handleChange={handleSectionChange} menuItems={sections} />
         </Grid>
         <Grid >
           <DynamicDropDownSelectWrapper value={selectedTemplate} label='Select Template' name='' handleChange={handleTemplateChange} menuItems={templates.map(tmplt => ({ title: tmplt.name, value: tmplt.id }))} />

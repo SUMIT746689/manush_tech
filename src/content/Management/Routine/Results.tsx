@@ -162,9 +162,9 @@ const Results = () => {
         </Grid>
         <Grid>
           {(selectedClass && selectedClass.has_section) ?
-            <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
+            <AutoCompleteWrapper label="Select Batch" placeholder="Select a batch..." value={selectedSection} options={sections} handleChange={handleSectionSelect} />
             :
-            <AutoCompleteWrapper label="Select section" placeholder="Select section..." value={undefined} options={[]} handleChange={handleSectionSelect} />
+            <AutoCompleteWrapper label="Select Batch" placeholder="Select batch..." value={undefined} options={[]} handleChange={handleSectionSelect} />
           }
         </Grid>
         <Grid>

@@ -74,7 +74,7 @@ const MultipleStudentPhotoUpload = () => {
         };
       });
       sections.push({
-        label: 'All sections',
+        label: 'All Batch',
         id: 'all'
       });
       setSections(sections);
@@ -432,8 +432,8 @@ const MultipleStudentPhotoUpload = () => {
               >
                 {selectedClass && selectedClass.has_section && sections ? (
                   <AutoCompleteWrapper
-                    label="Select section"
-                    placeholder="Section..."
+                    label="Select Batch"
+                    placeholder="batch..."
                     options={sections}
                     value={selectedSection}
                     handleChange={(e, v) => {
@@ -442,7 +442,7 @@ const MultipleStudentPhotoUpload = () => {
                     }}
                   />
                 ) : (
-                  <DisableTextWrapper label="Select section" touched={undefined} errors={undefined} value={undefined} />
+                  <DisableTextWrapper label="Select Batch" touched={undefined} errors={undefined} value={undefined} />
                 )}
               </Grid>
 

@@ -165,7 +165,7 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
   return (
     <>
       <Card sx={{ minHeight: 'calc(100vh - 410px)', borderRadius: 0 }}>
-        {!selectedBulkActions && (
+        {/* {!selectedBulkActions && ( */}
           <Box
             sx={{
               px: { xs: '9px', md: '18px' }
@@ -190,7 +190,7 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
               rowsPerPageOptions={[20, 50, 70]}
             />
           </Box>
-        )}
+        {/* )} */}
         <Divider />
 
         {paginatedClasses.length === 0 ? (
@@ -202,14 +202,14 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  <TableHeaderCellWrapper padding="checkbox">
                     <Checkbox checked={selectedAllUsers} indeterminate={selectedSomeUsers} onChange={handleSelectAllUsers} />
-                  </TableCell>
+                  </TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('student name')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('student id')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Class')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Class Roll')}</TableHeaderCellWrapper>
-                  <TableHeaderCellWrapper>{t('Section')}</TableHeaderCellWrapper>
+                  <TableHeaderCellWrapper>{t('Batch')}</TableHeaderCellWrapper>
                   <TableHeaderCellWrapper>{t('Phone')}</TableHeaderCellWrapper>
                 </TableRow>
               </TableHead>
@@ -218,16 +218,16 @@ const Results = ({ query, setQuery, selectedItems, setSelectedUsers, students, r
                   const isUserSelected = selectedItems.includes(i.id);
                   return (
                     <TableRow hover key={i.id} selected={isUserSelected}>
-                      <TableCell padding="checkbox">
+                      <TableBodyCellWrapper padding="checkbox">
                         <Checkbox checked={isUserSelected} onChange={(event) => handleSelectOneUser(event, i.id)} />
-                      </TableCell>
+                      </TableBodyCellWrapper>
                       <TableBodyCellWrapper>
                         {[i?.student_info?.first_name, i?.student_info?.middle_name, i?.student_info?.last_name].join(' ')}
                       </TableBodyCellWrapper>
                       <TableBodyCellWrapper>{i?.student_info?.student_id}</TableBodyCellWrapper>
                       <TableBodyCellWrapper>{i?.section?.class?.name}</TableBodyCellWrapper>
                       <TableBodyCellWrapper>{i?.class_roll_no}</TableBodyCellWrapper>
-                      <TableBodyCellWrapper>{i?.section?.class?.has_section ? i?.section?.name : 'no section'}</TableBodyCellWrapper>
+                      <TableBodyCellWrapper>{i?.batches ? i?.section?.name : 'no section'}</TableBodyCellWrapper>
                       <TableBodyCellWrapper>
                         <a href={`tel:${i?.student_info?.phone}`}>{i?.student_info?.phone}</a>
                       </TableBodyCellWrapper>

@@ -64,7 +64,7 @@ function ManagementClasses() {
           id: i.id
         }));
         sections.push({
-          label: 'All sections',
+          label: 'All Batch',
           id: 'all'
         });
         setSections(sections);
@@ -136,7 +136,7 @@ function ManagementClasses() {
         };
       });
       sections.push({
-        label: 'All sections',
+        label: 'All Batch',
         id: 'all'
       });
       setSections(sections);
@@ -259,8 +259,8 @@ function ManagementClasses() {
 
         {selectedClass && selectedClass.has_section && sections && (
           <AutoCompleteWrapper
-            label="Select section"
-            placeholder="Section..."
+            label="Select Batch"
+            placeholder="batch..."
             options={sections}
             value={selectedSection}
             handleChange={(e, v) => {

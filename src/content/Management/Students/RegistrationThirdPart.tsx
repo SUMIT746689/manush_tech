@@ -164,7 +164,6 @@ function RegistrationFirstPart({
           values,
           setFieldValue
         }) => {
-          console.log("T__values__", errors);
 
           return (
             <form onSubmit={handleSubmit}>

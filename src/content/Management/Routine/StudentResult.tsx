@@ -117,13 +117,12 @@ const StudentResults = ({data}) => {
       })
       .catch(err => console.log(err))
   }
-console.log("routine__",routine);
 
   return (
     <>
       <Card sx={{ maxWidth: 900, mx: 'auto', pt: 1, px: 1, my: 1, display: 'grid', gridTemplateColumns: { sm: '1fr 1fr min-content' }, columnGap: 1 }}>
         <UncontrolledTextFieldWrapper label="Class" value={data.class} />
-        <UncontrolledTextFieldWrapper label="Section" value={data.section} />
+        <UncontrolledTextFieldWrapper label="Batch" value={data.section} />
         
         {routine?.length > 0 &&
           <Grid item className='w-full'>

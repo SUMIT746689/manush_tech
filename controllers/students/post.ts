@@ -195,6 +195,7 @@ const postHandle = async (req, res, refresh_token) => {
           phone: fields.phone,
           email: fields?.email,
           national_id: fields?.national_id,
+          student_id:fields?.student_id || undefined,
 
           father_name: fields?.father_name,
           father_phone: fields?.father_phone,

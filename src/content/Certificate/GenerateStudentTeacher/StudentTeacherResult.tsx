@@ -136,7 +136,7 @@ const StudentTeacharResults: FC<ResultsProps> = ({ certificateFor, templates, st
             <UncontrolledTextFieldWrapper label="Class" value={student.section?.class?.name} />
           </Grid>
           <Grid >
-            <UncontrolledTextFieldWrapper label="Section" value={student.section.class.has_section ? student.section?.name : ''} />
+            <UncontrolledTextFieldWrapper label="Batch" value={student.section.class.has_section ? student.section?.name : ''} />
           </Grid>
         </Card>
       }

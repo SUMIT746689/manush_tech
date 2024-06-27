@@ -328,7 +328,8 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
 
       <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
         {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+        {/* old code  */}
+        {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
           <Grid
             item
             pr={2}
@@ -352,7 +353,26 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
               </i>
             </span>
           </Grid>
-        )}
+        )} */}
+
+        {/* updated code */}
+        <Grid sx={{ display: { xs: 'none', md: 'block' } }}>
+          {user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+            <Grid sx={{ pr: 2 }}>
+              {/* <Grid sx={{ color: (theme) => theme.colors.alpha.white[70], fontWeight: 700, fontSize: 12 }}>Academic Year: </Grid> */}
+              <Grid sx={{ color: 'white', opacity: 0.9, fontWeight: 700, fontSize: 12 }}>Academic Year: </Grid>
+
+              <CustomAutoCompleteWrapper
+                // label="Academic Year"
+                label="Academic Year"
+                placeholder="select a academic year..."
+                value={selectedAcademicYear}
+                options={academicYearList}
+                handleChange={handleAcademicYearChange}
+              />
+            </Grid>
+          )}
+        </Grid>
 
         {/* @ts-ignore */}
         {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' &&

@@ -281,7 +281,7 @@ function ManagementClasses() {
       </Card>
 
       <Grid sx={{ px: 1 }} container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{width: {xs:'100vw', md:'100%'}, minWidth: '150px'}}>
           <Results students={students?.AllStudents || []} refetch={handleStudentList} discount={discount} fee={fee} idCard={idCard} />
         </Grid>
       </Grid>
@@ -328,7 +328,15 @@ const BulkStudentUpload = ({ section_id, class_id, open, setOpen }) => {
       .post('/api/student/bulk-admission', form)
       .then((res) => {
         setExcelFileUpload(null);
-        showNotification(t(`${res?.data?.message}, ${(Array.isArray(res?.data?.faildedCreateStd) && res?.data?.faildedCreateStd.length > 0) ? '(failed:' + res?.data?.faildedCreateStd +')' : '' }`))
+        showNotification(
+          t(
+            `${res?.data?.message}, ${
+              Array.isArray(res?.data?.faildedCreateStd) && res?.data?.faildedCreateStd.length > 0
+                ? '(failed:' + res?.data?.faildedCreateStd + ')'
+                : ''
+            }`
+          )
+        );
       })
       .catch((err) => {
         handleShowErrMsg(err, showNotification);

@@ -223,7 +223,8 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
 
   return (
     <>
-      <Dialog
+   
+    <Dialog
         fullWidth
         maxWidth="lg"
         open={studentProfileModal}
@@ -668,6 +669,8 @@ const Results: FC<{ students: any[], refetch: () => void, discount: any[], idCar
           </Box>
         </Box>
       </DialogWrapper>
+
+    
     </>
   );
 };

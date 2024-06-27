@@ -156,19 +156,7 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
         enabled: false
       }
     },
-    labels: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-      'Last Week',
-      'Last Month',
-      'Last Year',
-      'Last Decade'
-    ],
+    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Last Week', 'Last Month', 'Last Year', 'Last Decade'],
     theme: {
       mode: theme.palette.mode === 'dark' ? 'light' : 'dark'
     },
@@ -213,9 +201,9 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
 
   return (
     <>
-      <UserBoxButton sx={{ border: "2px solid #FFFFFF", borderRadius: 0.5 }} ref={ref} onClick={handleOpen}>
+      <UserBoxButton sx={{ border: '2px solid #FFFFFF', borderRadius: 0.5 }} ref={ref} onClick={handleOpen}>
         {/* <UserAvatar sx={{borderRadius:0.5}} alt={user?.username} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} /> */}
-        <AccountCircleIcon sx={{ color: "#FFFFFF" }} />
+        <AccountCircleIcon sx={{ color: '#FFFFFF' }} />
       </UserBoxButton>
       <Popover
         disableScrollLock
@@ -241,9 +229,7 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
 
           <UserBoxText>
             <UserBoxLabel variant="body1">{user?.username}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user?.jobtitle}
-            </UserBoxDescription>
+            <UserBoxDescription variant="body2">{user?.jobtitle}</UserBoxDescription>
           </UserBoxText>
         </MenuUserBox>
         <Divider
@@ -251,9 +237,10 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
             mb: 0
           }}
         />
-        <MenuListWrapperPrimary disablePadding>
-          <Grid>
-            {/* <ListItemText
+
+        <MenuListWrapperPrimary disablePadding sx={{ display: { xs: 'block', md: 'none' } }}>
+          {/* <Grid> */}
+          {/* <ListItemText
               primaryTypographyProps={{
                 variant: 'h5'
               }}
@@ -265,30 +252,40 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
               }}
               primary={t(' Academic Year: ' )}
             /> */}
-            {
+          {/* {
               // @ts-ignore
-              user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-              <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{ color: "green" }}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
-            }
-          </Grid>
-          <Divider sx={{ mt: 2 }} />
-          <Grid pt={2}>
-            {/* @ts-ignore */}
-            {user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-              (
-                <Grid sx={{ pr: 2}}>
-                  <Grid sx={{ color: theme => theme.colors.primary.dark, fontWeight: 700, fontSize: 12 }}>Academic Year:</Grid>
-                  <CustomAutoCompleteWrapper
-                    // label="Academic Year"
-                    label="Academic Year"
-                    placeholder="select a academic year..."
-                    value={selectedAcademicYear}
-                    options={academicYearList}
-                    handleChange={handleAcademicYearChange}
-                  />
+              user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+                <Grid item pr={2} fontWeight={700}>
+                  Current Active <br /> Academic Year:{' '}
+                  <span style={{ color: 'green' }}>
+                    <i>
+                      {current_active_academic_year?.success ? (
+                        current_active_academic_year?.data?.title
+                      ) : (
+                        <span style={{ color: 'red' }}>not found</span>
+                      )}
+                    </i>
+                  </span>{' '}
                 </Grid>
               )
-            }
+            } */}
+          {/* </Grid> */}
+          {/* <Divider sx={{ mt: 2 }} /> */}
+          <Grid pt={2}>
+            {/* @ts-ignore */}
+            {user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+              <Grid sx={{ pr: 2 }}>
+                <Grid sx={{ color: (theme) => theme.colors.primary.dark, fontWeight: 700, fontSize: 12 }}>Academic Year:</Grid>
+                <CustomAutoCompleteWrapper
+                  // label="Academic Year"
+                  label="Academic Year"
+                  placeholder="select a academic year..."
+                  value={selectedAcademicYear}
+                  options={academicYearList}
+                  handleChange={handleAcademicYearChange}
+                />
+              </Grid>
+            )}
           </Grid>
 
           {/* <MenuItem>
@@ -342,7 +339,7 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
             />
           </MenuItem> */}
         </MenuListWrapperPrimary>
-        <Divider />
+        {/* <Divider /> */}
         {/* <Box m={1}>
           <Box px={2} pt={1} pb={0.5} display="flex" alignItems="flex-start">
             <Text color="warning">
@@ -364,7 +361,7 @@ function HeaderUserbox({ academicYearList, selectedAcademicYear, handleAcademicY
         </Box> */}
         <Divider />
         <Box m={1}>
-          <Button color="primary" fullWidth onClick={handleLogout}>
+          <Button color="primary" fullWidth onClick={handleLogout} sx={{ backgroundColor: (theme) => theme.colors.primary.lighter }}>
             <LockOpenTwoToneIcon
               sx={{
                 mr: 1

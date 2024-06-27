@@ -155,19 +155,7 @@ function HeaderUserbox({ current_active_academic_year }) {
         enabled: false
       }
     },
-    labels: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-      'Last Week',
-      'Last Month',
-      'Last Year',
-      'Last Decade'
-    ],
+    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Last Week', 'Last Month', 'Last Year', 'Last Decade'],
     theme: {
       mode: theme.palette.mode === 'dark' ? 'light' : 'dark'
     },
@@ -212,9 +200,9 @@ function HeaderUserbox({ current_active_academic_year }) {
 
   return (
     <>
-      <UserBoxButton sx={{ border: "2px solid #FFFFFF", borderRadius: 0.5 }} ref={ref} onClick={handleOpen}>
+      <UserBoxButton sx={{ border: '2px solid #FFFFFF', borderRadius: 0.5 }} ref={ref} onClick={handleOpen}>
         {/* <UserAvatar sx={{borderRadius:0.5}} alt={user?.username} src={`/api/get_file/${user?.user_photo?.replace(/\\/g, '/')}`} /> */}
-        <AccountCircleIcon sx={{ color: "#FFFFFF" }} />
+        <AccountCircleIcon sx={{ color: '#FFFFFF' }} />
       </UserBoxButton>
       <Popover
         disableScrollLock
@@ -240,9 +228,7 @@ function HeaderUserbox({ current_active_academic_year }) {
 
           <UserBoxText>
             <UserBoxLabel variant="body1">{user?.username}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
-              {user?.jobtitle}
-            </UserBoxDescription>
+            <UserBoxDescription variant="body2">{user?.jobtitle}</UserBoxDescription>
           </UserBoxText>
         </MenuUserBox>
         <Divider
@@ -266,8 +252,20 @@ function HeaderUserbox({ current_active_academic_year }) {
             /> */}
             {
               // @ts-ignore
-              user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
-              <Grid item pr={2} fontWeight={700} >Current Active <br /> Academic Year: <span style={{ color: "green" }}><i>{current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: "red" }}>not found</span>}</i></span> </Grid>
+              user?.role?.title !== 'SUPER_ADMIN' && user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+                <Grid item pr={2} fontWeight={700}>
+                  Current Active <br /> Academic Year:{' '}
+                  <span style={{ color: 'green' }}>
+                    <i>
+                      {current_active_academic_year?.success ? (
+                        current_active_academic_year?.data?.title
+                      ) : (
+                        <span style={{ color: 'red' }}>not found</span>
+                      )}
+                    </i>
+                  </span>{' '}
+                </Grid>
+              )
             }
           </Grid>
 

@@ -21,13 +21,13 @@ const DesignInvoice = ({ schoolData, selectedInvoice }) => {
   useEffect(() => {
     // calculate discount
     let discount = 0;
-    for (let i = 0; i < selectedInvoice.length; i++) {
-      for (let j = 0; j < selectedInvoice[i]?.fee?.Discount.length; j++) {
-        if (selectedInvoice[i]?.fee?.id === selectedInvoice[i]?.fee?.Discount[j].fee_id) {
-          if (selectedInvoice[i]?.fee?.Discount[j].type === 'flat') {
-            discount = discount + parseInt(selectedInvoice[i]?.fee?.Discount[j].amt); // 100
-          } else if (selectedInvoice[i]?.fee?.Discount[j].type === 'percent') {
-            discount = discount + parseInt(selectedInvoice[i]?.fee.amount) / parseInt(selectedInvoice[i]?.fee?.Discount[j].amt);
+    for (let i = 0; i < selectedInvoice?.length; i++) {
+      for (let j = 0; j < selectedInvoice[i]?.fee?.Discount?.length; j++) {
+        if (selectedInvoice[i]?.fee?.id === selectedInvoice[i]?.fee?.Discount[j]?.fee_id) {
+          if (selectedInvoice[i]?.fee?.Discount[j]?.type === 'flat') {
+            discount = discount + parseInt(selectedInvoice[i]?.fee?.Discount[j]?.amt); // 100
+          } else if (selectedInvoice[i]?.fee?.Discount[j]?.type === 'percent') {
+            discount = discount + parseInt(selectedInvoice[i]?.fee?.amount) / parseInt(selectedInvoice[i]?.fee?.Discount[j]?.amt);
           }
         }
       }

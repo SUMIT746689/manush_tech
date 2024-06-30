@@ -15,8 +15,10 @@ const index = async (req, res, refresh_token) => {
                         academic_year: {
                             id: parseInt(req.query.academic_year_id)
                         },
-                        section: {
-                            id: parseInt(req.query.section_id)
+                        batches: {
+                            some: {
+                                id: parseInt(req.query.section_id)
+                            }
                         },
                         student_info: {
                             user: {
@@ -33,20 +35,33 @@ const index = async (req, res, refresh_token) => {
                     select: {
                         id: true,
                         student_information_id: true,
-                        section_id: true,
+                        // section_id: true,
                         student_photo: true,
-                        section: {
+                        class_id:true,
+                        class: {
                             select: {
                                 id: true,
-                                name: true,
-                                class: {
-                                    select: {
-                                        id: true,
-                                        name: true
-                                    }
-                                }
+                                name: true
                             }
                         },
+                        batches: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        },
+                        // section: {
+                        //     select: {
+                        //         id: true,
+                        //         name: true,
+                        //         class: {
+                        //             select: {
+                        //                 id: true,
+                        //                 name: true
+                        //             }
+                        //         }
+                        //     }
+                        // },
                         academic_year_id: true,
                         class_roll_no: true,
                         class_registration_no: true,

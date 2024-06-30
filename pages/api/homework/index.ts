@@ -20,15 +20,23 @@ const index = async (req, res, refresh_token) => {
             case 'GET':
 
                 const query = {}
-                if (subject_id) query['subject_id'] = Number(subject_id)
-                if (student_id) query['student_id'] = Number(student_id)
+                if (subject_id) query['subject_id'] = parseInt(subject_id)
+                if (student_id) query['student_id'] = parseInt(student_id)
                 if (section_id) query['student'] = {
-                    section_id: Number(section_id)
+                    batches: {
+                        some: { id: parseInt(section_id) }
+                    }
                 }
+                // if (subject_id) query['subject_id'] = parseInt(subject_id)
+                // if (student_id) query['student_id'] = parseInt(student_id)
+                // if (class_id) query['student'] = { class_id: parseInt(class_id) }
+                // if (section_id) query['batches'] = { id: parseInt(section_id) }
+
                 const homework = await prisma.homework.findMany({
                     where: {
                         academic_year_id: Number(academic_year_id),
                         ...query,
+                        // student: { batches: { some: { id: parseInt(section_id) } } },
                         academicYear: {
                             school_id: refresh_token.school_id
                         },
@@ -54,7 +62,7 @@ const index = async (req, res, refresh_token) => {
                 }
 
                 const { files, fields, error } = await fileUpload({ req, filterFiles, uploadFolderName });
-                console.log("files, fields__", files, fields);
+                // console.log("files, fields__", files, fields);
 
                 if (error) throw new Error('Error')
                 res.status(200)

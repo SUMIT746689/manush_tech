@@ -45,7 +45,7 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
 
   useEffect(() => {
     if (data) {
-      setSubjects(data?.section?.class?.subjects?.map(i => ({
+      setSubjects(data?.class?.subjects?.map(i => ({
         label: i.name,
         id: i.id
       })))
@@ -95,7 +95,7 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
   };
 
   const handleClassSelect = (event, newValue) => {
-    console.log(newValue);
+    console.log({newValue});
     setSelectedClass(newValue);
     setSelectedSection(null);
 
@@ -137,7 +137,7 @@ function PageHeader({ reFetchData, data, classes, classList, setLeave }) {
   }
   const gettingStudent = (section_id) => {
     if (section_id) {
-      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${section_id}`)
+      axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&class_id=${selectedClass?.id}&section_id=${section_id}`)
         .then((res) =>
           setStudentList(
             res.data?.map((i) => {

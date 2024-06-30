@@ -153,7 +153,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                         data: {
                             class_roll_no: String(today) + index,
                             class_registration_no: registration_no_generate(index),
-                            section: { connect: { id: parseInt(section_id) } },
+                            // section: { connect: { id: parseInt(section_id) } },
                             batches: { connect: { id: parseInt(section_id) } },
                             academic_year: { connect: { id: dcryptAcademicYear.id } },
                             student_info: { connect: { id: stdInfo.id } },

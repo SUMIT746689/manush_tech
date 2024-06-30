@@ -43,14 +43,17 @@ export async function getServerSideProps(context: any) {
         ![
           'user_id',
           'id',
+          'class_id',
+          'group_id',
           'father_photo',
           'mother_photo',
           'student_photo',
-          'guardian_photo',
+          'guardian_photo', 
           'created_at',
           'extra_section_id',
           'school_id',
-          'student_information_id'
+          'student_information_id',
+          'is_separate'
         ].includes(columns[property])
       )
         without_photo_fields[property] = columns[property];

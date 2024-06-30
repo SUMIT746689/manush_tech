@@ -1,48 +1,10 @@
-import {
-  FC,
-  ChangeEvent,
-  MouseEvent,
-  SyntheticEvent,
-  useState,
-  ReactElement,
-  Ref,
-  forwardRef,
-  useEffect,
-  useContext
-} from 'react';
+import { FC, ChangeEvent, MouseEvent, SyntheticEvent, useState, ReactElement, Ref, forwardRef, useEffect, useContext } from 'react';
 
 import PropTypes from 'prop-types';
 import {
-  Avatar,
-  Box,
-  Card,
-  Checkbox,
-  Grid,
-  Slide,
-  Divider,
-  Tooltip,
-  IconButton,
-  InputAdornment,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableContainer,
-  TableRow,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tab,
-  Tabs,
-  TextField,
-  Button,
-  Typography,
-  Dialog,
-  Zoom,
-  styled,
-  Chip,
-  DialogTitle,
-  DialogContent,
+  Avatar, Box, Card, Checkbox, Grid, Slide, Divider, Tooltip, IconButton, InputAdornment, Table,
+  TableBody, TableCell, TableHead, TablePagination, TableContainer, TableRow, ToggleButton, ToggleButtonGroup,
+  Tab, Tabs, TextField, Button, Typography, Dialog, Zoom, styled, Chip, DialogTitle, DialogContent,
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import CloseIcon from '@mui/icons-material/Close';
@@ -64,6 +26,7 @@ import ApprovalIcon from '@mui/icons-material/Approval';
 import { useAuth } from '@/hooks/useAuth';
 import { AcademicYearContext } from '@/contexts/UtilsContextUse';
 import { accessNestedProperty, getFile } from '@/utils/utilitY-functions';
+import { TableBodyCellWrapper, TableHeaderCellWrapper } from '@/components/Table/Table';
 
 const DialogWrapper = styled(Dialog)(
   () => `
@@ -174,7 +137,7 @@ const Results = ({ users, reFetchData }) => {
   const { user } = useAuth();
   const [academicYear, setAcademicYear] = useContext(AcademicYearContext);
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(25);
   const [query, setQuery] = useState<string>('');
   const [filters, setFilters] = useState<Filters>({
     role: null
@@ -233,7 +196,7 @@ const Results = ({ users, reFetchData }) => {
 
       <Card sx={{ minHeight: 'calc(100vh - 330px) !important' }}>
         <Box
-          p={2}
+          p={1}
           display="flex"
           alignItems="center"
           justifyContent="space-between"
@@ -251,7 +214,7 @@ const Results = ({ users, reFetchData }) => {
             onRowsPerPageChange={handleLimitChange}
             page={page}
             rowsPerPage={limit}
-            rowsPerPageOptions={[5, 10, 15]}
+            rowsPerPageOptions={[25, 50, 75, 100]}
           />
         </Box>
         {paginatedClasses.length === 0 ? (
@@ -276,11 +239,11 @@ const Results = ({ users, reFetchData }) => {
               <Table size='small'>
                 <TableHead>
                   <TableRow>
-                    <TableCell align='center'>{t('ID')}</TableCell>
-                    <TableCell align='center'>{t('Date')}</TableCell>
-                    <TableCell align='center'>{t('To Date')}</TableCell>
-                    <TableCell align="center">{t('Applied Date')}</TableCell>
-                    <TableCell align='center'>{t('Status')}</TableCell>
+                    <TableHeaderCellWrapper >{t('ID')}           </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align='center'>{t('Date')}         </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align='center'>{t('To Date')}      </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align="center">{t('Applied Date')} </TableHeaderCellWrapper>
+                    <TableHeaderCellWrapper align='center'>{t('Status')}       </TableHeaderCellWrapper>
 
                   </TableRow>
                 </TableHead>
@@ -289,50 +252,29 @@ const Results = ({ users, reFetchData }) => {
 
                     return (
                       <TableRow hover key={i.id}>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {i?.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {dayjs(i?.date).format('YYYY-MM-DD')}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            {i?.subject?.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            <Typography noWrap variant="h5" py={0}>
-
-                              {i?.file_path && <a
-                                style={{ width: '50px', color: 'blue', textDecoration: 'underline' }}
-                                target="_blank"
-                                href={getFile(i?.file_path)}
-                              >
-                                File link
-                              </a>
-                              }
-                            </Typography>
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Typography variant="h5">
-                            <Tooltip title={t('Delete')} arrow>
-                              <IconButton
-                                onClick={() => setOpenConfirmDelete(i?.id)}
-                                color="primary"
-                              >
-                                <DeleteTwoToneIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Typography>
-                        </TableCell>
-
+                        <TableBodyCellWrapper>{i?.id}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">{dayjs(i?.date).format('YYYY-MM-DD')}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">{i?.subject?.name}</TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">
+                          {i?.file_path && <a
+                            style={{ width: '50px', color: 'blue', textDecoration: 'underline' }}
+                            target="_blank"
+                            href={getFile(i?.file_path)}
+                          >
+                            File link
+                          </a>
+                          }
+                        </TableBodyCellWrapper>
+                        <TableBodyCellWrapper align="center">
+                          <Tooltip title={t('Delete')} arrow>
+                            <IconButton
+                              onClick={() => setOpenConfirmDelete(i?.id)}
+                              color="primary"
+                            >
+                              <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableBodyCellWrapper>
                       </TableRow>
                     );
                   })}

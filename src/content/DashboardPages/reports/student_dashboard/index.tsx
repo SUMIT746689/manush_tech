@@ -43,7 +43,7 @@ function StudentDashboardReportsContent({ blockCount }) {
   const right_banner_check = Array.isArray(right_banners) && right_banners.length > 0;
 
   const name = [student?.student_info?.first_name, student?.student_info?.middle_name, student?.student_info?.last_name].join(' ');
-  const extraInfo = [['Roll', student.class_roll_no], ['Class', student.section.class?.name], ['Section', student.section.name]]
+  const extraInfo = [['Roll', student?.class_roll_no], ['Class', student?.class?.name], ['Batch', student?.batches?.map(batch=>batch.name).join(', ')]]
   // const quickLinks = [
   //   { name: 'Exam', src: "exam.svg", href: "/management/exam" },
   //   { name: 'Attendance', src: "attendance.svg", href: "/management/exam" },

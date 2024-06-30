@@ -259,9 +259,9 @@ const postHandle = async (req, res, refresh_token) => {
 
           ...group,
           ...extra_section,
-          section: {
-            connect: { id: parseInt(fields?.section_id) }
-          },
+          // section: {
+          //   connect: { id: parseInt(fields?.section_id) }
+          // },
           batches: {
             connect: { id: parseInt(fields?.section_id) }
           },

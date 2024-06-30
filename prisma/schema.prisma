@@ -248,7 +248,7 @@ model Section {
 
   class                      Class                        @relation(fields: [class_id], references: [id])
   class_teacher              Teacher?                     @relation("class_teacher", fields: [class_teacher_id], references: [id])
-  students                   Student[]
+  // students                   Student[]
   teachers                   Teacher[]                    @relation("SectionToTeacher")
   periods                    Period[]
   attendaces                 Attendance[]
@@ -307,7 +307,7 @@ model Student {
   id                      Int       @id @default(autoincrement())
   student_information_id  Int
   class_id                Int?
-  section_id              Int
+  // section_id              Int
   group_id                Int?
   academic_year_id        Int
   class_roll_no           String
@@ -328,7 +328,7 @@ model Student {
   academic_year AcademicYear       @relation(fields: [academic_year_id], references: [id])
   student_info  StudentInformation @relation(fields: [student_information_id], references: [id])
   class         Class?             @relation(fields: [class_id], references: [id])
-  section       Section            @relation(fields: [section_id], references: [id])
+  // section       Section            @relation(fields: [section_id], references: [id])
   group         Group?             @relation(fields: [group_id], references: [id])
   discount      Discount[]         @relation("DiscountToStudent")
   waiver_fees   Fee[]              @relation("WaiverFeesToStudent")

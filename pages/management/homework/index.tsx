@@ -31,22 +31,22 @@ export async function getServerSideProps(context: any) {
         select: {
           id: true,
           student_photo: true,
-          section_id: true,
-          academic_year: true,
-          section: {
+          // section_id: true,
+          class_id: true,
+          class: {
             select: {
               id: true,
               name: true,
-              class: {
-                select: {
-                  id: true,
-                  name: true,
-                  has_section: true,
-                  subjects: true
-                }
-              }
+              has_section: true,
+              subjects: true
             }
-
+          },
+          academic_year: true,
+          batches: {
+            select: {
+              id: true,
+              name: true
+            }
           },
         }
       });
@@ -67,7 +67,7 @@ function ManagementLeave({ data }) {
   const reFetchData = () => {
     if (data) {
       if (academicYear?.id) {
-        axios.get(`/api/homework?academic_year_id=${academicYear?.id}&class_id=${data?.section?.class?.id}&student_id=${data?.id}`)
+        axios.get(`/api/homework?academic_year_id=${academicYear?.id}&class_id=${data?.class_id}&student_id=${data?.id}`)
           .then(res => setLeave(res.data))
           .catch(err => console.log(err))
       }
@@ -89,7 +89,7 @@ function ManagementLeave({ data }) {
     reFetchData()
   }, [data, academicYear])
 
-
+console.log({data})
   return (
     <>
       <Head>

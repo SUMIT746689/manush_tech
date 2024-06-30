@@ -62,8 +62,8 @@ const LeftBox = ({
             options={searchData}
             value={searchValue}
             handleChange={searchHandleChange}
-            label="Search Student Id-Name-Roll-Class-Section-G"
-            placeholder="Search Student Id - Name - Roll - Class - Section - G"
+            label="Search Student Name | Roll | Class | Batch | G"
+            placeholder="Search Student Name - Roll - Class - Batch - G"
           />
           <Grid
             sx={{

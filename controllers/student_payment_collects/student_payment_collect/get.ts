@@ -6,22 +6,24 @@ import { logFile } from 'utilities_api/handleLogFile';
 const get = async (req, res, refresh_token, academic_year) => {
   try {
     let on_time_discount_total_arr = [];
-    const { id, selected_month, fromDate, toDate, subject_ids } = req.query;
+    const { id, section_id, selected_month, fromDate, toDate, subject_ids } = req.query;
     const { id: academic_year_id } = academic_year;
 
-
-
-  
+    if (!section_id) throw new Error('batch not founds');
+    const parseSectionId = parseInt(section_id);
+    if (Number.isNaN(parseSectionId)) throw new Error('provide invalid section id');
 
     if (!id) throw new Error('provide student_id');
-    // if (!subject_ids) throw new Error();
 
-    const parseSubjectIds = subject_ids?.split(',').map((subject_id) => {
-      const parseSubId = parseInt(subject_id);
-      if (typeof parseSubId !== 'number') throw new Error('provide invalid subject id');
-      return parseSubId;
-    });
-
+    const parseSubjectIds = subject_ids ?
+      subject_ids?.split(',').map((subject_id) => {
+        const parseSubId = parseInt(subject_id);
+        if (typeof parseSubId !== 'number') throw new Error('provide invalid subject id');
+        return parseSubId;
+      })
+      :
+      [];
+    console.log({ subject_ids, parseSubjectIds })
     const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
     if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error('provide a valid month');
 
@@ -30,7 +32,7 @@ const get = async (req, res, refresh_token, academic_year) => {
     const monthsBeforeSelected: monthListType[] = monthList.slice(0, selectedIndex + 1);
     // monthsBeforeSelected.push(selected_month.toLocaleLowerCase());
     // multiple month related code end
-  
+
     const dateFilter = {},
       query = {};
     if (fromDate) dateFilter['gte'] = new Date(new Date(fromDate).setUTCHours(0, 0, 0, 0));
@@ -52,12 +54,12 @@ const get = async (req, res, refresh_token, academic_year) => {
         }
       }
     });
-  
-   
+
+
     let whereObj = {}
-    if(monthsBeforeSelected.length > 0){
-      whereObj['fees_month'] =  { in: monthsBeforeSelected }
-      whereObj['OR'] =  [
+    if (monthsBeforeSelected.length > 0) {
+      whereObj['fees_month'] = { in: monthsBeforeSelected }
+      whereObj['OR'] = [
         {
           fees_type: "class_based"
         },
@@ -69,10 +71,10 @@ const get = async (req, res, refresh_token, academic_year) => {
           {}
       ]
     }
-    
+
 
     const all_fees = await prisma.student.findFirst({
-      where: { id: Number(id) },
+      where: { id: Number(id), batches: { some: { id: parseSectionId } } },
       select: {
         id: true,
         class_registration_no: true,
@@ -80,7 +82,7 @@ const get = async (req, res, refresh_token, academic_year) => {
         discount: true,
         waiver_fees: true,
         student_photo: true,
-        section_id: true,
+        // section_id: true,
         student_info: {
           select: {
             // id: true,
@@ -95,48 +97,118 @@ const get = async (req, res, refresh_token, academic_year) => {
             title: true
           }
         },
-        section: {
+        // section: {
+        //   select: {
+        //     name: true,
+        //     class: {
+        //       select: {
+        //         name: true,
+        //         fees: {
+        //           where: {
+        //             academic_year_id,
+        //             // old
+        //             // fees_month: { in: monthsBeforeSelected },
+        //             // OR: [
+        //             //   {
+        //             //     fees_type: "class_based"
+        //             //   },
+        //             //   parseSubjectIds ? {
+        //             //     fees_type: "subject_based",
+        //             //     subject_id: { in: parseSubjectIds }
+        //             //   }
+        //             //     :
+        //             //     {}
+        //             // ]
+        //             ...whereObj
+        //           },
+        //           include: {
+        //             fees_head: true,
+        //             subject: true
+        //           },
+        //           orderBy: { fees_month: 'asc' }
+        //         }
+        //       }
+        //     }
+        //   }
+        // },
+        class: {
           select: {
             name: true,
-            class: {
-              select: {
-                name: true,
-                fees: {
-                  where: {
-                    academic_year_id,
-                    // old
-                    // fees_month: { in: monthsBeforeSelected },
-                    // OR: [
-                    //   {
-                    //     fees_type: "class_based"
-                    //   },
-                    //   parseSubjectIds ? {
-                    //     fees_type: "subject_based",
-                    //     subject_id: { in: parseSubjectIds }
-                    //   }
-                    //     :
-                    //     {}
-                    // ]
-                    ...whereObj
-                  },
-                  include: {
-                    fees_head: true,
-                    subject: true
-                  },
-                  orderBy: { fees_month: 'asc' }
-                }
-              }
+            fees: {
+              where: {
+                academic_year_id,
+                // old
+                // fees_month: { in: monthsBeforeSelected },
+                // OR: [
+                //   {
+                //     fees_type: "class_based"
+                //   },
+                //   parseSubjectIds ? {
+                //     fees_type: "subject_based",
+                //     subject_id: { in: parseSubjectIds }
+                //   }
+                //     :
+                //     {}
+                // ]
+                ...whereObj
+              },
+              include: {
+                fees_head: true,
+                subject: true
+              },
+              orderBy: { fees_month: 'asc' }
             }
           }
+        },
+        batches: {
+          select: {
+            id: true,
+            name: true,
+          }
         }
+        // batches: {
+        //   select: {
+        //     name: true,
+        //     class: {
+        //       select: {
+        //         name: true,
+        //         fees: {
+        //           where: {
+        //             academic_year_id,
+        //             // old
+        //             // fees_month: { in: monthsBeforeSelected },
+        //             // OR: [
+        //             //   {
+        //             //     fees_type: "class_based"
+        //             //   },
+        //             //   parseSubjectIds ? {
+        //             //     fees_type: "subject_based",
+        //             //     subject_id: { in: parseSubjectIds }
+        //             //   }
+        //             //     :
+        //             //     {}
+        //             // ]
+        //             ...whereObj
+        //           },
+        //           include: {
+        //             fees_head: true,
+        //             subject: true
+        //           },
+        //           orderBy: { fees_month: 'asc' }
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
       }
     });
 
 
 
     const waiver_fee = all_fees?.waiver_fees?.length > 0 ? all_fees?.waiver_fees?.map((i) => i.id) : [];
-  
-    const fees = all_fees.section.class.fees
+
+    // const fees = all_fees.section.class.fees
+    const fees = all_fees.class.fees
       ?.filter((i) => !waiver_fee.includes(i.id))
       ?.map((fee) => {
         const findStudentFee: any = student_fee.filter((pay_fee) => pay_fee.fee?.id === fee.id);
@@ -237,7 +309,7 @@ const get = async (req, res, refresh_token, academic_year) => {
           return { ...fee, status: 'unpaid', on_time_discount: 0 };
         }
       });
-    
+
     // remove deleted fees
 
     let filterDeletedFees = fees?.filter((item) => {
@@ -262,17 +334,17 @@ const get = async (req, res, refresh_token, academic_year) => {
         }
       }
     }
-    
-  
- 
+
+
+
 
     const data = {
       ...all_fees.student_info,
       id: all_fees.id,
-      section_id: all_fees.section_id,
+      section_id: all_fees.batches[0].id,
       student_photo: all_fees.student_photo,
-      class_name: all_fees.section.class.name,
-      section_name: all_fees.section?.name,
+      class_name: all_fees.class.name,
+      section_name: all_fees.batches[0]?.name,
       group_title: all_fees.group?.title || null,
       class_registration_no: all_fees.class_registration_no,
       class_roll_no: all_fees.class_roll_no,
@@ -283,12 +355,13 @@ const get = async (req, res, refresh_token, academic_year) => {
       // })
     };
 
-    
+
 
 
 
     res.status(200).json({ data, success: true });
   } catch (err) {
+    console.log(err.message)
     logFile.error(err.message);
     res.status(404).json({ error: err.message });
   }

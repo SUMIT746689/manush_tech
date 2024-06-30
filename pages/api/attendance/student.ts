@@ -64,7 +64,8 @@ const index = async (req, res) => {
 
                 const fullSectionStudents = await prisma.student.findMany({
                     where: {
-                        section_id: parseInt(section_id)
+                        batches: { some: { id: parseInt(section_id) } }
+                        // section_id: parseInt(section_id)
                     },
                     select: {
                         id: true

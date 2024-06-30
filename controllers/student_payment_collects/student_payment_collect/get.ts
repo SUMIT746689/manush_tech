@@ -23,7 +23,6 @@ const get = async (req, res, refresh_token, academic_year) => {
       })
       :
       [];
-    console.log({ subject_ids, parseSubjectIds })
     const lowerCaseMonth = selected_month ? selected_month.toLocaleLowerCase() : undefined;
     if (lowerCaseMonth && !monthList.includes(lowerCaseMonth)) throw new Error('provide a valid month');
 

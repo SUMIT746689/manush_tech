@@ -1,18 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  styled,
-  Grid,
-  Autocomplete,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl
-} from '@mui/material';
+import { Box, IconButton, Tooltip, styled, Grid, Autocomplete, TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
@@ -36,11 +24,7 @@ import SearchInputWrapper from '@/components/SearchInput';
 import { NavIcon } from '@/components/Icon';
 import { useTranslation } from 'next-i18next';
 import { ModuleContext } from '@/contexts/ModuleContext';
-import {
-  adminModulesList,
-  studentModulesList,
-  teacherModulesList
-} from '@/utils/moduleLists';
+import { adminModulesList, studentModulesList, teacherModulesList } from '@/utils/moduleLists';
 import Link from 'next/link';
 
 const HeaderWrapper = styled(Box)(
@@ -84,9 +68,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
   const router = useRouter();
   const { showNotification } = useNotistick();
   const { data } = useClientDataFetch(`/api/academic_years`);
-  const { data: current_active_academic_year, reFetchData } = useClientFetch(
-    `/api/academic_years/current_active`
-  );
+  const { data: current_active_academic_year, reFetchData } = useClientFetch(`/api/academic_years/current_active`);
   // console.log({ current_active_academic_year })
   const auth: any = useAuth();
   const { user } = auth;
@@ -142,10 +124,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
 
   useEffect(() => {
     // @ts-ignore
-    if (
-      auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-      auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN'
-    ) {
+    if (auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN') {
       const tempMenu = [];
       for (const i of menuItems[0]?.items) {
         if (i.items) {
@@ -176,12 +155,8 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
     }
   }, [selectedAcademicYear]);
 
-  const handleAcademicYearChange = async (
-    event: any,
-    newValue: { id: number; label: string } | null
-  ) => {
-    if (!newValue?.id && !newValue?.label)
-      return showNotification('academic year values not found', 'error');
+  const handleAcademicYearChange = async (event: any, newValue: { id: number; label: string } | null) => {
+    if (!newValue?.id && !newValue?.label) return showNotification('academic year values not found', 'error');
     axios
       .patch(`/api/academic_years/${newValue.id}/current_user`)
       .then(({ data }) => {
@@ -197,10 +172,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
   //   ? auth?.user?.permissions?.map((permission: any) => permission.group)
   //   : [];
 
-  const permissionsArray_ =
-    auth?.user?.permissions?.length > 0
-      ? auth?.user?.permissions?.map((permission: any) => permission.value)
-      : [];
+  const permissionsArray_ = auth?.user?.permissions?.length > 0 ? auth?.user?.permissions?.map((permission: any) => permission.value) : [];
 
   return (
     <HeaderWrapper
@@ -233,130 +205,110 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
         //   )
         //   :
         drawerOpen ? (
-          <Tooltip
-            title={t('Hide Navbar')}
-            arrow
-            sx={{ px: 1, display: { xs: 'none', lg: 'block' } }}
-            onClick={handleDrawerClose}
-          >
+          <Tooltip title={t('Hide Navbar')} arrow sx={{ px: 1, display: { xs: 'none', lg: 'block' } }} onClick={handleDrawerClose}>
             <Grid>
               <NavIcon fillColor={'white'} style={{ cursor: 'pointer' }} />
             </Grid>
           </Tooltip>
         ) : (
-          <Tooltip
-            title={t('Show Navbar')}
-            arrow
-            sx={{ pr: 1, display: { xs: 'none', lg: 'block' } }}
-            onClick={handleDrawerOpen}
-          >
+          <Tooltip title={t('Show Navbar')} arrow sx={{ pr: 1, display: { xs: 'none', lg: 'block' } }} onClick={handleDrawerOpen}>
             <Grid>
-              <NavIcon
-                fillColor={'white'}
-                style={{ cursor: 'pointer', rotate: '180deg' }}
-              />
+              <NavIcon fillColor={'white'} style={{ cursor: 'pointer', rotate: '180deg' }} />
             </Grid>
           </Tooltip>
         )
       }
 
       {/* @ts-ignore */}
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-        auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
-          <Box
-            sx={{
-              display: { xs: 'none', sm: 'block' },
-              minWidth: 'fit-content',
-              backgroundColor: 'white',
-              textAlign: 'center',
-              py: 0.5,
-              px: 1,
-              mx: 1,
-              borderRadius: 0.4,
-              fontWeight: 600,
-              fontSize: 12
-            }}
-          >
-            Customer Support <br />
-            <a
-              href="tel:+8801894884114"
-              style={{ borderBottom: '1px solid white' }}
-            >
-              +880 1894 884 114
-            </a>
-          </Box>
-        )}
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+        <Box
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            minWidth: 'fit-content',
+            backgroundColor: 'white',
+            textAlign: 'center',
+            py: 0.5,
+            px: 1,
+            mx: 1,
+            borderRadius: 0.4,
+            fontWeight: 600,
+            fontSize: 12
+          }}
+        >
+          Customer Support <br />
+          <a href="tel:+8801894884114" style={{ borderBottom: '1px solid white' }}>
+            +880 1894 884 114
+          </a>
+        </Box>
+      )}
 
-      {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-        auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
-          <Grid sx={{ width: 200, p: 1 }}>
-            <InputLabel sx={{ color: 'white', fontSize: 12 }}>
-              Select Module:
-            </InputLabel>
-            <Select
-              value={selectModule}
-              size="small"
-              onChange={(e) => {
-                handleChangeModule(e.target.value);
-                // router.push(`/dashboards/modules/admin`);
-                if (auth?.user?.role?.title === 'ADMIN') return router.push(`/dashboards/modules/admin`);
-                if (auth?.user?.role?.title === 'TEACHER') return router.push(`/dashboards/modules/teacher`);
-                if (auth?.user?.role?.title === 'STUDENT') return router.push(`/dashboards/modules/student`);
-              }}
-              sx={{
-                minWidth: '100%',
-                color: 'white',
-                '& fieldset': {
-                  borderRadius: '3px',
-                  color: 'white'
-                  // backgroundColor:"white",
-                  // color:'black'
-                },
+      {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+        <Grid sx={{ width: 200, p: 1 }}>
+          <InputLabel sx={{ color: 'white', fontSize: 12 }}>Select Module:</InputLabel>
+          <Select
+            value={selectModule}
+            size="small"
+            onChange={(e) => {
+              handleChangeModule(e.target.value);
+              // router.push(`/dashboards/modules/admin`);
+              if (auth?.user?.role?.title === 'ADMIN') return router.push(`/dashboards/modules/admin`);
+              if (auth?.user?.role?.title === 'TEACHER') return router.push(`/dashboards/modules/teacher`);
+              if (auth?.user?.role?.title === 'STUDENT') return router.push(`/dashboards/modules/student`);
+            }}
+            sx={{
+              minWidth: '100%',
+              color: 'white',
+              '& fieldset': {
+                borderRadius: '3px',
+                color: 'white'
+                // backgroundColor:"white",
+                // color:'black'
+              },
+              '&  .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white'
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white'
+              },
+              ':hover': {
                 '&  .MuiOutlinedInput-notchedOutline': {
                   borderColor: 'white'
                 },
                 '& .MuiSvgIcon-root': {
                   color: 'white'
-                },
-                ':hover': {
-                  '&  .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'white'
-                  },
-                  '& .MuiSvgIcon-root': {
-                    color: 'white'
-                  }
-                },
-                ':active': {
-                  '&  .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'white'
-                  },
-                  '& .MuiSvgIcon-root': {
-                    color: 'white'
-                  }
                 }
-              }}
-            >
-              {auth?.user?.role?.title === 'ADMIN' &&
-                adminModulesList.map((module, index) => (
-                  <MenuItem key={index} value={module}>
-                    {module.split('_').join(' ')}
-                  </MenuItem>
-                ))}
-              {auth?.user?.role?.title === 'TEACHER' &&
-                teacherModulesList.map((module, index) => (
-                  <MenuItem key={index} value={module}>
-                    {module.split('_').join(' ')}
-                  </MenuItem>
-                ))}
-              {auth?.user?.role?.title === 'STUDENT' &&
-                studentModulesList.map((module, index) => (
-                  <MenuItem key={index} value={module}>
-                    {module.split('_').join(' ')}
-                  </MenuItem>
-                ))}
-            </Select>
-          </Grid>
-        )}
+              },
+              ':active': {
+                '&  .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'white'
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                }
+              }
+            }}
+          >
+            {auth?.user?.role?.title === 'ADMIN' &&
+              adminModulesList.map((module, index) => (
+                <MenuItem key={index} value={module}>
+                  {module.split('_').join(' ')}
+                </MenuItem>
+              ))}
+            {auth?.user?.role?.title === 'TEACHER' &&
+              teacherModulesList.map((module, index) => (
+                <MenuItem key={index} value={module}>
+                  {module.split('_').join(' ')}
+                </MenuItem>
+              ))}
+            {auth?.user?.role?.title === 'STUDENT' &&
+              studentModulesList.map((module, index) => (
+                <MenuItem key={index} value={module}>
+                  {module.split('_').join(' ')}
+                </MenuItem>
+              ))}
+          </Select>
+        </Grid>
+      )}
 
       {/* @ts-ignore */}
       {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' &&
@@ -374,44 +326,33 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
           </Grid>
         )} */}
 
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="right"
-        width="100%"
-        columnGap={2}
-      >
+      <Box display="flex" alignItems="center" justifyContent="right" width="100%" columnGap={2}>
         {/* @ts-ignore */}
-        {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
-          auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
-            <Grid
-              item
-              pr={2}
-              color="white"
-              fontSize={12}
-              fontWeight={800}
-              border={1}
-              borderRadius={0.7}
-              p={1}
-              sx={{
-                borderStyle: 'dashed',
-                display: { xs: 'none', md: 'block' }
-              }}
-            >
-              Current Active
-              <br />
-              {`Academic Year: `}
-              <span style={{ color: 'white' }}>
-                <i>
-                  {current_active_academic_year?.success ? (
-                    current_active_academic_year?.data?.title
-                  ) : (
-                    <span style={{ color: 'red' }}>not found</span>
-                  )}
-                </i>
-              </span>
-            </Grid>
-          )}
+        {auth?.user?.role?.title !== 'SUPER_ADMIN' && auth?.user?.role?.title !== 'ASSIST_SUPER_ADMIN' && (
+          <Grid
+            item
+            pr={2}
+            color="white"
+            fontSize={12}
+            fontWeight={800}
+            border={1}
+            borderRadius={0.7}
+            p={1}
+            sx={{
+              borderStyle: 'dashed',
+              display: { xs: 'none', md: 'block' }
+            }}
+          >
+            Current Active
+            <br />
+            {`Academic Year: `}
+            <span style={{ color: 'white' }}>
+              <i>
+                {current_active_academic_year?.success ? current_active_academic_year?.data?.title : <span style={{ color: 'red' }}>not found</span>}
+              </i>
+            </span>
+          </Grid>
+        )}
 
         {/* @ts-ignore */}
         {/* {auth?.user?.role?.title !== 'SUPER_ADMIN' &&
@@ -454,11 +395,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
         >
           <Tooltip arrow title="Show Menu" onClick={toggleSidebar}>
             <IconButton sx={{ color: '#FFFFFF', border: '2px solid #FFFFFF' }}>
-              {!sidebarToggle ? (
-                <MenuTwoToneIcon fontSize="small" />
-              ) : (
-                <CloseTwoToneIcon fontSize="small" />
-              )}
+              {!sidebarToggle ? <MenuTwoToneIcon fontSize="small" /> : <CloseTwoToneIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
         </Box>
@@ -469,16 +406,7 @@ function Header({ drawerOpen, handleDrawerOpen, handleDrawerClose }) {
 
 export default Header;
 
-export const CustomAutoCompleteWrapper = ({
-  minWidth = null,
-  required = false,
-  options,
-  value,
-  handleChange,
-  label,
-  placeholder,
-  ...params
-}) => {
+export const CustomAutoCompleteWrapper = ({ minWidth = null, required = false, options, value, handleChange, label, placeholder, ...params }) => {
   return (
     <Grid
       item
@@ -510,11 +438,7 @@ export const CustomAutoCompleteWrapper = ({
         filterSelectedOptions
         renderInput={(rnParams) => (
           <div ref={rnParams.InputProps.ref}>
-            <input
-              type="text"
-              {...rnParams.inputProps}
-              style={{ borderRadius: '4px', padding: '4px', maxWidth: '200px' }}
-            />
+            <input type="text" {...rnParams.inputProps} style={{ borderRadius: '4px', padding: '4px', maxWidth: '200px' }} />
           </div>
         )}
         onChange={handleChange}

@@ -56,9 +56,16 @@ const index = async (req, res) => {
         const fetchStdFees = await prisma.studentFee.findMany({
           where: {
             student: {
-              section_id: {
-                in: selected_section?.split(',').map(Number)
+              batches: {
+                some: {
+                  id: {
+                    in: selected_section?.split(',').map(Number)
+                  }
+                }
               },
+              // section_id: {
+              //   in: selected_section?.split(',').map(Number)
+              // },
               ...groupWise
             },
             collection_date: {
@@ -93,11 +100,16 @@ const index = async (req, res) => {
                     last_name: true
                   }
                 },
-                section: {
+                batches: {
                   select: {
                     name: true
                   }
                 },
+                // section: {
+                //   select: {
+                //     name: true
+                //   }
+                // },
                 group: {
                   select: {
                     title: true

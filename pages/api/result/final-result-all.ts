@@ -42,7 +42,12 @@ const FinalResultAll = async (req, res) => {
                         id: {
                             in: student_id_list
                         },
-                        section_id: parseInt(section_id),
+                        batches: {
+                            some: {
+                              id: parseInt(section_id)
+                            }
+                          },
+                        // section_id: parseInt(section_id),
                         academic_year_id: parseInt(academic_year_id),
                     },
                     select: {
@@ -83,16 +88,26 @@ const FinalResultAll = async (req, res) => {
                                     }
                                 }
                             },
-                            section: {
-                                select: {
-                                    name: true,
-                                    class: {
-                                        select: {
-                                            name: true
-                                        }
-                                    }
+                            class:{
+                                select:{
+                                    name:true
                                 }
-                            }
+                            },
+                            batches:{
+                                select:{
+                                    name:true
+                                }
+                            },
+                            // section: {
+                            //     select: {
+                            //         name: true,
+                            //         class: {
+                            //             select: {
+                            //                 name: true
+                            //             }
+                            //         }
+                            //     }
+                            // }
                         }
                     })
                     // if(!student){

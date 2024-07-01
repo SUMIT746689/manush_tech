@@ -28,9 +28,16 @@ const index = async (req, res) => {
               }
             },
             student: {
-              section_id: {
-                in: selected_section?.split(',').map(Number)
-              }
+              batches: {
+                some: {
+                  id: {
+                    in: selected_section?.split(',').map(Number)
+                  }
+                }
+              },
+              // section_id: {
+              //   in: selected_section?.split(',').map(Number)
+              // }
             }
           },
 
@@ -59,12 +66,18 @@ const index = async (req, res) => {
                     title: true
                   }
                 },
+
                 class_roll_no: true,
-                section: {
-                  select: {
-                    name: true
+                batches:{
+                  select:{
+                    name:true
                   }
                 },
+                // section: {
+                //   select: {
+                //     name: true
+                //   }
+                // },
                 group: {
                   select: {
                     title: true

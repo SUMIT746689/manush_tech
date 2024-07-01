@@ -132,16 +132,26 @@ const id = async (req, res) => {
                                 }
                             }
                         },
-                        section: {
-                            select: {
-                                name: true,
-                                class: {
-                                    select: {
-                                        name: true
-                                    }
-                                }
+                        class:{
+                            select:{
+                                name:true
                             }
-                        }
+                        },
+                        batches:{
+                            select:{
+                                name:true
+                            }
+                        },
+                        // section: {
+                        //     select: {
+                        //         name: true,
+                        //         class: {
+                        //             select: {
+                        //                 name: true
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     }
                 })
 

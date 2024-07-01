@@ -12,11 +12,13 @@ export const get = async (req, res) => {
       include: {
         student: {
           select: {
-            section: {
-              include: {
-                class: true
-              }
-            },
+            class:true,
+            batches:true,
+            // section: {
+            //   include: {
+            //     class: true
+            //   }
+            // },
             student_info: {
               select: {
                 first_name: true,

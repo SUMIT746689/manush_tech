@@ -139,12 +139,19 @@ export async function getServerSideProps(context: any) {
           },
           select: {
             class_roll_no: true,
-            section: {
-              select: {
-                name: true,
-                class: true,
+            class:true,
+            batches:{
+              select:{
+                name:true,
+                
               }
             },
+            // section: {
+            //   select: {
+            //     name: true,
+            //     class: true,
+            //   }
+            // },
             student_info: {
               select: {
                 first_name: true,

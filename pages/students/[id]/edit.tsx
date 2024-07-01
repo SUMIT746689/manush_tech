@@ -35,7 +35,8 @@ export const getServerSideProps = async ({ params }) => {
             }
           }
         },
-        section: true,
+        // section: true,
+        batches:true,
         extra_section: true
       }
     });

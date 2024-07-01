@@ -36,7 +36,12 @@ async function post(req, res, refresh_token) {
                 id: true,
                 // guardian_phone: true,
                 class_roll_no: true,
-                section: {
+                class:{
+                  select:{
+                    name:true
+                  }
+                },
+                batches: {
                   select:
                   {
                     id: true,
@@ -45,10 +50,10 @@ async function post(req, res, refresh_token) {
                     // std_late_time: true,
                     // std_absence_time: true,
                     // std_exit_time: true,
-                    class: {
-                      select:
-                        { name: true }
-                    }
+                    // class: {
+                    //   select:
+                    //     { name: true }
+                    // }
                   }
                 },
               }

@@ -26,7 +26,12 @@ const id = async (req, res) => {
                         class_registration_no,
                         academic_year_id,
                         class_roll_no,
-                        section_id,
+                        batches:{
+                            connect:{
+                                id: section_id
+                            }
+                        },
+                        // section_id,
                         student_information_id
                     }
                 })

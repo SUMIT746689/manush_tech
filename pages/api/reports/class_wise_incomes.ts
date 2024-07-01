@@ -30,9 +30,10 @@ const index = async (req, res, refresh_token, dcrypt_academic_year) => {
             },
             student: {
               academic_year_id,
-              section: {
-                class_id: { in: class_ids_ }
-              },
+              // section: {
+              //   class_id: { in: class_ids_ }
+              // },
+              class_id: { in: class_ids_ },
               student_info: {
                 school_id
               }
@@ -41,30 +42,40 @@ const index = async (req, res, refresh_token, dcrypt_academic_year) => {
           select: {
             id: true,
             collected_amount: true,
+
             student: {
               select: {
-                section: {
+                class_id: true,
+                class: {
                   select: {
-                    class_id: true,
-                    class: {
-                      select: {
-                        name: true
-                      }
-                    }
+                    name: true
                   }
-                }
+                },
+                batches: {
+                  select: { name: true, }
+                },
+                // section: {
+                //   select: {
+                //     class_id: true,
+                //     class: {
+                //       select: {
+                //         name: true
+                //       }
+                //     }
+                //   }
+                // }
               }
             }
           }
         });
 
-       
+
 
         const classesRes = class_ids_.map((cls_id: number) => {
           // console.log({  })
           let total_collected_amt = 0;
           studentFees.forEach((fees) => {
-            if (cls_id !== fees?.student?.section?.class_id) return;
+            if (cls_id !== fees?.student?.class_id) return;
             total_collected_amt += fees.collected_amount;
           });
           return {

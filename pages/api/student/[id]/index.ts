@@ -26,7 +26,7 @@ const id = async (req, res) => {
 
                     },
                     include: {
-                        section: {
+                        batches: {
                             include: {
                                 class_teacher: {
                                     where: { deleted_at: null },
@@ -42,7 +42,24 @@ const id = async (req, res) => {
                                 },
                                 class: true,
                             }
-                        }
+                        },
+                        // section: {
+                        //     include: {
+                        //         class_teacher: {
+                        //             where: { deleted_at: null },
+                        //             include: {
+                        //                 user: {
+                        //                     select: {
+                        //                         id: true,
+                        //                         username: true,
+                        //                     }
+
+                        //                 }
+                        //             }
+                        //         },
+                        //         class: true,
+                        //     }
+                        // }
                     }
                 })
                 res.status(200).json(user);

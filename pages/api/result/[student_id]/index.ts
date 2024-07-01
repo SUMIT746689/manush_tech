@@ -29,16 +29,18 @@ const id = async (req, res) => {
                                     }
                                 },
                                 class_roll_no: true,
-                                section: {
-                                    select: {
-                                        name: true,
-                                        class: {
-                                            select: {
-                                                name: true
-                                            }
-                                        }
-                                    }
-                                }
+                                class: { select: { name: true } },
+                                batches: { select: { name: true } },
+                                // section: {
+                                //     select: {
+                                //         name: true,
+                                //         class: {
+                                //             select: {
+                                //                 name: true
+                                //             }
+                                //         }
+                                //     }
+                                // }
                             }
                         },
                         result_details: {

@@ -8,7 +8,7 @@ const index = async (req, res) => {
     switch (method) {
       case 'GET':
         const { month_name, selected_class, selected_group, selected_section, selected_student } = req.query;
-    
+
 
         const where = {};
         if (selected_group) {
@@ -26,9 +26,16 @@ const index = async (req, res) => {
               id: {
                 in: selected_student?.split(',').map(Number)
               },
-              section_id: {
-                in: selected_section?.split(',').map(Number)
+              batches: {
+                some: {
+                  id: {
+                    in: selected_section?.split(',').map(Number)
+                  }
+                }
               },
+              // section_id: {
+              //   in: selected_section?.split(',').map(Number)
+              // },
               ...where
             }
           },
@@ -58,11 +65,14 @@ const index = async (req, res) => {
                   }
                 },
                 class_roll_no: true,
-                section: {
-                  select: {
-                    name: true
-                  }
+                batches: {
+                  select: { name: true }
                 },
+                // section: {
+                //   select: {
+                //     name: true
+                //   }
+                // },
                 group: {
                   select: {
                     title: true
@@ -81,7 +91,7 @@ const index = async (req, res) => {
           }
         });
 
-    
+
 
         res.status(200).json({
           status: true,

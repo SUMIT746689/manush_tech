@@ -25,17 +25,28 @@ const index = async (req, res, refresh_token) => {
                                 id: true,
                                 student_photo: true,
                                 class_registration_no: true,
-                                section: {
-                                    select: {
-                                        name: true,
-                                        class: {
-                                            select: {
-                                                id: true,
-                                                name: true
-                                            }
-                                        }
+                                class:{
+                                    select:{
+                                        id:true,
+                                        name:true
                                     }
                                 },
+                                batches:{
+                                    select:{
+                                        name:true
+                                    }
+                                },
+                                // section: {
+                                //     select: {
+                                //         name: true,
+                                //         class: {
+                                //             select: {
+                                //                 id: true,
+                                //                 name: true
+                                //             }
+                                //         }
+                                //     }
+                                // },
                                 student_info: {
                                     select: {
                                         id: true,

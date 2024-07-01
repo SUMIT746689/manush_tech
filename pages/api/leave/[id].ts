@@ -69,7 +69,10 @@ const id = async (req, res, refresh_token) => {
                             },
                             select: {
                                 id: true,
-                                section_id: true,
+                                // section_id: true,
+                                batches: {
+                                    select: { id: true }
+                                }
                             }
                         })
 
@@ -77,7 +80,8 @@ const id = async (req, res, refresh_token) => {
 
                         const section_attendance = await prisma.attendance.findMany({
                             where: {
-                                section_id: student.section_id,
+                                // section_id: student.section_id,
+                                section_id: student.batches[0].id,
                                 date: {
                                     gte: new Date(new Date(from_date).setUTCHours(0, 0, 0, 0)),
                                     lte: new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
@@ -137,7 +141,7 @@ const id = async (req, res, refresh_token) => {
                                         student_id: student.id,
                                         date: new Date(i),
                                         school_id: refresh_token.school_id,
-                                        section_id: student.section_id,
+                                        section_id: student.batches[0].id,
                                         //@ts-ignore
                                         status: query?.status
                                     }

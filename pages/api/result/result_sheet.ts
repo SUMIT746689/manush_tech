@@ -47,7 +47,7 @@ const FinalResultAll = async (req, res, refresh_token) => {
 
                 const student_result_list = await prisma.student.findMany({
                     where: {
-                        section_id,
+                        batches: { some: { id: section_id } },
                         academic_year_id,
                     },
                     select: {

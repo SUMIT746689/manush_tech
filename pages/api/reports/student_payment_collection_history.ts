@@ -52,25 +52,36 @@ const index = async (req, res) => {
                                         last_name: true
                                     }
                                 },
-                                section: {
+                                class: {
                                     select: {
-                                        name:true,
-                                        
-                                        class: {
-                                            select: {
-                                                id: true,
-                                                name: true
-                                            }
-                                        }
+                                        id: true,
+                                        name: true,
                                     }
                                 },
+                                batches:{
+                                    select:{
+                                        name:true
+                                    }
+                                },
+                                // section: {
+                                //     select: {
+                                //         name: true,
+
+                                //         class: {
+                                //             select: {
+                                //                 id: true,
+                                //                 name: true
+                                //             }
+                                //         }
+                                //     }
+                                // },
 
                             }
                         },
                         fee: {
                             select: {
-                                Discount:true,
-                                fees_head:true,
+                                Discount: true,
+                                fees_head: true,
                                 id: true,
                                 title: true,
                                 last_date: true,

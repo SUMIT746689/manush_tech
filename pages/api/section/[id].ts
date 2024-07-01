@@ -53,7 +53,7 @@ const section = async (req, res, refresh_token, academicYearVerify) => {
         const haveAlreadySection = await prisma.section.findFirst({
           where: { id, class: { school_id } },
           select: {
-            students: {
+            student: {
               select: {
                 id: true
               },
@@ -80,7 +80,7 @@ const section = async (req, res, refresh_token, academicYearVerify) => {
           return res.status(200).json({ success: 'successfully deleted' })
         }
 
-        if (haveAlreadySection?.students.length > 0) throw new Error('This section has dependencies')
+        if (haveAlreadySection?.student.length > 0) throw new Error('This section has dependencies')
 
         await prisma.section.update({
           where: {

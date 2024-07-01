@@ -37,7 +37,7 @@ export async function getServerSideProps(context: any) {
       select: {
         id: true,
         student_photo: true,
-        section_id: true,
+        // section_id: true,
         class_registration_no: true,
         student_present_address: true,
         discount: true,
@@ -54,21 +54,35 @@ export async function getServerSideProps(context: any) {
           }
         },
         academic_year: true,
-        section: {
+        class: {
           select: {
-            id: true,
+            id:true,
             name: true,
-            class: {
-              select: {
-                id: true,
-                name: true,
-                has_section: true,
-                fees: true,
-              }
-            }
+            has_section:true,
+            fees:true,
           }
-
         },
+        batches: {
+          select: {
+            id:true,
+            name: true,
+          }
+        },
+        // section: {
+        //   select: {
+        //     id: true,
+        //     name: true,
+        //     class: {
+        //       select: {
+        //         id: true,
+        //         name: true,
+        //         has_section: true,
+        //         fees: true,
+        //       }
+        //     }
+        //   }
+
+        // },
         guardian_phone: true,
         class_roll_no: true
       }
@@ -147,15 +161,15 @@ export async function getServerSideProps(context: any) {
 
     data = {
       ...student.student_info,
-      name : [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' '),
+      name: [student.student_info.first_name, student.student_info.middle_name, student.student_info.last_name].join(' '),
       class: student.section.class.name,
-      section:  student.section.class.has_section ? student.section.name : '',
+      section: student.section.class.has_section ? student.section.name : '',
       class_registration_no: student.class_registration_no,
       class_roll_no: student.class_roll_no,
       discount: student.discount,
       fees
     };
-  
+
   }
   catch (error) {
     console.log({ error })
@@ -165,7 +179,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function ManagementFees({ data }) {
-  
+
   return (
     <>
       <Head>

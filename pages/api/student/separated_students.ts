@@ -54,19 +54,32 @@ async function get(req, res, refresh_token) {
       academic_year: true,
       discount: true,
       waiver_fees: true,
-      section: {
+      class: {
         select: {
           id: true,
           name: true,
-          class: {
-            select: {
-              id: true,
-              name: true,
-              has_section: true
-            }
-          }
+          has_section: true
         }
       },
+      batches: {
+        select: {
+          id:true,
+          name: true
+        }
+      },
+      // section: {
+      //   select: {
+      //     id: true,
+      //     name: true,
+      //     class: {
+      //       select: {
+      //         id: true,
+      //         name: true,
+      //         has_section: true
+      //       }
+      //     }
+      //   }
+      // },
       group: {
         select: {
           title: true

@@ -14,14 +14,19 @@ const index = async (req, res, refresh_token) => {
             student_info: { user_id: refresh_token.id, school_id: refresh_token.school_id },
             // section: { class: { has_section: true } }
           },
-          select: { section: { include: { class: true } } }
+          select: {
+            class:true,
+            batches:true
+            // section: { include: { class: true } }
+          }
         })
 
         // if (!responseStudent.section?.class?.has_section) return res.status(200).json({ routine: null, class: responseStudent.section.class.name, section: '' })
 
         const routine = await prisma.period.findMany({
           where: {
-            section_id: responseStudent.section.id,
+            section_id: responseStudent.batches[0].id,
+            // section_id: responseStudent.section.id,
             school_id: refresh_token.school_id,
             room: { deleted_at: null }
           },
@@ -56,7 +61,7 @@ const index = async (req, res, refresh_token) => {
 
         });
 
-        res.status(200).json({ routine, class: responseStudent.section.class.name, section: responseStudent.section.class.has_section ? responseStudent.section.name : 'no section' });
+        res.status(200).json({ routine, class: responseStudent.class.name, section: responseStudent.class.has_section ? responseStudent.batches[0].name : 'no section' });
         break;
       default:
         res.setHeader('Allow', ['GET']);

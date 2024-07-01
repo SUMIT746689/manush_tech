@@ -316,9 +316,10 @@ const handlePost = async (req, res, refresh_token) => {
                         guardian_photo: '',
                         relation_with_guardian: i?.relation_with_guardian,
                         student_present_address: i?.student_present_address,
-                        section: {
-                            connect: { id: i?.section_id }
-                        },
+                        // section: {
+                        //     connect: { id: i?.section_id }
+                        // },
+                        batches:{connect: {id:i?.section_id}},
                         academic_year: {
                             connect: { id: i?.academic_year_id }
                         },

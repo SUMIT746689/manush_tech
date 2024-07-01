@@ -36,7 +36,8 @@ export async function getServerSideProps(context: any) {
       select: {
         id: true,
         student_photo: true,
-        section_id: true,
+        batches: true,
+        // section_id: true,
         class_registration_no: true,
         student_present_address: true,
         discount: true,
@@ -53,21 +54,29 @@ export async function getServerSideProps(context: any) {
           }
         },
         academic_year: true,
-        section: {
+        class: {
           select: {
             id: true,
             name: true,
-            class: {
-              select: {
-                id: true,
-                name: true,
-                has_section: true,
-                fees: true,
-              }
-            }
+            has_section: true,
+            fees: true
           }
-
         },
+        // section: {
+        //   select: {
+        //     id: true,
+        //     name: true,
+        //     class: {
+        //       select: {
+        //         id: true,
+        //         name: true,
+        //         has_section: true,
+        //         fees: true,
+        //       }
+        //     }
+        //   }
+
+        // },
         guardian_phone: true,
         class_roll_no: true
       }

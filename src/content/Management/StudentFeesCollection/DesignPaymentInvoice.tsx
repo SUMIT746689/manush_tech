@@ -52,6 +52,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   const [totalCurrentDisountAmount, setTotalCurrentDiscountAmount] = useState(0);
   const [totalPreviousDiscount, setTotalPreviousDiscount] = useState(0);
 
+  const { username } = user || {};
 
   // date
   let date = dayjs(new Date(collectionDate));
@@ -162,7 +163,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
     setTotalPreviousDiscount(Number(totalPrevDiscountValue));
     const totalAmount = temp.reduce((prev, curr) => prev + Number(curr.payableAmount), 0) || 0;
     setTotalFeeamount(totalAmount);
- 
+
     setSelectedFees(temp);
     if (printFees.length > 0) {
       setShowPrint(true);
@@ -216,6 +217,9 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
             </Typography>
             <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
               Student Payment Receipt
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Received By: {username}
             </Typography>
             <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
               Office Copy
@@ -902,6 +906,9 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
             </Typography>
             <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
               Student Payment Receipt
+            </Typography>
+            <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+              Received By: {username}
             </Typography>
             <Typography variant="body1" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
               Student Copy

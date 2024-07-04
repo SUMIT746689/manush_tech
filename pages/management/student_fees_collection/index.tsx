@@ -580,7 +580,7 @@ function Managementschools() {
     const student_list = await axios.get(`/api/student/student-list?academic_year_id=${academicYear?.id}&section_id=${userInformation?.section_id}`);
 
     const singleUser = student_list.data.find((item, i) => {
-      return item.student_information_id === userInformation.id;
+      return item.id === userInformation.id;
     });
     console.log({ singleUser });
     // updated code end

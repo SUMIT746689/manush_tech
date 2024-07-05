@@ -8,12 +8,17 @@ const index = async (req, res) => {
         switch (method) {
             case 'POST':
                 // console.log("req.body___", req.body, typeof (req.body));
-                const body = JSON.parse(req.body);
+                console.log(typeof req.body);
+                console.log(req.body);
+                
+                let body = [];
+                if (typeof req.body === 'string') body = JSON.parse(req.body);
+                if (typeof req.body === 'object') body = JSON.parse(JSON.stringify(req.body));
 
+                console.log({ body });
                 // body.forEach(element => {
                 //     console.log("element", element)
                 // });
-                console.log({ body });
                 // const user_ = await prisma
 
                 // const data2 = body.map(i => {
@@ -114,25 +119,49 @@ const index = async (req, res) => {
 
                 body.map((attendance) => {
                     // save attendence files
-
                     const { userID, schoolID, timestamp, status, machineID } = attendance || {};
-                    if (schoolID) prisma.attendence_info.create({ data: { type: "automatic", body: attendance, school_id: schoolID } });
-                    if (!userID || !schoolID || !timestamp || !status || !machineID) return logFile.error(`for creating attendance_table_queue missing required fields`);
+                    const time = {
+                        normal: new Date(timestamp),
+                        utcString: new Date(timestamp).toUTCString(),
+                        string: new Date(timestamp).toString(),
+                        isoString: new Date(timestamp).toISOString(),
+                        timeZoneOffset: new Date(timestamp).getTimezoneOffset(),
+                        custom: new Date(new Date(timestamp).setUTCHours(0, 0, 0, 0)).getTimezoneOffset()
+                    }
 
-                    prisma.tbl_attendance_queue.create({
-                        data: {
-                            user_id: parseInt(attendance.userID),
-                            school_id: attendance.schoolID,
-                            submission_time: new Date(attendance.timestamp),
-                            status: attendance.status,
-                            machine_id: attendance.machineID,
-                        }
-                    })
-                        .catch(err => {
-                            logFile.error(err.message);
+                    const offsetTime = new Date(timestamp).getTimezoneOffset();
+
+                    const date = new Date(timestamp);
+                    const time_ = date.getTime();
+                    const offsetMinutes = 360;
+                    // verify offset time and make utc zero
+                    const customUtcZeroFormat = offsetTime === 0 ? new Date(time_ - offsetMinutes * 60 * 1000) : date;
+
+                    console.log({ time, customUtcZeroFormat })
+
+                    if (schoolID) prisma.attendence_info.create({ data: { type: "automatic", body: { ...attendance, customUtcZeroFormat }, school_id: schoolID } })
+                        .then(async () => {
+                            if (!userID || !schoolID || !timestamp || !status || !machineID) return logFile.error(`for creating attendance_table_queue missing required fields`);
+                            await prisma.tbl_attendance_queue.create({
+                                data: {
+                                    user_id: parseInt(userID),
+                                    school_id: attendance.schoolID,
+                                    submission_time: customUtcZeroFormat,
+                                    status: status,
+                                    machine_id: machineID,
+                                }
+                            })
+                                .catch(err => {
+                                    console.log({ err })
+                                    logFile.error(err.message);
+                                })
                         })
-                })
+                        .catch(err => {
+                            logFile.error(err.message)
+                        });
 
+
+                })
                 res.status(200).json({ statusCode: '200', message: 'success' })
 
                 break;

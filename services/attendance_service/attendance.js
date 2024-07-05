@@ -1,5 +1,5 @@
 import prisma from "./utility/prismaClient.js";
-import { todayMinMaxDateTime } from "./utility/dateTime.js";
+import { todayMinMaxDateTime, todayMinMaxDateTimeUtcZeroFormat } from "./utility/dateTime.js";
 import { stdAttendance } from "./stdAttendance.js";
 import { empAttendance } from "./empAttendance.js";
 import { logFile } from "./utility/handleLog.js";
@@ -7,7 +7,7 @@ import { logFile } from "./utility/handleLog.js";
 const attendance = async () => {
     try {
 
-        const { today, min_attend_datetime, max_attend_datetime } = todayMinMaxDateTime();
+        const { today, min_attend_datetime, max_attend_datetime } = todayMinMaxDateTimeUtcZeroFormat();
 
         // student attendance processing 
         stdAttendance({ min_attend_datetime, max_attend_datetime });

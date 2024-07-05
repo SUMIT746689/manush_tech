@@ -21,26 +21,23 @@ export const customizeDateWithTime = (date) => {
 
 export const todayMinMaxDateTimeUtcZeroFormat = () => {
     const today = new Date(Date.now());
-    if (today.getTimezoneOffset !== 0) {
-        // utc day start time
-        const min_attend_datetime = new Date(today);
-        min_attend_datetime.setHours(0, 0, 0, 0);
-
-        // utc day end time
-        const max_attend_datetime = new Date(today);
-        max_attend_datetime.setHours(23, 59, 59, 999);
-
-        return { today, min_attend_datetime, max_attend_datetime };
-    }
-
-    // utc day start time (bd wise)
+    // utc day start time
     const min_attend_datetime = new Date(today);
-    min_attend_datetime.setHours(6, 0, 0, 0);
+    min_attend_datetime.setHours(0, 0, 0, 0);
 
-    // utc day end time (bd wise)
+    // utc day end time
     const max_attend_datetime = new Date(today);
-    max_attend_datetime.setHours(17, 59, 59, 999);
+    max_attend_datetime.setHours(23, 59, 59, 999);
 
-    return { today, min_attend_datetime, max_attend_datetime };
+    if (today.getTimezoneOffset !== 0) return { today, min_attend_datetime, max_attend_datetime };
 
+    const minTime = min_attend_datetime.getTime();
+    const maxTime = min_attend_datetime.getTime();
+    const offsetMinutes = 360;
+
+    // make utc zero (bd time wise)
+    const customUtcZeroFormatMinDateTime = new Date(minTime - offsetMinutes * 60 * 1000);
+    const customUtcZeroFormatMaxDateTime = new Date(maxTime - offsetMinutes * 60 * 1000);
+
+    return { today, min_attend_datetime: customUtcZeroFormatMinDateTime, max_attend_datetime: customUtcZeroFormatMaxDateTime };
 };

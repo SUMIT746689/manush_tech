@@ -13,7 +13,7 @@ export const resStdAttendanceQueues = async (from, to) => {
                 FROM tbl_attendance_queue as taq
                 JOIN user_role
                 JOIN users ON taq.user_id = users.id
-                WHERE user_role.id = users.role_id AND DATE(taq.submission_time) = DATE(NOW())
+                WHERE user_role.id = users.role_id AND TIMESTAMP(${from}) <= TIMESTAMP(taq.submission_time)  AND TIMESTAMP(${to}) >= TIMESTAMP(taq.submission_time)  
                 GROUP BY taq.user_id
                 )
 

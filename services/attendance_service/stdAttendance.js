@@ -7,7 +7,7 @@ import { sentSms } from "./utility/sent_sms.js";
 
 export const stdAttendance = async ({ min_attend_datetime, max_attend_datetime }) => {
     try {
-        const { error, data } = await resStdAttendanceQueues();
+        const { error, data } = await resStdAttendanceQueues(min_attend_datetime, max_attend_datetime);
         if (error) return logFile.error(error);
         if (data.length === 0) return logFile.info("student tbl_attendance_queue response array length is 0");
 

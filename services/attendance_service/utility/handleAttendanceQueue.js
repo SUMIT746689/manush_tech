@@ -1,6 +1,6 @@
 import prisma from "./prismaClient.js";
 
-export const resStdAttendanceQueues = async () => {
+export const resStdAttendanceQueues = async (from, to) => {
     try {
         const res = await prisma.$queryRaw`
             WITH 

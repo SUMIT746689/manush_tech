@@ -123,7 +123,7 @@ const index = async (req, res) => {
                         data: {
                             user_id: parseInt(attendance.userID),
                             school_id: attendance.schoolID,
-                            submission_time: new Date(Date.now() || attendance.timestamp),
+                            submission_time: new Date(attendance.timestamp),
                             status: attendance.status,
                             machine_id: attendance.machineID,
                         }

@@ -151,12 +151,13 @@ class AuthApi {
 
         const response: any = await axios.get('/api/login');
 
+        console.log('hi....................')
+        console.log(response.data)
         if (!response.data?.user) {
 
           reject(new Error('Invalid username or password'));
           return;
         }
-
         resolve(response.data);
       } catch (err) {
         console.error(err);

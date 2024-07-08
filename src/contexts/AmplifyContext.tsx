@@ -199,6 +199,7 @@ export const AuthProvider: FC<AuthProviderProps> = (props) => {
           email: user.email,
           name: user.name,
           role: user.role,
+          user_role: user.user_role,
           location: user.location,
           username: user.username,
           posts: user.posts,

@@ -16,6 +16,11 @@ async function get(req: any, res: any, refresh_token: any) {
             permissions: true
           }
         },
+        user_role: {
+          include: {
+            permissions: true
+          }
+        },
         school: {
           include: {
             subscription: {
@@ -37,13 +42,13 @@ async function get(req: any, res: any, refresh_token: any) {
     const host = req.headers.host;
     if (host !== adminPanel?.domain) throw new Error("Login using correct domain address")
     if (admin_panel_id !== adminPanel.id) throw new Error("malicious info, login again")
-    if (!user.permissions.length) {
-      user['permissions'] = user.role.permissions;
-      delete user['role']['permissions'];
+    if (user.permissions.length === 0) {
+      user['permissions'] = user.user_role.permissions;
+      delete user['user_role']['permissions'];
     }
     delete user['password'];
-
-    if (user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN') {
+    // console.log(user.permissions)
+    if (user?.user_role?.title !== 'ASSIST_SUPER_ADMIN' && user?.user_role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
       if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
@@ -52,10 +57,10 @@ async function get(req: any, res: any, refresh_token: any) {
 
       }
       else {
-        if (user?.role?.title === 'ADMIN') {
+        if (user?.user_role?.title === 'ADMIN') {
 
           isSubscriptionActive = true;
-          console.log(isSubscriptionActive, "user?.role?.title__", user?.role?.title,);
+          console.log(isSubscriptionActive, "user?.role?.title__", user?.user_role?.title,);
           user['permissions'] = user['permissions'].filter(i => i.value === 'package_request')
         }
       }
@@ -83,7 +88,14 @@ async function get(req: any, res: any, refresh_token: any) {
 
       user.school.subscription[0].package.price = student_cnt._count.id * user.school.subscription[0].package.price
     }
-    res.status(200).json({ user });
+    console.log(user.permissions)
+    // res.status(200).json({ ...user, role: user.user_role });
+    const customRole = { ...user, role: user.user_role };
+    // customRole.role['permissions'] = customRole.permissions;
+    res.status(200).json({ user: customRole });
+
+    // res.status(200).json({user});
+
   } catch (err) {
     logFile.error(err.message)
     console.log(err.message);

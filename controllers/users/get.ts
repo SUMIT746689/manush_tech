@@ -18,7 +18,7 @@ export const get = async (req, res, refresh_token) => {
 
       },
       include: {
-        role: true
+        user_role:true
       }
     });
     const { role, is_enabled } = req.query;
@@ -28,12 +28,12 @@ export const get = async (req, res, refresh_token) => {
       deleted_at: null
     })
 
-    if (user.role.title === 'SUPER_ADMIN') AND.push({
+    if (user.user_role.title === 'SUPER_ADMIN') AND.push({
       role: {
         title: 'ASSIST_SUPER_ADMIN'
       }
     });
-    else if (user.role.title === 'ASSIST_SUPER_ADMIN') AND.push(
+    else if (user.user_role.title === 'ASSIST_SUPER_ADMIN') AND.push(
       { admin_panel_id: admin_panel_id || { not: null } },
       {
         role: {
@@ -41,7 +41,7 @@ export const get = async (req, res, refresh_token) => {
         }
       }
     );
-    else if (user.role.title === 'ADMIN') {
+    else if (user.user_role.title === 'ADMIN') {
       AND.push(
         { admin_panel_id: admin_panel_id || { not: null } },
         { school_id: user.school_id },
@@ -55,7 +55,7 @@ export const get = async (req, res, refresh_token) => {
       );
       if (role && role !== 'SUPER_ADMIN' && role !== 'ASSIST_SUPER_ADMIN' && role !== 'ADMIN') {
         AND.push({
-          role: {
+          user_role: {
             title: role
           }
         })
@@ -89,6 +89,7 @@ export const get = async (req, res, refresh_token) => {
             title: true
           }
         },
+        user_role_id:true,
         role_id: true,
         school_id: true,
         school: {

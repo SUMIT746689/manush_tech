@@ -47,6 +47,11 @@ export default async function post(req, res) {
             permissions: true
           }
         },
+        user_role: {
+          include: {
+            permissions: true
+          }
+        },
         school: {
           include: {
             subscription: {
@@ -70,33 +75,32 @@ export default async function post(req, res) {
     const { adminPanel } = user;
     const host = req.headers.host;
 
-    if (user.role.title !== "SUPER_ADMIN") {
+    if (user.user_role.title !== "SUPER_ADMIN") {
       if (!adminPanel?.is_active) throw new Error("Admin Panel is disabled");
       if (host !== adminPanel?.domain) throw new Error("Login using correct domain address");
     }
 
     if (user_id) {
-      if (user.role_id) {
-        if (user.role.title === 'ASSIST_SUPER_ADMIN' && request_refresh_token.role?.title === 'ADMIN') {
+      if (user.user_role) {
+        if (user.user_role.title === 'ASSIST_SUPER_ADMIN' && request_refresh_token.user_role?.title === 'ADMIN') {
           throw new Error('Bad request !');
         }
-        else if ((user.role.title == 'ADMIN' && request_refresh_token.role?.title !== 'ASSIST_SUPER_ADMIN')) {
+        else if ((user.user_role.title == 'ADMIN' && request_refresh_token.user_role?.title !== 'ASSIST_SUPER_ADMIN')) {
           throw new Error('Bad request !');
         }
       }
       else {
-        if (request_refresh_token.role?.title !== 'ADMIN') {
+        if (request_refresh_token.user_role?.title !== 'ADMIN') {
           throw new Error('Bad request !');
         }
       }
 
     }
-    if (user.role_id) {
-      user['permissions'] = user.role?.permissions;
-      delete user['role']['permissions'];
+    if (user.user_role_id) {
+      user['permissions'] = user.user_role?.permissions;
+      delete user['user_role']['permissions'];
     }
-
-    if (user?.role?.title !== 'ASSIST_SUPER_ADMIN' && user?.role?.title !== 'SUPER_ADMIN') {
+    if (user?.user_role?.title !== 'ASSIST_SUPER_ADMIN' && user?.user_role?.title !== 'SUPER_ADMIN') {
       let isSubscriptionActive = false;
       // console.log(user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime());
       if (user?.school?.subscription?.length > 0 && user.school?.subscription[0]?.end_date.getTime() + 86400000 > new Date().getTime()) {
@@ -105,7 +109,7 @@ export default async function post(req, res) {
 
       }
       else {
-        if (user?.role?.title === 'ADMIN') {
+        if (user?.user_role?.title === 'ADMIN') {
 
           isSubscriptionActive = true;
           console.log(isSubscriptionActive, "user?.role?.title__", user?.role?.title,);
@@ -129,14 +133,14 @@ export default async function post(req, res) {
     }
 
     const access_token = jwt.sign(
-      { name: user.username, id: user.id, school_id: user.school_id, role: user.role, admin_panel_id: user.admin_panel_id },
+      { name: user.username, id: user.id, school_id: user.school_id, role: user.user_role, admin_panel_id: user.admin_panel_id },
       process.env.JWT_ACCESS_TOKEN_SECRET,
       {
         expiresIn: '5000ms'
       }
     );
     const refresh_token = jwt.sign(
-      { name: user.username, id: user.id, school_id: user.school_id, role: user.role, admin_panel_id: user.admin_panel_id },
+      { name: user.username, id: user.id, school_id: user.school_id, role: user.user_role, admin_panel_id: user.admin_panel_id },
       process.env.JWT_REFRESH_TOKEN_SECRET,
       {
         expiresIn: '1d'

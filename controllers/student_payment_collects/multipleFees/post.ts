@@ -91,9 +91,6 @@ const handleTransaction = ({ collection_date, data, status, account, voucher, re
           }
         });
 
-
-      
-
         new_student_fees_id.push(temp.id);
         new_transaction_fees_id.push(temp.transaction_id);
 
@@ -322,8 +319,7 @@ export const post = async (req, res, refresh_token) => {
 
       if (successfulResults.length > 0) {
         for (const successfulResult of successfulResults) {
-       
-          await teacherPayamount(successfulResult, school_id)
+          await teacherPayamount(successfulResult, school_id);
         }
 
         // Expected outpu
@@ -421,11 +417,16 @@ export const post = async (req, res, refresh_token) => {
   // updated code end
 };
 
-
 const teacherPayamount = async (data, school_id) => {
   const {
-    fee_id, id: student_fee_id
-    , account_id, account_balance, collect_amount, tracking_number, collection_date, created_at,
+    fee_id,
+    id: student_fee_id,
+    account_id,
+    account_balance,
+    collect_amount,
+    tracking_number,
+    collection_date,
+    created_at,
     on_time_discount,
     last_payment_date,
     account_name,
@@ -440,7 +441,7 @@ const teacherPayamount = async (data, school_id) => {
     subject_id
   } = data;
 
-  if(!subject_id) return ;
+  if (!subject_id) return;
 
   const teacherFindPay = await prisma.teacherSalaryStructure.findFirst({
     where: {
@@ -455,19 +456,26 @@ const teacherPayamount = async (data, school_id) => {
   const totalAmt = amount + late_fee;
 
   // calculate teacher should pay from student fee
-  const calcTeacherPayAmt = teacherFindPay.payment_type === "percentage" ?
-    (paidAmount * teacherFindPay.percentage_amount) / 100
-    :
-    (paidAmount * teacherFindPay.fixed_amount) / totalAmt;
+  const calcTeacherPayAmt =
+    teacherFindPay.payment_type === 'percentage'
+      ? (paidAmount * teacherFindPay.percentage_amount) / 100
+      : (paidAmount * teacherFindPay.fixed_amount) / totalAmt;
 
-  return await prisma.studentFeeWiseTeacherPay.create({
-    data: {
-      teacher_pay_type: teacherFindPay.payment_type,
-      subject_id,
-      student_fee_id,
-      amount: calcTeacherPayAmt,
-      collection_date
-    }
-  }).then(res => { console.log(res) })
-
-}
+  return await prisma.studentFeeWiseTeacherPay
+    .create({
+      data: {
+        school_id: school_id,
+        teacher_id: teacherFindPay.teacher_id,
+        teacher_pay_type: teacherFindPay.payment_type,
+        subject_id,
+        student_fee_id,
+        amount: calcTeacherPayAmt,
+        collection_date,
+        percentage_amount: teacherFindPay.percentage_amount ? Number(teacherFindPay.percentage_amount) : 0,
+        fixed_amount: teacherFindPay.fixed_amount ? Number(teacherFindPay.fixed_amount) : 0
+      }
+    })
+    .then((res) => {
+      console.log(res);
+    });
+};

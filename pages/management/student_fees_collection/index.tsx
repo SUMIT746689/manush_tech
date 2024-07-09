@@ -666,7 +666,7 @@ function Managementschools() {
   useEffect(() => {
     // console.log({ accounts, selectedAccount, selectedGateway });
   }, [selectedGateway]);
-
+ 
   return (
     <>
       <Head>

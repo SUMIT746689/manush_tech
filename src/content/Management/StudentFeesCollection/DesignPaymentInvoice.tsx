@@ -41,6 +41,7 @@ const DesignPaymentInvoice: FC<PaymentInvoiceType> = ({
   setIsCompleteUpdate,
   teacherFees
 }) => {
+
   const dueRef = useRef(0);
   const { user } = useAuth();
   const [word, setWord] = useState('');

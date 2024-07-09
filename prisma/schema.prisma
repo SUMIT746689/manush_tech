@@ -134,6 +134,7 @@ model School {
   teacherSalaries            TeacherSalaryStructure[]
   // StudentClassSubjects       StudentClassSubjects[]
   smsSettings                SmsSettings?
+  studentFeeWiseTeacherPay studentFeeWiseTeacherPay[]
 
   // routines Routine[]
   @@map("schools")
@@ -210,6 +211,7 @@ model Teacher {
   seatPlans       seatPlan[]               @relation("teacher_to_seat_plan")
   // StudentClassSubjects StudentClassSubjects[]
   teacherSalaries TeacherSalaryStructure[]
+  studentFeeWiseTeacherPay studentFeeWiseTeacherPay[]
 
   @@map("teachers")
 }
@@ -403,6 +405,7 @@ model Subject {
   fees            Fee[]
   teacherSalaries TeacherSalaryStructure[]
   students        Student[]                @relation("student_subjects")
+  studentFeeWiseTeacherPay studentFeeWiseTeacherPay[]
 
   @@map("subjects")
 }
@@ -1740,12 +1743,18 @@ model studentFeeWiseTeacherPay {
   student_fee_id   Int            @unique
   subject_id       Int
   teacher_pay_type TeacherPayType
+  teacher_id       Int
+  school_id        Int
   amount           Float
   collection_date  DateTime
   created_at       DateTime       @default(now())
+  percentage_amount Int
+  fixed_amount     Int
 
   studentFee StudentFee? @relation(fields: [student_fee_id], references: [id])
-
+  school     School      @relation(fields: [school_id], references: [id])
+  teacher    Teacher     @relation(fields: [teacher_id], references: [id])
+  subject    Subject     @relation(fields: [subject_id], references: [id])
   @@map("student_fee_wise_teacher_pays")
 }
 

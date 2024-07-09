@@ -508,6 +508,11 @@ const accounting: MenuItems[] = [
             name: 'Expense Summary',
             link: '/reports/expense_summary',
             icon: HistoryIcon
+          },
+          {
+            name: 'Teacher Salary',
+            link: '/reports/teacher_salary_report',
+            icon: HistoryIcon
           }
         ]
       },

@@ -88,8 +88,7 @@ async function get(req: any, res: any, refresh_token: any) {
 
       user.school.subscription[0].package.price = student_cnt._count.id * user.school.subscription[0].package.price
     }
-    console.log(user.permissions)
-    // res.status(200).json({ ...user, role: user.user_role });
+
     const customRole = { ...user, role: user.user_role };
     // customRole.role['permissions'] = customRole.permissions;
     res.status(200).json({ user: customRole });

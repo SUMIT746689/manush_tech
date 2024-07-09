@@ -1,6 +1,7 @@
 import axios from "axios";
 import { logFile } from "./utilities/handleLog.js";
 import prisma from "./utilities/prismaClient.js";
+import { handleDateTimeUtcZeroFormat } from "./utilities/handletime.js";
 
 let max_date;
 let max_time;
@@ -126,12 +127,16 @@ const main = async () => {
                     return logFile.error(`auth_user(${auth_user}), user not founds username(${user_name}) `);
                     // continue;
                 };
+                console.log({ access_date, access_time });
 
                 const time = new Date(access_date);
                 const access_time_ = access_time.split(':');
-                time.setUTCHours(access_time_[0])
-                time.setUTCMinutes(access_time_[1])
-                time.setUTCSeconds(access_time_[2])
+                time.setUTCHours(access_time_[0]);
+                time.setUTCMinutes(access_time_[1]);
+                time.setUTCSeconds(access_time_[2]);
+                const customTime = handleDateTimeUtcZeroFormat(time)
+                
+                console.log({ customTime });
 
                 // tbl_attendance_queue_datas.push({
                 //     school_id: datas.school_id,
@@ -148,7 +153,7 @@ const main = async () => {
                         machine_id: unit_id,
                         user_id: datas.student_info.user_id,
                         status: 1,
-                        submission_time: time
+                        submission_time: customTime
                     }
                 }).catch((err) => {
                     logFile.error(`user_id(${datas?.id})` + err.message)

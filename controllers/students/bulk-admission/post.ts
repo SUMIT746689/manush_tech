@@ -72,12 +72,14 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
         const today = Date.now();
         await getDatasExcelOrCsvFile(students.filepath)
             .then(async res => {
+                console.log({ res })
                 const keys = Object.keys(res[0])
                 if (keys.length === 0) return;
                 for (const student of res) {
+                    console.log({ perStd: student });
                     if (!student['Students ID'] || !student['Student Name'] || !student.Gender || !student['Mobile (SMS)']) continue;
 
-                    // gender vefiry
+                    // gender verify
                     let gender = student.Gender ? student.Gender.trim().toLowerCase() : undefined;
                     if (gender) {
                         if (!["male", "female"].includes(gender)) {
@@ -121,6 +123,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                             }
                         }
                     };
+                    console.log({ studentData })
                     customStudentsData.push(studentData);
                     // if (!err) finalContacts.push(number);
                 }
@@ -189,6 +192,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                         resolve(true);
                     })
                     .catch(err => {
+                        console.log({ transactionErr: err })
                         faildedCreateStd.push(customStudentInfo.student_id);
                         logFile.error(`user_id=${user_id}` + err.message)
                         if (err.message.includes('Unique constraint failed')) resolve(false);
@@ -211,6 +215,7 @@ const handlePost = async (req, res, refresh_token, dcryptAcademicYear) => {
                 res.status(404).json({ error: 'failed insert all students' });
             })
             .catch(err => {
+                console.log({ promiseErr: err })
                 res.status(404).json({ error: err.message });
             })
     } catch (err) {

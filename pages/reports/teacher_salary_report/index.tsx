@@ -141,12 +141,20 @@ function TeacherReport() {
   };
   const handlePaymentHistoryFind = (e) => {
     e.preventDefault();
+
     if (!startDate || !endDate) {
       showNotification('Please select both a start date and an end date to proceed.', 'error');
       return;
     } else if (startDate && endDate) {
-      const fromDate = new Date(new Date(startDate).getTime() - 21600000);
-      const toDate = new Date(new Date(endDate).getTime() - 21600000 + 86399999);
+      // const fromDate = new Date(new Date(startDate).getTime() - 21600000);
+      // const toDate = new Date(new Date(endDate).getTime() - 21600000 + 86399999);
+
+      const fromDate = new Date(new Date(startDate).setHours(0, 0, 0, 0)).toISOString();
+      const toDate = new Date(new Date(endDate).setHours(23, 59, 59, 999)).toISOString();
+
+      // const startD
+      // console.log({ fromDate, toDate });
+
       getData(fromDate, toDate);
     }
   };

@@ -15,12 +15,15 @@ async function get(req, res, refresh_token) {
     }
     
     if(from_date && to_date){
+      
        
         const response = await prisma.studentFeeWiseTeacherPay.findMany({
             where: {
                 created_at: {
-                    gte: new Date(new Date(from_date).setUTCHours(0, 0, 0, 0)),
-                    lte: new Date(new Date(to_date).setUTCHours(23, 59, 59, 999))
+                    gte:from_date,
+                    lte:to_date,
+                    // gte: new Date(new Date(from_date).setHours(0, 0, 0, 0)),
+                    // lte: new Date(new Date(to_date).setHours(23, 59, 59, 999))
                   },
                   ...where
             },

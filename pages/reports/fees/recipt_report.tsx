@@ -410,6 +410,9 @@ function FeesPaymentReport() {
         {/* old code  */}
         {/* <Grid ref={selectedInvoiceRef}> <PaymentInvoice printFees={selectedInvoice} student={selectedInvoice[0]?.student} /> </Grid> */}
       </Dialog>
+
+
+      
       <Grid
         sx={{
           display: 'none'

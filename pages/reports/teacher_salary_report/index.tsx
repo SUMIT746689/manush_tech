@@ -488,9 +488,9 @@ function TeacherReport() {
 }
 
 TeacherReport.getLayout = (page) => (
-  //    <Authenticated name="report">
-  <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
-  // </Authenticated>
+  <Authenticated name="report">
+    <ExtendedSidebarLayout>{page}</ExtendedSidebarLayout>
+  </Authenticated>
 );
 
 export default TeacherReport;

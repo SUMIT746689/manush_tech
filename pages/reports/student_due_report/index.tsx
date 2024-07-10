@@ -71,10 +71,10 @@ const TableContent = ({ totalCalculation, studentDueInfo, selectedClass }) => {
                   item.student_info.middle_name ? item.student_info.middle_name : ''
                 } ${item.student_info.last_name ? item.student_info.last_name : ''}`}</TableBodyCellWrapper>
                 <TableBodyCellWrapper>{selectedClass.label}</TableBodyCellWrapper>
-                <TableBodyCellWrapper>{item.group.title && item.group.title}</TableBodyCellWrapper>
-                <TableBodyCellWrapper>{item.section.name && item.section.name}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item?.group?.title && item?.group?.title}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item?.section?.name && item?.section?.name}</TableBodyCellWrapper>
                 <TableBodyCellWrapper>{item.class_roll_no}</TableBodyCellWrapper>
-                <TableBodyCellWrapper>{item.academic_year.title}</TableBodyCellWrapper>
+                <TableBodyCellWrapper>{item?.academic_year?.title}</TableBodyCellWrapper>
                 <TableBodyCellWrapper>{item.total_payable}</TableBodyCellWrapper>
                 <TableBodyCellWrapper>{item.collected_amount}</TableBodyCellWrapper>
                 <TableBodyCellWrapper>{parseFloat(item.discount_amount?.toFixed(2)) + parseFloat(item.total_on_time_discount)}</TableBodyCellWrapper>
@@ -191,7 +191,7 @@ const StudentDueReport = () => {
       ]);
       const setTargetGroup = targetClassSections?.Group?.map((i) => {
         return {
-          label: i.title,
+          label: i?.title,
           id: i.id
         };
       });

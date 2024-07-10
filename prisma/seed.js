@@ -385,7 +385,7 @@ async function seed() {
     data: {
       class_roll_no: '01',
       class_registration_no: (Date.now().toString() + Math.random().toString()).substring(0, 11),
-      section: {
+      batches: {
         connect: { id: createSection.id }
       },
       academic_year: {

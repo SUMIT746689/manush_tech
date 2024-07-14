@@ -352,7 +352,7 @@ function Managementschools() {
         // if (!searchValue?.subject_ids) return showNotification('student subjects not founds', 'error');
         // if (haveInvalidSubjectId(searchValue?.subject_ids)) return showNotification('student subjects not founds', 'error');
 
-        let url = `/api/student_payment_collect/${searchValue.student_table_id}?selected_month=${selected_month}&subject_ids=${searchValue?.subject_ids || ''}&section_id=${searchValue?.section_id}`;
+        let url = `/api/student_payment_collect/${searchValue.student_table_id}?selected_month=${selected_month}&section_id=${searchValue?.section_id}`;
         if (searchValue?.subject_ids && !haveInvalidSubjectId(searchValue?.subject_ids)) url = url + `&subject_ids=${searchValue?.subject_ids}`;
         const res = await axios.get(url);
 

@@ -1,6 +1,7 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, redirect } from "react-router-dom";
 import { NavbarNested } from "./nav/Navbar";
 import { Flex } from '@mantine/core';
+import { ofetch } from "@/lib/ofetch";
 
 export default function MainLayout() {
   return (

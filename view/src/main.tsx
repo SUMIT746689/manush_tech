@@ -22,11 +22,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
-    // loader: async ({ request }) => {
-    //   if (!await isLoggedIn()) return redirect('/login')
-    //   if (new URL(request.url).pathname === "/") return redirect('/dashboard')
-    //   return null
-    // },
+    loader: async ({ request }) => {
+      if (!await isLoggedIn()) return redirect('/login')
+      if (new URL(request.url).pathname === "/") return redirect('/dashboard')
+      return null
+    },
     // action: LayoutRouteAction,
     errorElement: <ErrorBoundary />,
     children: [
